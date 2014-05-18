@@ -22,14 +22,20 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.MessageFormat;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.dto.TaskDto;
+import org.ng200.openolympus.FileAccess;
+import org.ng200.openolympus.StorageSpace;
+import org.ng200.openolympus.dto.TaskModificationDto;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.repositories.TaskRepository;
 import org.ng200.openolympus.services.TestingService;
@@ -61,19 +67,31 @@ public class TaskModificationController extends TaskUploader {
 	@RequestMapping(method = RequestMethod.POST)
 	public String editTask(final Model model, final HttpServletRequest request,
 			@PathVariable("task") final Task task,
-			@Valid final TaskDto taskDto, final BindingResult bindingResult)
-					throws IllegalStateException, IOException, ArchiveException {
+			@Valid final TaskModificationDto taskModificationDto,
+			final BindingResult bindingResult) throws IllegalStateException,
+			IOException, ArchiveException {
 		Assertions.resourceExists(task);
-
-		this.taskDtoValidator.validate(taskDto, bindingResult, task.getName());
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("submitURL", "/task/" + task.getId() + "/edit");
 			model.addAttribute("mode", "edit");
-			return "tasks/add";
+			model.addAttribute("taskId", task.getId());
+			return "tasks/edit";
 		}
-		task.setName(taskDto.getName());
-		this.uploadTaskData(task, taskDto);
+		if (taskModificationDto.getDescriptionFile() != null
+				&& taskModificationDto.getDescriptionFile().getSize() == 0)
+			taskModificationDto.setDescriptionFile(null);
+		if (taskModificationDto.getDescriptionFile() == null) {
+			final String descriptionPath = MessageFormat.format(
+					TaskUploader.TASK_DESCRIPTION_PATH_TEMPLATE,
+					StorageSpace.STORAGE_PREFIX, task.getTaskLocation());
+			final File descriptionFile = new File(descriptionPath);
+			FileAccess.writeString(
+					Optional.of(taskModificationDto.getDescriptionText())
+							.orElse(""), descriptionFile);
+		}
+		task.setName(taskModificationDto.getName());
+		this.uploadTaskData(task, taskModificationDto);
 		this.taskRepository.save(task);
 		this.testingService.reloadTasks();
 		return "redirect:/task/" + task.getId();
@@ -87,10 +105,14 @@ public class TaskModificationController extends TaskUploader {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String showTaskEditingForm(final Model model,
-			@PathVariable("task") final Task task, final TaskDto taskDto) {
+			@PathVariable("task") final Task task,
+			final TaskModificationDto taskModificationDto) throws IOException {
+
 		model.addAttribute("submitURL", "/task/" + task.getId() + "/edit");
 		model.addAttribute("mode", "edit");
-		taskDto.setName(task.getName());
-		return "tasks/add";
+		model.addAttribute("taskId", task.getId());
+		taskModificationDto.setName(task.getName());
+		taskModificationDto.setDescriptionText("");
+		return "tasks/edit";
 	}
 }

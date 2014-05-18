@@ -1,0 +1,188 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+>
+<head
+	th:replace="fragments/head::head (title=#{archive.solution.title(${solution.task.name}, ${solution.id})})"
+>
+</head>
+
+<body>
+	<div th:replace="fragments/sitewidescripts::bodyStart"></div>
+	<div th:replace="fragments/header::header"></div>
+
+	<div class="row">
+		<div class="large-12 large-centered columns">
+			<h1
+				th:utext="#{archive.solution.heading(${solution.task.name}, ${solution.id}, ${solution.user.username})}"
+			></h1>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="large-12 large-centered columns">
+			<a
+				class="button tiny"
+				th:text="#{archive.solution.backButton}"
+				th:href="@{/task/__${solution.task.id}__}"
+			></a>
+			<table style="width: 100; min-width: 100%; max-width: 100%;">
+				<thead>
+					<tr>
+						<th
+							width="50"
+							th:text="#{archive.solution.score}"
+						></th>
+						<th
+							width="50"
+							th:text="#{archive.solution.maxscore}"
+						></th>
+						<th
+							width="50"
+							th:text="#{archive.solution.cpuTime}"
+						></th>
+						<th
+							width="50"
+							th:text="#{archive.solution.realTime}"
+						></th>
+						<th
+							width="50"
+							th:text="#{archive.solution.memory}"
+						></th>
+						<th th:text="#{archive.solution.message}"></th>
+					</tr>
+					<tr id="totalHeader">
+						<td th:text="${completeScore}"></td>
+						<td th:text="${completeMaximumScore}"></td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td th:utext="#{archive.solution.total}">-</td>
+					</tr>
+				</thead>
+				<tbody id="solutionView">
+
+					<tr th:each="verdict : ${verdicts}">
+						<td th:text="${verdict.score}"></td>
+						<td th:text="${verdict.maximumScore}"></td>
+						<td th:text="${verdict.cpuTime >=0 ? verdict.cpuTime: '-'}"></td>
+						<td th:text="${verdict.realTime >=0 ? verdict.realTime: '-'}"></td>
+						<td
+							th:text="${verdict.memoryPeak >=0 ? #numbers.formatInteger(verdict.memoryPeak, 1, 'DEFAULT'): '-'}"
+						></td>
+						<td
+							th:utext="#{__${verdict.message}__(${verdict.additionalInformation},${verdict.unauthorisedSyscall})}"
+							th:class="${verdict.tested?(verdict.score.signum()>0?'success':'failure'):'nottested'}"
+						></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div th:replace="fragments/sitewidescripts::bodyEnd"></div>
+	<script
+		type="text/javascript"
+		src="/resources/js/underscore-min.js"
+	></script>
+	<script
+		type="text/javascript"
+		src="/resources/js/backbone-min.js"
+	></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var VerdictModel = Backbone.Model.extend({
+			urlRoot : '/api/verdict',
+			defaults : {
+				score : "-",
+				maximumScore : "-",
+				cpuTime : "-",
+				realTime : "-",
+				memoryPeak : "-",
+				message : ""
+			}
+		});
+
+		var sid = /*[[${solution.id}]]*/;
+		var totalMessage = /*[[#{archive.solution.total}]]*/;
+		var Solution = Backbone.Collection
+				.extend({
+					url: "/api/solution?id="+sid,
+					model : VerdictModel
+				});
+		var hdrtmplt = [
+			             "<td><% var sm = 0.0; _.each(solution, function(verdict) { sm+=parseFloat(verdict.score); }); print(sm.toFixed(2));%></td>",
+			             "<td><% var sm = 0.0; _.each(solution, function(verdict) { sm+=parseFloat(verdict.maximumScore); }); print(sm.toFixed(2));%></td>",
+			         	 "<td>-</td>",
+			         	 "<td>-</td>",
+			         	 "<td>-</td>",
+			         	 "<td>", totalMessage,"</td>"
+			             ].join('\n');
+		var tmplt = [
+		             "<% _.each(solution, function(verdict) { %>",
+		             "<tr><td><%- verdict.score %></td>",
+		             "<td><%- verdict.maximumScore %></td>",
+		             "<td><%- verdict.cpuTime %></td>",
+		             "<td><%- verdict.realTime %></td>",
+		             "<td><%- verdict.memoryPeak %></td>",
+		             "<td class=\"<%- (verdict.tested=='true')?((verdict.success=='true')?'success':'failure'):'nottested' %>\">",
+            		 "<%= verdict.message.replace('sd') %>",
+            		 "</td></tr>",
+		             "<%  }); %>"].join('\n');
+
+		var SolutionView = Backbone.View.extend({
+			el : $('#solutionView'),
+			hdr : $('#totalHeader'),
+			template: _.template(tmplt),
+			headerTemplate: _.template(hdrtmplt),
+			render : function() {
+				$(this.hdr).html(this.headerTemplate({
+					solution: this.model.toJSON()
+				}));
+				$(this.el).html(this.template({
+					solution: this.model.toJSON()
+				}));
+			}
+		});
+		setInterval(function() {
+			solution = new Solution({id: sid });
+			solution.fetch({
+				success : function(g, response) {
+					gv = new SolutionView({
+						model : solution
+					});
+					gv.render();
+				}
+			});
+		}, 400);
+		/*]]>*/
+	</script>
+</body>
+
+</html>

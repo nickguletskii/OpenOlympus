@@ -174,17 +174,20 @@
 					</properties>
 					<excludes>
 						<exclude>**/README.md</exclude>
-						<exclude>src/main/resources/css/foundation.css</exclude>
-						<exclude>src/main/resources/css/foundation.min.css</exclude>
-						<exclude>src/main/resources/css/jquery-ui.css</exclude>
-						<exclude>src/main/resources/css/normalize.css</exclude>
-						<exclude>src/main/resources/css/foundation.min.css</exclude>
-						<exclude>src/main/resources/js/backbone-min.js</exclude>
-						<exclude>src/main/resources/js/foundation.min.js</exclude>
-						<exclude>src/main/resources/js/jquery-ui.js</exclude>
-						<exclude>src/main/resources/js/underscore-min.js</exclude>
-						<exclude>src/main/resources/js/foundation/**</exclude>
-						<exclude>src/main/resources/js/vendor/**</exclude>
+						<exclude>src/main/resources/resources/css/foundation.css</exclude>
+						<exclude>src/main/resources/resources/css/foundation.min.css</exclude>
+						<exclude>src/main/resources/resources/css/jquery-ui.css</exclude>
+						<exclude>src/main/resources/resources/css/normalize.css</exclude>
+						<exclude>src/main/resources/resources/css/foundation.min.css</exclude>
+						<exclude>src/main/resources/resources/css/codemirror.css</exclude>
+						<exclude>src/main/resources/resources/js/backbone-min.js</exclude>
+						<exclude>src/main/resources/resources/js/foundation.min.js</exclude>
+						<exclude>src/main/resources/resources/js/jquery-ui.js</exclude>
+						<exclude>src/main/resources/resources/js/underscore-min.js</exclude>
+						<exclude>src/main/resources/resources/js/foundation/**</exclude>
+						<exclude>src/main/resources/resources/js/vendor/**</exclude>
+						<exclude>src/main/resources/resources/js/lib/**</exclude>
+						<exclude>src/main/resources/resources/js/mode/**</exclude>
 						<exclude>tasks/**</exclude>
 						<exclude>solutions/**</exclude>
 						<exclude>**/.directory</exclude>

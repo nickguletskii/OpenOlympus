@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -50,9 +51,12 @@ public class ChangePasswordController {
 	private UserRepository userRepository;
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String changePassword(@Valid final PasswordChangeDto userDto,
+	public String changePassword(Model model,
+			@Valid final PasswordChangeDto userDto,
 			final BindingResult bindingResult, final Principal principal) {
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("postUrl", "/user/changePassword");
+			model.addAttribute("hideOldPassword", false);
 			return "user/changePassword";
 		}
 		final User user = this.userRepository.findByUsername(principal
@@ -60,15 +64,17 @@ public class ChangePasswordController {
 		if (!this.passwordEncoder.matches(userDto.getExistingPassword(),
 				user.getPassword())) {
 			bindingResult
-			.rejectValue("existingPassword", "",
-					"user.changePassword.form.errors.existingPasswordDoesntMatch");
+					.rejectValue("existingPassword", "",
+							"user.changePassword.form.errors.existingPasswordDoesntMatch");
 		}
 		if (!userDto.getPassword().equals(userDto.getPasswordConfirmation())) {
 			bindingResult
-			.rejectValue("passwordConfirmation", "",
-					"user.changePassword.form.errors.passwordConfirmationDoesntMatch");
+					.rejectValue("passwordConfirmation", "",
+							"user.changePassword.form.errors.passwordConfirmationDoesntMatch");
 		}
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("hideOldPassword", false);
+			model.addAttribute("postUrl", "/user/changePassword");
 			return "user/changePassword";
 		}
 
@@ -84,7 +90,10 @@ public class ChangePasswordController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String showPasswordChangeForm(final PasswordChangeDto userDto) {
+	public String showPasswordChangeForm(Model model,
+			final PasswordChangeDto userDto) {
+		model.addAttribute("hideOldPassword", false);
+		model.addAttribute("postUrl", "/user/changePassword");
 		return "user/changePassword";
 	}
 }

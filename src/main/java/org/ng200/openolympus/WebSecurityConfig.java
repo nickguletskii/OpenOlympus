@@ -74,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		"/contest/*/addTask", "/contest/*/edit", "/task/*/edit",
 		"/contest/*/addUser", "/contest/*/addUserTime", "/contests/add",
 		"/contest/*/removeTask/*", "/contests/remove/*",
-		"/admin/diagnostics", "/contest/*/completeResults" };
+		"/admin/diagnostics", "/contest/*/completeResults", "/api/taskSourcecode" };
 
 	@Bean
 	public Filter characterEncodingFilter() {

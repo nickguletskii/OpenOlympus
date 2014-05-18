@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class TaskDto {
+public class TaskDto implements UploadableTask {
 
 	@NotNull(message = "task.add.form.errors.empty")
 	private String name;
@@ -37,6 +37,7 @@ public class TaskDto {
 	@NotNull(message = "task.add.form.errors.empty")
 	private MultipartFile taskZip;
 
+	@Override
 	public MultipartFile getDescriptionFile() {
 		return this.descriptionFile;
 	}
@@ -45,6 +46,7 @@ public class TaskDto {
 		return this.name;
 	}
 
+	@Override
 	public MultipartFile getTaskZip() {
 		return this.taskZip;
 	}

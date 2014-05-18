@@ -1,7 +1,7 @@
 missingLocalisation.txt
 src/main/resources/spring.properties
-tasks/
-solutions/
+/tasks/
+/solutions/
 *.class
 
 # Mobile Tools for Java (J2ME)

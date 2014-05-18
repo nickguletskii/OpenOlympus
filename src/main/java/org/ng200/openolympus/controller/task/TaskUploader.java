@@ -37,53 +37,57 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.ng200.openolympus.StorageSpace;
 import org.ng200.openolympus.dto.TaskDto;
+import org.ng200.openolympus.dto.UploadableTask;
 import org.ng200.openolympus.model.Task;
 
 public class TaskUploader {
 
-	private static final String TASK_CHECKING_CHAIN_PATH_TEMPLATE = "{0}/tasks/checkingchains/{1}/";
-	private static final String TASK_DESCRIPTION_PATH_TEMPLATE = "{0}/tasks/descriptions/{1}.html";
+	public static final String TASK_CHECKING_CHAIN_PATH_TEMPLATE = "{0}/tasks/checkingchains/{1}/";
+	public static final String TASK_DESCRIPTION_PATH_TEMPLATE = "{0}/tasks/descriptions/{1}.html";
 
 	public TaskUploader() {
 		super();
 	}
 
-	protected void uploadTaskData(final Task task, final TaskDto taskDto)
+	protected void uploadTaskData(final Task task, final UploadableTask taskDto)
 			throws IOException, IllegalStateException, FileNotFoundException,
 			ArchiveException {
 		final String descriptionPath = MessageFormat.format(
 				TaskUploader.TASK_DESCRIPTION_PATH_TEMPLATE,
 				StorageSpace.STORAGE_PREFIX, task.getTaskLocation());
 
-		final File descriptionFile = new File(descriptionPath);
-		if (descriptionFile.exists()) {
-			descriptionFile.delete();
+		if (taskDto.getDescriptionFile() != null) {
+			final File descriptionFile = new File(descriptionPath);
+			if (descriptionFile.exists()) {
+				descriptionFile.delete();
+			}
+			descriptionFile.getParentFile().mkdirs();
+			descriptionFile.createNewFile();
+			taskDto.getDescriptionFile().transferTo(descriptionFile);
 		}
-		descriptionFile.getParentFile().mkdirs();
-		descriptionFile.createNewFile();
+		if (taskDto.getTaskZip() != null) {
+			final String checkingChainPath = MessageFormat.format(
+					TaskUploader.TASK_CHECKING_CHAIN_PATH_TEMPLATE,
+					StorageSpace.STORAGE_PREFIX, task.getTaskLocation());
+			final File checkingChainFile = new File(checkingChainPath);
+			if (checkingChainFile.exists()) {
+				FileUtils.deleteDirectory(checkingChainFile);
+			}
+			checkingChainFile.mkdirs();
 
-		taskDto.getDescriptionFile().transferTo(descriptionFile);
-
-		final String checkingChainPath = MessageFormat.format(
-				TaskUploader.TASK_CHECKING_CHAIN_PATH_TEMPLATE,
-				StorageSpace.STORAGE_PREFIX, task.getTaskLocation());
-		final File checkingChainFile = new File(checkingChainPath);
-		if (checkingChainFile.exists()) {
-			FileUtils.deleteDirectory(checkingChainFile);
-		}
-		checkingChainFile.mkdirs();
-
-		try (ArchiveInputStream in = new ArchiveStreamFactory()
-		.createArchiveInputStream("zip", taskDto.getTaskZip()
-				.getInputStream())) {
-			ZipArchiveEntry entry;
-			while ((entry = (ZipArchiveEntry) in.getNextEntry()) != null) {
-				final File file = new File(checkingChainFile, entry.getName());
-				if (entry.isDirectory()) {
-					file.mkdirs();
-				} else {
-					try (OutputStream out = new FileOutputStream(file)) {
-						IOUtils.copy(in, out);
+			try (ArchiveInputStream in = new ArchiveStreamFactory()
+					.createArchiveInputStream("zip", taskDto.getTaskZip()
+							.getInputStream())) {
+				ZipArchiveEntry entry;
+				while ((entry = (ZipArchiveEntry) in.getNextEntry()) != null) {
+					final File file = new File(checkingChainFile,
+							entry.getName());
+					if (entry.isDirectory()) {
+						file.mkdirs();
+					} else {
+						try (OutputStream out = new FileOutputStream(file)) {
+							IOUtils.copy(in, out);
+						}
 					}
 				}
 			}

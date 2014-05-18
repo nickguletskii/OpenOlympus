@@ -24,87 +24,44 @@ package org.ng200.openolympus.controller.user;
 
 import java.security.Principal;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.dto.UserInfoDto;
-import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/user")
-public class UserInfoController {
-
+public class UserInfoController extends AbstractUserInfoController {
 	@Autowired
 	private UserRepository userRepository;
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String changePersonInfo(@Valid final UserInfoDto userInfoDto,
+	public String changePersonInfo(Model model,
+			@Valid final UserInfoDto userInfoDto,
 			final BindingResult bindingResult, final Principal principal) {
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("postUrl", "/user");
+			model.addAttribute("changePasswordLink", "/user/changePassword");
 			return "user/personalInfo";
 		}
-		final User user = this.userRepository.findByUsername(principal
-				.getName());
-		user.setFirstNameMain(userInfoDto.getFirstNameMain());
-		user.setMiddleNameMain(userInfoDto.getMiddleNameMain());
-		user.setLastNameMain(userInfoDto.getLastNameMain());
-		user.setFirstNameLocalised(userInfoDto.getFirstNameLocalised());
-		user.setMiddleNameLocalised(userInfoDto.getMiddleNameLocalised());
-		user.setLastNameLocalised(userInfoDto.getLastNameLocalised());
-		user.setTeacherFirstName(userInfoDto.getTeacherFirstName());
-		user.setTeacherMiddleName(userInfoDto.getTeacherMiddleName());
-		user.setTeacherLastName(userInfoDto.getTeacherLastName());
-		user.setAddressLine1(userInfoDto.getAddressLine1());
-		user.setAddressLine2(userInfoDto.getAddressLine2());
-		user.setAddressCity(userInfoDto.getAddressCity());
-		user.setAddressState(userInfoDto.getAddressState());
-		user.setAddressCountry(userInfoDto.getAddressCountry());
-		user.setLandline(userInfoDto.getLandline());
-		user.setMobile(userInfoDto.getMobile());
-		user.setSchool(userInfoDto.getSchool());
-		user.setBirthDate(userInfoDto.getDateOfBirth());
-		this.userRepository.save(user);
+		super.copyDtoIntoDatabase(userInfoDto, bindingResult,
+				userRepository.findByUsername(principal.getName()));
 		return "redirect:/";
 	}
 
-	@InitBinder
-	protected void initBinder(final HttpServletRequest request,
-			final ServletRequestDataBinder binder) throws Exception {
-		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-	}
-
 	@RequestMapping(method = RequestMethod.GET)
-	public String showUserDetailsForm(final UserInfoDto userInfoDto,
-			final Principal principal) {
-		final User user = this.userRepository.findByUsername(principal
-				.getName());
-		userInfoDto.setFirstNameMain(user.getFirstNameMain());
-		userInfoDto.setMiddleNameMain(user.getMiddleNameMain());
-		userInfoDto.setLastNameMain(user.getLastNameMain());
-		userInfoDto.setFirstNameLocalised(user.getFirstNameLocalised());
-		userInfoDto.setMiddleNameLocalised(user.getMiddleNameLocalised());
-		userInfoDto.setLastNameLocalised(user.getLastNameLocalised());
-		userInfoDto.setTeacherFirstName(user.getTeacherFirstName());
-		userInfoDto.setTeacherMiddleName(user.getTeacherMiddleName());
-		userInfoDto.setTeacherLastName(user.getTeacherLastName());
-		userInfoDto.setAddressLine1(user.getAddressLine1());
-		userInfoDto.setAddressLine2(user.getAddressLine2());
-		userInfoDto.setAddressCity(user.getAddressCity());
-		userInfoDto.setAddressState(user.getAddressState());
-		userInfoDto.setAddressCountry(user.getAddressCountry());
-		userInfoDto.setLandline(user.getLandline());
-		userInfoDto.setMobile(user.getMobile());
-		userInfoDto.setSchool(user.getSchool());
-		userInfoDto.setDateOfBirth(user.getBirthDate());
+	public String showUserDetailsForm(Model model,
+			final UserInfoDto userInfoDto, Principal principal) {
+		super.initialiseDTO(userInfoDto,
+				userRepository.findByUsername(principal.getName()));
+		model.addAttribute("postUrl", "/user");
+		model.addAttribute("changePasswordLink", "/user/changePassword");
 		return "user/personalInfo";
 	}
 }

@@ -28,7 +28,9 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
 >
-<head th:replace="fragments/head::head (title=#{user.personalInfo.title})">
+<head
+	th:replace="fragments/head::head (title=#{user.personalInfo.title})"
+>
 </head>
 
 <body>
@@ -40,11 +42,11 @@
 			<a
 				class="button tiny"
 				th:text="#{user.personalInfo.changePasswordButton}"
-				th:href="@{/user/changePassword}"
+				th:href="@{__${changePasswordLink}__}"
 			></a>
 			<form
 				action="#"
-				th:action="@{/user}"
+				th:action="@{__${postUrl}__}"
 				th:object="${userInfoDto}"
 				method="post"
 			>

@@ -41,7 +41,23 @@
 			</label><small
 				th:if="${#fields.hasErrors(fieldName)}"
 				class="error"
-				
+			><span
+				th:each="err : ${#fields.errors(fieldName)}"
+				th:utext="#{__${err}__}+'&lt;br/&gt;'"
+			></span></small>
+		</div>
+		<div th:fragment="textArea">
+			<label> <span th:text="#{${fieldLabel}}">${fieldName}:</span>
+				<textarea
+					rows="20"
+					cols="80"
+					th:field="*{__${fieldName}__}"
+					th:errorclass="error"
+					th:attr="id=${fieldName},name=${fieldName}"
+				></textarea>
+			</label><small
+				th:if="${#fields.hasErrors(fieldName)}"
+				class="error"
 			><span
 				th:each="err : ${#fields.errors(fieldName)}"
 				th:utext="#{__${err}__}+'&lt;br/&gt;'"
