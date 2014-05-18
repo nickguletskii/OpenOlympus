@@ -1,0 +1,174 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+>
+<head th:replace="fragments/head::head (title=#{user.personalInfo.title})">
+</head>
+
+<body>
+	<div th:replace="fragments/sitewidescripts::bodyStart"></div>
+	<div th:replace="fragments/header::header"></div>
+	<div class="row">
+		<div class="large-8 large-centered columns">
+			<h1 th:utext="#{user.personalInfo.heading}">Register</h1>
+			<a
+				class="button tiny"
+				th:text="#{user.personalInfo.changePasswordButton}"
+				th:href="@{/user/changePassword}"
+			></a>
+			<form
+				action="#"
+				th:action="@{/user}"
+				th:object="${userInfoDto}"
+				method="post"
+			>
+				<div class="row">
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='firstNameMain',fieldLabel='register.form.labels.firstNameMain')"
+					></div>
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='middleNameMain',fieldLabel='register.form.labels.middleNameMain')"
+					></div>
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='lastNameMain',fieldLabel='register.form.labels.lastNameMain')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='firstNameLocalised',fieldLabel='register.form.labels.firstNameLocalised')"
+					></div>
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='middleNameLocalised',fieldLabel='register.form.labels.middleNameLocalised')"
+					></div>
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='lastNameLocalised',fieldLabel='register.form.labels.lastNameLocalised')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='teacherFirstName',fieldLabel='register.form.labels.teacherFirstName')"
+					></div>
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='teacherMiddleName',fieldLabel='register.form.labels.teacherMiddleName')"
+					></div>
+					<div
+						class="large-4 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='teacherLastName',fieldLabel='register.form.labels.teacherLastName')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='addressLine1',fieldLabel='register.form.labels.addressLine1')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='addressLine2',fieldLabel='register.form.labels.addressLine2')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='addressCity',fieldLabel='register.form.labels.addressCity')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='addressState',fieldLabel='register.form.labels.addressState')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='addressCountry',fieldLabel='register.form.labels.addressCountry')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='landline',fieldLabel='register.form.labels.landline')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='mobile',fieldLabel='register.form.labels.mobile')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='text',fieldName='school',fieldLabel='register.form.labels.school')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div
+						class="large-12 columns"
+						th:include="fragments/formfragments::input(type='date',fieldName='dateOfBirth',fieldLabel='register.form.labels.dateOfBirth')"
+					></div>
+				</div>
+
+				<div class="row">
+					<div class="large-12 columns">
+						<input
+							type="submit"
+							th:value="#{user.personalInfo.form.labels.submit}"
+							class="button tiny"
+						/>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div th:replace="fragments/sitewidescripts::bodyEnd"></div>
+</body>
+
+</html>
