@@ -1,0 +1,67 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+</head>
+
+<body th:fragment="content">
+
+    <button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{task.editButton}" class="hidden-print btn btn-primary glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id})">
+    </button>
+
+    <h2>{{title}}</h2>
+    <div ng-bind-html="description"></div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ 'task.submit.heading' | translate }}</h3>
+        </div>
+        <div class="panel-body">
+            <form name="solutionSubmissionForm" role="form" novalidate="" ng-submit="submitSolution(solution)" ng-show="isFormVisible">
+
+                <div class="form-group">
+                    <input label="task.solutionSubmit.labels.solutionFile" type="button" class="btn btn-default" ng-file-select="" ng-model="solution.solutionFile" multiple="false" oolinput=""></input>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">{{'task.solutionSubmit.labels.submitButton' | translate}}</button>
+                </div>
+            </form>
+            <form ng-show="!isFormVisible">
+                <div class="form-group">
+                    <label>{{'task.solutionSubmit.labels.submitProgress' | translate}}</label>
+                    <progressbar value="uploadProgress" type="{{ uploadProgressBarColour() }}" class="progress-striped" ng-class="{'active': uploading }"><b>{{uploadProgress}}%</b>
+                    </progressbar>
+                    <label ng-if="processing">{{'task.solutionSubmit.labels.processing' | translate}}</label>
+                    <button class="btn btn-danger" ng-if="uploadFailure" ng-click="reset()">{{'task.solutionSubmit.labels.back' | translate}}</button>
+                    <button class="btn btn-success" ng-if="uploadSuccess" ng-click="reset()">{{'task.solutionSubmit.labels.again' | translate}}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

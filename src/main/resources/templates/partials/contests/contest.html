@@ -1,0 +1,62 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+</head>
+
+<body th:fragment="content">
+	<button type="button" ng-if="security.isAdmin()" translate="archive.list.users.add" class="hidden-print btn btn-primary btn-sm"  ui-sref=".addUser"></button>
+	<button type="button" ng-if="security.isAdmin()" translate="archive.list.tasks.add" class="hidden-print btn btn-primary btn-sm"  ui-sref=".addTask"></button>
+	<table class="table table-striped table-bordered table-hover" id="tasksTable">
+		<thead>
+			<tr>
+				<th ng-if="security.isUser()" width="50">{{contest.task.score}}</th>
+				<th width="50">{{contest.task.maximumScore}}</th>
+				<th width="150">{{contest.task.dateadded}}</th>
+				<th>{{contest.task.taskname}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="task in tasks">
+				<td ng-if="security.isUser()">{{task.score}}</td>
+				<td>{{task.maxScore}}</td>
+				<td>{{task.timeAdded | asDate | date:'yyyy-MM-dd'}}</td>
+				<td><a ui-sref="taskView({taskId: task.id})">{{task.name}}</a>
+					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id})">
+					</button>
+					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.rejudgeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation">
+					</button>
+				</td>
+			</tr>
+		</tbody>
+
+	</table>
+	<pagination total-items="taskCount" ng-model="page" previous-text="&lsaquo;" next-text="&rsaquo; " first-text="&laquo; " last-text="&raquo; " direction-links="true " boundary-links="true "></pagination>
+
+</body>
+
+</html>

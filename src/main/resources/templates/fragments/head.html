@@ -1,0 +1,142 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:fragment="header (title)">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title th:text="${title}"></title>
+	<link rel="icon" type="image/png" href="/favicon.png" />
+	<link href="/resources/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet"></link>
+
+	<link rel="stylesheet" href="/resources/css/flatly.css"></link>
+
+	<link rel="stylesheet" href="/resources/css/app.css"></link>
+	<link rel="stylesheet" href="/resources/css/animate.css"></link>
+
+	<link rel="stylesheet" href="/resources/css/spinkit.css"></link>
+
+	<link rel="stylesheet" href="/resources/lib/codemirror/lib/codemirror.css"></link>
+
+
+	<script>
+	var lib = function(path) {
+		return "/resources/lib/" + path;
+	}
+	var require = {
+		baseUrl: "/resources/js/",
+		paths: {
+			"angular": lib("angularjs/angular"),
+			"ui-route": lib("angular-ui-router/release/angular-ui-router"),
+			"ui-route-extras": lib("ui-router-extras/release/ct-ui-router-extras"),
+			"bootstrap": lib("angular-bootstrap/ui-bootstrap"),
+			"bootstrap-tpls": lib("angular-bootstrap/ui-bootstrap-tpls"),
+			"codemirror": lib("codemirror/lib/codemirror"),
+			"jquery": lib("jquery/dist/jquery"),
+			"restangular": lib("restangular/dist/restangular"),
+			"angular-form-validation": lib("angular-form-validation/dist/angular-form-validation"),
+			"angular-file-upload": lib("ng-file-upload/angular-file-upload"),
+			"angular-input-modified": lib("angular-input-modified/dist/angular-input-modified"),
+			"angular-translate": lib("angular-translate/angular-translate"),
+			"angular-translate-loader-url": lib("angular-translate-loader-url/angular-translate-loader-url"),
+			"angular-ui-codemirror": lib("angular-ui-codemirror/ui-codemirror"),
+			"codemirror": lib("codemirror/lib/codemirror"),
+			"moment": lib("moment/moment"),
+			"moment-tz": lib("moment/moment-tz")
+		},
+		packages: [{
+			name: "when",
+			location: lib("when/"),
+			main: "when"
+		}, {
+			name: "lodash",
+			location: lib("lodash/dist/"),
+			main: "lodash"
+		}, {
+			name: "rest",
+			location: lib("rest/"),
+			main: "browser"
+		}],
+		shim: {
+			'angular': {
+				exports: "angular"
+			},
+			'ui-route': {
+				deps: ["angular"]
+			},
+			'ui-route-extras': {
+				deps: ["angular", "ui-route"]
+			},
+			'bootstrap': {
+				deps: ["angular"]
+			},
+			'restangular': {
+				deps: ["angular", "lodash"]
+			},
+			'bootstrap-tpls': {
+				deps: ['bootstrap']
+			},
+			'jquery': {
+				deps: []
+			},
+			'jquery-ui': {
+				deps: ['jquery']
+			},
+			'angular-form-validation': {
+				deps: ['angular-input-modified']
+			},
+			'angular-file-upload': {
+				deps: ['angular']
+			},
+			'angular-input-modified': {
+				deps: ['angular']
+			},
+			'angular-translate': {
+				deps: ['angular']
+			},
+			'angular-translate-loader-url': {
+				deps: ['angular', 'angular-translate']
+			},
+			'angular-ui-codemirror': {
+				deps: ['angular', 'codemirror'],
+			},
+			'codemirror': {
+				exports: 'CodeMirror'
+			},
+			'moment-tz': {
+				deps: ['moment']
+			}
+		},
+		priority: ["angular", "restangular"]
+	};
+	</script>
+	<script th:attr="data-main=|/resources/js/${pageScript?:'common.js'}|" src="/resources/js/require.js"></script>
+	<base href="/" />
+</head>
+
+<body>
+</body>
+
+</html>

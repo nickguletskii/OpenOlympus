@@ -1,0 +1,71 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+</head>
+
+<body th:fragment="content">
+    <form name="contestCreationForm" role="form" novalidate="" ng-submit="createContest(contest)" ng-show="isFormVisible">
+        <input label="contest.creationForm.labels.name" type="text" ng-model="contest.name" required="" oolinput=""></input>
+        <div class="row">
+            <div class="col-md-6">
+                <input label="contest.creationForm.labels.date" type="text" oolinput="" datepicker-popup="yyyy-MM-dd" is-open="opened" ng-model="contest.date" required="">
+                </input>
+                <button type="button" class="inlined-with-input btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i>
+                </button>
+            </div>
+
+            <div class="col-md-6">
+                <input label="contest.creationForm.labels.time" type="time" ng-model="contest.time" required="" oolinput=""></input>
+            </div>
+        </div>
+
+        <select label="contest.creationForm.labels.timezone" class="form-control" ng-model="contest.timezone" required="" oolinput="">
+            <option ng-repeat="timezone in timezones">{{timezone}}</option>
+        </select>
+
+        <input label="contest.creationForm.labels.duration" type="number" ng-model="contest.duration" min="1" ng-min="1" required="" oolinput=""></input>
+
+        <div class="form-group">
+            <button type="submit" ng-disabled="!contestCreationForm.$valid" class="btn btn-default">{{'contest.creationForm.labels.createButton' | translate}}</button>
+        </div>
+    </form>
+    <form ng-show="!isFormVisible">
+        <div class="form-group">
+            <label>{{'contest.creationForm.labels.uploading' | translate}}</label>
+            <progressbar value="uploadProgress" type="{{ uploadProgressBarColour() }}" class="progress-striped" ng-class="{'active': uploading }"><b>{{uploadProgress}}%</b>
+            </progressbar>
+            <label ng-if="processing">{{'contest.creationForm.labels.processing' | translate}}</label>
+            <button class="btn btn-danger" ng-if="uploadFailure" ng-click="reset()">{{'contest.creationForm.labels.back' | translate}}</button>
+            <button class="btn btn-success" ng-if="uploadSuccess" ng-click="reset()">{{'contest.creationForm.labels.again' | translate}}</button>
+            <button class="btn btn-success" ng-if="uploadSuccess" ui-sref="contestView({contestId: createdContestId})">{{'contest.creationForm.labels.toContest' | translate}}</button>
+        </div>
+    </form>
+
+</body>
+
+</html>
