@@ -36,6 +36,7 @@ import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
 import org.ng200.openolympus.services.RoleService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.sqlSupport.OpenOlympusPostgreDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -128,7 +129,8 @@ public class Application {
 		final HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
 		adapter.setShowSql(false);
 		adapter.setGenerateDdl(true);
-		adapter.setDatabasePlatform("org.ng200.openolympus.OpenOlympusPostgreDialect");
+		adapter.setDatabasePlatform(OpenOlympusPostgreDialect.class
+				.getCanonicalName());
 		return adapter;
 	}
 
