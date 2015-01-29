@@ -32,7 +32,7 @@ import org.ng200.openolympus.model.Task;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @SuppressWarnings("unused")
-public class SolutionDTO implements Serializable {
+public class SolutionDto implements Serializable {
 
 	public static interface SolutionDTOView extends Task.UnprivilegedTaskView {
 	}
@@ -50,7 +50,7 @@ public class SolutionDTO implements Serializable {
 	private Date submissionTime;
 	private Task task;
 
-	public SolutionDTO(Solution solution) {
+	public SolutionDto(Solution solution) {
 		this.id = solution.getId();
 		this.userId = solution.getUser().getId();
 		this.score = solution.getScore();
@@ -59,35 +59,35 @@ public class SolutionDTO implements Serializable {
 		this.submissionTime = solution.getTimeAdded();
 	}
 
-	@JsonView(SolutionDTO.SolutionDTOView.class)
+	@JsonView(SolutionDto.SolutionDTOView.class)
 	public long getId() {
 		return this.id;
 	}
 
-	@JsonView(SolutionDTO.SolutionDTOView.class)
+	@JsonView(SolutionDto.SolutionDTOView.class)
 	public BigDecimal getMaximumScore() {
 		return this.maximumScore;
 	}
 
-	@JsonView(SolutionDTO.SolutionDTOView.class)
+	@JsonView(SolutionDto.SolutionDTOView.class)
 	public BigDecimal getScore() {
 		return this.score;
 	}
 
-	@JsonView(SolutionDTO.SolutionDTOView.class)
+	@JsonView(SolutionDto.SolutionDTOView.class)
 	public Date getSubmissionTime() {
 		return this.submissionTime;
 	}
 
 	@JsonView({
-			SolutionDTO.SolutionDTOView.class,
+			SolutionDto.SolutionDTOView.class,
 			Task.UnprivilegedTaskView.class
 	})
 	public Task getTask() {
 		return this.task;
 	}
 
-	@JsonView(SolutionDTO.SolutionDTOView.class)
+	@JsonView(SolutionDto.SolutionDTOView.class)
 	public long getUserId() {
 		return this.userId;
 	}

@@ -37,7 +37,7 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
-import org.ng200.openolympus.dto.SolutionDTO;
+import org.ng200.openolympus.dto.SolutionDto;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.cache.CacheBuilder;
@@ -121,7 +121,7 @@ public class Task implements Serializable {
 
 	@JsonView({
 			UnprivilegedTaskView.class,
-			SolutionDTO.SolutionDTOView.class
+			SolutionDto.SolutionDTOView.class
 	})
 	public long getId() {
 		return this.id;

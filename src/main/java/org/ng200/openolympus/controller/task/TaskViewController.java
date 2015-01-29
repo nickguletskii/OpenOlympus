@@ -35,7 +35,7 @@ import javax.validation.Valid;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
-import org.ng200.openolympus.dto.SolutionDto;
+import org.ng200.openolympus.dto.SolutionSubmissionDto;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.model.User;
@@ -135,7 +135,7 @@ public class TaskViewController {
 	@RequestMapping(value = "/api/task/{task}/submitSolution", method = RequestMethod.POST)
 	public BindingResponse submitSolution(
 			@PathVariable("task") final Task task, final Principal principal,
-			@Valid final SolutionDto solutionDto,
+			@Valid final SolutionSubmissionDto solutionDto,
 			final BindingResult bindingResult) throws BindException,
 			IOException {
 		if (bindingResult.hasErrors()) {

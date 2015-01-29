@@ -20,28 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.validation;
+package org.ng200.openolympus.dto;
 
-import org.ng200.openolympus.dto.SolutionSubmissionDto;
-import org.springframework.stereotype.Component;
-import org.springframework.validation.Errors;
+import javax.validation.constraints.NotNull;
 
-@Component
-public class SolutionDtoValidator {
+import org.springframework.web.multipart.MultipartFile;
 
-	public void validate(final SolutionSubmissionDto solutionDto, final Errors errors) {
-		if (errors.hasErrors()) {
-			return;
-		}
-		if (solutionDto.getSolutionFile().getOriginalFilename()
-				.replaceAll("[^a-zA-Z0-9-\\._]", "").isEmpty()) {
-			errors.rejectValue("taskFile", "",
-					"solution.form.errors.badFilename");
-		}
-		if (solutionDto.getSolutionFile().isEmpty()) {
-			errors.rejectValue("solutionFile", "",
-					"solution.form.errors.emptyFile");
-		}
+public class SolutionSubmissionDto {
+
+	@NotNull(message = "solution.form.errors.empty")
+	private MultipartFile solutionFile;
+
+	public MultipartFile getSolutionFile() {
+		return this.solutionFile;
+	}
+
+	public void setSolutionFile(final MultipartFile solutionFile) {
+		this.solutionFile = solutionFile;
 	}
 
 }

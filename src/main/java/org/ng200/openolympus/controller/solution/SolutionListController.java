@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.ng200.openolympus.dto.SolutionDTO;
+import org.ng200.openolympus.dto.SolutionDto;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.User;
@@ -82,18 +82,18 @@ public class SolutionListController {
 	}
 
 	@RequestMapping(value = "/api/admin/solutions", method = RequestMethod.GET)
-	public List<SolutionDTO> showAllSolutions(
+	public List<SolutionDto> showAllSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
 			final Model model) {
 		return this.solutionService
 				.getPage(pageNumber, SolutionListController.PAGE_SIZE).stream()
-				.map(solution -> new SolutionDTO(solution))
+				.map(solution -> new SolutionDto(solution))
 				.collect(Collectors.toList());
 	}
 
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
-	@JsonView(SolutionDTO.SolutionDTOView.class)
-	public List<SolutionDTO> showUserSolutions(
+	@JsonView(SolutionDto.SolutionDTOView.class)
+	public List<SolutionDto> showUserSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
 			final Model model, final Principal principal) {
 		final User user = this.userService.getUserByUsername(principal
@@ -111,7 +111,7 @@ public class SolutionListController {
 					pageNumber, SolutionListController.PAGE_SIZE));
 		}
 
-		return solutions.stream().map(solution -> new SolutionDTO(solution))
+		return solutions.stream().map(solution -> new SolutionDto(solution))
 				.map(dto -> {
 					if (contest != null) {
 						dto.setScore(null);
