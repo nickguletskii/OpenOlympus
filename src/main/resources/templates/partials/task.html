@@ -30,11 +30,12 @@
 
 <body th:fragment="content">
 
-    <button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{task.editButton}" class="hidden-print btn btn-primary glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id})">
+    <button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{task.editButton}" class="hidden-print btn btn-primary glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: taskId})">
     </button>
+    <h2>{{name}}</h2>
 
-    <h2>{{title}}</h2>
     <div ng-bind-html="description"></div>
+    
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 class="panel-title">{{ 'task.submit.heading' | translate }}</h3>
