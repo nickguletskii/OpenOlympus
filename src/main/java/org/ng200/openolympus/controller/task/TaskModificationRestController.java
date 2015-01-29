@@ -22,7 +22,9 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -100,6 +102,12 @@ public class TaskModificationRestController extends
 			if (taskModificationDto.getDescriptionFile() != null) {
 				this.uploadDescription(task, taskModificationDto
 						.getDescriptionFile().getInputStream());
+			} else {
+				this.uploadDescription(
+						task,
+						new ByteArrayInputStream(taskModificationDto
+								.getDescriptionText().getBytes(
+										Charset.forName("UTF8"))));
 			}
 			if (taskModificationDto.getJudgeFile() != null) {
 				this.uploadJudgeFile(task, taskModificationDto);
