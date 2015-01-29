@@ -24,13 +24,13 @@
 
 var stateList = [{
     "name": "taskView",
-    "url": "/task/{taskId:[0-9]+}",
+    "url": "/task/{taskId:[0-9]+}?contestId",
     "templateUrl": "/partials/task",
     "controllerPath": "controllers/task",
     "controller": "TaskViewController"
 }, {
     "name": "taskModificationView",
-    "url": "/task/{taskId:[0-9]+}/edit",
+    "url": "/task/{taskId:[0-9]+}/edit?contestId",
     "templateUrl": "/partials/task/edit",
     "controllerPath": "controllers/task/edit",
     "controller": "TaskModificationController"
@@ -133,12 +133,31 @@ var modalStateList = [{
     "controllerPath": "controllers/archive/tasks/rejudgeWorker",
     "controller": "TaskRejudgementWorkerController",
     "backdrop": true
+},{
+    "parent": "contestView",
+    "name": "contestView.rejudgeTaskConfirmation",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/confirmation",
+    "backdrop": true
+}, {
+    "parent": "contestView",
+    "name": "contestView.rejudgeTaskWorking",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/working",
+    "controllerPath": "controllers/archive/tasks/rejudgeWorker",
+    "controller": "TaskRejudgementWorkerController",
+    "backdrop": true
 }, {
     "parent": "contestView",
     "name": "contestView.addUser",
     "templateUrl": "/partials/contests/contest/addUser",
     "controllerPath": "controllers/contests/contest/addUser",
     "controller": "ContestUserAdditionController",
+    "backdrop": true
+}, {
+    "parent": "contestView",
+    "name": "contestView.addTask",
+    "templateUrl": "/partials/contests/contest/addTask",
+    "controllerPath": "controllers/contests/contest/addTask",
+    "controller": "ContestTaskAdditionController",
     "backdrop": true
 }];
 

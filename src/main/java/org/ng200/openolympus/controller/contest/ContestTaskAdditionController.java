@@ -27,6 +27,7 @@ import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.controller.BindingResponse;
+import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestTaskAdditionDto;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
@@ -45,6 +46,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.google.common.collect.ImmutableMap;
 
 @RestController
 public class ContestTaskAdditionController {
@@ -81,7 +84,9 @@ public class ContestTaskAdditionController {
 				this.taskService.getTaskByName(contestTaskAdditionDto
 						.getTaskName()));
 		this.contestService.saveContest(contest);
-		return BindingResponse.OK;
+		return  new BindingResponse(Status.OK, null, ImmutableMap
+				.<String, Object> builder()
+				.put("taskName", contestTaskAdditionDto.getTaskName()).build());
 	}
 
 	@InitBinder

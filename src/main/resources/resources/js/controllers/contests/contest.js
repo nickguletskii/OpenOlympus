@@ -27,10 +27,8 @@ define(['oolutil', 'lodash'],
             function($timeout, $q, $scope, $rootScope, $http, $location,
                 $stateParams, Restangular) {
                 $scope.$apply(function() {
-                    console.log("HI");
-                    Restangular.all('api/contest/' + $stateParams.contest).getList({
-                        page: page
-                    }).then(function(tasks) {
+                    $scope.contestId = $stateParams.contestId;
+                    Restangular.all('api/contest/' + $stateParams.contestId).getList().then(function(tasks) {
                         $scope.tasks = tasks;
                     });
                 });
