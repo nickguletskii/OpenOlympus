@@ -71,7 +71,7 @@ define(['oolutil', 'lodash'],
                             fd.append("judgeFile", task.judgeFile[0]);
                         if (!!task.descriptionFile)
                             fd.append("descriptionFile", task.descriptionFile[0]);
-                        ValidationService.postToServer($scope, '/api/task/create', fd, success, failure, reset);
+                        ValidationService.postToServer($scope, '/api/task/create', $scope.taskCreationForm, fd, success, failure, reset);
                     } catch (err) {
                         reset();
                     }

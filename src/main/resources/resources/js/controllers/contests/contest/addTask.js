@@ -25,8 +25,8 @@ define(['oolutil', 'lodash'],
         return function($timeout, $q, $scope, $rootScope, $http,
             $location, $stateParams, Restangular, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
             $scope.$apply(function() {
-                $scope.getUserSuggestions = function(name) {
-                    return $http.get("/api/userCompletion", {
+                $scope.getTaskSuggestions = function(name) {
+                    return $http.get("/api/taskCompletion", {
                         params: {
                             "term": name
                         }
@@ -36,7 +36,7 @@ define(['oolutil', 'lodash'],
                 };
 
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.userAdditionForm.forceValidation = true;
+                $scope.taskAdditionForm.forceValidation = true;
                 $scope.task = {};
                 $scope.uploadProgressBarColour = function() {
                     if ($scope.uploadFailure)
@@ -52,10 +52,10 @@ define(['oolutil', 'lodash'],
                     $scope.uploadSuccess = true;
                     $scope.uploadFailure = false;
                     $scope.processing = false;
-                    $translate('contest.addUser.lastAdded', {
-                        username: response.data.username
+                    $translate('contest.addTask.lastAdded', {
+                        taskName: response.data.taskName
                     }).then(function(d) {
-                        $scope.userAddedMessage = d;
+                        $scope.taskAddedMessage = d;
                     });
                 }
 
@@ -73,14 +73,14 @@ define(['oolutil', 'lodash'],
                     $scope.processing = false;
                 }
 
-                $scope.addUser = function(username) {
+                $scope.addTask = function(taskName) {
                     $scope.isSubmitting = true;
 
                     try {
                         var fd = new FormData();
-                        fd.append("username", username);
+                        fd.append("taskName", taskName);
 
-                        ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUser', $scope.userAdditionForm, fd, success, failure, reset);
+                        ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addTask', $scope.taskAdditionForm, fd, success, failure, reset);
                     } catch (err) {
                         reset();
                     }

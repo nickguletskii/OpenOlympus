@@ -32,6 +32,7 @@ define(['oolutil', 'lodash'],
                 });
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.solutionSubmissionForm.forceValidation = true;
+                $scope.taskId = $stateParams.taskId;
                 $scope.task = {};
                 $scope.isFormVisible = true;
 
@@ -77,7 +78,7 @@ define(['oolutil', 'lodash'],
                         if (!!solution.solutionFile)
                             fd.append("solutionFile", solution.solutionFile[0]);
 
-                       ValidationService. ValidationService.postToServer($scope, '/api/task/' + $stateParams.taskId + '/submitSolution', fd, success, failure, reset);
+                        ValidationService.ValidationService.postToServer($scope, '/api/task/' + $stateParams.taskId + '/submitSolution', $scope.solutionSubmissionForm, fd, success, failure, reset);
                     } catch (err) {
                         reset();
                     }

@@ -90,7 +90,7 @@ define(['oolutil', 'lodash', 'moment-tz'],
                         });
 
                         fd.append("startTime", time.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"));
-                        ValidationService.postToServer($scope, '/api/contests/create', fd, success, failure, reset);
+                        ValidationService.postToServer($scope, '/api/contests/create', $scope.contestCreationForm, fd, success, failure, reset);
 
                     } catch (err) {
                         reset();

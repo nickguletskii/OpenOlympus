@@ -135,7 +135,7 @@ define(['angular', 'app', 'lodash'], function(angular, app, _) {
                     reporter.report(form[field], field, errors);
                 });
             },
-            postToServer: function($scope, path, fd, success, failure, reset) {
+            postToServer: function($scope, path, form, fd, success, failure, reset) {
                 $injector.invoke(function($rootScope, $upload, ValidationService) {
                     $upload.http({
                         method: 'POST',
@@ -153,7 +153,7 @@ define(['angular', 'app', 'lodash'], function(angular, app, _) {
                         }
                     }).success(function(response) {
                         if (response.status === "BINDING_ERROR") {
-                            ValidationService.report($scope.serverErrorReporter, $scope.userAdditionForm, response.fieldErrors);
+                            ValidationService.report($scope.serverErrorReporter, form, response.fieldErrors);
                             reset(response);
                         } else if (response.status === "OK") {
                             success(response);
