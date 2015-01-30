@@ -23,12 +23,10 @@
 package org.ng200.openolympus.dto;
 
 import java.math.BigDecimal;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.ng200.openolympus.model.User;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
+import org.ng200.openolympus.model.views.UnprivilegedView;
+import org.ng200.openolympus.util.Beans;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -44,22 +42,13 @@ public class UserRanking extends User {
 	public UserRanking(User user, BigDecimal score) {
 		this.score = score;
 
-		final BeanWrapper src = new BeanWrapperImpl(user);
-		final BeanWrapper trg = new BeanWrapperImpl(this);
-
-		for (final String propertyName : Stream
-				.of(src.getPropertyDescriptors()).map(pd -> pd.getName())
-				.collect(Collectors.toList())) {
-			if (trg.getPropertyDescriptor(propertyName).getWriteMethod() == null) {
-				continue;
-			}
-
-			trg.setPropertyValue(propertyName,
-					src.getPropertyValue(propertyName));
-		}
+		Beans.copy(user, this);
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	public UserRanking() {
+	}
+
+	@JsonView(UnprivilegedView.class)
 	public BigDecimal getScore() {
 		return this.score;
 	}

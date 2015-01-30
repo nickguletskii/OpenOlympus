@@ -28,13 +28,14 @@ import java.util.Date;
 
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
 @SuppressWarnings("unused")
 public class SolutionDto implements Serializable {
 
-	public static interface SolutionDTOView extends Task.UnprivilegedTaskView {
+	public static interface SolutionDTOView extends UnprivilegedView {
 	}
 
 	/**
@@ -81,7 +82,7 @@ public class SolutionDto implements Serializable {
 
 	@JsonView({
 			SolutionDto.SolutionDTOView.class,
-			Task.UnprivilegedTaskView.class
+			UnprivilegedView.class
 	})
 	public Task getTask() {
 		return this.task;

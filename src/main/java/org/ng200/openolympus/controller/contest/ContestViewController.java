@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Task;
-import org.ng200.openolympus.model.Task.UnprivilegedTaskView;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SecurityService;
 import org.ng200.openolympus.services.TaskService;
@@ -54,7 +54,7 @@ public class ContestViewController {
 
 	@PreAuthorize("@oolsec.noContest() or (@oolsec.userInContest(contest) and hasAuthority('USER')) and hasAuthority('SUPERUSER')")
 	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
-	@JsonView(UnprivilegedTaskView.class)
+	@JsonView(UnprivilegedView.class)
 	public Set<Task> showContestHub(
 			@PathVariable(value = "contest") final Contest contest,
 			final Principal principal) {

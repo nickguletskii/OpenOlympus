@@ -25,7 +25,7 @@ package org.ng200.openolympus.controller.archive;
 import java.util.List;
 
 import org.ng200.openolympus.dto.UserRanking;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,13 +42,13 @@ public class ArchiveUserRankListRestController {
 	private UserService userService;
 
 	@RequestMapping(value = "/api/archive/rankCount", method = RequestMethod.GET)
-	@JsonView(User.UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public Long countUsers() {
 		return this.userService.countUsers();
 	}
 
 	@RequestMapping(value = "/api/archive/rank", method = RequestMethod.GET)
-	@JsonView(User.UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public List<UserRanking> getUsers(@RequestParam("page") Long page) {
 		return this.userService.getArchiveRankPage(page,
 				ArchiveUserRankListRestController.PAGE_SIZE);

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
@@ -56,12 +57,12 @@ public class ArchiveTaskListRestController {
 			this.maxScore = maxScore;
 		}
 
-		@JsonView(UnprivilegedTaskView.class)
+		@JsonView(UnprivilegedView.class)
 		public BigDecimal getMaxScore() {
 			return this.maxScore;
 		}
 
-		@JsonView(UnprivilegedTaskView.class)
+		@JsonView(UnprivilegedView.class)
 		public BigDecimal getScore() {
 			return this.score;
 		}
@@ -85,13 +86,13 @@ public class ArchiveTaskListRestController {
 	private UserService userService;
 
 	@RequestMapping(value = "/api/archive/taskCount", method = RequestMethod.GET)
-	@JsonView(User.UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public Long countUsers() {
 		return this.taskService.countTasks();
 	}
 
 	@RequestMapping(value = "/api/archive/tasks.json", method = RequestMethod.GET)
-	@JsonView(Task.UnprivilegedTaskView.class)
+	@JsonView(UnprivilegedView.class)
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,
 			Principal principal) {
 

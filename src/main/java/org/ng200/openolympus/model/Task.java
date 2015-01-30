@@ -38,6 +38,8 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.dto.SolutionDto;
+import org.ng200.openolympus.model.views.ServerView;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.cache.CacheBuilder;
@@ -50,15 +52,6 @@ import com.google.common.cache.LoadingCache;
 		@Index(columnList = "name")
 })
 public class Task implements Serializable {
-	public interface PriviligedTaskView extends UnprivilegedTaskView {
-	}
-
-	private interface ServerTaskView extends PriviligedTaskView {
-	}
-
-	public interface UnprivilegedTaskView {
-	};
-
 	/**
 	 *
 	 */
@@ -71,7 +64,7 @@ public class Task implements Serializable {
 				public ReadWriteLock load(Long key) throws Exception {
 					return new ReentrantReadWriteLock();
 				}
-			});;
+			});
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -114,30 +107,30 @@ public class Task implements Serializable {
 		return true;
 	}
 
-	@JsonView(ServerTaskView.class)
+	@JsonView(ServerView.class)
 	public String getDescriptionFile() {
 		return this.descriptionFile;
 	}
 
 	@JsonView({
-			UnprivilegedTaskView.class,
+			UnprivilegedView.class,
 			SolutionDto.SolutionDTOView.class
 	})
 	public long getId() {
 		return this.id;
 	}
 
-	@JsonView(UnprivilegedTaskView.class)
+	@JsonView(UnprivilegedView.class)
 	public String getName() {
 		return this.name;
 	}
 
-	@JsonView(ServerTaskView.class)
+	@JsonView(ServerView.class)
 	public String getTaskLocation() {
 		return this.taskLocation;
 	}
 
-	@JsonView(UnprivilegedTaskView.class)
+	@JsonView(UnprivilegedView.class)
 	public Date getTimeAdded() {
 		return this.timeAdded;
 	}
@@ -150,7 +143,7 @@ public class Task implements Serializable {
 		return result;
 	}
 
-	@JsonView(UnprivilegedTaskView.class)
+	@JsonView(UnprivilegedView.class)
 	public boolean isPublished() {
 		return this.published;
 	}

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.model.User.PriviligedUserView;
+import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +52,7 @@ public class AdminUserListRestController {
 	}
 
 	@RequestMapping(value = "/api/admin/users.json", method = RequestMethod.GET)
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUsersAlphabetically(page,
 				AdminUserListRestController.PAGE_SIZE);

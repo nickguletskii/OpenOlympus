@@ -33,7 +33,7 @@ import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.controller.auth.EmailConfirmationController;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.model.User.PriviligedUserView;
+import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.EmailService;
 import org.ng200.openolympus.services.RoleService;
 import org.ng200.openolympus.services.UserService;
@@ -63,7 +63,7 @@ public class ApproveUserRegistrationController {
 			Beans.copy(user, this);
 		}
 
-		@JsonView(User.PriviligedUserView.class)
+		@JsonView(PriviligedView.class)
 		public String getStatusMessage() {
 			return this.statusMessage;
 		}
@@ -128,7 +128,7 @@ public class ApproveUserRegistrationController {
 	}
 
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.PATCH)
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public List<Result> approveUsers(@RequestParam("users") List<Long> userIds) {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
 				.map(u -> {
