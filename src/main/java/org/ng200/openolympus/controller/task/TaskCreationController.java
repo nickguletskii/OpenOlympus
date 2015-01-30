@@ -29,7 +29,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -43,6 +42,7 @@ import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.ServletRequestDataBinder;
