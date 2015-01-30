@@ -38,6 +38,9 @@ import javax.persistence.Index;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.ng200.openolympus.model.views.PriviligedView;
+import org.ng200.openolympus.model.views.ServerView;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,17 +49,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @Table(name = "Users", indexes = {
-                                  @Index(columnList = "username")
+	@Index(columnList = "username")
 })
 public class User implements UserDetails, Serializable {
-	public interface PriviligedUserView extends UnprivilegedUserView {
-	};
-
-	private interface ServerUserView extends PriviligedUserView {
-	};
-
-	public interface UnprivilegedUserView {
-	};
 
 	/**
 	 *
@@ -156,32 +151,32 @@ public class User implements UserDetails, Serializable {
 		this.emailConfirmationToken = emailConfirmationToken;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getAddressCity() {
 		return this.addressCity;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getAddressCountry() {
 		return this.addressCountry;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getAddressLine1() {
 		return this.addressLine1;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getAddressLine2() {
 		return this.addressLine2;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getAddressState() {
 		return this.addressState;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		final Collection<GrantedAuthority> authorities = new ArrayList<>();
@@ -196,98 +191,98 @@ public class User implements UserDetails, Serializable {
 		return authorities;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public Date getBirthDate() {
 		return this.birthDate;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getEmailAddress() {
 		return this.emailAddress;
 	}
 
-	@JsonView(ServerUserView.class)
+	@JsonView(ServerView.class)
 	public String getEmailConfirmationToken() {
 		return this.emailConfirmationToken;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public String getFirstNameLocalised() {
 		return this.firstNameLocalised;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public String getFirstNameMain() {
 		return this.firstNameMain;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public long getId() {
 		return this.id;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getLandline() {
 		return this.landline;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public String getLastNameLocalised() {
 		return this.lastNameLocalised;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public String getLastNameMain() {
 		return this.lastNameMain;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public String getMiddleNameLocalised() {
 		return this.middleNameLocalised;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	public String getMiddleNameMain() {
 		return this.middleNameMain;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getMobile() {
 		return this.mobile;
 	}
 
-	@JsonView(ServerUserView.class)
+	@JsonView(ServerView.class)
 	@Override
 	public String getPassword() {
 		return this.password;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public Set<Role> getRoles() {
 		return this.roles;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getSchool() {
 		return this.school;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getTeacherFirstName() {
 		return this.teacherFirstName;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getTeacherLastName() {
 		return this.teacherLastName;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	public String getTeacherMiddleName() {
 		return this.teacherMiddleName;
 	}
 
-	@JsonView(UnprivilegedUserView.class)
+	@JsonView(UnprivilegedView.class)
 	@Override
 	public String getUsername() {
 		return this.username;
@@ -297,25 +292,25 @@ public class User implements UserDetails, Serializable {
 		return this.roles.contains(role);
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	@Override
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
-	@JsonView(PriviligedUserView.class)
+	@JsonView(PriviligedView.class)
 	@Override
 	public boolean isEnabled() {
 		return this.enabled;
