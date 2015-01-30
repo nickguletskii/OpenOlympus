@@ -80,8 +80,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 							.orderBy(Tables.SOLUTIONS.TIME_ADDED.desc())
 							.asTable("solution_score_table");
 
-			final String sql = SqlQueryProvider.DSL_CONTEXT.renderNamedParams(
-					DSL.select(table.field(Tables.SOLUTIONS.SCORE)).from(table).limit(1)
+			final String sql = SqlQueryProvider.DSL_CONTEXT.renderNamedOrInlinedParams(
+					DSL.select(table.field(Tables.SOLUTIONS.SCORE)).from(table).limit(DSL.inline(1))
 					);
 			return sql;
 			//@formatter:on
