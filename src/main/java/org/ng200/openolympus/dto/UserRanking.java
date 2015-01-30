@@ -39,13 +39,13 @@ public class UserRanking extends User {
 
 	private BigDecimal score;
 
+	public UserRanking() {
+	}
+
 	public UserRanking(User user, BigDecimal score) {
 		this.score = score;
 
 		Beans.copy(user, this);
-	}
-
-	public UserRanking() {
 	}
 
 	@JsonView(UnprivilegedView.class)

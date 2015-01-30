@@ -23,6 +23,7 @@
 package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.cerberus.util.Lists;
+import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.ContestParticipation;
 import org.ng200.openolympus.model.ContestPerUserTimeExtension;
@@ -41,6 +43,7 @@ import org.ng200.openolympus.repositories.ContestRepository;
 import org.ng200.openolympus.repositories.ContestTimeExtensionRepository;
 import org.ng200.openolympus.repositories.SolutionRepository;
 import org.ng200.openolympus.repositories.TaskRepository;
+import org.ng200.openolympus.repositories.UserRepository;
 import org.ng200.openolympus.util.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -52,6 +55,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ContestService {
 
+	private static final int CONTEST_RESULTS_PAGE_LENGTH = 10;
+	private static final int CONTEST_PARTICIPANTS_PAGE_LENGTH = 10;
 	@Autowired
 	private ContestRepository contestRepository;
 	@Autowired
@@ -64,6 +69,9 @@ public class ContestService {
 
 	@Autowired
 	private TaskRepository taskRepository;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	public void addContestParticipant(final Contest contest, final User user) {
 		this.contestParticipationRepository.save(new ContestParticipation(
@@ -125,6 +133,11 @@ public class ContestService {
 								.orElse(0l));
 	}
 
+	public Date getContestEndTime(final Contest contest) {
+		return Date.from(contest.getStartTime().toInstant()
+				.plusMillis(contest.getDuration()));
+	}
+
 	public Date getContestEndTimeForUser(final Contest contest, final User user) {
 		return Date.from(contest
 				.getStartTime()
@@ -139,6 +152,28 @@ public class ContestService {
 		return this.contestParticipationRepository.findByContest(contest)
 				.stream().map(participation -> participation.getUser())
 				.collect(Collectors.toList());
+	}
+
+	public List<UserRanking> getContestResults(Contest contest) {
+		return this.userRepository
+				.getContestResults(contest.getId(), contest.getStartTime(),
+						this.getContestEndTime(contest))
+				.stream()
+				.map(arr -> new UserRanking(this.userRepository
+						.findOne(((BigInteger) arr[0]).longValue()),
+						(BigDecimal) arr[1])).collect(Collectors.toList());
+	}
+
+	public List<UserRanking> getContestResultsPage(Contest contest, int page) {
+		return this.userRepository
+				.getContestResultsPage(contest.getId(), contest.getStartTime(),
+						this.getContestEndTime(contest),
+						ContestService.CONTEST_RESULTS_PAGE_LENGTH,
+						(page - 1) * ContestService.CONTEST_RESULTS_PAGE_LENGTH)
+				.stream()
+				.map(arr -> new UserRanking(this.userRepository
+						.findOne(((BigInteger) arr[0]).longValue()),
+						(BigDecimal) arr[1])).collect(Collectors.toList());
 	}
 
 	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
@@ -156,6 +191,12 @@ public class ContestService {
 	public long getNumberOfPages(final long pageSize) {
 		return PageUtils.getNumberOfPages(this.contestRepository.count(),
 				pageSize);
+	}
+
+	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber) {
+		return this.userRepository.findPartiticpants(contest,
+				new PageRequest(pageNumber - 1,
+						ContestService.CONTEST_PARTICIPANTS_PAGE_LENGTH));
 	}
 
 	public Contest getRunningContest() {
@@ -216,4 +257,5 @@ public class ContestService {
 	public Contest saveContest(Contest contest) {
 		return contest = this.contestRepository.save(contest);
 	}
+
 }

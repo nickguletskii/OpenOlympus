@@ -24,29 +24,66 @@ package org.ng200.openolympus.controller.contest;
 
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Task;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.model.views.PriviligedView;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.util.Beans;
+import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 //TODO: Port contest results to new API
-@Controller
+@RestController
 public class ContestResultsController {
+
+	public class ContestUserRankingDto extends UserRanking {
+
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = -6613906700172390312L;
+
+		private List<Pair<Task, BigDecimal>> taskScores;
+
+		public ContestUserRankingDto(Contest contest, UserRanking ranking) {
+			Beans.copy(ranking, this);
+			this.setTaskScores(contest
+					.getTasks()
+					.stream()
+					.map(task -> new Pair<Task, BigDecimal>(task,
+							ContestResultsController.this.contestService
+							.getUserTaskScoreInContest(contest,
+									ranking, task)))
+					.collect(Collectors.toList()));
+		}
+
+		@JsonView(UnprivilegedView.class)
+		public List<Pair<Task, BigDecimal>> getTaskScores() {
+			return this.taskScores;
+		}
+
+		public void setTaskScores(List<Pair<Task, BigDecimal>> taskScores) {
+			this.taskScores = taskScores;
+		}
+
+	}
 
 	@SuppressWarnings("unused")
 	private static class TaskColumn {
@@ -77,8 +114,6 @@ public class ContestResultsController {
 
 	}
 
-	private static final int PAGE_SIZE = 10;
-
 	@Autowired
 	private ContestService contestService;
 
@@ -88,104 +123,21 @@ public class ContestResultsController {
 	@Autowired
 	private TaskService taskService;
 
-	private List<User> getContestParticipantsOrderedByPlace(
-			final Contest contest) {
-		return this.contestService
-				.getContestParticipants(contest)
-				.stream()
-				.sorted((l, r) -> -(this.getUserScoreInContest(l, contest)
-						.compareTo(this.getUserScoreInContest(r, contest))))
-						.collect(Collectors.toList());
-	}
-
-	private List<BigDecimal> getContestTotalScores(final Contest contest,
-			final List<User> contestUsers) {
-		return contestUsers.stream()
-				.map(user -> this.getUserScoreInContest(user, contest))
-				.collect(Collectors.toList());
-	}
-
-	private BigDecimal getUserScoreForTaskInContest(final User user,
-			final Contest contest, final Task task) {
-		return this.contestService.getUserTaskScoreInContest(contest, user,
-				task);
-	}
-
-	private BigDecimal getUserScoreInContest(final User user,
-			final Contest contest) {
-		return contest
-				.getTasks()
-				.stream()
-				.map(task -> this.getUserScoreForTaskInContest(user, contest,
-						task)).reduce((ls, rs) -> ls.add(rs))
-						.orElse(BigDecimal.ZERO);
-	}
-
-	@RequestMapping(value = "/contest/{contest}/completeResults", method = RequestMethod.GET)
-	public String showCompleteResultsPage(
+	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
+	@JsonView(PriviligedView.class)
+	public List<ContestUserRankingDto> showCompleteResultsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			final Model model, final Principal principal) {
 		Assertions.resourceExists(contest);
 
-		final List<User> contestUsers = this
-				.getContestParticipantsOrderedByPlace(contest);
-
-		final List<BigDecimal> contestTotalScores = this.getContestTotalScores(
-				contest, contestUsers);
-
-		return this.showResultsPage(contest, null, model, contestUsers,
-				contestTotalScores, 0, contestUsers.size(), null);
+		return this.contestService.getContestResults(contest).stream()
+				.map(ranking -> new ContestUserRankingDto(contest, ranking))
+				.collect(Collectors.toList());
 	}
 
-	private String showResultsPage(final Contest contest,
-			final Integer pageNumber, final Model model,
-			final List<User> contestUsers,
-			final List<BigDecimal> contestTotalScores, final int startOfPage,
-			final int endOfPage, final Integer numberOfPages) {
-		final List<Integer> contestPlaces = new ArrayList<>(endOfPage);
-
-		int currentPlace = 0;
-		BigDecimal lastScore = new BigDecimal("-1");
-		for (int i = 0; i < endOfPage; i++) {
-			if (lastScore.compareTo(contestTotalScores.get(i)) != 0) {
-				currentPlace++;
-			}
-			contestPlaces.add(currentPlace);
-			lastScore = contestTotalScores.get(i);
-		}
-
-		final List<Integer> places = contestPlaces.subList(startOfPage,
-				endOfPage);
-
-		final List<User> users = contestUsers.subList(startOfPage, endOfPage);
-
-		final List<BigDecimal> totalScores = contestTotalScores.subList(
-				startOfPage, endOfPage);
-
-		final List<TaskColumn> taskColumns = contest
-				.getTasks()
-				.stream()
-				.map(task -> new TaskColumn(task.getName(), users
-						.stream()
-						.map(user -> this.getUserScoreForTaskInContest(user,
-								contest, task)).collect(Collectors.toList())))
-								.collect(Collectors.toList());
-
-		model.addAttribute("places", places);
-		model.addAttribute("users", users);
-		model.addAttribute("taskColumns", taskColumns);
-		model.addAttribute("totalScores", totalScores);
-		model.addAttribute("numberOfPages", numberOfPages);
-		model.addAttribute("currentPage", pageNumber);
-
-		model.addAttribute("pagePrefix", "/contest/" + contest.getId()
-				+ "/results");
-
-		return "contest/results";
-	}
-
-	@RequestMapping(value = "/contest/{contest}/results", method = RequestMethod.GET)
-	public String showResultsPage(
+	@RequestMapping(value = "/api/contest/{contest}/results", method = RequestMethod.GET)
+	@JsonView(UnprivilegedView.class)
+	public List<ContestUserRankingDto> showResultsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
 			final Model model, final Principal principal) {
@@ -194,27 +146,11 @@ public class ContestResultsController {
 			throw new ResourceNotFoundException();
 		}
 
-		final List<User> contestUsers = this
-				.getContestParticipantsOrderedByPlace(contest);
+		Assertions.resourceExists(contest);
 
-		final List<BigDecimal> contestTotalScores = this.getContestTotalScores(
-				contest, contestUsers);
-
-		final int startOfPage = Math.min((pageNumber - 1)
-				* ContestResultsController.PAGE_SIZE, contestUsers.size());
-		final int endOfPage = Math.min(pageNumber
-				* ContestResultsController.PAGE_SIZE, contestUsers.size());
-
-		return this.showResultsPage(
-				contest,
-				pageNumber,
-				model,
-				contestUsers,
-				contestTotalScores,
-				startOfPage,
-				endOfPage,
-				Math.max((contestUsers.size()
-						+ ContestResultsController.PAGE_SIZE - 1)
-						/ ContestResultsController.PAGE_SIZE, 1));
+		return this.contestService.getContestResultsPage(contest, pageNumber)
+				.stream()
+				.map(ranking -> new ContestUserRankingDto(contest, ranking))
+				.collect(Collectors.toList());
 	}
 }

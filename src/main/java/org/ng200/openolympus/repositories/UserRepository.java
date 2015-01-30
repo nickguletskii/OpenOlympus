@@ -23,13 +23,21 @@
 package org.ng200.openolympus.repositories;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.Record2;
+import org.jooq.SelectSeekStep1;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
+import org.jooq.types.DayToSecond;
+import org.jooq.util.postgres.PostgresDataType;
 import org.ng200.openolympus.annotations.QueryProvider;
 import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.sqlSupport.SqlQueryProvider;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +49,80 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+	@Component
+	public class ContestResultsPageQuery extends ContestResultsQuery {
+
+		@Override
+		public String getSql() {
+			final SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> query = this
+					.getUnlimitedQuery();
+			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query.limit(
+					DSL.param("offset", 0), DSL.param("limit", 10)));
+
+		}
+
+	}
+
+	@Component
+	public class ContestResultsQuery implements SqlQueryProvider {
+
+		@Override
+		public String getSql() {
+			final SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> query = this
+					.getUnlimitedQuery();
+			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query);
+		}
+
+		protected SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> getUnlimitedQuery() {
+			//@formatter:off
+			final Field<DayToSecond> timeExtensions = DSL.select(
+					DSL.field("sum(\"public\".\"time_extensions\".\"duration\") * INTERVAL '1 MILLISECOND'")
+					)
+					.from(Tables.TIME_EXTENSIONS)
+					.where(Tables.TIME_EXTENSIONS.CONTEST_ID.eq(DSL.param("contest", 0l))
+							.and(Tables.TIME_EXTENSIONS.USER_ID.eq(Tables.SOLUTIONS.USER_ID)))
+							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
+
+			final Condition taskInContest = Tables.SOLUTIONS.TASK_ID.in(
+					DSL.select(Tables.CONTESTS_TASKS.TASKS_ID)
+					.from(Tables.CONTESTS_TASKS)
+					.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l))));
+
+			final Condition solutionWithinTimeBounds =
+					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
+							DSL.param("contestEndTime", new Timestamp(0)).add(
+									timeExtensions
+									)
+							);
+			final Table<?> userTasks =
+					DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.SCORE)
+					.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
+					.from(Tables.SOLUTIONS)
+					.where(taskInContest.and(solutionWithinTimeBounds))
+					.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
+					.asTable("users_tasks");
+
+			final Field<BigDecimal> user_score =
+					DSL.coalesce(
+							DSL.sum(userTasks.field(Tables.SOLUTIONS.SCORE)),
+							DSL.field("0")
+							).as("user_score");
+
+			final SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> query =
+					DSL.select(
+							Tables.USERS.ID,
+							user_score
+							)
+							.from(Tables.USERS)
+							.leftOuterJoin(userTasks)
+							.on(Tables.USERS.ID.eq(userTasks.field(Tables.SOLUTIONS.USER_ID)))
+							.groupBy(Tables.USERS.ID)
+							.orderBy(user_score.desc());
+			//@formatter:on
+			return query;
+		}
+	}
 
 	@Component
 	public class RankPageQuery implements SqlQueryProvider {
@@ -89,8 +171,25 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Query(nativeQuery = true, value = "select * from users where username ilike :part or last_name_main ilike :part or last_name_localised ilike :part")
 	List<User> findFirst30Like(@Param("part") String name);
 
+	@Query("select c.user from ContestParticipation c where c.contest=:contest")
+	List<User> findPartiticpants(@Param("contest") Contest contest,
+			Pageable pageable);
+
 	@Query("select u from User u left outer join u.roles as role where role is null")
 	List<User> findUnapproved(Pageable pageable);
+
+	@Query(nativeQuery = true)
+	@QueryProvider(value = ContestResultsQuery.class)
+	List<Object[]> getContestResults(@Param("contest") Long contest,
+			@Param("contestStartTime") Date contestStartTime,
+			@Param("contestEndTime") Date contestEndTime);
+
+	@Query(nativeQuery = true)
+	@QueryProvider(value = ContestResultsPageQuery.class)
+	List<Object[]> getContestResultsPage(@Param("contest") Long contest,
+			@Param("contestStartTime") Date contestStartTime,
+			@Param("contestEndTime") Date contestEndTime,
+			@Param("limit") int limit, @Param("offset") int offset);
 
 	@Query(nativeQuery = true)
 	@QueryProvider(value = RankPageQuery.class)
