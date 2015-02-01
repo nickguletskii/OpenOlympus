@@ -79,7 +79,7 @@ public class Application {
 		ScriptUtils
 				.executeSqlScript(dataSource.getConnection(),
 						new EncodedResource(new ClassPathResource(
-								"/setupTriggers.sql")), false, false,
+								"sql/setupTriggers.sql")), false, false,
 						ScriptUtils.DEFAULT_COMMENT_PREFIX,
 						"^^^ NEW STATEMENT ^^^",
 						ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
