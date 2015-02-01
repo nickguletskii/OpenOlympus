@@ -297,6 +297,8 @@
 						<owner>Nick Guletskii</owner>
 						<email>nickguletskii200@gmail.com</email>
 					</properties>
+					<failIfMissing>false</failIfMissing>
+					<failIfUnknown>false</failIfUnknown>
 					<excludes>
 						<exclude>**/README.md</exclude>
 						<exclude>src/main</exclude>
