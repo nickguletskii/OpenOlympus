@@ -114,7 +114,7 @@
 		<dependency>
 			<groupId>org.jppf</groupId>
 			<artifactId>jppf-client</artifactId>
-			<version>4.2.3</version>
+			<version>4.2.5</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-log4j12</artifactId>
@@ -125,7 +125,7 @@
 		<dependency>
 			<groupId>org.jppf</groupId>
 			<artifactId>jppf-common</artifactId>
-			<version>4.2.3</version>
+			<version>4.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
