@@ -47,7 +47,7 @@
 				<td><a ui-sref="taskView({taskId: task.id})">{{task.name}}</a>
 					<button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{archive.list.task.editButton}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id})">
 					</button>
-					<button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{archive.list.task.rejudgeButton}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation">
+					<button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{archive.list.task.rejudgeButton}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
 					</button>
 				</td>
 			</tr>

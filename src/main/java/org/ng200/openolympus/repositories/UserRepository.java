@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.Record2;
+import org.jooq.Record3;
 import org.jooq.SelectSeekStep1;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
@@ -55,7 +55,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 		@Override
 		public String getSql() {
-			final SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> query = this
+			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query = this
 					.getUnlimitedQuery();
 			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query.limit(
 					DSL.param("offset", 0), DSL.param("limit", 10)));
@@ -69,12 +69,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 		@Override
 		public String getSql() {
-			final SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> query = this
+			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query = this
 					.getUnlimitedQuery();
 			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query);
 		}
 
-		protected SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> getUnlimitedQuery() {
+		protected SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> getUnlimitedQuery() {
 			//@formatter:off
 			final Field<DayToSecond> timeExtensions = DSL.select(
 					DSL.field("sum(\"public\".\"time_extensions\".\"duration\") * INTERVAL '1 MILLISECOND'")
@@ -109,10 +109,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 							DSL.field("0")
 							).as("user_score");
 
-			final SelectSeekStep1<Record2<Long, BigDecimal>, BigDecimal> query =
+			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query =
 					DSL.select(
 							Tables.USERS.ID,
-							user_score
+							user_score,
+							DSL.rank().over(DSL.orderBy(DSL.coalesce(
+									DSL.sum(userTasks.field(Tables.SOLUTIONS.SCORE)),
+									DSL.field("0")
+									)))
 							)
 							.from(Tables.USERS)
 							.leftOuterJoin(userTasks)
@@ -145,7 +149,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			final String sql = SqlQueryProvider.DSL_CONTEXT.renderNamedParams(
 					DSL.select(
 							Tables.USERS.ID,
-							user_score
+							user_score,
+							DSL.rank().over(DSL.orderBy(DSL.coalesce(
+									DSL.sum(userTasks.field(Tables.SOLUTIONS.SCORE)),
+									DSL.field("0")
+									)))
 							)
 							.from(Tables.USERS)
 							.leftOuterJoin(userTasks)

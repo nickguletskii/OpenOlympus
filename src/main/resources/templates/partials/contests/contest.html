@@ -29,8 +29,10 @@
 </head>
 
 <body th:fragment="content">
-	<button type="button" ng-if="security.isAdmin()" translate="archive.list.users.add" class="hidden-print btn btn-primary btn-sm"  ui-sref=".addUser"></button>
-	<button type="button" ng-if="security.isAdmin()" translate="archive.list.tasks.add" class="hidden-print btn btn-primary btn-sm"  ui-sref=".addTask"></button>
+	<button type="button" ng-if="security.isAdmin()" translate="contest.addUserButton" class="hidden-print btn btn-primary btn-sm" ui-sref=".addUser"></button>
+	<button type="button" ng-if="security.isAdmin()" translate="contest.addTaskButton" class="hidden-print btn btn-primary btn-sm" ui-sref=".addTask"></button>
+	<button type="button" ng-if="security.isAdmin()" translate="contest.participantsButton" class="hidden-print btn btn-primary btn-sm" ui-sref="contestParticipantsList({contestId:contestId})"></button>
+	<button type="button" ng-if="security.isAdmin() || security.isContestOver(contestId)" translate="contest.results" class="hidden-print btn btn-primary btn-sm" ui-sref="contestResults({contestId:contestId})"></button>
 	<table class="table table-striped table-bordered table-hover" id="tasksTable">
 		<thead>
 			<tr>
@@ -42,7 +44,7 @@
 				<td><a ui-sref="taskView({taskId: task.id, contestId: contestId})">{{task.name}}</a>
 					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id, contestId: contestId})">
 					</button>
-					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.rejudgeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation">
+					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.rejudgeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
 					</button>
 				</td>
 			</tr>

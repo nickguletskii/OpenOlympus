@@ -22,6 +22,9 @@
  */
 'use strict';
 
+var NARROW = 'col-md-6 col-md-offset-3';
+var WIDE = 'col-md-12 col-md-offset-0';
+
 var stateList = [{
     "name": "taskView",
     "url": "/task/{taskId:[0-9]+}?contestId",
@@ -36,17 +39,19 @@ var stateList = [{
     "controller": "TaskModificationController"
 }, {
     "name": "archiveTaskList",
-    "url": "/archive/tasks?page",
+    "url": "/archive/tasks?page?taskId",
     "templateUrl": "/partials/archive/tasks",
     "controllerPath": "controllers/archive/tasks",
     "controller": "ArchiveTaskListController",
     "params": {
-        "page": 1
+        "page": 1,
+        "taskId": null
     }
 }, {
     "name": "archiveRank",
     "url": "/archive/users?page",
-    "templateUrl": "/partials/archive/users","controllerPath": "controllers/archive/users",
+    "templateUrl": "/partials/archive/users",
+    "controllerPath": "controllers/archive/users",
 
     "controller": "ArchiveRankController",
     "params": {
@@ -61,12 +66,35 @@ var stateList = [{
     "params": {
         "page": 1
     }
-},{
+}, {
     "name": "contestView",
-    "url": "/contest/{contestId:[0-9]+}",
+    "url": "/contest/{contestId:[0-9]+}?taskId",
     "templateUrl": "/partials/contests/contest",
     "controllerPath": "controllers/contests/contest",
-    "controller": "ContestViewController"
+    "controller": "ContestViewController",
+    "params": {
+        "taskId": null
+    }
+}, {
+    "name": "contestParticipantsList",
+    "url": "/contest/{contestId:[0-9]+}/participants",
+    "templateUrl": "/partials/contests/contest/participants",
+    "controllerPath": "controllers/contests/contest/participants",
+    "controller": "ContestParticipantsListController",
+    "params": {
+        "page": 1
+    }
+}, {
+    "name": "contestResults",
+    "url": "/contest/{contestId:[0-9]+}/results",
+    "templateUrl": "/partials/contests/contest/results",
+    "controllerPath": "controllers/contests/contest/results",
+    "customWidth": WIDE,
+    "fluidContainer": true,
+    "controller": "ContestResultsController",
+    "params": {
+        "page": 1
+    }
 }, {
     "name": "userSolutionList",
     "url": "/user/solutions?page",
@@ -100,7 +128,7 @@ var stateList = [{
     "templateUrl": "/partials/login",
     "controllerPath": "controllers/login",
     "controller": "LoginController",
-    "narrow": true,
+    "customWidth": NARROW,
     "params": {
         "failure": false
     }
@@ -110,7 +138,7 @@ var stateList = [{
     "templateUrl": "/partials/register",
     "controllerPath": "controllers/register",
     "controller": "RegistrationController",
-    "narrow": true
+    "customWidth": NARROW
 }, {
     "name": "home",
     "url": "/",
@@ -118,7 +146,7 @@ var stateList = [{
     "controllerPath": "controllers/home",
     "controller": "HomeController",
     "type": "requireController",
-    "narrow": true
+    "customWidth": NARROW
 }];
 
 var modalStateList = [{
@@ -133,7 +161,12 @@ var modalStateList = [{
     "controllerPath": "controllers/archive/tasks/rejudgeWorker",
     "controller": "TaskRejudgementWorkerController",
     "backdrop": true
-},{
+}, {
+    "parent": "archiveTaskList",
+    "name": "archiveTaskList.rejudgeTaskSuccess",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/success",
+    "backdrop": true
+}, {
     "parent": "contestView",
     "name": "contestView.rejudgeTaskConfirmation",
     "templateUrl": "/partials/archive/tasks/rejudgeTask/confirmation",

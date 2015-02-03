@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License
  * Copyright (c) 2014-2015 Nick Guletskii
  *
@@ -20,54 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.dto;
+define(['oolutil', 'lodash'],
+    function(Util, _) {
+        return ['$timeout', '$q', '$scope', '$rootScope', '$http', '$location',
+            '$stateParams', 'Restangular',
+            function($timeout, $q, $scope, $rootScope, $http, $location,
+                $stateParams, Restangular) {
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+                $scope.$apply(function() {
+                    var page = $stateParams.page;
 
-import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.model.views.UnprivilegedView;
-import org.ng200.openolympus.util.Beans;
+                    $scope.page = $stateParams.page;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
-public class UserRanking extends User {
-
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -1305111374276439473L;
-
-	private BigDecimal score;
-
-	private BigInteger rank;
-
-	@JsonView(UnprivilegedView.class)
-	public BigInteger getRank() {
-		return rank;
-	}
-
-	public void setRank(BigInteger rank) {
-		this.rank = rank;
-	}
-
-	public UserRanking() {
-	}
-
-	public UserRanking(BigInteger rank, User user, BigDecimal score) {
-		this.rank = rank;
-		this.score = score;
-
-		Beans.copy(user, this);
-	}
-
-	@JsonView(UnprivilegedView.class)
-	public BigDecimal getScore() {
-		return this.score;
-	}
-
-	public void setScore(BigDecimal score) {
-		this.score = score;
-	}
-
-}
+                    Restangular.all('api/contest/' + $stateParams.contestId + "/results").getList({
+                        page: page
+                    }).then(function(users) {
+                        $scope.users = users;
+                        $scope.tasks = _.map(users[0].taskScores, function(taskScore) {
+                            return taskScore.first;
+                        });
+                    });
+                    $http.get('api/contest/' + $stateParams.contestId + '/participantsCount').then(function(response) {
+                        $scope.userCount = response.data;
+                    });
+                });
+            }
+        ];
+    });

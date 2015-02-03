@@ -102,9 +102,10 @@ public class UserService implements UserDetailsService {
 		return this.userRepository
 				.getRankPage(pageSize, (page - 1) * pageSize)
 				.stream()
-				.map(arr -> new UserRanking(this.userRepository
-						.findOne(((BigInteger) arr[0]).longValue()),
-						(BigDecimal) arr[1])).collect(Collectors.toList());
+				.map(arr -> new UserRanking((BigInteger) arr[2],
+						this.userRepository.findOne(((BigInteger) arr[0])
+								.longValue()), (BigDecimal) arr[1]))
+				.collect(Collectors.toList());
 	}
 
 	@PreAuthorize("hasAuthority('SUPERUSER')")

@@ -159,9 +159,10 @@ public class ContestService {
 				.getContestResults(contest.getId(), contest.getStartTime(),
 						this.getContestEndTime(contest))
 				.stream()
-				.map(arr -> new UserRanking(this.userRepository
-						.findOne(((BigInteger) arr[0]).longValue()),
-						(BigDecimal) arr[1])).collect(Collectors.toList());
+				.map(arr -> new UserRanking((BigInteger) arr[2],
+						this.userRepository.findOne(((BigInteger) arr[0])
+								.longValue()), (BigDecimal) arr[1]))
+				.collect(Collectors.toList());
 	}
 
 	public List<UserRanking> getContestResultsPage(Contest contest, int page) {
@@ -171,9 +172,10 @@ public class ContestService {
 						ContestService.CONTEST_RESULTS_PAGE_LENGTH,
 						(page - 1) * ContestService.CONTEST_RESULTS_PAGE_LENGTH)
 				.stream()
-				.map(arr -> new UserRanking(this.userRepository
-						.findOne(((BigInteger) arr[0]).longValue()),
-						(BigDecimal) arr[1])).collect(Collectors.toList());
+				.map(arr -> new UserRanking((BigInteger) arr[2],
+						this.userRepository.findOne(((BigInteger) arr[0])
+								.longValue()), (BigDecimal) arr[1]))
+				.collect(Collectors.toList());
 	}
 
 	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,

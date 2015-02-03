@@ -24,6 +24,10 @@ package org.ng200.openolympus.util;
 
 import java.io.Serializable;
 
+import org.ng200.openolympus.model.views.UnprivilegedView;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
 public class Pair<F, S> implements Serializable {
 	/**
 	 *
@@ -69,10 +73,12 @@ public class Pair<F, S> implements Serializable {
 		return true;
 	}
 
+	@JsonView(UnprivilegedView.class)
 	public F getFirst() {
 		return this.first;
 	}
 
+	@JsonView(UnprivilegedView.class)
 	public S getSecond() {
 		return this.second;
 	}

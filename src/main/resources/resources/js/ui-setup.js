@@ -63,7 +63,13 @@ define(
                 "</div>");
         }]);
 
-        app.run(function($rootScope, AuthenticationProvider) {
+        app.run(function($rootScope, $stateParams, AuthenticationProvider) {
+            $rootScope.stateParams = $stateParams;
+            $rootScope.$on('$stateChangeStart',
+                function(event, toState, toParams, fromState, fromParams) {
+                    console.log(toParams);
+                    $rootScope.stateParams = toParams;
+                });
             $rootScope.security = AuthenticationProvider;
             $rootScope.$on('$stateNotFound',
                 function(event, unfoundState, fromState, fromParams) {

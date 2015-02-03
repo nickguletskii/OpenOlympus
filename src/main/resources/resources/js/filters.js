@@ -37,5 +37,13 @@ define(['angular', 'services', 'lodash'], function(angular, services, _) {
                     return "-";
                 return input;
             };
+        }).filter("pairMap", function(){
+            return function(input, key, primary){
+                var x= _.filter(input, function(pair){
+                    return pair.first[primary] === key[primary];
+                });
+                
+                return x[0].second;
+            };
         });
 });
