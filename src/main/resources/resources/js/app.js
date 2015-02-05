@@ -62,7 +62,7 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
     });
 
     app.config(['$translateProvider', 'formValidationErrorsProvider', '$injector', function($translateProvider, $formValidationErrorsProvider) {
-        $translateProvider.useUrlLoader('/translation.json');
+        $translateProvider.useUrlLoader('/translation');
         $translateProvider.preferredLanguage('ru');
         $formValidationErrorsProvider.setDictionary(dictionary);
     }]);

@@ -51,7 +51,7 @@ public class AdminUserListRestController {
 		return "ok";
 	}
 
-	@RequestMapping(value = "/api/admin/users.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/admin/users", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUsersAlphabetically(page,

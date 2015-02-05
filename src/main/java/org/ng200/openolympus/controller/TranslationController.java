@@ -39,7 +39,7 @@ public class TranslationController {
 	@Autowired
 	OpenOlympusMessageSource messageSource;
 
-	@RequestMapping(value = "/translation.json")
+	@RequestMapping(value = "/translation")
 	public Map<String, String> strings(WebRequest webRequest,
 			@RequestParam("lang") String lang) {
 		if (webRequest.checkNotModified(this.messageSource.getLastModified())) {

@@ -91,7 +91,7 @@ public class ArchiveTaskListRestController {
 		return this.taskService.countTasks();
 	}
 
-	@RequestMapping(value = "/api/archive/tasks.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,
 			Principal principal) {

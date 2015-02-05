@@ -31,7 +31,7 @@ define(['oolutil', 'lodash'],
 
                     $scope.page = $stateParams.page;
 
-                    Restangular.all('api/archive/tasks.json').getList({
+                    Restangular.all('api/archive/tasks').getList({
                         page: page
                     }).then(function(tasks) {
                         $scope.tasks = tasks;
