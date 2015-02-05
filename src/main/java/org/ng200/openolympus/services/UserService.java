@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.dto.UserRanking;
+import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.repositories.ContestParticipationRepository;
 import org.ng200.openolympus.repositories.ContestTimeExtensionRepository;
@@ -52,6 +53,9 @@ public class UserService implements UserDetailsService {
 
 	@Autowired
 	private VerdictRepository verdictRepository;
+
+	@Autowired
+	private RoleService roleService;
 
 	@Autowired
 	private SolutionRepository solutionRepository;
@@ -156,5 +160,13 @@ public class UserService implements UserDetailsService {
 
 	public User saveUser(User user) {
 		return user = this.userRepository.save(user);
+	}
+
+	public long countUnapprovedUsers() {
+		return this.userRepository.countUnapproved();
+	}
+
+	public boolean isUserApproved(User user) {
+		return user.getRoles().contains(roleService.getRoleByName(Role.USER));
 	}
 }

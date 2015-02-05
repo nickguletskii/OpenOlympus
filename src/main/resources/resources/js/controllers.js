@@ -147,6 +147,16 @@ var stateList = [{
     "controller": "HomeController",
     "type": "requireController",
     "customWidth": NARROW
+}, {
+    "name": "pendingUsersList",
+    "url": "/admin/pendingUsers?page",
+    "templateUrl": "/partials/admin/pendingUsers",
+    "customWidth": WIDE,
+    "controllerPath": "controllers/admin/pendingUsers",
+    "controller": "PendingUsersController",
+    "params": {
+        "page": 1
+    }
 }];
 
 var modalStateList = [{

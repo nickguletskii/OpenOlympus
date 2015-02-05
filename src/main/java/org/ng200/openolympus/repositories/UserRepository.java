@@ -167,7 +167,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 		}
 	}
 
-	@Query("select count(u) from User u left outer join u.roles as role where role is null")
+	@Query("select count(u) from User u left outer join u.roles as role where role is null and u.approvalEmailSent = false")
 	long countUnapproved();
 
 	List<User> findByLastNameMain(String lastNameMain);
@@ -183,7 +183,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	List<User> findPartiticpants(@Param("contest") Contest contest,
 			Pageable pageable);
 
-	@Query("select u from User u left outer join u.roles as role where role is null")
+	@Query("select u from User u left outer join u.roles as role where role is null and u.approvalEmailSent = false")
 	List<User> findUnapproved(Pageable pageable);
 
 	@Query(nativeQuery = true)

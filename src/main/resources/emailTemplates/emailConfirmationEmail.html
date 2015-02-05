@@ -33,7 +33,11 @@
 </head>
 <body>
 	<p th:text="#{email.confirmationEmail.greeting(${user.getUsername()})}">Hello!</p>
-	
-	<a th:text="#{email.confirmationEmail.link}" th:href="${link}"></a>
+
+	<a
+		th:text="#{email.confirmationEmail.link}"
+		th:href="${link}"
+	></a>
+	<a th:text="${link}"></a>
 </body>
 </html>

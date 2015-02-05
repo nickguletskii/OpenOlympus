@@ -40,12 +40,14 @@ import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.ImmutableMap;
 
 @RestController
 public class ApproveUserRegistrationController {
@@ -84,8 +86,8 @@ public class ApproveUserRegistrationController {
 	@Autowired
 	private UserService userService;
 
-	public void approveUser(final User user) throws MessagingException,
-	EmailException {
+	public void approveUser(User user) throws MessagingException,
+			EmailException {
 		Assertions.resourceExists(user);
 
 		if (this.emailConfirmationEnabled) {
@@ -96,28 +98,21 @@ public class ApproveUserRegistrationController {
 					.build().encode().toUriString();
 
 			this.emailService
-			.sendEmail(
-					user.getEmailAddress(),
-					"Welcome to OpenOlympus!",
-					"emailConfirmationEmail",
-
-					new StringBuilder()
-					.append("Welcome to OpenOlympus! Please click the following link to complete your registration: ") // TODO:
-					// Localise
-					// this
-					// message
-					.append(link).toString(),
-					new HashMap<String, Object>() {
-						/**
-						 *
-						 */
-						private static final long serialVersionUID = 400752129999869515L;
-
-						{
-							this.put("link", link);
-							this.put("user", user);
-						}
-					});
+					.sendEmail(
+							user.getEmailAddress(),
+							"Welcome to OpenOlympus!",
+							"emailConfirmationEmail",
+							new StringBuilder()
+									.append("Welcome to OpenOlympus! Please click the following link to complete your registration: ") // TODO:
+									// Localise
+									// this
+									// message
+									.append(link).toString(),
+							ImmutableMap.<String, Object> builder()
+									.put("link", link).put("user", user)
+									.build());
+			user.setApprovalEmailSent(true);
+			user = userService.saveUser(user);
 		} else {
 			final Role role = this.roleService.getRoleByName(Role.USER);
 
@@ -127,10 +122,11 @@ public class ApproveUserRegistrationController {
 		}
 	}
 
-	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
 	@JsonView(PriviligedView.class)
-	public List<Result> approveUsers(@RequestParam("users") List<Long> userIds) {
+	public List<Result> approveUsers(@RequestBody List<Long> userIds) {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
+				.filter(user -> !this.userService.isUserApproved(user))
 				.map(u -> {
 					try {
 						this.approveUser(u);

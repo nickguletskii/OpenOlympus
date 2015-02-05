@@ -42,20 +42,17 @@ public class UnapprovedUserListRestController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.DELETE)
-	public String deleteUsers(@RequestParam("users") List<Long> userIds) {
-		final List<User> users = userIds.stream()
-				.map(id -> this.userService.getUserById(id))
-				.collect(Collectors.toList());
-		this.userService.deleteUsers(users);
-		return "ok";
-	}
-
-	@RequestMapping(value = "/api/admin/pendingUsers.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/admin/pendingUsers", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUnapprovedUsers(page,
 				UnapprovedUserListRestController.PAGE_SIZE);
+	}
+
+	@RequestMapping(value = "/api/admin/pendingUsersCount", method = RequestMethod.GET)
+	@JsonView(PriviligedView.class)
+	public long getUsers() {
+		return this.userService.countUnapprovedUsers();
 	}
 
 }

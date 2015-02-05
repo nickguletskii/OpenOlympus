@@ -107,6 +107,8 @@ public class User implements UserDetails, Serializable {
 
 	private String emailConfirmationToken;
 
+	private boolean approvalEmailSent;
+
 	@ManyToMany(fetch = FetchType.EAGER)
 	private Set<Role> roles;
 
@@ -149,6 +151,7 @@ public class User implements UserDetails, Serializable {
 		this.school = school;
 		this.birthDate = birthDate;
 		this.emailConfirmationToken = emailConfirmationToken;
+		this.approvalEmailSent = false;
 	}
 
 	@JsonView(PriviligedView.class)
@@ -418,6 +421,15 @@ public class User implements UserDetails, Serializable {
 				.format("User [id=%s, username=%s, firstNameMain=%s, middleNameMain=%s, lastNameMain=%s]",
 						this.id, this.username, this.firstNameMain,
 						this.middleNameMain, this.lastNameMain);
+	}
+
+	@JsonView(PriviligedView.class)
+	public boolean isApprovalEmailSent() {
+		return approvalEmailSent;
+	}
+
+	public void setApprovalEmailSent(boolean approvalEmailSent) {
+		this.approvalEmailSent = approvalEmailSent;
 	}
 
 }

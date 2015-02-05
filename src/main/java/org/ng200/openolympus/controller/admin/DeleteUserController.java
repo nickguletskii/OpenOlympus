@@ -22,11 +22,16 @@
  */
 package org.ng200.openolympus.controller.admin;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,10 +44,21 @@ public class DeleteUserController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/admin/deleteUser", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/admin/users/deleteUser", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
+	@Transactional
 	public void deleteUser(@RequestParam(value = "user") final User user) {
 		Assertions.resourceExists(user);
 		this.userService.deleteUser(user);
+	}
+
+	@RequestMapping(value = "/api/admin/users/deleteUsers", method = RequestMethod.POST)
+	@ResponseStatus(value = HttpStatus.OK)
+	@Transactional
+	public void deleteUser(@RequestBody List<Long> userIds) {
+		List<User> users = userIds.stream().map(userService::getUserById)
+				.collect(Collectors.toList());
+		users.forEach(Assertions::resourceExists);
+		users.forEach(this.userService::deleteUser);
 	}
 }
