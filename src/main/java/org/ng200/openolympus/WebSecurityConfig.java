@@ -25,6 +25,7 @@ package org.ng200.openolympus;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationFailureHandler;
@@ -57,6 +58,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebMvcSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+	private static final String REMEMBERME_COOKIE_NAME = "openolympus-rememberme";
 	@Autowired
 	public UserService userService;
 	@Autowired
@@ -72,50 +74,51 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private static String[] permittedAny = {
 			"/",
-			"/locale/",
+			"/translation",
 			"/resources/**",
-			"/register/",
+			"/api/user/register/",
 			"/errors/**"
 	};
 
 	private static String[] authorisedAny = {
-			"/archive/users",
-			"/contests",
-			"/contest/*",
-			"/contest/*/results",
-			"/api/taskCompletion",
+			"/api/archive/rank",
+			"/api/archive/rankCount",
+			"/api/archive/tasks",
+			"/api/archive/taskCount",
+			"/api/contests",
+			"/api/contestsCount",
+			"/api/contest/*",
+			"/api/contest/*/results",
 			"/api/verdict",
-			"/api/solution",
-			"/customResources/**"
+			"/api/user/solutions",
+			"/api/user/solutionsCount",
+			"/api/user/solutionsCount",
+			"/api/task/*",
+			"/api/task/*/name"
 	};
 
 	private static String[] authorisedPost = {
-			"/task/*",
-			"/user/**"
+			"/user/**",
+			"/api/task/*/submitSolution"
 	};
 	private static String[] authorisedGet = {
-			"/task/*",
-			"/solution",
-			"/solutionDownload",
-			"/user/solutions*",
-			"/user/**",
-			"/task/*"
 	};
 	private static String[] permittedGet = {};
 	private static String[] administrativeAny = {
-			"/admin/**",
-			"/archive/add",
-			"/contest/*/addTask",
-			"/contest/*/edit",
-			"/task/*/edit",
-			"/task/*/rejudgeTask",
-			"/contest/*/addUser",
-			"/contest/*/addUserTime",
-			"/contests/add",
-			"/contest/*/removeTask/*",
-			"/contest/*/remove",
-			"/admin/diagnostics",
-			"/contest/*/completeResults",
+			"/api/admin/**",
+			"/api/task/create",
+			"/api/taskSourcecode",
+			"/api/task/*/edit",
+			"/api/task/*/rejudgeTask",
+			"/api/contests/create",
+			"/api/contest/*/edit",
+			"/api/contest/*/participants",
+			"/api/contest/*/remove",
+			"/api/contest/*/completeResults",
+			"/api/contest/*/addTask",
+			"/api/contest/*/addUser",
+			"/api/contest/*/addUserTime",
+			"/api/contest/*/removeTask/*",
 			"/api/taskSourcecode"
 	};
 
@@ -202,11 +205,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				if (request.getHeader("X-Auth-Token") != null) {
 					return request.getHeader("X-Auth-Token");
 				}
-				return super.extractRememberMeCookie(request);
+				Cookie[] cookies = request.getCookies();
+
+				if ((cookies == null) || (cookies.length == 0)) {
+					return null;
+				}
+
+				for (Cookie cookie : cookies) {
+					if (REMEMBERME_COOKIE_NAME.equals(cookie.getName())) {
+						return cookie.getValue();
+					}
+				}
+
+				return null;
 			}
 
 		};
-		rememberMeServices.setCookieName("openolympus-rememberme");
+		rememberMeServices.setCookieName(REMEMBERME_COOKIE_NAME);
 		rememberMeServices.setAlwaysRemember(true);
 		return rememberMeServices;
 	}
