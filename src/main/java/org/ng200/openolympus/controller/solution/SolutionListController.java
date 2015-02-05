@@ -62,12 +62,12 @@ public class SolutionListController {
 	@Autowired
 	private TaskService taskService;
 
-	@RequestMapping(value = "/api/admin/solutions/count", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/admin/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCount(final User user) {
 		return this.solutionService.getSolutionCount();
 	}
 
-	@RequestMapping(value = "/api/user/solutions/count", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCountForUser(final @AuthenticationPrincipal User user) {
 		// TODO: replace with SQL
 		if (this.contestService.getRunningContest() == null) {
