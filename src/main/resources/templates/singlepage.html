@@ -37,9 +37,15 @@
         </div>
         <div th:replace="fragments/sitewidescripts::bodyEnd"></div>
     </div>
-    <div ng-if="showErrorModal" ng-cloak="">
-        <h1>{{'error.title' | translate}}</h1>
-        <p>{{'error.body' | translate}}</p>
+    <div class="container text-center" ng-if="showErrorModal" ng-cloak="">
+        <div class="row">
+            <span class="glyphicon glyphicon-exclamation-sign text-danger" style="font-size: 20em"></span>
+        </div>
+        <div class="row">
+            <h1>{{'error.title' | translate}}</h1>
+            <p>{{'error.body' | translate}}</p>
+            <button class="btn btn-danger" onClick="window.location.reload()">{{'error.reloadPage' | translate}}</button>
+        </div>
     </div>
 </body>
 

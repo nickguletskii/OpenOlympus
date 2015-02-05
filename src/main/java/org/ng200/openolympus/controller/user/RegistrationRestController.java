@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.user;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,13 +32,11 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import net.tanesha.recaptcha.ReCaptchaImpl;
-import net.tanesha.recaptcha.ReCaptchaResponse;
-
+import org.apache.http.client.ClientProtocolException;
 import org.ng200.openolympus.controller.user.RegistrationRestController.RegistrationResponse.Status;
 import org.ng200.openolympus.dto.UserDto;
-import org.ng200.openolympus.exceptions.InvalidRecaptchaException;
 import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.services.CaptchaService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.UserDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +45,6 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -72,14 +70,15 @@ public class RegistrationRestController {
 		}
 
 		private Status status;
-		private String recaptchaError;
+		private List<String> recaptchaErrorCodes;
 		private List<FieldError> fieldErrors;
 		private List<ObjectError> globalErrors;
 
-		public RegistrationResponse(Status status, String recaptchaError,
-				List<FieldError> fieldErrors, List<ObjectError> globalErrors) {
+		public RegistrationResponse(Status status,
+				List<String> recaptchaErrorCodes, List<FieldError> fieldErrors,
+				List<ObjectError> globalErrors) {
 			this.status = status;
-			this.recaptchaError = recaptchaError;
+			this.recaptchaErrorCodes = recaptchaErrorCodes;
 			this.fieldErrors = fieldErrors;
 			this.globalErrors = globalErrors;
 		}
@@ -90,10 +89,6 @@ public class RegistrationRestController {
 
 		public List<ObjectError> getGlobalErrors() {
 			return this.globalErrors;
-		}
-
-		public String getRecaptchaError() {
-			return this.recaptchaError;
 		}
 
 		public Status getStatus() {
@@ -108,8 +103,12 @@ public class RegistrationRestController {
 			this.globalErrors = globalErrors;
 		}
 
-		public void setRecaptchaError(String recaptchaError) {
-			this.recaptchaError = recaptchaError;
+		public List<String> getRecaptchaErrorCodes() {
+			return recaptchaErrorCodes;
+		}
+
+		public void setRecaptchaErrorCodes(List<String> recaptchaErrorCodes) {
+			this.recaptchaErrorCodes = recaptchaErrorCodes;
 		}
 
 		public void setStatus(Status status) {
@@ -132,25 +131,8 @@ public class RegistrationRestController {
 	@Autowired
 	private UserService userService;
 
-	private final ReCaptchaImpl reCaptcha;
-
-	@Value("${enableCaptcha}")
-	private boolean captchaEnabled;
-
-	@Value("${recaptchaPublicKey}")
-	private String recaptchaPublicKey;
-
-	public RegistrationRestController() {
-		this.reCaptcha = new ReCaptchaImpl();
-	}
-
-	// TODO: fix captcha support
-	private void applyCaptcha(Model model) {
-		if (this.captchaEnabled) {
-			model.addAttribute("captchaEnabled", true);
-			model.addAttribute("recaptchaPublicKey", this.recaptchaPublicKey);
-		}
-	}
+	@Autowired
+	private CaptchaService captchaService;
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@ExceptionHandler({
@@ -160,16 +142,6 @@ public class RegistrationRestController {
 		return new RegistrationResponse(Status.BINDING_ERROR, null, exception
 				.getBindingResult().getFieldErrors(), exception
 				.getBindingResult().getGlobalErrors());
-	}
-
-	@ResponseStatus(value = HttpStatus.OK)
-	@ExceptionHandler({
-		InvalidRecaptchaException.class
-	})
-	public RegistrationResponse handleRecaptchaException(
-			InvalidRecaptchaException exception) {
-		return new RegistrationResponse(Status.RECAPTCHA_ERROR,
-				exception.getMessage(), null, null);
 	}
 
 	@InitBinder
@@ -185,24 +157,14 @@ public class RegistrationRestController {
 	public RegistrationResponse registerUser(final HttpServletRequest request,
 			@RequestBody @Valid final UserDto userDto,
 			final BindingResult bindingResult) throws BindException,
-			InvalidRecaptchaException {
-		final String reCaptchaChallenge = request
-				.getParameter("recaptcha_challenge_field");
-		final String reCaptchaResponse = request
-				.getParameter("recaptcha_response_field");
-		if (this.captchaEnabled && !StringUtils.isEmpty(reCaptchaChallenge)) {
-			if (!StringUtils.isEmpty(reCaptchaResponse)) {
-				final ReCaptchaResponse reCaptchaCheck = this.reCaptcha
-						.checkAnswer(this.remoteAddress, reCaptchaChallenge,
-								reCaptchaResponse);
-
-				if (!reCaptchaCheck.isValid()) {
-					throw new InvalidRecaptchaException("invalid");
-				}
-			} else {
-				throw new InvalidRecaptchaException("empty");
-			}
+			URISyntaxException, ClientProtocolException, IOException {
+		List<String> recaptchaErrorCodes = captchaService.checkCaptcha(userDto
+				.getRecaptchaResponse());
+		if (recaptchaErrorCodes!=null && !recaptchaErrorCodes.isEmpty()) {
+			return new RegistrationResponse(Status.RECAPTCHA_ERROR,
+					recaptchaErrorCodes, null, null);
 		}
+
 		this.validate(request, userDto, bindingResult);
 
 		final User user = new User(userDto.getUsername(),
@@ -224,18 +186,11 @@ public class RegistrationRestController {
 		return new RegistrationResponse(Status.OK, null, null, null);
 	}
 
-	@Value("${recaptchaPrivateKey}")
-	public void setRecaptchaPrivateKey(String key) {
-		if (this.captchaEnabled) {
-			this.reCaptcha.setPrivateKey(key);
-		}
-	}
-
 	@RequestMapping(value = "/api/user/register/validate", method = RequestMethod.POST)
 	private RegistrationResponse validate(final HttpServletRequest request,
 			@RequestBody @Valid final UserDto userDto,
 			final BindingResult bindingResult)
-					throws InvalidRecaptchaException, BindException {
+			throws  BindException {
 
 		this.userDtoValidator.validate(userDto, bindingResult);
 		if (bindingResult.hasErrors()) {

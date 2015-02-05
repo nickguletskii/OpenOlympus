@@ -29,8 +29,8 @@
 </head>
 
 <body th:fragment="content">
-
-    <form name="userForm" role="form" novalidate="" ng-submit="register(user)">
+    <div class="spinner" ng-if="!loaded"></div>
+    <form name="userForm" role="form" novalidate="" ng-submit="register(user)" ng-show="!!loaded">
         <input label="register.form.labels.username" type="text" ng-model="user.username" ng-length="4,16" ng-username="" required="" oolinput=""></input>
         <input label="register.form.labels.password" type="password" ng-model="user.password" ng-passwords-match-master="passwordConfirmation" ng-length="6,32" required="" oolinput=""></input>
         <input label="register.form.labels.passwordConfirmation" type="password" ng-model="user.passwordConfirmation" ng-model-options="{ updateOn: 'default passwordChanged' }" ng-passwords-match-slave="password" ng-length="6,32" required="" oolinput=""></input>
@@ -59,6 +59,14 @@
                 <datepicker name="dateOfBirth" datepicker-localdate="" ng-model="user.dateOfBirth" min-date="minDate" show-weeks="true" class="well well-sm"></datepicker>
             </div>
         </div>
+
+        <div class="form-group">
+            <div id="no-captcha"></div>
+            <div class="error-list">
+                <span class="constraint-length help-block text-danger" ng-repeat="captchaError in captchaErrors">{{ captchaError | captchaErrorToOwnKey | translate}}</span>
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-default">{{'register.registerButton' | translate}}</button>
         <a ng-class="{disabled:!form.$valid}"></a>
     </form>

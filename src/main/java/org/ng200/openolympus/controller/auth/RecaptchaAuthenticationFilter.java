@@ -23,6 +23,8 @@
 package org.ng200.openolympus.controller.auth;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -30,35 +32,23 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import net.tanesha.recaptcha.ReCaptchaImpl;
-import net.tanesha.recaptcha.ReCaptchaResponse;
-
+import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
+import org.ng200.openolympus.services.CaptchaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
-//TODO: Write ReCaptcha support for the new API
-public class ReCaptchaAuthenticationFilter extends GenericFilterBean {
+public class RecaptchaAuthenticationFilter extends GenericFilterBean {
 
 	private final AntPathRequestMatcher LOGIN_REQUEST_MATCHER = new AntPathRequestMatcher(
 			"/login", "POST");
 
-	@Value("${enableCaptcha}")
-	private boolean captchaEnabled;
-
-	private final ReCaptchaImpl reCaptcha;
-	private final Logger logger = LoggerFactory
-			.getLogger(ReCaptchaAuthenticationFilter.class);
-
-	@Value("${remoteAddress}")
-	private String remoteAddress;
-
-	public ReCaptchaAuthenticationFilter() {
-		this.reCaptcha = new ReCaptchaImpl();
-	}
+	private static final Logger logger = LoggerFactory
+			.getLogger(RecaptchaAuthenticationFilter.class);
+	@Autowired
+	private CaptchaService captchaService;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -67,52 +57,33 @@ public class ReCaptchaAuthenticationFilter extends GenericFilterBean {
 			chain.doFilter(request, response);
 			return;
 		}
+		final String recaptchaResponse = request
+				.getParameter("recaptchaResponse");
 
-		final String reCaptchaChallenge = request
-				.getParameter("recaptcha_challenge_field");
-		final String reCaptchaResponse = request
-				.getParameter("recaptcha_response_field");
+		List<String> recaptchaErrors;
+		try {
+			recaptchaErrors = this.captchaService
+					.checkCaptcha(recaptchaResponse);
+		} catch (URISyntaxException e) {
+			throw new GeneralNestedRuntimeException(
+					"Couldn't access Recaptcha servers: ", e);
+		}
 
-		if (this.captchaEnabled && !StringUtils.isEmpty(reCaptchaChallenge)) {
-			if (!StringUtils.isEmpty(reCaptchaResponse)) {
-				final ReCaptchaResponse reCaptchaCheck = this.reCaptcha
-						.checkAnswer(this.remoteAddress, reCaptchaChallenge,
-								reCaptchaResponse);
-
-				if (!reCaptchaCheck.isValid()) {
-					this.reCaptchaError(
-							request,
-							response,
-							"ReCaptcha failed : "
-									+ reCaptchaCheck.getErrorMessage());
-					return;
-				} else {
-					chain.doFilter(request, response);
-					return;
-				}
-			} else {
-				this.reCaptchaError(request, response,
-						"ReCaptcha failed : empty answer");
-				return;
-			}
+		if (recaptchaErrors != null && !recaptchaErrors.isEmpty()) {
+			this.recaptchaError(request, response, recaptchaErrors);
+			return;
 		}
 
 		chain.doFilter(request, response);
 	}
 
-	private void reCaptchaError(ServletRequest request,
-			ServletResponse response, String errorMsg) throws IOException {
-		this.logger.warn("ReCaptcha failed : {}", errorMsg);
+	private void recaptchaError(ServletRequest request,
+			ServletResponse response, List<String> recaptchaErrors)
+			throws IOException {
 
 		response.setContentType("application/json");
 		AuthenticationResponder.writeLoginStatusJson(response.getWriter(),
-				"unknown", "failed");
+				"unknown", recaptchaErrors);
 	}
 
-	@Value("${recaptchaPrivateKey}")
-	public void setRecaptchaPrivateKey(String key) {
-		if (this.captchaEnabled) {
-			this.reCaptcha.setPrivateKey(key);
-		}
-	}
 }

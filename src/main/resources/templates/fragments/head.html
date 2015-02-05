@@ -62,6 +62,7 @@
 			"angular-translate": lib("angular-translate/angular-translate"),
 			"angular-translate-loader-url": lib("angular-translate-loader-url/angular-translate-loader-url"),
 			"angular-ui-codemirror": lib("angular-ui-codemirror/ui-codemirror"),
+			"angular-no-captcha": lib("angular-no-captcha/src/angular-no-captcha"),
 			"codemirror": lib("codemirror/lib/codemirror"),
 			"moment": lib("moment/moment"),
 			"moment-tz": lib("moment/moment-tz")
@@ -121,6 +122,9 @@
 			},
 			'angular-ui-codemirror': {
 				deps: ['angular', 'codemirror'],
+			},
+			'angular-no-captcha': {
+				deps: ['angular'],
 			},
 			'codemirror': {
 				exports: 'CodeMirror'

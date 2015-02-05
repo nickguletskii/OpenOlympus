@@ -24,6 +24,7 @@ package org.ng200.openolympus.controller.auth;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -32,12 +33,21 @@ import com.fasterxml.jackson.core.JsonGenerator;
 public class AuthenticationResponder {
 
 	public static void writeLoginStatusJson(Writer out, String authMessage,
-			String captchaMessage) throws IOException, JsonGenerationException {
+			List<String> captchaErrorCodes) throws IOException,
+			JsonGenerationException {
 		final JsonFactory factory = new JsonFactory();
 		final JsonGenerator generator = factory.createGenerator(out);
 		generator.writeStartObject();
 		generator.writeStringField("auth", authMessage);
-		generator.writeStringField("captcha", captchaMessage);
+		if (captchaErrorCodes != null && !captchaErrorCodes.isEmpty()) {
+			generator.writeArrayFieldStart("captchas");
+			for (String captchaErrorCode : captchaErrorCodes) {
+				generator.writeString(captchaErrorCode);
+			}
+			generator.writeEndArray();
+		} else {
+			generator.writeNullField("captchas");
+		}
 		generator.writeEndObject();
 		generator.close();
 	}

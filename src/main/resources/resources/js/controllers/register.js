@@ -22,7 +22,7 @@
  */
 define(['oolutil', 'lodash'],
     function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
+        return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
             $location, $stateParams, Restangular, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
             $scope.$apply(function() {
                 $http.get("/api/security/userStatus").success(function(response) {
@@ -35,6 +35,28 @@ define(['oolutil', 'lodash'],
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.userForm.forceValidation = true;
                 $scope.user = {};
+                $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
+                    console.log(recaptchaPublicKey);
+                    googleGrecaptcha.then(function() {
+                        widgetId = grecaptcha.render(
+                            document.getElementById("no-captcha"), {
+                                "theme": "light",
+                                "sitekey": recaptchaPublicKey,
+                                "callback": function(r) {
+                                    $scope.$apply(function() {
+                                        $scope.user.recaptchaResponse = r;
+                                        $scope.captchaErrors = null;
+                                    });
+                                }
+                            }
+                        );
+                        $scope.resetCaptcha = function() {
+                            grecaptcha.reset(widgetId);
+                            $scope.user.recaptchaResponse = null;
+                        };
+                        $scope.loaded = true;
+                    });
+                });
 
                 $scope.register = function(user) {
                     $http({
@@ -44,6 +66,8 @@ define(['oolutil', 'lodash'],
                     }).then(function(response) {
                         if (response.data.status === "BINDING_ERROR") {
                             ValidationService.report($scope.serverErrorReporter, $scope.userForm, response.data.fieldErrors);
+                        } else if (response.data.status === "RECAPTCHA_ERROR") {
+                            $scope.captchaErrors = response.data.recaptchaErrorCodes;
                         } else {
                             $state.go("login");
                         }

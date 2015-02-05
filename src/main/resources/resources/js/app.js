@@ -23,7 +23,8 @@
 'use strict';
 
 define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 'controllers',
-    'ui-route', 'restangular', 'bootstrap-tpls', 'angular-form-validation', 'angular-file-upload', 'angular-translate', "angular-translate-loader-url", "angular-ui-codemirror"
+    'ui-route', 'restangular', 'bootstrap-tpls', 'angular-form-validation', 'angular-file-upload',
+    'angular-translate', "angular-translate-loader-url", "angular-ui-codemirror", "angular-no-captcha"
 ], function(require, angular,
     bootstrap, filters, services, directives, controllers) {
 
@@ -31,7 +32,8 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
 
     var app = angular.module('ool', ['pascalprecht.translate', 'restangular', 'ui.router',
         'ui.bootstrap', 'ool.filters', 'ool.controllers',
-        'ool.services', 'ool.directives', 'ngFormValidation', 'angularFileUpload', 'ui.codemirror'
+        'ool.services', 'ool.directives', 'ngFormValidation', 'angularFileUpload', 'ui.codemirror',
+        'noCAPTCHA'
     ]);
     app.config([
         'formValidationDecorationsProvider',
@@ -119,6 +121,15 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
         });
 
     });
-
+    app.factory('$exceptionHandler', function($injector) {
+        return function(exception, cause) {
+            var $rootScope = $injector.get("$rootScope");
+            var $timeout = $injector.get("$timeout");
+            $timeout( function() {
+                $rootScope.showErrorModal = true;
+            }, 1);
+            throw exception;
+        };
+    });
     return app;
 });

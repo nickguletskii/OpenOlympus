@@ -1,4 +1,4 @@
-/*
+/**
  * The MIT License
  * Copyright (c) 2014-2015 Nick Guletskii
  *
@@ -20,34 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-'use strict';
+package org.ng200.openolympus.controller;
 
-define(['angular', 'services', 'lodash'], function(angular, services, _) {
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-    /* Filters */
+@RestController
+public class RecaptchaPublicKeyController {
+	@Value("${recaptchaPublicKey:null}")
+	private String recaptchaPublicKey;
 
-    angular.module('ool.filters', ['ool.services'])
-        .filter("asDate", function() {
-            return function(input) {
-                return new Date(input);
-            };
-        }).filter("minusOneNoValue", function() {
-            return function(input) {
-                if (input === -1)
-                    return "-";
-                return input;
-            };
-        }).filter("pairMap", function() {
-            return function(input, key, primary) {
-                var x = _.filter(input, function(pair) {
-                    return pair.first[primary] === key[primary];
-                });
-
-                return x[0].second;
-            };
-        }).filter("captchaErrorToOwnKey", function() {
-            return function(input) {
-                return "recaptcha." + input;
-            };
-        });
-});
+	@RequestMapping(value = "/api/recaptchaPublicKey", method = RequestMethod.GET, produces = "text/plain")
+	public String getKey() {
+		return recaptchaPublicKey;
+	}
+}

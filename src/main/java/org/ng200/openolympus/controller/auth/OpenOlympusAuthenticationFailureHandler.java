@@ -47,6 +47,6 @@ AuthenticationFailureHandler {
 		response.setContentType("application/json");
 		response.setStatus(HttpStatus.OK.value());
 		AuthenticationResponder.writeLoginStatusJson(response.getWriter(),
-				"failed", "succeded");
+				"failed", null);
 	}
 }

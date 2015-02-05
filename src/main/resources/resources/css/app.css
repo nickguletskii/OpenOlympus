@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 .nav, .pagination, .carousel, .panel-title a {
     cursor: pointer;
 }
@@ -46,6 +47,7 @@ input[type='button'] {
     border: 0;
     padding: 0;
 }
-['ng-cloak'] {
-    display: none;
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+    opacity: 0
 }

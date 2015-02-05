@@ -37,20 +37,10 @@ public class UserDto extends UserInfoDto {
 	@Size(min = 6, max = 32, message = "length")
 	private String password;
 
-	private String recaptchaResponseField;
-
-	private String recaptchaChallengeField;
-
+	private String recaptchaResponse;
+	
 	public String getPassword() {
 		return this.password;
-	}
-
-	public String getRecaptchaChallengeField() {
-		return this.recaptchaChallengeField;
-	}
-
-	public String getRecaptchaResponseField() {
-		return this.recaptchaResponseField;
 	}
 
 	public String getUsername() {
@@ -60,18 +50,16 @@ public class UserDto extends UserInfoDto {
 	public void setPassword(final String password) {
 		this.password = password;
 	}
-
-	public void setRecaptchaChallengeField(String recaptcha_challenge_field) {
-		this.recaptchaChallengeField = recaptcha_challenge_field;
-	}
-
-	public void setRecaptchaResponseField(String recaptchaResponseField) {
-		this.recaptchaResponseField = recaptchaResponseField;
-
-	}
-
 	public void setUsername(final String username) {
 		this.username = username;
+	}
+
+	public String getRecaptchaResponse() {
+		return recaptchaResponse;
+	}
+
+	public void setRecaptchaResponse(String recaptchaResponse) {
+		this.recaptchaResponse = recaptchaResponse;
 	}
 
 }

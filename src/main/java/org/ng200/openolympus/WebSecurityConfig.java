@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationFailureHandler;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationSuccessHandler;
-import org.ng200.openolympus.controller.auth.ReCaptchaAuthenticationFilter;
+import org.ng200.openolympus.controller.auth.RecaptchaAuthenticationFilter;
 import org.ng200.openolympus.customPageSupport.CustomPage;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.repositories.OlympusPersistentTokenRepositoryImpl;
@@ -183,8 +183,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public ReCaptchaAuthenticationFilter reCaptchaAuthenticationFilter() {
-		return new ReCaptchaAuthenticationFilter();
+	public RecaptchaAuthenticationFilter reCaptchaAuthenticationFilter() {
+		return new RecaptchaAuthenticationFilter();
 	}
 
 	@Bean

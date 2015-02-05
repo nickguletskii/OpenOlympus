@@ -45,6 +45,6 @@ AuthenticationSuccessHandler {
 					throws IOException, ServletException {
 		response.setContentType("application/json");
 		AuthenticationResponder.writeLoginStatusJson(response.getWriter(),
-				"succeded", "succeded");
+				"succeded", null);
 	}
 }

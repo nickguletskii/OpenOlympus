@@ -20,17 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.exceptions;
+package org.ng200.openolympus;
 
-public class InvalidRecaptchaException extends Exception {
+import java.util.List;
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -4823136097813895929L;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-	public InvalidRecaptchaException(String message) {
-		super(message);
+public class RecaptchaResponse {
+	private boolean success;
+	private List<String> errorCodes;
+
+	public boolean isSuccess() {
+		return success;
+	}
+
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
+
+	@JsonProperty("error-codes")
+	public List<String> getErrorCodes() {
+		return errorCodes;
+	}
+
+	@JsonProperty("error-codes")
+	public void setErrorCodes(List<String> errorCodes) {
+		this.errorCodes = errorCodes;
 	}
 
 }

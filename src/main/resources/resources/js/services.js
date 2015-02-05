@@ -69,7 +69,7 @@ define(['angular', 'app', 'lodash'], function(angular, app, _) {
                 return _.contains(data.roles, "SUPERUSER");
             },
             update: update,
-            login: function(username, password) {
+            login: function(username, password, recaptchaResponse) {
                 return $http({
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -78,8 +78,9 @@ define(['angular', 'app', 'lodash'], function(angular, app, _) {
                     url: '/login',
                     transformRequest: transform,
                     data: {
-                        username: username,
-                        password: password
+                        'username': username,
+                        'password': password,
+                        'recaptchaResponse': recaptchaResponse
                     }
                 });
             },

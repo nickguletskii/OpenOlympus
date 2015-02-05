@@ -22,7 +22,7 @@
  */
 define(['oolutil', 'lodash'],
     function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
+        return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
             $location, $stateParams, Restangular, $state, AuthenticationProvider) {
             $scope.$apply(function() {
                 $http.get("/api/security/userStatus").success(function(response) {
@@ -43,9 +43,33 @@ define(['oolutil', 'lodash'],
                     }
                 }
 
+                $scope.resetCaptcha = function() {};
+
+                $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
+                    googleGrecaptcha.then(function() {
+                        widgetId = grecaptcha.render(
+                            document.getElementById("no-captcha"), {
+                                "theme": "light",
+                                "sitekey": recaptchaPublicKey,
+                                "callback": function(r) {
+                                    $scope.$apply(function() {
+                                        $scope.recaptchaResponse = r;
+                                        $scope.captchaErrors = null;
+                                    });
+                                }
+                            }
+                        );
+                        $scope.resetCaptcha = function() {
+                            grecaptcha.reset(widgetId);
+                            $scope.recaptchaResponse = null;
+                        };
+                        $scope.loaded = true;
+                    });
+                });
+
                 $scope.login = function() {
 
-                    AuthenticationProvider.login($scope.username, $scope.password).success(function(response) {
+                    AuthenticationProvider.login($scope.username, $scope.password, $scope.recaptchaResponse).success(function(response) {
                         if (response.auth === "succeded") {
                             AuthenticationProvider.update();
                             $state.go("home");
@@ -53,8 +77,11 @@ define(['oolutil', 'lodash'],
                             $scope.authError = true;
                             changeTooltips(response.auth);
                         }
+                        if (response.captchas) {
+                            $scope.captchaErrors = response.captchas;
+                        }
                     });
-
+                    $scope.resetCaptcha();
                 };
                 $scope.username = "";
                 $scope.password = "";
