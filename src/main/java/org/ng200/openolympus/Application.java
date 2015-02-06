@@ -43,7 +43,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.ErrorPage;
 import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -54,7 +53,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.datasource.init.ScriptException;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -76,14 +74,12 @@ public class Application {
 		final UserService userService = context.getBean(UserService.class);
 		final RoleService roleService = context.getBean(RoleService.class);
 		final DataSource dataSource = context.getBean(DataSource.class);
-		ScriptUtils
-				.executeSqlScript(dataSource.getConnection(),
-						new EncodedResource(new ClassPathResource(
-								"sql/setupTriggers.sql")), false, false,
-						ScriptUtils.DEFAULT_COMMENT_PREFIX,
-						"^^^ NEW STATEMENT ^^^",
-						ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
-						ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
+		ScriptUtils.executeSqlScript(dataSource.getConnection(),
+				new EncodedResource(new ClassPathResource(
+						"sql/setupTriggers.sql")), false, false,
+				ScriptUtils.DEFAULT_COMMENT_PREFIX, "^^^ NEW STATEMENT ^^^",
+				ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
+				ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
 
 		if (userService.getUserByUsername("admin") == null) {
 			Application.logger.info("Creating administrator account");
@@ -165,15 +161,9 @@ public class Application {
 
 	@Bean
 	public EmbeddedServletContainerFactory servletContainer() {
-
 		final TomcatEmbeddedServletContainerFactory containerFactory = new TomcatEmbeddedServletContainerFactory(
 				this.serverPort);
-		containerFactory.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND,
-				"/errors/404"), new ErrorPage(HttpStatus.FORBIDDEN,
-				"/errors/403"));
-
 		containerFactory.setSessionTimeout(30);
-
 		return containerFactory;
 	}
 

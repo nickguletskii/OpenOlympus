@@ -48,6 +48,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
@@ -101,8 +103,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			"/user/**",
 			"/api/task/*/submitSolution"
 	};
-	private static String[] authorisedGet = {
-	};
+	private static String[] authorisedGet = {};
 	private static String[] permittedGet = {};
 	private static String[] administrativeAny = {
 			"/api/admin/**",
@@ -146,6 +147,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.csrf().disable()
 		.headers()
 		.xssProtection().and()
+		.exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
+		.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+		.and()
 		.formLogin()
 		.loginPage("/login")
 		.failureHandler(this.authenticationFailureHandler())

@@ -115,6 +115,12 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
                         $rootScope.showErrorModal = true;
                         return $q.reject(response);
                     }
+
+                    if (response.status == 403) {
+                        $location.path("/forbidden");
+                        return $q.reject(response);
+                    }
+
                     return $q.reject(response);
                 }
             };

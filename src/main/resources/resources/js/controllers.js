@@ -26,6 +26,10 @@ var NARROW = 'col-md-6 col-md-offset-3';
 var WIDE = 'col-md-12 col-md-offset-0';
 
 var stateList = [{
+    "name": "forbidden",
+    "url": "/forbidden",
+    "templateUrl": "/partials/forbidden"
+},{
     "name": "taskView",
     "url": "/task/{taskId:[0-9]+}?contestId",
     "templateUrl": "/partials/task",
