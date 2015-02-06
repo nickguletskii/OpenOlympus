@@ -50,11 +50,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping(value = "/solutionDownload")
 public class SolutionDownloadController {
 
-	public static UriComponentsBuilder getUriBuilder() {
-		return MvcUriComponentsBuilder
-				.fromController(SolutionDownloadController.class);
-	}
-
 	@Autowired
 	private SolutionService solutionService;
 

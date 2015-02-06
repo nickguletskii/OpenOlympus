@@ -51,11 +51,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/contest/{contest}/edit")
 public class ContestModificationController {
 
-	public static UriComponentsBuilder getUriBuilder() {
-		return MvcUriComponentsBuilder
-				.fromController(ContestModificationController.class);
-	}
-
 	@Autowired
 	private ContestDtoValidator contestDtoValidator;
 
@@ -74,9 +69,6 @@ public class ContestModificationController {
 		this.contestDtoValidator.validate(contestDto, contest, bindingResult);
 
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("submitURL", ContestModificationController
-					.getUriBuilder().buildAndExpand(contest.getId()).encode()
-					.toUriString());
 			return "contest/add";
 		}
 		contest.setName(contestDto.getName());
@@ -95,9 +87,6 @@ public class ContestModificationController {
 		contestDto.setName(contest.getName());
 		contestDto.setDuration(contest.getDuration() / (60 * 1000));
 		contestDto.setStartTime(contest.getStartTime());
-		model.addAttribute("submitURL", ContestModificationController
-				.getUriBuilder().buildAndExpand(contest.getId()).encode()
-				.toUriString());
 		return "contest/add";
 	}
 }

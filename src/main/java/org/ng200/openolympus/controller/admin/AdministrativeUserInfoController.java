@@ -42,12 +42,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/admin/user/{user}/personalInfo")
 public class AdministrativeUserInfoController extends
 		AbstractUserInfoController {
-
-	public static UriComponentsBuilder getUriBuilder() {
-		return MvcUriComponentsBuilder
-				.fromController(AdministrativeUserInfoController.class);
-	}
-
+	
 	@RequestMapping(method = RequestMethod.POST)
 	public BindingResponse changePersonInfo(final Model model,
 			@Valid final UserInfoDto userInfoDto,

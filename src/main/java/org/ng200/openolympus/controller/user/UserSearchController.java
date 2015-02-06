@@ -39,12 +39,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Controller
 @RequestMapping(value = "/api/userCompletion")
 public class UserSearchController {
-
-	public static UriComponentsBuilder getUriBuilder() {
-		return MvcUriComponentsBuilder
-				.fromController(UserSearchController.class);
-	}
-
+	
 	@Autowired
 	private UserService userService;
 

@@ -48,11 +48,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping(value = "/api/contestTimeRemaining/{contest}")
 public class ContestTimerController {
 
-	public static UriComponentsBuilder getUriBuilder() {
-		return MvcUriComponentsBuilder
-				.fromController(ContestTimerController.class);
-	}
-
 	@Autowired
 	private ContestService contestService;
 

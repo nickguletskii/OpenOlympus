@@ -52,11 +52,6 @@ import com.google.common.collect.ImmutableMap;
 @RestController
 public class ContestTaskAdditionController {
 
-	public static UriComponentsBuilder getUriBuilder() {
-		return MvcUriComponentsBuilder
-				.fromController(ContestTaskAdditionController.class);
-	}
-
 	@Autowired
 	private TaskService taskService;
 	@Autowired

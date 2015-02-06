@@ -46,11 +46,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TaskDescriptionSourcecodeController extends
 TaskFilesystemManipulatingController {
 
-	public static UriComponentsBuilder getUriBuilder() {
-		return MvcUriComponentsBuilder
-				.fromController(TaskDescriptionSourcecodeController.class);
-	}
-
 	@Autowired
 	private StorageService storageService;
 
