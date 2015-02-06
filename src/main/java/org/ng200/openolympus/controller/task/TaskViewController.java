@@ -115,12 +115,6 @@ public class TaskViewController {
 		return task.getName();
 	}
 
-	@InitBinder
-	protected void initBinder(final HttpServletRequest request,
-			final ServletRequestDataBinder binder) throws Exception {
-		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-	}
-
 	@PreAuthorize("hasAuthority('SUPERUSER') or ((@oolsec.taskInContest(#task) or (@oolsec.noLockdown() and @oolsec.noContest() and #task.published)) and hasAuthority('USER'))")
 	@RequestMapping(value = "/api/task/{task}", method = RequestMethod.GET)
 	public TaskDescriptionView showTaskView(

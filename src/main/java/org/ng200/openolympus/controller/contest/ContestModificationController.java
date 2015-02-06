@@ -86,12 +86,6 @@ public class ContestModificationController {
 		return null;
 	}
 
-	@InitBinder
-	protected void initBinder(final HttpServletRequest request,
-			final ServletRequestDataBinder binder) throws Exception {
-		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-	}
-
 	@RequestMapping(method = RequestMethod.GET)
 	public String showContestEditingForm(final Model model,
 			@PathVariable("contest") final Contest contest,

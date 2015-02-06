@@ -75,12 +75,6 @@ public class TaskModificationRestController extends
 		return taskModificationDto;
 	}
 
-	@InitBinder
-	protected void initBinder(final HttpServletRequest request,
-			final ServletRequestDataBinder binder) throws Exception {
-		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-	}
-
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.POST)
 	public Callable<BindingResponse> patchTask(
 			@PathVariable("task") final Task task,

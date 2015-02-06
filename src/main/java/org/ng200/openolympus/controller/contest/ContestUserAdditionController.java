@@ -81,10 +81,4 @@ public class ContestUserAdditionController {
 				.put("username", contestUserAdditionDto.getUsername()).build());
 	}
 
-	@InitBinder
-	protected void initBinder(final HttpServletRequest request,
-			final ServletRequestDataBinder binder) throws Exception {
-		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-	}
-
 }

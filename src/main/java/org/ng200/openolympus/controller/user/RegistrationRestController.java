@@ -120,9 +120,6 @@ public class RegistrationRestController {
 	@Value("${remoteAddress}")
 	private String remoteAddress;
 
-	private static CustomDateEditor dateEditor = new CustomDateEditor(
-			new SimpleDateFormat("YYYY-MM-DD"), true);
-
 	@Autowired
 	private UserDtoValidator userDtoValidator;
 	@Autowired
@@ -144,15 +141,6 @@ public class RegistrationRestController {
 				.getBindingResult().getGlobalErrors());
 	}
 
-	@InitBinder
-	protected void initBinder(final HttpServletRequest request,
-			final ServletRequestDataBinder binder) throws Exception {
-		binder.registerCustomEditor(LocalDate.class,
-				RegistrationRestController.dateEditor);
-		binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-
-	}
-
 	@RequestMapping(value = "/api/user/register", method = RequestMethod.POST)
 	public RegistrationResponse registerUser(final HttpServletRequest request,
 			@RequestBody @Valid final UserDto userDto,
@@ -160,7 +148,7 @@ public class RegistrationRestController {
 			URISyntaxException, ClientProtocolException, IOException {
 		List<String> recaptchaErrorCodes = captchaService.checkCaptcha(userDto
 				.getRecaptchaResponse());
-		if (recaptchaErrorCodes!=null && !recaptchaErrorCodes.isEmpty()) {
+		if (recaptchaErrorCodes != null && !recaptchaErrorCodes.isEmpty()) {
 			return new RegistrationResponse(Status.RECAPTCHA_ERROR,
 					recaptchaErrorCodes, null, null);
 		}
@@ -189,8 +177,7 @@ public class RegistrationRestController {
 	@RequestMapping(value = "/api/user/register/validate", method = RequestMethod.POST)
 	private RegistrationResponse validate(final HttpServletRequest request,
 			@RequestBody @Valid final UserDto userDto,
-			final BindingResult bindingResult)
-			throws  BindException {
+			final BindingResult bindingResult) throws BindException {
 
 		this.userDtoValidator.validate(userDto, bindingResult);
 		if (bindingResult.hasErrors()) {
