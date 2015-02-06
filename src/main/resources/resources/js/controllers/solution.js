@@ -22,23 +22,20 @@
  */
 define(['oolutil', 'lodash'],
     function(Util, _) {
-        return ['$timeout', '$q', '$scope', '$rootScope', '$http', '$location',
-            '$stateParams', 'Restangular',
-            function($timeout, $q, $scope, $rootScope, $http, $location,
-                $stateParams, Restangular) {
+        return function($timeout, $q, $scope, $rootScope, $http, $location,
+            $stateParams) {
 
-                $scope.$apply(function() {
-                    function update() {
-                        $http.get("/api/solution/" + $stateParams.solutionId).success(function(response) {
-                            console.log(response);
-                            $scope.verdicts = response.verdicts;
-                            $scope.solutionMaximumScore = response.maximumScore;
-                            $scope.solutionScore = response.score;
-                        });
-                    }
-                    update();
-                    // TODO: Websocket integration: server should push verdict updates.
-                });
-            }
-        ];
+            $scope.$apply(function() {
+                function update() {
+                    $http.get("/api/solution/" + $stateParams.solutionId).success(function(response) {
+                        console.log(response);
+                        $scope.verdicts = response.verdicts;
+                        $scope.solutionMaximumScore = response.maximumScore;
+                        $scope.solutionScore = response.score;
+                    });
+                }
+                update();
+                // TODO: Websocket integration: server should push verdict updates.
+            });
+        };
     });

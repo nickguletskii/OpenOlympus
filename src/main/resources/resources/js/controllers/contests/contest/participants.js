@@ -22,25 +22,22 @@
  */
 define(['oolutil', 'lodash'],
     function(Util, _) {
-        return ['$timeout', '$q', '$scope', '$rootScope', '$http', '$location',
-            '$stateParams', 'Restangular',
-            function($timeout, $q, $scope, $rootScope, $http, $location,
-                $stateParams, Restangular) {
+        return function($timeout, $q, $scope, $rootScope, $http, $location,
+            $stateParams) {
 
-                $scope.$apply(function() {
-                    var page = $stateParams.page;
+            $scope.$apply(function() {
+                var page = $stateParams.page;
 
-                    $scope.page = $stateParams.page;
+                $scope.page = $stateParams.page;
 
-                    Restangular.all('api/contest/'+$stateParams.contestId+"/participants").getList({
-                        page: page
-                    }).then(function(users) {
-                        $scope.users = users;
-                    });
-                    $http.get('api/contest/'+$stateParams.contestId+'/participantsCount').then(function(response) {
-                        $scope.userCount = response.data;
-                    });
+                $http.get('api/contest/' + $stateParams.contestId + "/participants", {
+                    page: page
+                }).success(function(users) {
+                    $scope.users = users;
                 });
-            }
-        ];
+                $http.get('api/contest/' + $stateParams.contestId + '/participantsCount').then(function(response) {
+                    $scope.userCount = response.data;
+                });
+            });
+        };
     });

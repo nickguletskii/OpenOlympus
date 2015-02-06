@@ -23,7 +23,7 @@
 define(['oolutil', 'lodash', 'moment-tz'],
     function(Util, _, moment) {
         return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, Restangular, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
+            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
             $scope.$apply(function() {
                 $scope.serverErrorReporter = new ServersideFormErrorReporter({
                     'startTime': ['time', 'date']

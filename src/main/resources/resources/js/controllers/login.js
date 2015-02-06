@@ -23,7 +23,7 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
-            $location, $stateParams, Restangular, $state, AuthenticationProvider) {
+            $location, $stateParams, $state, AuthenticationProvider) {
             $scope.$apply(function() {
                 $http.get("/api/security/userStatus").success(function(response) {
                     if (response.loggedIn) {

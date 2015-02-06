@@ -23,7 +23,7 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, Restangular, $state) {
+            $location, $stateParams, $state) {
 
 
         };

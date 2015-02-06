@@ -23,7 +23,7 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, Restangular, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
+            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
             $scope.$apply(function() {
                 $scope.getUserSuggestions = function(name) {
                     return $http.get("/api/userCompletion", {

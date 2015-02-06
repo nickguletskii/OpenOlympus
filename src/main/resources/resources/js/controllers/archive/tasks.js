@@ -22,25 +22,22 @@
  */
 define(['oolutil', 'lodash'],
     function(Util, _) {
-        return ['$timeout', '$q', '$scope', '$rootScope', '$http', '$location',
-            '$stateParams', 'Restangular',
-            function($timeout, $q, $scope, $rootScope, $http, $location,
-                $stateParams, Restangular) {
-                $scope.$apply(function() {
-                    var page = $stateParams.page;
+        return function($timeout, $q, $scope, $rootScope, $http, $location,
+            $stateParams) {
+            $scope.$apply(function() {
+                var page = $stateParams.page;
 
-                    $scope.page = $stateParams.page;
+                $scope.page = $stateParams.page;
 
-                    Restangular.all('api/archive/tasks').getList({
-                        page: page
-                    }).then(function(tasks) {
-                        $scope.tasks = tasks;
-                    });
-
-                    $http.get('api/archive/taskCount').then(function(response) {
-                        $scope.taskCount = response.data;
-                    });
+                $http.get('api/archive/tasks', {
+                    page: page
+                }).success(function(tasks) {
+                    $scope.tasks = tasks;
                 });
-            }
-        ];
+
+                $http.get('api/archive/taskCount').then(function(response) {
+                    $scope.taskCount = response.data;
+                });
+            });
+        };
     });

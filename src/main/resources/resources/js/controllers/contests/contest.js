@@ -22,16 +22,13 @@
  */
 define(['oolutil', 'lodash'],
     function(Util, _) {
-        return ['$timeout', '$q', '$scope', '$rootScope', '$http', '$location',
-            '$stateParams', 'Restangular',
-            function($timeout, $q, $scope, $rootScope, $http, $location,
-                $stateParams, Restangular) {
-                $scope.$apply(function() {
-                    $scope.contestId = $stateParams.contestId;
-                    Restangular.all('api/contest/' + $stateParams.contestId).getList().then(function(tasks) {
-                        $scope.tasks = tasks;
-                    });
+        return function($timeout, $q, $scope, $rootScope, $http, $location,
+            $stateParams) {
+            $scope.$apply(function() {
+                $scope.contestId = $stateParams.contestId;
+                $http.get('api/contest/' + $stateParams.contestId).success(function(tasks) {
+                    $scope.tasks = tasks;
                 });
-            }
-        ];
+            });
+        };
     });

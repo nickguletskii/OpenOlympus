@@ -23,7 +23,7 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, $state, Restangular) {
+            $stateParams, $state) {
             $scope.$apply(function() {
                 $http.post('/api/task/' + $stateParams.taskId + '/rejudgeTask').success(function(response) {
                     $state.go("^.rejudgeTaskSuccess", {
