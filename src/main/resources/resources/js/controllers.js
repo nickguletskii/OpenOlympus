@@ -29,7 +29,7 @@ var stateList = [{
     "name": "forbidden",
     "url": "/forbidden",
     "templateUrl": "/partials/forbidden"
-},{
+}, {
     "name": "taskView",
     "url": "/task/{taskId:[0-9]+}?contestId",
     "templateUrl": "/partials/task",
@@ -105,6 +105,15 @@ var stateList = [{
     "templateUrl": "/partials/user/solutions",
     "controllerPath": "controllers/user/solutions",
     "controller": "UserSolutionListController",
+    "params": {
+        "page": 1
+    }
+}, {
+    "name": "adminSolutionList",
+    "url": "/admin/solutions?page",
+    "templateUrl": "/partials/admin/solutions",
+    "controllerPath": "controllers/admin/solutions",
+    "controller": "AdminSolutionListController",
     "params": {
         "page": 1
     }
