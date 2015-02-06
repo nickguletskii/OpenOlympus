@@ -81,7 +81,7 @@ var stateList = [{
     }
 }, {
     "name": "contestParticipantsList",
-    "url": "/contest/{contestId:[0-9]+}/participants",
+    "url": "/contest/{contestId:[0-9]+}/participants?userId",
     "templateUrl": "/partials/contests/contest/participants",
     "controllerPath": "controllers/contests/contest/participants",
     "controller": "ContestParticipantsListController",
@@ -205,6 +205,13 @@ var modalStateList = [{
     "templateUrl": "/partials/contests/contest/addTask",
     "controllerPath": "controllers/contests/contest/addTask",
     "controller": "ContestTaskAdditionController",
+    "backdrop": true
+}, {
+    "parent": "contestParticipantsList",
+    "name": "contestParticipantsList.addUserTime",
+    "templateUrl": "/partials/contests/contest/addUserTime",
+    "controllerPath": "controllers/contests/contest/addUserTime",
+    "controller": "ContestUserTimeAdditionController",
     "backdrop": true
 }];
 

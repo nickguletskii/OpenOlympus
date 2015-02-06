@@ -25,27 +25,30 @@ package org.ng200.openolympus.dto;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.ng200.openolympus.model.User;
+
 public class ContestUserTimeAdditionDto {
 	@NotNull(message = "contest.addUserTime.form.errors.empty")
-	private String username;
+	private User user;
+
 	@NotNull(message = "contest.addUserTime.form.errors.empty")
 	@Min(value = 1, message = "contest.addUserTime.form.errors.mustBePositive")
-	private Long duration;
+	private Long time;
 
-	public Long getDuration() {
-		return this.duration;
+	public User getUser() {
+		return user;
 	}
 
-	public String getUsername() {
-		return this.username;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
-	public void setDuration(final Long duration) {
-		this.duration = duration;
+	public Long getTime() {
+		return time;
 	}
 
-	public void setUsername(final String username) {
-		this.username = username;
+	public void setTime(Long time) {
+		this.time = time;
 	}
 
 }

@@ -46,14 +46,13 @@ public class ContestUserTimeAdditionDtoValidator {
 		if (errors.hasErrors()) {
 			return;
 		}
-		final User user = this.userService
-				.getUserByUsername(contestTimeAddition.getUsername());
-		if (user == null) {
+		if (contestTimeAddition.getUser() == null) {
 			errors.rejectValue("username", "",
 					"contest.addUserTime.form.errors.userDoesntExist");
 			return;
 		}
-		if (!this.contestService.isUserParticipatingIn(user, contest)) {
+		if (!this.contestService.isUserParticipatingIn(
+				contestTimeAddition.getUser(), contest)) {
 			errors.rejectValue("username", "",
 					"contest.addUserTime.form.errors.userNotInContest");
 			return;
