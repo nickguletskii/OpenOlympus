@@ -30,7 +30,9 @@ define(['oolutil', 'lodash'],
                 $scope.page = $stateParams.page;
 
                 $http.get('api/archive/tasks', {
-                    page: page
+                    params: {
+                        page: page
+                    }
                 }).success(function(tasks) {
                     $scope.tasks = tasks;
                 });

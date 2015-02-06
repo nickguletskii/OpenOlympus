@@ -31,7 +31,9 @@ define(['oolutil', 'lodash'],
                 $scope.page = $stateParams.page;
 
                 $http.get('api/user/solutions', {
-                    page: page
+                    params: {
+                        page: page
+                    }
                 }).success(function(solutions) {
                     $scope.solutions = solutions;
                 });

@@ -31,7 +31,9 @@ define(['oolutil', 'lodash'],
                 $scope.page = $stateParams.page;
 
                 $http.get('api/archive/rank', {
-                    page: page
+                    params: {
+                        page: page
+                    }
                 }).success(function(users) {
                     $scope.users = users;
                 });

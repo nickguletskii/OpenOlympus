@@ -31,7 +31,9 @@ define(['oolutil', 'lodash'],
                 $scope.page = $stateParams.page;
 
                 $http.get('api/contest/' + $stateParams.contestId + "/participants", {
-                    page: page
+                    params: {
+                        page: page
+                    }
                 }).success(function(users) {
                     $scope.users = users;
                 });

@@ -31,7 +31,9 @@ define(['oolutil', 'lodash'],
                 $scope.page = $stateParams.page;
 
                 $http.get('api/contest/' + $stateParams.contestId + "/results", {
-                    page: page
+                    params: {
+                        page: page
+                    }
                 }).success(function(users) {
                     $scope.users = users;
                     $scope.tasks = _.map(users[0].taskScores, function(taskScore) {

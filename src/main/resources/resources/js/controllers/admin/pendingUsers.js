@@ -32,7 +32,9 @@ define(['oolutil', 'lodash'],
 
                 function updateUsers() {
                     $http.get('api/admin/pendingUsers', {
-                        page: page
+                        params: {
+                            page: page
+                        }
                     }).success(function(users) {
                         $scope.users = users;
                     });
@@ -44,7 +46,9 @@ define(['oolutil', 'lodash'],
 
                 function handleApprovalResponse(userApprovals) {
                     $http.get('api/admin/pendingUsers', {
-                        page: page
+                        params: {
+                            page: page
+                        }
                     }).success(function(users) {
                         $scope.users = _.map(users, function(user) {
                             var oldUser = _.find($scope.users, function(oldUser) {
