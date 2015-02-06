@@ -51,7 +51,7 @@
         <input label="contest.creationForm.labels.duration" type="number" ng-model="contest.duration" min="1" ng-min="1" required="" oolinput=""></input>
 
         <div class="form-group">
-            <button type="submit" ng-disabled="!contestCreationForm.$valid" class="btn btn-default">{{'contest.creationForm.labels.createButton' | translate}}</button>
+            <button type="submit" ng-disabled="contestCreationForm.$invalid || contestCreationForm.$pristine" class="btn btn-default">{{'contest.creationForm.labels.createButton' | translate}}</button>
         </div>
     </form>
     <form ng-show="!isFormVisible">

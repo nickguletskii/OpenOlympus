@@ -41,10 +41,8 @@
         </div>
 
         <div class="form-group">
-            <button type="submit" class="btn btn-default">{{'task.creationForm.labels.createButton' | translate}}</button>
+            <button type="submit" class="btn btn-default" ng-disabled="taskCreationForm.$invalid || taskCreationForm.$pristine">{{'task.creationForm.labels.createButton' | translate}}</button>
         </div>
-
-        <a ng-class="{disabled:!form.$valid}"></a>
     </form>
     <form ng-show="!isFormVisible">
         <div class="form-group">
