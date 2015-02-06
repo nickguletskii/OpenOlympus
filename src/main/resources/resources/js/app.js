@@ -61,6 +61,8 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
             function(event, language) {
                 dictionary.instantTranslationFunc = $translate.instant;
             });
+        $rootScope.availableLanguages = ["en", "ru"]; // TODO: Make this dynamic
+        $rootScope.changeLanguage = $translate.use;
     });
 
     app.config(['$translateProvider', 'formValidationErrorsProvider', '$injector', function($translateProvider, $formValidationErrorsProvider) {
@@ -131,7 +133,7 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
         return function(exception, cause) {
             var $rootScope = $injector.get("$rootScope");
             var $timeout = $injector.get("$timeout");
-            $timeout( function() {
+            $timeout(function() {
                 $rootScope.showErrorModal = true;
             }, 1);
             throw exception;

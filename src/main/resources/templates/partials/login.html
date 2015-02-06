@@ -33,12 +33,12 @@
     <div class="spinner" ng-if="!loaded"></div>
     <form role="form" ng-show="!!loaded">
         <div class="form-group" ng-class="authError &amp;&amp; ['has-error', 'has-feedback']">
-            <label for="username" th:text="#{login.username}"></label>
+            <label for="username" translate="login.username"></label>
             <input type="text" ng-model="username" class="form-control" id="username" tooltip-placement="right" tooltip="{{usernameTooltip}}" th:attr="placeholder=#{login.username}"></input>
             <span ng-if="authError" class="glyphicon glyphicon-remove form-control-feedback"></span>
         </div>
         <div class="form-group" ng-class="authError &amp;&amp; ['has-error', 'has-feedback']">
-            <label for="password" th:text="#{login.password}"></label>
+            <label for="password" translate="login.password"></label>
             <input type="password" ng-model="password" class="form-control" id="password" tooltip-placement="right" tooltip="{{passwordTooltip}}" th:attr="placeholder=#{login.password}"></input>
             <span ng-if="authError" class="glyphicon glyphicon-remove form-control-feedback"></span>
         </div>
@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <button type="submit" ng-click="login()" class="btn btn-default" th:text="#{login.loginButton}"></button>
+        <button type="submit" ng-click="login()" class="btn btn-default" translate="login.loginButton"></button>
     </form>
 </body>
 

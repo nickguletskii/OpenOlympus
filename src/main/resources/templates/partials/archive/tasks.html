@@ -29,14 +29,14 @@
 </head>
 
 <body th:fragment="content">
-	<button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{archive.list.tasks.add}" class="hidden-print btn btn-primary btn-sm glyphicon glyphicon-plus" ui-sref="createTask()"></button>
+	<button type="button" ng-if="security.isAdmin()" tooltip="{{'archive.list.tasks.add' | translate}}" class="hidden-print btn btn-primary btn-sm glyphicon glyphicon-plus" ui-sref="createTask()"></button>
 	<table class="table table-striped table-bordered table-hover" id="tasksTable">
 		<thead>
 			<tr>
-				<th ng-if="security.isUser()" th:text="#{archive.list.score}" width="50"></th>
-				<th th:text="#{archive.list.maximumScore}" width="50"></th>
-				<th width="150" th:text="#{archive.list.dateadded}"></th>
-				<th th:text="#{archive.list.taskname}"></th>
+				<th ng-if="security.isUser()" translate="archive.list.score" width="50"></th>
+				<th translate="archive.list.maximumScore" width="50"></th>
+				<th width="150" translate="archive.list.dateadded"></th>
+				<th translate="archive.list.taskname"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -45,9 +45,9 @@
 				<td>{{task.maxScore}}</td>
 				<td>{{task.timeAdded | asDate | date:'yyyy-MM-dd'}}</td>
 				<td><a ui-sref="taskView({taskId: task.id})">{{task.name}}</a>
-					<button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{archive.list.task.editButton}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id})">
+					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'archive.list.task.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id})">
 					</button>
-					<button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{archive.list.task.rejudgeButton}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
+					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'archive.list.task.rejudgeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
 					</button>
 				</td>
 			</tr>

@@ -39,50 +39,39 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" th:text="topbar.openolympus" href="/"></a>
+				<a class="navbar-brand" translate="topbar.openolympus" href="/"></a>
 			</div>
 
 			<div class="collapse navbar-collapse" ng-class="!navCollapsed &amp;&amp; 'in'" ng-click="navCollapsed=true">
 				<ul class="nav navbar-nav">
-					<li th:if="${@contestService.getRunningContest()!=null}">
-						<a th:href="@{|/contest/${@contestService.getRunningContest().id}|}" th:text="#{topbar.navigation.currentContest}" id="headerCurrentContestLink" style="background: #43ac6a;"></a>
+					<li ng-if="!!runningContest">
+						<a ui-sref="contestView({contestId: runningContest.id })" translate="topbar.navigation.currentContest" id="headerCurrentContestLink"></a>
 					</li>
 
 					<li>
 						<a ui-sref="contestList" id="headerContestsLink">
-							<span th:text="#{topbar.navigation.contests}"></span>
+							<span translate="topbar.navigation.contests"></span>
 						</a>
 					</li>
 					<li class="dropdown" dropdown="">
 						<a class="dropdown-toggle" dropdown-toggle="">
-							<span th:text="#{topbar.navigation.archive}"></span>
+							<span translate="topbar.navigation.archive"></span>
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a ui-sref="archiveTaskList" th:text="#{topbar.navigation.archive.tasks}"></a>
+								<a ui-sref="archiveTaskList" translate="topbar.navigation.archive.tasks"></a>
 							</li>
 							<li>
-								<a ui-sref="archiveRank" th:text="#{topbar.navigation.archive.ranking}"></a>
+								<a ui-sref="archiveRank" translate="topbar.navigation.archive.ranking"></a>
 							</li>
 						</ul>
 					</li>
 					<li ng-if="security.isUser()">
-						<a href="/user/solutions" th:text="#{user.solutions}" id="headerSolutionsLink"></a>
-					</li>
-					<li class="dropdown" dropdown="">
-						<a ng-if="security.isUser()" dropdown-toggle="">
-							<span th:text="#{topbar.navigation.misc}"></span>
-							<span class="caret"></span>
-						</a>
-						<ul class="dropdown-menu">
-							<li th:each="customPage : ${@customPages}">
-								<a th:href="@{|${customPage.getURL()}|}" th:text="|${customPage.getTitle(#locale)}|"></a>
-							</li>
-						</ul>
+						<a href="/user/solutions" translate="user.solutions" id="headerSolutionsLink"></a>
 					</li>
 					<li ng-if="security.isAdmin()">
-						<a ui-sref="adminPage" th:text="#{topbar.navigation.admin}" id="headerAdminLink"></a>
+						<a ui-sref="adminPage" translate="topbar.navigation.admin" id="headerAdminLink"></a>
 					</li>
 				</ul>
 
@@ -90,15 +79,12 @@
 					<!-- Right Nav Section -->
 					<li class="dropdown" dropdown="">
 						<a dropdown-toggle="">
-							<span th:text="#{header.languageMenu}"></span>
+							<span translate="header.languageMenu"></span>
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li>
-								<a th:href="@{/locale?name=en_US}" th:text="#{locale.english}"></a>
-							</li>
-							<li>
-								<a th:href="@{/locale?name=ru_RU}" th:text="#{locale.russian}"></a>
+							<li ng-repeat="language in availableLanguages">
+								<a ng-click="changeLanguage(language)">{{ ('locale.language.' + language) | translate }}</a>
 							</li>
 						</ul>
 					</li>
@@ -106,13 +92,13 @@
 						<a ui-sref="user" id="headerUserInfoLink">{{security.getUsername()}}</a>
 					</li>
 					<li ng-if="security.isLoggedIn()">
-						<a ng-click="security.logout()" th:text="#{header.logout}" id="headerLogoutLink"></a>
+						<a ng-click="security.logout()" translate="header.logout" id="headerLogoutLink"></a>
 					</li>
 					<li ng-if="!security.isLoggedIn()">
-						<a ui-sref="login" th:text="#{header.login}"> </a>
+						<a ui-sref="login" translate="header.login"> </a>
 					</li>
 					<li ng-if="!security.isLoggedIn()">
-						<a ui-sref="register" th:text="#{header.register}" id="headerRegisterLink"></a>
+						<a ui-sref="register" translate="header.register" id="headerRegisterLink"></a>
 					</li>
 				</ul>
 			</div>
