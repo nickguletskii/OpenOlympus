@@ -37,7 +37,6 @@ define(['oolutil', 'lodash'],
 
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.userAdditionForm.forceValidation = true;
-                $scope.task = {};
                 $scope.uploadProgressBarColour = function() {
                     if ($scope.uploadFailure)
                         return "danger";
@@ -52,6 +51,7 @@ define(['oolutil', 'lodash'],
                     $scope.uploadSuccess = true;
                     $scope.uploadFailure = false;
                     $scope.processing = false;
+                    $scope.username = "";
                     $translate('contest.addUser.lastAdded', {
                         username: response.data.username
                     }).then(function(d) {
