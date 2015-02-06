@@ -67,7 +67,8 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-default" ng-disabled="userForm.$invalid || userForm.$pristine">{{'register.registerButton' | translate}}</button>
+        <button type="submit" class="btn btn-default">{{'register.registerButton' | translate}}</button>
+        <a ng-class="{disabled:!form.$valid}"></a>
     </form>
 </body>
 

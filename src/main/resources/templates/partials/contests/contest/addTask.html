@@ -41,7 +41,7 @@
 			<input label="{{ 'contest.addTask.taskName' | translate }}" type="text" ng-model="taskName" placeholder="{{ 'contest.addTask.placeholder' | translate }}" typeahead="task for task in getTaskSuggestions($viewValue)" typeahead-loading="{{ 'contest.addTask.loadingSuggestions' | translate }}" class="form-control" oolinput=""></input>
 
 			<div class="form-group">
-				<button type="submit" class="btn btn-default" ng-disabled="isSubmitting || taskAdditionForm.$invalid || taskAdditionForm.$pristine">
+				<button type="submit" class="btn btn-default">
 					<span class="glyphicon glyphicon-refresh" ng-show="isSubmitting"></span> {{'contest.addTask.addTaskButton' | translate}}
 				</button>
 				<p class="text-success" ng-show="!!taskAddedMessage">
