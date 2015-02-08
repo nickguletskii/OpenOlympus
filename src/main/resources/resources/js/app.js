@@ -80,6 +80,8 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
                 'responseError': function(rejection) {
                     var status = rejection.status;
                     var config = rejection.config;
+                    if(!config)
+                        return $q.reject(rejection);
                     var method = config.method;
                     var url = config.url;
 
