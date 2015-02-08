@@ -22,7 +22,7 @@
  */
 'use strict';
 
-define(['angular', 'services', 'lodash'], function(angular, services, _) {
+define(['angular', 'services', 'lodash', 'moment'], function(angular, services, _, moment) {
 
     /* Directives */
 
@@ -94,6 +94,16 @@ define(['angular', 'services', 'lodash'], function(angular, services, _) {
             link: function(scope, elm, attrs, ctrl) {
                 ctrl.$validators.username = function(modelValue, viewValue) {
                     return USERNAME_REGEXP.test(viewValue);
+                };
+            }
+        };
+    }).directive('ngDateTime', function($q, $timeout) {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            link: function(scope, elm, attrs, ctrl) {
+                ctrl.$validators.dateTime = function(modelValue, viewValue) {
+                    return moment(viewValue, "YYYY-MM-DDTHH:mm:ss.SSSZ", true).isValid();
                 };
             }
         };

@@ -37,9 +37,16 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
+import org.ng200.openolympus.IsoDateSerializer;
+import org.ng200.openolympus.model.views.PriviligedView;
+import org.ng200.openolympus.model.views.UnprivilegedView;
+
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @Entity
 @Table(name = "Contests", indexes = {
-                                     @Index(columnList = "startTime")
+	@Index(columnList = "startTime")
 })
 public class Contest implements Serializable {
 	/**
@@ -58,10 +65,10 @@ public class Contest implements Serializable {
 	private String name;
 
 	@ManyToMany(cascade = {
-	                       CascadeType.MERGE,
-	                       CascadeType.REFRESH,
-	                       CascadeType.PERSIST,
-	                       CascadeType.DETACH
+			CascadeType.MERGE,
+			CascadeType.REFRESH,
+			CascadeType.PERSIST,
+			CascadeType.DETACH
 	})
 	private Set<Task> tasks;
 
@@ -96,22 +103,28 @@ public class Contest implements Serializable {
 		return true;
 	}
 
+	@JsonView(UnprivilegedView.class)
 	public long getDuration() {
 		return this.duration;
 	}
 
+	@JsonView(UnprivilegedView.class)
 	public long getId() {
 		return this.id;
 	}
 
+	@JsonView(UnprivilegedView.class)
 	public String getName() {
 		return this.name;
 	}
 
+	@JsonSerialize(using = IsoDateSerializer.class)
+	@JsonView(UnprivilegedView.class)
 	public Date getStartTime() {
 		return this.startTime;
 	}
 
+	@JsonView(PriviligedView.class)
 	public Set<Task> getTasks() {
 		return this.tasks;
 	}

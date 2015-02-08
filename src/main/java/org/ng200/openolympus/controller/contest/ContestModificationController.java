@@ -29,26 +29,22 @@ import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestDto;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.RestController;
 
-//TODO: Port contest modification to new API
-@Controller
-@RequestMapping("/contest/{contest}/edit")
+@RestController
+@RequestMapping("/api/contest/{contest}/edit")
 public class ContestModificationController {
 
 	@Autowired
@@ -58,35 +54,29 @@ public class ContestModificationController {
 	private ContestService contestService;
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String editContest(final Model model,
+	public BindingResponse editContest(final Model model,
 			final HttpServletRequest request,
 			@PathVariable("contest") Contest contest,
 			@Valid final ContestDto contestDto,
 			final BindingResult bindingResult) throws IllegalStateException,
-			IOException, ArchiveException {
+			IOException, ArchiveException, BindException {
 		Assertions.resourceExists(contest);
 
 		this.contestDtoValidator.validate(contestDto, contest, bindingResult);
 
 		if (bindingResult.hasErrors()) {
-			return "contest/add";
+			throw new BindException(bindingResult);
 		}
 		contest.setName(contestDto.getName());
 		contest.setDuration(contestDto.getDuration() * 60 * 1000);
 		contest.setStartTime(contestDto.getStartTime());
 		contest = this.contestService.saveContest(contest);
-		return null;
+		return BindingResponse.OK;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String showContestEditingForm(final Model model,
-			@PathVariable("contest") final Contest contest,
-			final ContestDto contestDto) {
-		Assertions.resourceExists(contest);
-
-		contestDto.setName(contest.getName());
-		contestDto.setDuration(contest.getDuration() / (60 * 1000));
-		contestDto.setStartTime(contest.getStartTime());
-		return "contest/add";
+	public Contest showContestEditingForm(
+			@PathVariable("contest") final Contest contest) {
+		return contest;
 	}
 }

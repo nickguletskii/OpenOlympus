@@ -52,7 +52,6 @@ public class ContestViewController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize("@oolsec.noContest() or (@oolsec.userInContest(contest) and hasAuthority('USER')) and hasAuthority('SUPERUSER')")
 	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public Set<Task> showContestHub(

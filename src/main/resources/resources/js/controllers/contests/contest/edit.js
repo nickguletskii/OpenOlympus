@@ -20,17 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash', 'moment'],
+define(['oolutil', 'lodash', 'moment-tz'],
     function(Util, _, moment) {
         return function($timeout, $q, $scope, $rootScope, $http,
             $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
             $scope.$apply(function() {
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.contestCreationForm.forceValidation = true;
-                $scope.contest = {
-                    duration: 0,
-                    startTime: moment().format("YYYY-MM-DDTHH:mm:ss.SSSZ")
-                };
+                $scope.contestModificationForm.forceValidation = true;
+                $scope.contest = {};
+                $http.get("/api/contest/" + $stateParams.contestId + "/edit").success(function(contest) {
+                    $scope.contest = contest;
+                    $scope.contest.duration = contest.duration / (60 * 1000);
+                });
 
                 $scope.open = function($event) {
                     $event.preventDefault();
@@ -49,7 +50,6 @@ define(['oolutil', 'lodash', 'moment'],
                 $scope.isFormVisible = true;
 
                 function success(response) {
-                    $scope.createdContestId = response.data.id;
                     $scope.isFormVisible = false;
                     $scope.uploadSuccess = true;
                     $scope.uploadFailure = false;
@@ -71,7 +71,7 @@ define(['oolutil', 'lodash', 'moment'],
                 }
                 $scope.reset = reset;
 
-                $scope.createContest = function(contest) {
+                $scope.modifyContest = function(contest) {
                     $scope.isFormVisible = false;
                     console.log(contest);
                     try {
@@ -79,8 +79,7 @@ define(['oolutil', 'lodash', 'moment'],
                         _(contest).forEach(function(value, key) {
                             fd.append(key, value);
                         });
-                        ValidationService.postToServer($scope, '/api/contests/create', $scope.contestCreationForm, fd, success, failure, reset);
-
+                        ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/edit', $scope.contestModificationForm, fd, success, failure, reset);
                     } catch (err) {
                         reset();
                     }

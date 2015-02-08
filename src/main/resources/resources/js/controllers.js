@@ -136,6 +136,12 @@ var stateList = [{
     "controllerPath": "controllers/contests/add",
     "controller": "ContestCreationController"
 }, {
+    "name": "editContest",
+    "url": "/contest/{contestId:[0-9]+}/edit",
+    "templateUrl": "/partials/contests/contest/edit",
+    "controllerPath": "controllers/contests/contest/edit",
+    "controller": "ContestModificationController"
+}, {
     "name": "login",
     "url": "/login?failure",
     "templateUrl": "/partials/login",
