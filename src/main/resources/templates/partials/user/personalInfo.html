@@ -1,0 +1,75 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+</head>
+
+<body th:fragment="content">
+    <div class="spinner" ng-if="!loaded"></div>
+    <div class="row">
+        <form name="passwordForm" role="form" novalidate="" ng-submit="changePassword(password)" ng-show="!!loaded">
+            <input label="user.password.form.labels.existingPassword" ng-if="requireExistingPassword" type="password" ng-model="password.existingPassword" oolinput=""></input>
+            <input label="user.password.form.labels.password" type="password" ng-model="password.password" ng-passwords-match-master="passwordConfirmation" ng-length="6,32" required="" oolinput=""></input>
+            <input label="user.password.labels.passwordConfirmation" type="password" ng-model="password.passwordConfirmation" ng-model-options="{ updateOn: 'default passwordChanged' }" ng-passwords-match-slave="password" ng-length="6,32" required="" oolinput=""></input>
+            <button type="submit" class="btn" ng-class="{'btn-success':updatedPassword}">
+                <span ng-if="updatedPassword" class="glyphicon glyphicon-ok"></span> {{'user.password.changeButton' | translate}}</button>
+        </form>
+    </div>
+    <div class="row">
+        <form name="userForm" role="form" novalidate="" ng-submit="patchUser(user)" ng-show="!!loaded">
+            <input label="user.personalInfo.formlabels.emailAddress" type="email" ng-model="user.emailAddress" ng-length="3" required="" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.firstNameMain" type="text" ng-model="user.firstNameMain" ng-length="1" required="" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.middleNameMain" type="text" ng-model="user.middleNameMain" ng-length="1" required="" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.lastNameMain" type="text" ng-model="user.lastNameMain" ng-length="1" required="" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.firstNameLocalised" type="text" ng-model="user.firstNameLocalised" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.middleNameLocalised" type="text" ng-model="user.middleNameLocalised" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.lastNameLocalised" type="text" ng-model="user.lastNameLocalised" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.teacherFirstName" type="text" ng-model="user.teacherFirstName" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.teacherMiddleName" type="text" ng-model="user.teacherMiddleName" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.teacherLastName" type="text" ng-model="user.teacherLastName" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.addressLine1" type="text" ng-model="user.addressLine1" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.addressLine2" type="text" ng-model="user.addressLine2" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.addressCity" type="text" ng-model="user.addressCity" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.addressState" type="text" ng-model="user.addressState" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.addressCountry" type="text" ng-model="user.addressCountry" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.landline" type="text" ng-model="user.landline" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.mobile" type="text" ng-model="user.mobile" ng-length="1" oolinput=""></input>
+            <input label="user.personalInfo.formlabels.school" type="text" ng-model="user.school" ng-length="1" oolinput=""></input>
+            <div class="form-group ">
+                <div class="center-block">
+                    <label>{{'user.personalInfo.formlabels.dateOfBirth' | translate}}</label>
+                    <datepicker name="dateOfBirth" datepicker-localdate="" ng-model="user.dateOfBirth" min-date="minDate" show-weeks="true" class="well well-sm"></datepicker>
+                </div>
+            </div>
+
+            <button type="submit" class="btn" ng-class="{'btn-success':updatedUser}">
+                <span ng-if="updatedUser" class="glyphicon glyphicon-ok"></span> {{'user.personalInfo.saveButton' | translate}}</button>
+        </form>
+    </div>
+</body>
+
+</html>

@@ -22,22 +22,20 @@
  */
 package org.ng200.openolympus.controller.user;
 
+import java.io.IOException;
 import java.security.Principal;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.PasswordChangeDto;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.validation.PasswordChangeDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,18 +50,25 @@ public class ChangePasswordController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/user/changePassword", method = RequestMethod.POST)
+	@Autowired
+	private PasswordChangeDtoValidator passwordChangeDtoValidator;
+
+	@RequestMapping(value = "/api/user/changePassword", method = RequestMethod.PATCH)
 	public BindingResponse changePassword(
-			@Valid @RequestBody final PasswordChangeDto userDto,
+			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,
 			final BindingResult bindingResult, final Principal principal)
 			throws BindException {
+		final User user = this.userService.getUserByUsername(principal
+				.getName());
+
+		passwordChangeDtoValidator.validate(passwordChangeDto, user,
+				bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 
-		final User user = this.userService.getUserByUsername(principal
-				.getName());
-		user.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
+		user.setPassword(this.passwordEncoder.encode(passwordChangeDto
+				.getPassword()));
 		this.userService.saveUser(user);
 		return BindingResponse.OK;
 	}

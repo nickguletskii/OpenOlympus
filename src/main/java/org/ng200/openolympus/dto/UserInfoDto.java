@@ -34,7 +34,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 public class UserInfoDto {
 
-	public static final String PHONE_REGEX = "\\+?[0-9]+";
+	public static final String PHONE_REGEX = "\\+?[0-9]*";
 
 	@Email(message = "email")
 	@NotNull(message = "required")

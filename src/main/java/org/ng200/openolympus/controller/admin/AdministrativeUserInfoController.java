@@ -33,19 +33,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("/admin/user/{user}/personalInfo")
+@RestController
 public class AdministrativeUserInfoController extends
 		AbstractUserInfoController {
-	
-	@RequestMapping(method = RequestMethod.POST)
+
+	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.PATCH)
 	public BindingResponse changePersonInfo(final Model model,
-			@Valid final UserInfoDto userInfoDto,
+			@Valid @RequestBody final UserInfoDto userInfoDto,
 			final BindingResult bindingResult,
 			@PathVariable(value = "user") final User user) {
 		Assertions.resourceExists(user);
@@ -53,7 +52,7 @@ public class AdministrativeUserInfoController extends
 		return BindingResponse.OK;
 	}
 
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(
 			@PathVariable(value = "user") final User user) {
 		final UserInfoDto userInfoDto = new UserInfoDto();

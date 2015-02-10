@@ -31,7 +31,7 @@ define(['angular', 'app', 'lodash'], function(angular, app, _) {
     angular.module('ool.services', []).factory('AuthenticationProvider', function($rootScope, $http, $timeout) {
         var data = {
             loggedIn: false,
-            username: null,
+            user: null,
             roles: []
         };
         var poller = function() {
@@ -60,7 +60,12 @@ define(['angular', 'app', 'lodash'], function(angular, app, _) {
                 return data.loggedIn;
             },
             getUsername: function() {
-                return data.username;
+                if (!data.user)
+                    return null;
+                return data.user.username;
+            },
+            getUser: function() {
+                return data.user;
             },
             isUser: function() {
                 return _.contains(data.roles, "USER");
@@ -138,9 +143,9 @@ define(['angular', 'app', 'lodash'], function(angular, app, _) {
     }).factory('ValidationService', function($injector) {
         return {
             report: function(reporter, form, errors) {
-                _.chain(form).filter(function(element) {
+                _.map(_.filter(form, function(element) {
                     return _.has(element, "$setValidity");
-                }).map(function(element) {
+                }), function(element) {
                     return element.$name;
                 }).forEach(function(field) {
                     reporter.report(form[field], field, errors);

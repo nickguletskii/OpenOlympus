@@ -159,6 +159,42 @@ var stateList = [{
     "controller": "RegistrationController",
     "customWidth": NARROW
 }, {
+    "name": "personalInfoModificationView",
+    "url": "/user/personalInfo",
+    "templateUrl": "/partials/user/personalInfo",
+    "controllerPath": "controllers/user/personalInfo",
+    "controller": "PersonalInfoModificationController",
+    "customWidth": NARROW,
+    "resolve": {
+        personalInfoPatchUrl: function() {
+            return '/api/user/personalInfo';
+        },
+        passwordPatchUrl: function() {
+            return '/api/user/changePassword';
+        },
+        requireExistingPassword: function() {
+            return true;
+        }
+    }
+}, {
+    "name": "administrativePersonalInfoModificationView",
+    "url": "/admin/user/{userId:[0-9]+}/personalInfo",
+    "templateUrl": "/partials/user/personalInfo",
+    "controllerPath": "controllers/user/personalInfo",
+    "controller": "AdministrativePersonalInfoModificationController",
+    "customWidth": NARROW,
+    "resolve": {
+        personalInfoPatchUrl: function($stateParams) {
+            return '/api/admin/user/' + $stateParams.userId + '/personalInfo';
+        },
+        passwordPatchUrl: function($stateParams) {
+            return '/api/admin/user/' + $stateParams.userId + '/changePassword';
+        },
+        requireExistingPassword: function() {
+            return false;
+        }
+    }
+}, {
     "name": "home",
     "url": "/",
     "templateUrl": "/partials/home",
@@ -173,6 +209,16 @@ var stateList = [{
     "customWidth": WIDE,
     "controllerPath": "controllers/admin/pendingUsers",
     "controller": "PendingUsersController",
+    "params": {
+        "page": 1
+    }
+}, {
+    "name": "adminUsersList",
+    "url": "/admin/users?page",
+    "templateUrl": "/partials/admin/users",
+    "customWidth": WIDE,
+    "controllerPath": "controllers/admin/users",
+    "controller": "AdministrativeUsersController",
     "params": {
         "page": 1
     }
@@ -238,23 +284,29 @@ stateList.forEach(function(state) {
 
 define(required, function(require, angular, _) {
 
-    var getControllerInjector = function(controllerPath) {
-        return ['$scope', '$stateParams', '$injector',
+    var getControllerInjector = function(controllerPath, resolve) {
+        if (!resolve)
+            resolve = [];
+        return _.union(['$scope', '$stateParams', '$injector'], resolve, [
             function($scope, $stateParams, $injector) {
+                var args = arguments;
                 require([controllerPath], function(controller) {
-                    $injector.invoke(controller, this, {
+                    var routerArgs = _.assign({
                         '$scope': $scope,
-                        '$stateParams': $stateParams
-                    });
+                        '$stateParams': $stateParams,
+                    }, _.zipObject(resolve,
+                        _.takeRight(args, resolve.length)
+                    ));
+                    $injector.invoke(controller, this, routerArgs);
                 });
             }
-        ];
+        ]);
     };
 
     var controllers = angular.module('ool.controllers', ['ool.services']);
 
     function processState(state) {
-        controllers.controller(state.controller, getControllerInjector(state.controllerPath));
+        controllers.controller(state.controller, getControllerInjector(state.controllerPath, _.keys(state.resolve)));
     }
 
     _.each(stateList, processState);

@@ -22,17 +22,13 @@
  */
 package org.ng200.openolympus.controller.user;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.dto.UserInfoDto;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 
 public class AbstractUserInfoController {
 

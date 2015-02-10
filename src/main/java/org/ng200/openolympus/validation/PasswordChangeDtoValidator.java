@@ -20,32 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.dto;
+package org.ng200.openolympus.validation;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.io.IOException;
 
-public class PasswordChangeDto {
-	private String existingPassword;
+import org.ng200.openolympus.dto.PasswordChangeDto;
+import org.ng200.openolympus.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
 
-	@NotNull(message = "empty")
-	@Size(min = 6, max = 32, message = "length")
-	private String password;
+@Component
+public class PasswordChangeDtoValidator {
 
-	public String getExistingPassword() {
-		return this.existingPassword;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	public void validate(final PasswordChangeDto passwordChangeDto, User user,
+			final Errors errors) {
+		if (errors.hasErrors()) {
+			return;
+		}
+		if (passwordChangeDto.getExistingPassword() == null)
+			errors.rejectValue("existingPassword", "", "empty");
+		else if (!passwordEncoder.matches(
+				passwordChangeDto.getExistingPassword(), user.getPassword()))
+			errors.rejectValue("existingPassword", "", "passwordDoesntMatch");
 	}
-
-	public String getPassword() {
-		return this.password;
-	}
-
-	public void setExistingPassword(final String existingPassword) {
-		this.existingPassword = existingPassword;
-	}
-
-	public void setPassword(final String password) {
-		this.password = password;
-	}
-
 }

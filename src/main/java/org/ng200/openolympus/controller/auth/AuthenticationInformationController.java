@@ -27,34 +27,37 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.cerberus.util.Lists;
+import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @RestController
 public class AuthenticationInformationController {
+
 	public static class UserStatus {
 		private boolean loggedIn;
-		private String username;
+		private User user;
 		private List<String> roles;
 
-		public UserStatus(boolean loggedIn, String username, List<String> roles) {
+		public UserStatus(boolean loggedIn, User user, List<String> roles) {
 			super();
 			this.loggedIn = loggedIn;
-			this.username = username;
+			this.user = user;
 			this.roles = roles;
 		}
 
+		@JsonView(UnprivilegedView.class)
 		public List<String> getRoles() {
 			return this.roles;
 		}
 
-		public String getUsername() {
-			return this.username;
-		}
-
+		@JsonView(UnprivilegedView.class)
 		public boolean isLoggedIn() {
 			return this.loggedIn;
 		}
@@ -67,21 +70,28 @@ public class AuthenticationInformationController {
 			this.roles = roles;
 		}
 
-		public void setUsername(String username) {
-			this.username = username;
+		@JsonView(UnprivilegedView.class)
+		public User getUser() {
+			return user;
 		}
+
+		public void setUser(User user) {
+			this.user = user;
+		}
+
 	}
 
 	@Autowired
 	private UserService userService;
 
+	@JsonView(UnprivilegedView.class)
 	@RequestMapping(value = "/api/security/userStatus", method = RequestMethod.GET)
 	public UserStatus getUsers(Principal principal) {
 		if (principal == null) {
 			return new UserStatus(false, null, Lists.from());
 		}
-		return new UserStatus(true, principal.getName(), this.userService
-				.getUserByUsername(principal.getName()).getRoles().stream()
+		User user = this.userService.getUserByUsername(principal.getName());
+		return new UserStatus(true, user, user.getRoles().stream()
 				.map(role -> role.getRoleName()).collect(Collectors.toList()));
 	}
 

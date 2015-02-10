@@ -42,20 +42,17 @@ public class AdminUserListRestController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/admin/users/delete", method = RequestMethod.DELETE)
-	public String deleteUsers(@RequestParam("users") List<Long> userIds) {
-		final List<User> users = userIds.stream()
-				.map(id -> this.userService.getUserById(id))
-				.collect(Collectors.toList());
-		this.userService.deleteUsers(users);
-		return "ok";
-	}
-
 	@RequestMapping(value = "/api/admin/users", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUsersAlphabetically(page,
 				AdminUserListRestController.PAGE_SIZE);
+	}
+
+	@RequestMapping(value = "/api/admin/usersCount", method = RequestMethod.GET)
+	@JsonView(PriviligedView.class)
+	public long countUsers() {
+		return this.userService.countUsers();
 	}
 
 }

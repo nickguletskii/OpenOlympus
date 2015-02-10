@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.controller.BindingResponse;
@@ -30,18 +29,17 @@ import org.ng200.openolympus.dto.PasswordChangeDto;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class AdministrativeChangePasswordController {
 
 	@Autowired
@@ -50,13 +48,17 @@ public class AdministrativeChangePasswordController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/admin/user/{user}/changePassword", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/admin/user/{user}/changePassword", method = RequestMethod.PATCH)
 	public BindingResponse changePassword(
-			@Valid @RequestBody final PasswordChangeDto userDto,
+			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,
 			final BindingResult bindingResult,
-			@PathVariable(value = "user") final User user) {
+			@PathVariable(value = "user") final User user) throws BindException {
 
-		user.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
+		if (bindingResult.hasErrors()) {
+			throw new BindException(bindingResult);
+		}
+
+		user.setPassword(this.passwordEncoder.encode(passwordChangeDto.getPassword()));
 		this.userService.saveUser(user);
 		return BindingResponse.OK;
 	}

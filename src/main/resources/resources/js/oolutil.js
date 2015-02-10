@@ -21,36 +21,44 @@
  * THE SOFTWARE.
  */
 define(function() {
-	String.prototype.endsWith = function(suffix) {
-		return this.indexOf(suffix, this.length - suffix.length) !== -1;
-	};
-	
-	String.prototype.format = function() {
-		var args = arguments;
-		return this.replace(/{(\d+)}/g, function(match, number) {
-			return typeof args[number] != 'undefined' ? args[number] : match;
-		});
-	};
-	
-	var util = {
-		getURLParameters : function() {
-			var result = {}, tmp = [];
-			location.search.substr(1).split("&").forEach(function(item) {
-				tmp = item.split("=");
-				result[tmp[0]] = decodeURIComponent(tmp[1]);
-			});
-			return result;
-		},
-		mergeObjects : function(obj1, obj2) {
-			var obj3 = {};
-			for ( var attrname in obj1) {
-				obj3[attrname] = obj1[attrname];
-			}
-			for ( var attrname in obj2) {
-				obj3[attrname] = obj2[attrname];
-			}
-			return obj3;
-		}
-	};
-	return util;
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+
+    String.prototype.format = function() {
+        var args = arguments;
+        return this.replace(/{(\d+)}/g, function(match, number) {
+            return typeof args[number] != 'undefined' ? args[number] : match;
+        });
+    };
+
+    var util = {
+        getURLParameters: function() {
+            var result = {},
+                tmp = [];
+            location.search.substr(1).split("&").forEach(function(item) {
+                tmp = item.split("=");
+                result[tmp[0]] = decodeURIComponent(tmp[1]);
+            });
+            return result;
+        },
+        mergeObjects: function(obj1, obj2) {
+            var obj3 = {};
+            for (var attrname in obj1) {
+                obj3[attrname] = obj1[attrname];
+            }
+            for (var attrname in obj2) {
+                obj3[attrname] = obj2[attrname];
+            }
+            return obj3;
+        },
+        emptyToNull: function(obj) {
+            return _.mapValues(obj, function(value) {
+            	if(value === "")
+            		return null;
+                return value;
+            });
+        }
+    };
+    return util;
 });

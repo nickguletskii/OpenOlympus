@@ -44,7 +44,7 @@ public class DeleteUserController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/admin/users/deleteUser", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/admin/users/deleteUser", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.OK)
 	@Transactional
 	public void deleteUser(@RequestParam(value = "user") final User user) {
