@@ -29,6 +29,7 @@
 </head>
 
 <body th:fragment="content">
+	<a ng-if="security.isAdmin()" translate="contest.edit" class="hidden-print btn btn-primary btn-sm" ui-sref="editContest({contestId: contestId})"></a>
 	<button type="button" ng-if="security.isAdmin()" translate="contest.addUserButton" class="hidden-print btn btn-primary btn-sm" ui-sref=".addUser"></button>
 	<button type="button" ng-if="security.isAdmin()" translate="contest.addTaskButton" class="hidden-print btn btn-primary btn-sm" ui-sref=".addTask"></button>
 	<button type="button" ng-if="security.isAdmin()" translate="contest.participantsButton" class="hidden-print btn btn-primary btn-sm" ui-sref="contestParticipantsList({contestId:contestId})"></button>

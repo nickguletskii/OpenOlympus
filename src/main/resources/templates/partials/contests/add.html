@@ -31,22 +31,8 @@
 <body th:fragment="content">
     <form name="contestCreationForm" role="form" novalidate="" ng-submit="createContest(contest)" ng-show="isFormVisible">
         <input label="contest.creationForm.labels.name" type="text" ng-model="contest.name" required="" oolinput=""></input>
-        <div class="row">
-            <div class="col-md-6">
-                <input label="contest.creationForm.labels.date" type="text" oolinput="" datepicker-popup="yyyy-MM-dd" is-open="opened" ng-model="contest.date" required="">
-                </input>
-                <button type="button" class="inlined-with-input btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i>
-                </button>
-            </div>
 
-            <div class="col-md-6">
-                <input label="contest.creationForm.labels.time" type="time" ng-model="contest.time" required="" oolinput=""></input>
-            </div>
-        </div>
-
-        <select label="contest.creationForm.labels.timezone" class="form-control" ng-model="contest.timezone" required="" oolinput="">
-            <option ng-repeat="timezone in timezones">{{timezone}}</option>
-        </select>
+        <input label="contest.creationForm.labels.startTime" type="datetime" ng-model="contest.startTime" required="" ng-date-time="" oolinput=""></input>
 
         <input label="contest.creationForm.labels.duration" type="number" ng-model="contest.duration" min="1" ng-min="1" required="" oolinput=""></input>
 
