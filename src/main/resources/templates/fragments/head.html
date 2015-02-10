@@ -48,6 +48,7 @@
 	var require = {
 		baseUrl: "/resources/js/",
 		paths: {
+			"lodash": lib("lodash/lodash"),
 			"angular": lib("angularjs/angular"),
 			"ui-route": lib("angular-ui-router/release/angular-ui-router"),
 			"ui-route-extras": lib("ui-router-extras/release/ct-ui-router-extras"),
@@ -71,10 +72,6 @@
 			name: "when",
 			location: lib("when/"),
 			main: "when"
-		}, {
-			name: "lodash",
-			location: lib("lodash/dist/"),
-			main: "lodash"
 		}, {
 			name: "rest",
 			location: lib("rest/"),
