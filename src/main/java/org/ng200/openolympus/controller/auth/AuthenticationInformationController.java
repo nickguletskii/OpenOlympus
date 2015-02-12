@@ -58,6 +58,11 @@ public class AuthenticationInformationController {
 		}
 
 		@JsonView(UnprivilegedView.class)
+		public User getUser() {
+			return this.user;
+		}
+
+		@JsonView(UnprivilegedView.class)
 		public boolean isLoggedIn() {
 			return this.loggedIn;
 		}
@@ -68,11 +73,6 @@ public class AuthenticationInformationController {
 
 		public void setRoles(List<String> roles) {
 			this.roles = roles;
-		}
-
-		@JsonView(UnprivilegedView.class)
-		public User getUser() {
-			return user;
 		}
 
 		public void setUser(User user) {
@@ -90,7 +90,8 @@ public class AuthenticationInformationController {
 		if (principal == null) {
 			return new UserStatus(false, null, Lists.from());
 		}
-		User user = this.userService.getUserByUsername(principal.getName());
+		final User user = this.userService.getUserByUsername(principal
+				.getName());
 		return new UserStatus(true, user, user.getRoles().stream()
 				.map(role -> role.getRoleName()).collect(Collectors.toList()));
 	}

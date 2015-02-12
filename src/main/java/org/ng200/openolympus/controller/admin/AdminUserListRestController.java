@@ -23,7 +23,6 @@
 package org.ng200.openolympus.controller.admin;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.views.PriviligedView;
@@ -42,17 +41,17 @@ public class AdminUserListRestController {
 	@Autowired
 	private UserService userService;
 
+	@RequestMapping(value = "/api/admin/usersCount", method = RequestMethod.GET)
+	@JsonView(PriviligedView.class)
+	public long countUsers() {
+		return this.userService.countUsers();
+	}
+
 	@RequestMapping(value = "/api/admin/users", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUsersAlphabetically(page,
 				AdminUserListRestController.PAGE_SIZE);
-	}
-
-	@RequestMapping(value = "/api/admin/usersCount", method = RequestMethod.GET)
-	@JsonView(PriviligedView.class)
-	public long countUsers() {
-		return this.userService.countUsers();
 	}
 
 }

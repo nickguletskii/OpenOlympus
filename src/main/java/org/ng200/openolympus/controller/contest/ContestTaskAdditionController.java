@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
@@ -34,18 +33,13 @@ import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -79,7 +73,7 @@ public class ContestTaskAdditionController {
 				this.taskService.getTaskByName(contestTaskAdditionDto
 						.getTaskName()));
 		this.contestService.saveContest(contest);
-		return  new BindingResponse(Status.OK, null, ImmutableMap
+		return new BindingResponse(Status.OK, null, ImmutableMap
 				.<String, Object> builder()
 				.put("taskName", contestTaskAdditionDto.getTaskName()).build());
 	}

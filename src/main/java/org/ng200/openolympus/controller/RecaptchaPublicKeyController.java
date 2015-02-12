@@ -37,6 +37,6 @@ public class RecaptchaPublicKeyController {
 
 	@RequestMapping(value = "/api/recaptchaPublicKey", method = RequestMethod.GET, produces = "text/plain")
 	public String getKey() {
-		return recaptchaEnabled ? recaptchaPublicKey : null;
+		return this.recaptchaEnabled ? this.recaptchaPublicKey : null;
 	}
 }

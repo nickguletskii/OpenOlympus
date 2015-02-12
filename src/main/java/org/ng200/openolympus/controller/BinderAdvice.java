@@ -18,6 +18,6 @@ public class BinderAdvice {
 	@InitBinder
 	protected void initBinder(final HttpServletRequest request,
 			final ServletRequestDataBinder binder) throws Exception {
-		binder.registerCustomEditor(LocalDate.class, dateEditor);
+		binder.registerCustomEditor(LocalDate.class, BinderAdvice.dateEditor);
 	}
 }

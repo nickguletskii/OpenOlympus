@@ -41,12 +41,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 @Service
 public class CaptchaService {
 
-	private CloseableHttpClient httpclient = HttpClients.createDefault();
+	private final CloseableHttpClient httpclient = HttpClients.createDefault();
 
 	@Value("${enableCaptcha}")
 	private boolean captchaEnabled;
@@ -56,26 +55,28 @@ public class CaptchaService {
 
 	public List<String> checkCaptcha(final String recaptchaResponse)
 			throws URISyntaxException, IOException, JsonParseException,
-			JsonMappingException,
-			ClientProtocolException {
-		if (!captchaEnabled)
+			JsonMappingException, ClientProtocolException {
+		if (!this.captchaEnabled) {
 			return null;
+		}
 
-		URI uri = new URIBuilder().setScheme("https").setHost("www.google.com")
-				.setPath("/recaptcha/api/siteverify")
-				.setParameter("secret", recaptchaPrivateKey)
+		final URI uri = new URIBuilder().setScheme("https")
+				.setHost("www.google.com").setPath("/recaptcha/api/siteverify")
+				.setParameter("secret", this.recaptchaPrivateKey)
 				.setParameter("response", recaptchaResponse).build();
 
-		HttpGet httpget = new HttpGet(uri);
-		try (CloseableHttpResponse httpResponse = httpclient.execute(httpget)) {
-			ObjectMapper mapper = new ObjectMapper();
+		final HttpGet httpget = new HttpGet(uri);
+		try (CloseableHttpResponse httpResponse = this.httpclient
+				.execute(httpget)) {
+			final ObjectMapper mapper = new ObjectMapper();
 
-			RecaptchaResponse response = mapper.readValue(httpResponse
+			final RecaptchaResponse response = mapper.readValue(httpResponse
 					.getEntity().getContent(),
 					new TypeReference<RecaptchaResponse>() {
 					});
-			if (response.isSuccess())
+			if (response.isSuccess()) {
 				return null;
+			}
 			return response.getErrorCodes();
 		}
 	}

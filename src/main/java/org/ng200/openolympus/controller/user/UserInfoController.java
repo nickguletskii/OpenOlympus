@@ -23,21 +23,15 @@
 package org.ng200.openolympus.controller.user;
 
 import java.security.Principal;
-import java.time.LocalDate;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.markdown4j.YumlPlugin;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.UserInfoDto;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -62,7 +56,7 @@ public class UserInfoController extends AbstractUserInfoController {
 		return BindingResponse.OK;
 	}
 
-	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.GET) 
+	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(final Principal principal) {
 		final UserInfoDto userInfoDto = new UserInfoDto();
 		super.initialiseDTO(userInfoDto,

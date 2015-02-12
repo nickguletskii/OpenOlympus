@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.controller.user;
 
-import java.io.IOException;
 import java.security.Principal;
 
 import javax.validation.Valid;
@@ -61,7 +60,7 @@ public class ChangePasswordController {
 		final User user = this.userService.getUserByUsername(principal
 				.getName());
 
-		passwordChangeDtoValidator.validate(passwordChangeDto, user,
+		this.passwordChangeDtoValidator.validate(passwordChangeDto, user,
 				bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);

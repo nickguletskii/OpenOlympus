@@ -44,21 +44,22 @@ public class DeleteUserController {
 	@Autowired
 	private UserService userService;
 
+	@RequestMapping(value = "/api/admin/users/deleteUsers", method = RequestMethod.POST)
+	@ResponseStatus(value = HttpStatus.OK)
+	@Transactional
+	public void deleteUser(@RequestBody List<Long> userIds) {
+		final List<User> users = userIds.stream()
+				.map(this.userService::getUserById)
+				.collect(Collectors.toList());
+		users.forEach(Assertions::resourceExists);
+		users.forEach(this.userService::deleteUser);
+	}
+
 	@RequestMapping(value = "/api/admin/users/deleteUser", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.OK)
 	@Transactional
 	public void deleteUser(@RequestParam(value = "user") final User user) {
 		Assertions.resourceExists(user);
 		this.userService.deleteUser(user);
-	}
-
-	@RequestMapping(value = "/api/admin/users/deleteUsers", method = RequestMethod.POST)
-	@ResponseStatus(value = HttpStatus.OK)
-	@Transactional
-	public void deleteUser(@RequestBody List<Long> userIds) {
-		List<User> users = userIds.stream().map(userService::getUserById)
-				.collect(Collectors.toList());
-		users.forEach(Assertions::resourceExists);
-		users.forEach(this.userService::deleteUser);
 	}
 }

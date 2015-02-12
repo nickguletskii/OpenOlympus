@@ -308,6 +308,11 @@ public class User implements UserDetails, Serializable {
 	}
 
 	@JsonView(PriviligedView.class)
+	public boolean isApprovalEmailSent() {
+		return this.approvalEmailSent;
+	}
+
+	@JsonView(PriviligedView.class)
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
@@ -337,6 +342,10 @@ public class User implements UserDetails, Serializable {
 
 	public void setAddressState(final String addressState) {
 		this.addressState = addressState;
+	}
+
+	public void setApprovalEmailSent(boolean approvalEmailSent) {
+		this.approvalEmailSent = approvalEmailSent;
 	}
 
 	public void setBirthDate(final Date birthDate) {
@@ -421,15 +430,6 @@ public class User implements UserDetails, Serializable {
 				.format("User [id=%s, username=%s, firstNameMain=%s, middleNameMain=%s, lastNameMain=%s]",
 						this.id, this.username, this.firstNameMain,
 						this.middleNameMain, this.lastNameMain);
-	}
-
-	@JsonView(PriviligedView.class)
-	public boolean isApprovalEmailSent() {
-		return approvalEmailSent;
-	}
-
-	public void setApprovalEmailSent(boolean approvalEmailSent) {
-		this.approvalEmailSent = approvalEmailSent;
 	}
 
 }

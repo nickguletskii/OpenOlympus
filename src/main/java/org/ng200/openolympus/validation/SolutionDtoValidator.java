@@ -29,7 +29,8 @@ import org.springframework.validation.Errors;
 @Component
 public class SolutionDtoValidator {
 
-	public void validate(final SolutionSubmissionDto solutionDto, final Errors errors) {
+	public void validate(final SolutionSubmissionDto solutionDto,
+			final Errors errors) {
 		if (errors.hasErrors()) {
 			return;
 		}

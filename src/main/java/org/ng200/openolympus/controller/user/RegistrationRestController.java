@@ -24,8 +24,6 @@ package org.ng200.openolympus.controller.user;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,17 +39,13 @@ import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.UserDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -91,6 +85,10 @@ public class RegistrationRestController {
 			return this.globalErrors;
 		}
 
+		public List<String> getRecaptchaErrorCodes() {
+			return this.recaptchaErrorCodes;
+		}
+
 		public Status getStatus() {
 			return this.status;
 		}
@@ -101,10 +99,6 @@ public class RegistrationRestController {
 
 		public void setGlobalErrors(List<ObjectError> globalErrors) {
 			this.globalErrors = globalErrors;
-		}
-
-		public List<String> getRecaptchaErrorCodes() {
-			return recaptchaErrorCodes;
 		}
 
 		public void setRecaptchaErrorCodes(List<String> recaptchaErrorCodes) {
@@ -146,8 +140,8 @@ public class RegistrationRestController {
 			@RequestBody @Valid final UserDto userDto,
 			final BindingResult bindingResult) throws BindException,
 			URISyntaxException, ClientProtocolException, IOException {
-		List<String> recaptchaErrorCodes = captchaService.checkCaptcha(userDto
-				.getRecaptchaResponse());
+		final List<String> recaptchaErrorCodes = this.captchaService
+				.checkCaptcha(userDto.getRecaptchaResponse());
 		if (recaptchaErrorCodes != null && !recaptchaErrorCodes.isEmpty()) {
 			return new RegistrationResponse(Status.RECAPTCHA_ERROR,
 					recaptchaErrorCodes, null, null);

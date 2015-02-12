@@ -23,7 +23,6 @@
 package org.ng200.openolympus.controller.admin;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.views.PriviligedView;
@@ -42,17 +41,17 @@ public class UnapprovedUserListRestController {
 	@Autowired
 	private UserService userService;
 
+	@RequestMapping(value = "/api/admin/pendingUsersCount", method = RequestMethod.GET)
+	@JsonView(PriviligedView.class)
+	public long getUsers() {
+		return this.userService.countUnapprovedUsers();
+	}
+
 	@RequestMapping(value = "/api/admin/pendingUsers", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUnapprovedUsers(page,
 				UnapprovedUserListRestController.PAGE_SIZE);
-	}
-
-	@RequestMapping(value = "/api/admin/pendingUsersCount", method = RequestMethod.GET)
-	@JsonView(PriviligedView.class)
-	public long getUsers() {
-		return this.userService.countUnapprovedUsers();
 	}
 
 }

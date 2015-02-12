@@ -209,14 +209,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				if (request.getHeader("X-Auth-Token") != null) {
 					return request.getHeader("X-Auth-Token");
 				}
-				Cookie[] cookies = request.getCookies();
+				final Cookie[] cookies = request.getCookies();
 
 				if ((cookies == null) || (cookies.length == 0)) {
 					return null;
 				}
 
-				for (Cookie cookie : cookies) {
-					if (REMEMBERME_COOKIE_NAME.equals(cookie.getName())) {
+				for (final Cookie cookie : cookies) {
+					if (WebSecurityConfig.REMEMBERME_COOKIE_NAME.equals(cookie
+							.getName())) {
 						return cookie.getValue();
 					}
 				}
@@ -225,7 +226,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			}
 
 		};
-		rememberMeServices.setCookieName(REMEMBERME_COOKIE_NAME);
+		rememberMeServices
+		.setCookieName(WebSecurityConfig.REMEMBERME_COOKIE_NAME);
 		rememberMeServices.setAlwaysRemember(true);
 		return rememberMeServices;
 	}

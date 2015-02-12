@@ -30,22 +30,22 @@ public class RecaptchaResponse {
 	private boolean success;
 	private List<String> errorCodes;
 
-	public boolean isSuccess() {
-		return success;
-	}
-
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-
 	@JsonProperty("error-codes")
 	public List<String> getErrorCodes() {
-		return errorCodes;
+		return this.errorCodes;
+	}
+
+	public boolean isSuccess() {
+		return this.success;
 	}
 
 	@JsonProperty("error-codes")
 	public void setErrorCodes(List<String> errorCodes) {
 		this.errorCodes = errorCodes;
+	}
+
+	public void setSuccess(boolean success) {
+		this.success = success;
 	}
 
 }

@@ -30,7 +30,6 @@ import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,7 +57,8 @@ public class AdministrativeChangePasswordController {
 			throw new BindException(bindingResult);
 		}
 
-		user.setPassword(this.passwordEncoder.encode(passwordChangeDto.getPassword()));
+		user.setPassword(this.passwordEncoder.encode(passwordChangeDto
+				.getPassword()));
 		this.userService.saveUser(user);
 		return BindingResponse.OK;
 	}

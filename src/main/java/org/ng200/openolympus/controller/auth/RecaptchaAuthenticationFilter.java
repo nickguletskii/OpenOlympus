@@ -64,7 +64,7 @@ public class RecaptchaAuthenticationFilter extends GenericFilterBean {
 		try {
 			recaptchaErrors = this.captchaService
 					.checkCaptcha(recaptchaResponse);
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			throw new GeneralNestedRuntimeException(
 					"Couldn't access Recaptcha servers: ", e);
 		}

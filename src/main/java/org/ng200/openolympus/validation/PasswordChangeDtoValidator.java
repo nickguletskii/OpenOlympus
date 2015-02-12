@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.validation;
 
-import java.io.IOException;
-
 import org.ng200.openolympus.dto.PasswordChangeDto;
 import org.ng200.openolympus.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +40,11 @@ public class PasswordChangeDtoValidator {
 		if (errors.hasErrors()) {
 			return;
 		}
-		if (passwordChangeDto.getExistingPassword() == null)
+		if (passwordChangeDto.getExistingPassword() == null) {
 			errors.rejectValue("existingPassword", "", "empty");
-		else if (!passwordEncoder.matches(
-				passwordChangeDto.getExistingPassword(), user.getPassword()))
+		} else if (!this.passwordEncoder.matches(
+				passwordChangeDto.getExistingPassword(), user.getPassword())) {
 			errors.rejectValue("existingPassword", "", "passwordDoesntMatch");
+		}
 	}
 }

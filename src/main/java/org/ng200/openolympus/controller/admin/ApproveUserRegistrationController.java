@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -112,7 +110,7 @@ public class ApproveUserRegistrationController {
 									.put("link", link).put("user", user)
 									.build());
 			user.setApprovalEmailSent(true);
-			user = userService.saveUser(user);
+			user = this.userService.saveUser(user);
 		} else {
 			final Role role = this.roleService.getRoleByName(Role.USER);
 

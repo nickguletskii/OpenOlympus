@@ -38,9 +38,13 @@ public class UserDto extends UserInfoDto {
 	private String password;
 
 	private String recaptchaResponse;
-	
+
 	public String getPassword() {
 		return this.password;
+	}
+
+	public String getRecaptchaResponse() {
+		return this.recaptchaResponse;
 	}
 
 	public String getUsername() {
@@ -50,16 +54,13 @@ public class UserDto extends UserInfoDto {
 	public void setPassword(final String password) {
 		this.password = password;
 	}
-	public void setUsername(final String username) {
-		this.username = username;
-	}
-
-	public String getRecaptchaResponse() {
-		return recaptchaResponse;
-	}
 
 	public void setRecaptchaResponse(String recaptchaResponse) {
 		this.recaptchaResponse = recaptchaResponse;
+	}
+
+	public void setUsername(final String username) {
+		this.username = username;
 	}
 
 }

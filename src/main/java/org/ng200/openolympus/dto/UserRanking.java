@@ -42,15 +42,6 @@ public class UserRanking extends User {
 
 	private BigInteger rank;
 
-	@JsonView(UnprivilegedView.class)
-	public BigInteger getRank() {
-		return rank;
-	}
-
-	public void setRank(BigInteger rank) {
-		this.rank = rank;
-	}
-
 	public UserRanking() {
 	}
 
@@ -62,8 +53,17 @@ public class UserRanking extends User {
 	}
 
 	@JsonView(UnprivilegedView.class)
+	public BigInteger getRank() {
+		return this.rank;
+	}
+
+	@JsonView(UnprivilegedView.class)
 	public BigDecimal getScore() {
 		return this.score;
+	}
+
+	public void setRank(BigInteger rank) {
+		this.rank = rank;
 	}
 
 	public void setScore(BigDecimal score) {

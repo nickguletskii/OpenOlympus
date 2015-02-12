@@ -35,20 +35,20 @@ public class ContestUserTimeAdditionDto {
 	@Min(value = 1, message = "contest.addUserTime.form.errors.mustBePositive")
 	private Long time;
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
 	public Long getTime() {
-		return time;
+		return this.time;
+	}
+
+	public User getUser() {
+		return this.user;
 	}
 
 	public void setTime(Long time) {
 		this.time = time;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

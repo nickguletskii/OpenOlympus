@@ -39,8 +39,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 public class ContestUserTimeAdditionController {
@@ -71,6 +69,5 @@ public class ContestUserTimeAdditionController {
 				contestUserTimeAdditionDto.getTime() * 60 * 1000);
 		return BindingResponse.OK;
 	}
-
 
 }

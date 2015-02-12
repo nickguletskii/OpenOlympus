@@ -69,6 +69,10 @@ public class UserService implements UserDetailsService {
 
 	}
 
+	public long countUnapprovedUsers() {
+		return this.userRepository.countUnapproved();
+	}
+
 	public long countUsers() {
 		return this.userRepository.count();
 	}
@@ -147,6 +151,11 @@ public class UserService implements UserDetailsService {
 		return this.userRepository.findAll(request).getContent();
 	}
 
+	public boolean isUserApproved(User user) {
+		return user.getRoles().contains(
+				this.roleService.getRoleByName(Role.USER));
+	}
+
 	@Override
 	public UserDetails loadUserByUsername(final String username)
 			throws UsernameNotFoundException {
@@ -160,13 +169,5 @@ public class UserService implements UserDetailsService {
 
 	public User saveUser(User user) {
 		return user = this.userRepository.save(user);
-	}
-
-	public long countUnapprovedUsers() {
-		return this.userRepository.countUnapproved();
-	}
-
-	public boolean isUserApproved(User user) {
-		return user.getRoles().contains(roleService.getRoleByName(Role.USER));
 	}
 }

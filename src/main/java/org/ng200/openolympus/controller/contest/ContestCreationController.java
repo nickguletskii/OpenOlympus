@@ -25,7 +25,6 @@ package org.ng200.openolympus.controller.contest;
 import java.io.IOException;
 import java.util.HashSet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -36,11 +35,8 @@ import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;

@@ -41,7 +41,7 @@ public class AuthenticationResponder {
 		generator.writeStringField("auth", authMessage);
 		if (captchaErrorCodes != null && !captchaErrorCodes.isEmpty()) {
 			generator.writeArrayFieldStart("captchas");
-			for (String captchaErrorCode : captchaErrorCodes) {
+			for (final String captchaErrorCode : captchaErrorCodes) {
 				generator.writeString(captchaErrorCode);
 			}
 			generator.writeEndArray();
