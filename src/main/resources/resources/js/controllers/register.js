@@ -36,7 +36,11 @@ define(['oolutil', 'lodash'],
                 $scope.userForm.forceValidation = true;
                 $scope.user = {};
                 $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
-                    console.log(recaptchaPublicKey);
+                    if (_.isEmpty(recaptchaPublicKey)) {
+                        $scope.captchaDisabled = true;
+                        $scope.loaded = true;
+                        return;
+                    }
                     googleGrecaptcha.then(function() {
                         widgetId = grecaptcha.render(
                             document.getElementById("no-captcha"), {

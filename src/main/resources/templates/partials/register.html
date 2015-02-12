@@ -60,7 +60,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" ng-if="!captchaDisabled">
             <div id="no-captcha"></div>
             <div class="error-list">
                 <span class="constraint-length help-block text-danger" ng-repeat="captchaError in captchaErrors">{{ captchaError | captchaErrorToOwnKey | translate}}</span>

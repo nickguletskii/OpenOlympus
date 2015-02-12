@@ -23,7 +23,7 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
-            $location, $stateParams, $state, AuthenticationProvider) {
+            $location, $stateParams, $state, AuthenticationProvider, $translate) {
             $scope.$apply(function() {
                 $http.get("/api/security/userStatus").success(function(response) {
                     if (response.loggedIn) {
@@ -33,19 +33,15 @@ define(['oolutil', 'lodash'],
                     }
                 });
 
-                function changeTooltips(authStatus) {
-                    if (authStatus == "failed") {
-                        $scope.usernameTooltip = getTranslation("login.wrongUsernameOrPassword");
-                        $scope.passwordTooltip = getTranslation("login.wrongUsernameOrPassword");
-                    } else {
-                        $scope.usernameTooltip = null;
-                        $scope.passwordTooltip = null;
-                    }
-                }
-
                 $scope.resetCaptcha = function() {};
+                $scope.user = {};
 
                 $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
+                    if (_.isEmpty(recaptchaPublicKey)) {
+                        $scope.captchaDisabled = true;
+                        $scope.loaded = true;
+                        return;
+                    }
                     googleGrecaptcha.then(function() {
                         widgetId = grecaptcha.render(
                             document.getElementById("no-captcha"), {
@@ -69,23 +65,24 @@ define(['oolutil', 'lodash'],
 
                 $scope.login = function() {
 
-                    AuthenticationProvider.login($scope.username, $scope.password, $scope.recaptchaResponse).success(function(response) {
-                        if (response.auth === "succeded") {
-                            AuthenticationProvider.update();
-                            $state.go("home");
-                        } else if (response.auth === "failed") {
-                            $scope.authError = true;
-                            changeTooltips(response.auth);
-                        }
-                        if (response.captchas) {
-                            $scope.captchaErrors = response.captchas;
-                        }
-                    });
+                    AuthenticationProvider.login($scope.user.username, $scope.user.password, $scope.recaptchaResponse)
+                        .success(function(response) {
+                            console.log(response);
+                            if (response.auth === "succeded") {
+                                $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", true);
+                                AuthenticationProvider.update();
+                                $state.go("home");
+                            } else if (response.auth === "failed") {
+                                $scope.authError = true;
+                                console.log($scope.loginForm);
+                                $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", false);
+                            }
+                            if (response.captchas) {
+                                $scope.captchaErrors = response.captchas;
+                            }
+                        });
                     $scope.resetCaptcha();
                 };
-                $scope.username = "";
-                $scope.password = "";
-                changeTooltips("none");
             });
         };
     });

@@ -32,8 +32,11 @@ public class RecaptchaPublicKeyController {
 	@Value("${recaptchaPublicKey:null}")
 	private String recaptchaPublicKey;
 
+	@Value("${enableCaptcha:false}")
+	private boolean recaptchaEnabled;
+
 	@RequestMapping(value = "/api/recaptchaPublicKey", method = RequestMethod.GET, produces = "text/plain")
 	public String getKey() {
-		return recaptchaPublicKey;
+		return recaptchaEnabled ? recaptchaPublicKey : null;
 	}
 }
