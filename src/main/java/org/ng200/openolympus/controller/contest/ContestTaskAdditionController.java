@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.contest;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
@@ -33,6 +35,7 @@ import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -54,6 +57,7 @@ public class ContestTaskAdditionController {
 	@Autowired
 	private ContestService contestService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addTask")
 	public BindingResponse addTask(final Model model,
 			@PathVariable(value = "contest") final Contest contest,

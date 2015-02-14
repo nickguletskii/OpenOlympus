@@ -22,6 +22,15 @@
  */
 package org.ng200.openolympus.services;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_OWNER;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+import static org.ng200.openolympus.SecurityExpressionConstants.TASK_PUBLISHED;
+import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +41,6 @@ import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.repositories.SolutionRepository;
 import org.ng200.openolympus.repositories.VerdictRepository;
-import org.ng200.openolympus.util.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -49,40 +57,36 @@ public class SolutionService {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #user.username == authentication.name)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + ')')
 	public long countUserSolutions(final User user) {
 		return this.solutionRepository.countByUser(user);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #user.username == authentication.name)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ TASK_PUBLISHED + ')')
 	public long countUserSolutionsForTask(final User user, final Task task) {
 		return this.solutionRepository.countByUserAndTask(user, task);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
-	public long getNumberOfPages(final long pageSize) {
-		return PageUtils.getNumberOfPages(this.solutionRepository.count(),
-				pageSize);
-	}
-
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public long getNumberOfPendingVerdicts() {
 		return this.verdictRepository.countByTested(false);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #solution.user.username == authentication.name)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + "#solution.user"
+			+ IS_OWNER + ')')
 	public long getNumberOfPendingVerdicts(final Solution solution) {
 		return this.verdictRepository.countBySolutionAndTested(solution, false);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public List<Solution> getPage(final int pageNumber, final int pageSize) {
 		return this.solutionRepository.findAll(
 				new PageRequest(pageNumber - 1, pageSize, Direction.DESC,
 						"timeAdded")).getContent();
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #user.username == authentication.name)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + ')')
 	public List<Solution> getPage(final User user, final Integer pageNumber,
 			final int pageSize, final Date startTime, final Date endTime) {
 		return this.solutionRepository
@@ -91,18 +95,20 @@ public class SolutionService {
 								pageSize));
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #user.username == authentication.name and @oolsec.noContest())")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ NO_CONTEST_CURRENTLY + ')')
 	public List<Solution> getPageOutsideOfContest(final User user,
 			final Integer pageNumber, final int pageSize) {
 		return this.solutionRepository.findByUser(user, new PageRequest(
 				pageNumber - 1, pageSize, Direction.DESC, "timeAdded"));
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public List<Verdict> getPendingVerdicts() {
 		return this.verdictRepository.findByTestedOrderByIdAsc(false);
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	public long getSolutionCount() {
 		return this.solutionRepository.count();
 	}
@@ -113,14 +119,16 @@ public class SolutionService {
 				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #user.username == authentication.name and #task.published)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ TASK_PUBLISHED + ')')
 	public List<Solution> getSolutionsByUserAndTaskNewestFirst(final User user,
 			final Task task, final PageRequest pageRequest) {
 		return this.solutionRepository.findByUserAndTaskOrderByTimeAddedDesc(
 				user, task, pageRequest);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #solution.user.username == authentication.name)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + "#solution.user"
+			+ IS_OWNER + ')')
 	public BigDecimal getSolutionScore(final Solution solution) {
 		if (solution == null) {
 			return BigDecimal.ZERO;
@@ -130,7 +138,8 @@ public class SolutionService {
 				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #solution.user.username == authentication.name)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + "#solution.user"
+			+ IS_OWNER + ')')
 	public List<Verdict> getVerdictsVisibleDuringContest(final Solution solution) {
 		if (this.contestService.getRunningContest() == null) {
 			return this.verdictRepository.findBySolutionOrderByIdAsc(solution);
@@ -140,6 +149,8 @@ public class SolutionService {
 						solution, true);
 	}
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + "#solution.user"
+			+ IS_OWNER + ')')
 	public Solution saveSolution(Solution solution) {
 		return solution = this.solutionRepository.save(solution);
 	}

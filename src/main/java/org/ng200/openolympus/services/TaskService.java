@@ -22,6 +22,14 @@
  */
 package org.ng200.openolympus.services;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+import static org.ng200.openolympus.SecurityExpressionConstants.TASK_PUBLISHED;
+import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
+
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
@@ -42,7 +50,6 @@ import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.repositories.SolutionRepository;
 import org.ng200.openolympus.repositories.TaskRepository;
 import org.ng200.openolympus.repositories.VerdictRepository;
-import org.ng200.openolympus.util.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -74,17 +81,19 @@ public class TaskService {
 	@Autowired
 	private SecurityService securityService;
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	public Long countTasks() {
 		return this.taskRepository.count();
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public List<Task> findAFewTasksWithNameContaining(final String name) {
 		return this.taskRepository.findByNameContaining(name, new PageRequest(
 				0, TaskService.LIMIT_TASKS_WITH_NAME_CONTAINING));
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and @oolsec.noLockdown() and @oolsec.noContest())")
+	@PreAuthorize(IS_ADMIN)
 	public List<Task> findTasksNewestFirst(final int pageNumber,
 			final int pageSize) {
 		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
@@ -92,7 +101,8 @@ public class TaskService {
 		return this.taskRepository.findAll(request).getContent();
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and @oolsec.noLockdown() and @oolsec.noContest())")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	public List<Task> findTasksNewestFirstAndAuthorized(Integer pageNumber,
 			int pageSize, Principal principal) {
 		if (this.securityService.isSuperuser(principal)) {
@@ -104,34 +114,30 @@ public class TaskService {
 		return this.taskRepository.findByPublished(true, request).getContent();
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and @oolsec.noLockdown() and @oolsec.noContest() and #task.published)")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ AND + TASK_PUBLISHED + ')')
 	public BigDecimal getMaximumScore(final Task task) {
 		return Lists.first(
 				this.taskRepository.getTaskMaximumScore(task.getId())).orElse(
-						BigDecimal.ZERO);
+				BigDecimal.ZERO);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and @oolsec.noLockdown() and @oolsec.noContest())")
-	public long getNumberOfPages(final long pageSize) {
-		// TODO: Add counting of published tasks
-		return PageUtils
-				.getNumberOfPages(this.taskRepository.count(), pageSize);
-	}
-
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and #user.username == authorization.name and @oolsec.noLockdown() and @oolsec.noContest())")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ NO_CONTEST_CURRENTLY + AND + TASK_PUBLISHED + ')')
 	public BigDecimal getScore(final Task task, final User user) {
 		return Lists.first(
 				this.taskRepository.getTaskScore(task.getId(), user.getId()))
 				.orElse(BigDecimal.ZERO);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (hasAuthority('USER') and @oolsec.noLockdown() and @oolsec.noContest())")
-	@PostAuthorize("hasAuthority('SUPERUSER') or #returnObject.published")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ NO_CONTEST_CURRENTLY + ')')
+	@PostAuthorize(IS_ADMIN + OR + " #returnObject.published")
 	public Task getTaskByName(final String taskName) {
 		return this.taskRepository.findByName(taskName);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	@Transactional
 	public void rejudgeTask(final Task task) throws ExecutionException {
 
@@ -172,6 +178,7 @@ public class TaskService {
 		}
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	public Task saveTask(Task task) {
 		return task = this.taskRepository.save(task);
 	}

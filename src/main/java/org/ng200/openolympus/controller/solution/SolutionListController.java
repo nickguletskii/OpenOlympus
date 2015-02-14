@@ -22,6 +22,9 @@
  */
 package org.ng200.openolympus.controller.solution;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,7 @@ import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,11 +66,13 @@ public class SolutionListController {
 	@Autowired
 	private TaskService taskService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCount(final User user) {
 		return this.solutionService.getSolutionCount();
 	}
 
+	@PreAuthorize(IS_USER)
 	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCountForUser(final @AuthenticationPrincipal User user) {
 		// TODO: replace with SQL
@@ -81,6 +87,7 @@ public class SolutionListController {
 						user, task)).reduce((x, y) -> x + y).orElse(0l);
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/solutions", method = RequestMethod.GET)
 	public List<SolutionDto> showAllSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
@@ -91,6 +98,7 @@ public class SolutionListController {
 				.collect(Collectors.toList());
 	}
 
+	@PreAuthorize(IS_USER)
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
 	@JsonView(SolutionDto.SolutionDTOView.class)
 	public List<SolutionDto> showUserSolutions(

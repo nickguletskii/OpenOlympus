@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.admin;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import javax.validation.Valid;
 
 import org.ng200.openolympus.controller.BindingResponse;
@@ -29,6 +31,7 @@ import org.ng200.openolympus.dto.PasswordChangeDto;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -47,6 +50,7 @@ public class AdministrativeChangePasswordController {
 	@Autowired
 	private UserService userService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/user/{user}/changePassword", method = RequestMethod.PATCH)
 	public BindingResponse changePassword(
 			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,

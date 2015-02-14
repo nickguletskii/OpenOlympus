@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -33,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,14 +43,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/api/taskSourcecode")
 public class TaskDescriptionSourcecodeController extends
 TaskFilesystemManipulatingController {
 
 	@Autowired
 	private StorageService storageService;
 
-	@RequestMapping(method = RequestMethod.GET)
+	@PreAuthorize(IS_ADMIN)
+	@RequestMapping(value = "/api/taskSourcecode", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<String> getTaskSourcecode(
 			@RequestParam(value = "id") final Task task) throws IOException {
 		Assertions.resourceExists(task);

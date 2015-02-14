@@ -22,12 +22,15 @@
  */
 package org.ng200.openolympus.controller.user;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,6 +44,7 @@ public class UserSearchController {
 	@Autowired
 	private UserService userService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody List<String> searchUsers(
 			@RequestParam(value = "term") final String name) {

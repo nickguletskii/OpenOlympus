@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.contest;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.security.Principal;
 import java.util.List;
 
@@ -32,6 +34,7 @@ import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +50,7 @@ public class ContestParticipantsController {
 	@Autowired
 	private ContestService contestService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> showParticipantsPage(

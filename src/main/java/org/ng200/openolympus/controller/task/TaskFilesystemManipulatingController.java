@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -39,12 +41,14 @@ import org.ng200.openolympus.dto.UploadableTask;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 public class TaskFilesystemManipulatingController {
 
 	@Autowired
 	private StorageService storageService;
 
+	@PreAuthorize(IS_ADMIN)
 	private void extractZipFile(final InputStream zipFile,
 			final File destination) throws Exception {
 		try (ArchiveInputStream input = new ArchiveStreamFactory()
@@ -63,11 +67,13 @@ public class TaskFilesystemManipulatingController {
 		}
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	protected void uploadDescription(final Task task, InputStream inputStream)
 			throws ExecuteException, IOException {
 		this.storageService.writeTaskDescription(task, inputStream);
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	protected void uploadJudgeFile(final Task task, final UploadableTask taskDto)
 			throws IOException, Exception {
 		final File judgeFile = this.storageService.getTaskJudgeFile(task);

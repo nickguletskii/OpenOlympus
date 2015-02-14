@@ -22,6 +22,13 @@
  */
 package org.ng200.openolympus.controller.contest;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.CONTEST_OVER;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
@@ -40,6 +47,7 @@ import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.util.Beans;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,8 +77,8 @@ public class ContestResultsController {
 					.stream()
 					.map(task -> new Pair<Task, BigDecimal>(task,
 							ContestResultsController.this.contestService
-							.getUserTaskScoreInContest(contest,
-									ranking, task)))
+									.getUserTaskScoreInContest(contest,
+											ranking, task)))
 					.collect(Collectors.toList()));
 		}
 
@@ -123,6 +131,7 @@ public class ContestResultsController {
 	@Autowired
 	private TaskService taskService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<ContestUserRankingDto> showCompleteResultsPage(
@@ -135,6 +144,8 @@ public class ContestResultsController {
 				.collect(Collectors.toList());
 	}
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + CONTEST_OVER + AND
+			+ NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/contest/{contest}/results", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public List<ContestUserRankingDto> showResultsPage(

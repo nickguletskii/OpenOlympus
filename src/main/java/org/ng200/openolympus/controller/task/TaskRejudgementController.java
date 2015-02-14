@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.util.concurrent.ExecutionException;
 
 import org.ng200.openolympus.Assertions;
@@ -29,6 +31,7 @@ import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +45,7 @@ public class TaskRejudgementController {
 	@Autowired
 	private TaskService taskService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void rejudgeTask(@PathVariable(value = "task") final Task task,

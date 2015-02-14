@@ -22,6 +22,13 @@
  */
 package org.ng200.openolympus.controller.solution;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+import static org.ng200.openolympus.SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST;
+import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
+
 import java.security.Principal;
 import java.util.List;
 
@@ -41,7 +48,8 @@ public class SolutionStatusController {
 	@Autowired
 	private SolutionService solutionService;
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or ((@oolsec.taskInContest(#solution.task) or (@oolsec.noLockdown() and @oolsec.noContest() and #solution.task.published)) and #solution.user.username == authorization.name and hasAuthority('USER'))")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST + ')')
 	@RequestMapping(value = "/api/solution/{id}/verdicts", method = RequestMethod.GET)
 	public List<Verdict> viewSolutionStatus(
 			@PathVariable(value = "id") final Solution solution,

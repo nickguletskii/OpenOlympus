@@ -22,6 +22,13 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+import static org.ng200.openolympus.SecurityExpressionConstants.TASK_IN_CONTEST;
+import static org.ng200.openolympus.SecurityExpressionConstants.TASK_PUBLISHED;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
@@ -103,7 +110,8 @@ public class TaskViewController {
 	@Autowired
 	private SolutionService solutionService;
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or ((@oolsec.taskInContest(#task) or (@oolsec.noLockdown() and @oolsec.noContest() and #task.published)) and hasAuthority('USER'))")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + TASK_PUBLISHED + AND
+			+ TASK_IN_CONTEST + ')')
 	@RequestMapping(value = "/api/task/{task}/name", method = RequestMethod.GET)
 	public String getTaskName(@PathVariable(value = "task") final Task task,
 			final Locale locale) throws IOException {
@@ -111,7 +119,8 @@ public class TaskViewController {
 		return task.getName();
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or ((@oolsec.taskInContest(#task) or (@oolsec.noLockdown() and @oolsec.noContest() and #task.published)) and hasAuthority('USER'))")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + TASK_PUBLISHED + AND
+			+ TASK_IN_CONTEST + ')')
 	@RequestMapping(value = "/api/task/{task}", method = RequestMethod.GET)
 	public TaskDescriptionView showTaskView(
 			@PathVariable(value = "task") final Task task, final Locale locale)
@@ -121,7 +130,8 @@ public class TaskViewController {
 				this.storageService.getTaskDescription(task));
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or ((@oolsec.taskInContest(#task) or (@oolsec.noLockdown() and @oolsec.noContest() and #task.published)) and hasAuthority('USER'))")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + TASK_PUBLISHED + AND
+			+ TASK_IN_CONTEST + ')')
 	@RequestMapping(value = "/api/task/{task}/submitSolution", method = RequestMethod.POST)
 	public BindingResponse submitSolution(
 			@PathVariable("task") final Task task, final Principal principal,

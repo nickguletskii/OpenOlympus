@@ -22,10 +22,15 @@
  */
 package org.ng200.openolympus.services;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +49,6 @@ import org.ng200.openolympus.repositories.ContestTimeExtensionRepository;
 import org.ng200.openolympus.repositories.SolutionRepository;
 import org.ng200.openolympus.repositories.TaskRepository;
 import org.ng200.openolympus.repositories.UserRepository;
-import org.ng200.openolympus.util.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -73,16 +77,18 @@ public class ContestService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@PreAuthorize(IS_ADMIN)
 	public void addContestParticipant(final Contest contest, final User user) {
 		this.contestParticipationRepository.save(new ContestParticipation(
 				contest, user));
 	}
 
+	@PreAuthorize(IS_USER)
 	public long countContests() {
 		return this.contestRepository.count();
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	@Transactional
 	public void deleteContest(Contest contest) {
 		contest = this.contestRepository.findOne(contest.getId());
@@ -97,17 +103,19 @@ public class ContestService {
 		this.contestRepository.delete(contest);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public void extendTimeForUser(final Contest contest, final User user,
 			final long time) {
 		this.contestTimeExtensionRepository
 				.save(new ContestPerUserTimeExtension(contest, user, time));
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	public Contest getContestByName(final String name) {
 		return this.contestRepository.findByName(name);
 	}
 
+	@PreAuthorize(IS_USER)
 	public Instant getContestEndIncludingAllTimeExtensions(final Contest contest) {
 		return contest
 				.getStartTime()
@@ -133,11 +141,14 @@ public class ContestService {
 								.orElse(0l));
 	}
 
+	@PreAuthorize(IS_USER)
 	public Date getContestEndTime(final Contest contest) {
 		return Date.from(contest.getStartTime().toInstant()
 				.plusMillis(contest.getDuration()));
 	}
 
+	@PreAuthorize(IS_ADMIN + OR + '('
+			+ " #user.username == authentication.name " + ')')
 	public Date getContestEndTimeForUser(final Contest contest, final User user) {
 		return Date.from(contest
 				.getStartTime()
@@ -148,12 +159,7 @@ public class ContestService {
 										contest, user)));
 	}
 
-	public Collection<User> getContestParticipants(final Contest contest) {
-		return this.contestParticipationRepository.findByContest(contest)
-				.stream().map(participation -> participation.getUser())
-				.collect(Collectors.toList());
-	}
-
+	@PreAuthorize(IS_ADMIN)
 	public List<UserRanking> getContestResults(Contest contest) {
 		return this.userRepository
 				.getContestResults(contest.getId(), contest.getStartTime(),
@@ -165,6 +171,8 @@ public class ContestService {
 				.collect(Collectors.toList());
 	}
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	public List<UserRanking> getContestResultsPage(Contest contest, int page) {
 		return this.userRepository
 				.getContestResultsPage(contest.getId(), contest.getStartTime(),
@@ -178,6 +186,7 @@ public class ContestService {
 				.collect(Collectors.toList());
 	}
 
+	@PreAuthorize(IS_USER)
 	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
 			final int pageSize) {
 		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
@@ -185,16 +194,13 @@ public class ContestService {
 		return this.contestRepository.findAll(request).getContent();
 	}
 
+	@PreAuthorize(IS_USER)
 	public Contest getContestThatIntersects(final Date startDate,
 			final Date endDate) {
 		return this.contestRepository.findIntersects(startDate, endDate);
 	}
 
-	public long getNumberOfPages(final long pageSize) {
-		return PageUtils.getNumberOfPages(this.contestRepository.count(),
-				pageSize);
-	}
-
+	@PreAuthorize(IS_ADMIN)
 	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber) {
 		return this.userRepository.findPartiticpants(contest,
 				new PageRequest(pageNumber - 1,
@@ -206,6 +212,7 @@ public class ContestService {
 				Date.from(Instant.now()));
 	}
 
+	@PreAuthorize(IS_USER)
 	public long getTotalTimeExtensionTimeForUser(final Contest contest,
 			final User user) {
 		return this.contestTimeExtensionRepository
@@ -214,6 +221,8 @@ public class ContestService {
 				.reduce((x, y) -> (x + y)).orElse(0l);
 	}
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	public BigDecimal getUserTaskScoreInContest(final Contest contest,
 			final User user, final Task task) {
 		return Lists.first(
@@ -230,7 +239,7 @@ public class ContestService {
 		return !contest.getStartTime().toInstant().isAfter(Instant.now());
 	}
 
-	@PreAuthorize("hasAuthority('USER')")
+	@PreAuthorize(IS_USER)
 	public boolean isContestInProgressForUser(final Contest contest,
 			final User user) {
 		if (Instant.now().isBefore(contest.getStartTime().toInstant())) {
@@ -240,22 +249,19 @@ public class ContestService {
 				.isAfter(Instant.now());
 	}
 
+	@PreAuthorize(IS_USER)
 	public boolean isContestOverIncludingAllTimeExtensions(final Contest contest) {
 		return this.getContestEndIncludingAllTimeExtensions(contest).isBefore(
 				Instant.now());
 	}
 
-	public boolean isUserInContest(final User user, final Contest contest) {
-		return this.contestParticipationRepository.findOneByContestAndUser(
-				contest, user) != null;
-	}
-
+	@PreAuthorize(IS_USER)
 	public boolean isUserParticipatingIn(final User user, final Contest contest) {
 		return this.contestParticipationRepository.findOneByContestAndUser(
 				contest, user) != null;
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public Contest saveContest(Contest contest) {
 		return contest = this.contestRepository.save(contest);
 	}

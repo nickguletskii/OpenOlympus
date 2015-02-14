@@ -22,6 +22,12 @@
  */
 package org.ng200.openolympus.services;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -69,15 +75,18 @@ public class UserService implements UserDetailsService {
 
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	public long countUnapprovedUsers() {
 		return this.userRepository.countUnapproved();
 	}
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	public long countUsers() {
 		return this.userRepository.count();
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public void deleteUser(final User user) {
 		// TODO: use SQL
 		this.solutionRepository.findByUser(user).forEach(
@@ -93,18 +102,19 @@ public class UserService implements UserDetailsService {
 		this.userRepository.delete(user);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public void deleteUsers(List<User> users) {
 		// TODO: use SQL
 		users.forEach(this::deleteUser);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public List<User> findAFewUsersWithNameContaining(final String name) {
 		return this.userRepository.findFirst30Like("%" + name + "%");
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER') or (@oolsec.noLockdown() and @oolsec.noContest() and hasAuthority('USER'))")
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	public List<UserRanking> getArchiveRankPage(final long page,
 			final long pageSize) {
 		return this.userRepository
@@ -116,25 +126,14 @@ public class UserService implements UserDetailsService {
 				.collect(Collectors.toList());
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
-	public long getNumberOfPagesOfUnapprovedUsers(int pageSize) {
-		return PageUtils.getNumberOfPages(
-				this.userRepository.countUnapproved(), pageSize);
-	}
-
-	@PreAuthorize("hasAuthority('SUPERUSER') or (@oolsec.noLockdown() and @oolsec.noContest() and hasAuthority('USER'))")
-	public long getNumberOfPagesOfUsers(final int pageSize) {
-		return PageUtils
-				.getNumberOfPages(this.userRepository.count(), pageSize);
-	}
-
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public List<User> getUnapprovedUsers(int pageNumber, int pageSize) {
 		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
 				Sort.Direction.DESC, "firstNameMain");
 		return this.userRepository.findUnapproved(request);
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	public User getUserById(final Long id) {
 		return this.userRepository.findOne(id);
 	}
@@ -143,7 +142,7 @@ public class UserService implements UserDetailsService {
 		return this.userRepository.findByUsername(username);
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public List<User> getUsersAlphabetically(final Integer pageNumber,
 			final int pageSize) {
 		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
@@ -151,6 +150,7 @@ public class UserService implements UserDetailsService {
 		return this.userRepository.findAll(request).getContent();
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	public boolean isUserApproved(User user) {
 		return user.getRoles().contains(
 				this.roleService.getRoleByName(Role.USER));

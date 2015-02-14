@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -37,6 +39,7 @@ import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.TestingService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,6 +62,7 @@ public class TaskModificationRestController extends
 	@Autowired
 	private StorageService storageService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
 			throws IOException {
@@ -71,6 +75,7 @@ public class TaskModificationRestController extends
 		return taskModificationDto;
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.POST)
 	public Callable<BindingResponse> patchTask(
 			@PathVariable("task") final Task task,

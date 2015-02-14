@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.admin;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -84,6 +87,7 @@ public class ApproveUserRegistrationController {
 	@Autowired
 	private UserService userService;
 
+	@PreAuthorize(IS_ADMIN)
 	public void approveUser(User user) throws MessagingException,
 			EmailException {
 		Assertions.resourceExists(user);
@@ -120,6 +124,7 @@ public class ApproveUserRegistrationController {
 		}
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
 	@JsonView(PriviligedView.class)
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {

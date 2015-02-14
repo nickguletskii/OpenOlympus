@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.admin;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +47,7 @@ public class DeleteUserController {
 	@Autowired
 	private UserService userService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/users/deleteUsers", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	@Transactional
@@ -55,6 +59,7 @@ public class DeleteUserController {
 		users.forEach(this.userService::deleteUser);
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/users/deleteUser", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.OK)
 	@Transactional

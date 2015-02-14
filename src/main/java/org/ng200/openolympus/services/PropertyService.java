@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.services;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.io.Serializable;
 
 import org.ng200.openolympus.model.Property;
@@ -45,7 +47,7 @@ public class PropertyService {
 		return property;
 	}
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public void set(final String key, final Serializable value) {
 		Property property = this.propertyRepository.findByKey(key);
 		if (property == null) {

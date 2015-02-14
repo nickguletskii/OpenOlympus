@@ -22,12 +22,19 @@
  */
 package org.ng200.openolympus.controller.archive;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+
 import java.util.List;
 
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,12 +48,16 @@ public class ArchiveUserRankListRestController {
 	@Autowired
 	private UserService userService;
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	@RequestMapping(value = "/api/archive/rankCount", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public Long countUsers() {
 		return this.userService.countUsers();
 	}
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
 	@RequestMapping(value = "/api/archive/rank", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public List<UserRanking> getUsers(@RequestParam("page") Long page) {

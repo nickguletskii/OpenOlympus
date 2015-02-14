@@ -22,12 +22,15 @@
  */
 package org.ng200.openolympus.controller.admin;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.util.List;
 
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,12 +44,14 @@ public class AdminUserListRestController {
 	@Autowired
 	private UserService userService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/usersCount", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public long countUsers() {
 		return this.userService.countUsers();
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/admin/users", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {

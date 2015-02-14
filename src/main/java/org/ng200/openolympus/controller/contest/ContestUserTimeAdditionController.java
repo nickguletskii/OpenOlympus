@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.contest;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
@@ -32,6 +34,7 @@ import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.ContestUserTimeAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -52,6 +55,7 @@ public class ContestUserTimeAdditionController {
 	@Autowired
 	private UserService userService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/contest/{contest}/addUserTime", method = RequestMethod.POST)
 	public BindingResponse addUserTime(final Model model,
 			@PathVariable(value = "contest") final Contest contest,

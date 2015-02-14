@@ -22,6 +22,13 @@
  */
 package org.ng200.openolympus.controller.solution;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+import static org.ng200.openolympus.SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST;
+import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +40,7 @@ import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -94,6 +102,8 @@ public class SolutionJSONController {
 	private final Cache<Pair<Locale, Solution>, SolutionDto> cache = CacheBuilder
 			.newBuilder().maximumSize(1000).build();
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST + ')')
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody SolutionDto solutionApi(
 			@PathVariable(value = "id") final Solution solution,

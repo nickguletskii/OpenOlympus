@@ -22,6 +22,13 @@
  */
 package org.ng200.openolympus.controller.solution;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.AND;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+import static org.ng200.openolympus.SecurityExpressionConstants.OR;
+import static org.ng200.openolympus.SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST;
+import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
+
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +43,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,6 +62,8 @@ public class SolutionDownloadController {
 	@Autowired
 	private StorageService storageService;
 
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
+			+ SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST + ')')
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<FileSystemResource> solutionDownload(
 			final HttpServletRequest request, final Model model,

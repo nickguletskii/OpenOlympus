@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.io.File;
 import java.time.Instant;
 import java.util.Date;
@@ -40,6 +42,7 @@ import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -60,6 +63,7 @@ public class TaskCreationController extends
 	@Autowired
 	private StorageService storageService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 	@ResponseBody
 	@Transactional

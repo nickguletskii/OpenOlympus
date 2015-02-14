@@ -22,6 +22,9 @@
  */
 package org.ng200.openolympus.controller.contest;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +38,7 @@ import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -53,6 +57,7 @@ public class ContestModificationController {
 	@Autowired
 	private ContestService contestService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(method = RequestMethod.POST)
 	public BindingResponse editContest(final Model model,
 			final HttpServletRequest request,
@@ -74,6 +79,7 @@ public class ContestModificationController {
 		return BindingResponse.OK;
 	}
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(method = RequestMethod.GET)
 	public Contest showContestEditingForm(
 			@PathVariable("contest") final Contest contest) {

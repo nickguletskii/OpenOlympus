@@ -38,15 +38,13 @@ public class AccessDeniedExceptionHandler {
 	private static final Logger logger = LoggerFactory
 			.getLogger(AccessDeniedExceptionHandler.class);
 
-	@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+	@ResponseStatus(value = HttpStatus.FORBIDDEN)
 	@ExceptionHandler({
 		AccessDeniedException.class
 	})
-	@RequestMapping(produces = "application/json; charset=utf-8")
+	@RequestMapping(produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public String handleAccessDeniedException(AccessDeniedException exception) {
-		AccessDeniedExceptionHandler.logger
-		.info("Access denied: {}", exception);
-		return "{'error':'auth.accessdenied'}";
+		return "{\"error\":\"auth.accessdenied\"}";
 	}
 }

@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.services;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -57,10 +59,10 @@ public class EmailService {
 	@Autowired
 	private TemplateEngine templateEngine;
 
-	@PreAuthorize("hasAuthority('SUPERUSER')")
+	@PreAuthorize(IS_ADMIN)
 	public void sendEmail(String emailAddress, String subject, String view,
 			String alternativeText, Map<String, Object> variables)
-					throws MessagingException, EmailException {
+			throws MessagingException, EmailException {
 		final Context ctx = new Context();
 		ctx.setVariables(variables);
 

@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.controller.contest;
 
+import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
+
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -35,6 +37,7 @@ import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,6 +55,7 @@ public class ContestCreationController {
 	@Autowired
 	private ContestService contestService;
 
+	@PreAuthorize(IS_ADMIN)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contests/create")
 	public BindingResponse createContest(@Valid final ContestDto contestDto,
 			final BindingResult bindingResult) throws IllegalStateException,

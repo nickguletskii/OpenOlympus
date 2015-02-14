@@ -23,8 +23,12 @@
 package org.ng200.openolympus.services;
 
 import java.security.Principal;
+import java.time.Instant;
 
+import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Role;
+import org.ng200.openolympus.model.Solution;
+import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.repositories.ContestParticipationRepository;
 import org.ng200.openolympus.repositories.UserRepository;
@@ -39,6 +43,9 @@ public class SecurityService {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private TaskService taskService;
 
 	@Autowired
 	private ContestParticipationRepository contestParticipationRepository;
@@ -75,5 +82,40 @@ public class SecurityService {
 
 	public boolean noLockdown() {
 		return !this.isOnLockdown();
+	}
+
+	public boolean isContestOver(final Contest contest) {
+		return contestService.getContestEndIncludingAllTimeExtensions(contest)
+				.isBefore(Instant.now());
+	}
+
+	public boolean isContestInProgressForUser(final Contest contest,
+			String username) {
+		return !contest.getStartTime().toInstant().isAfter(Instant.now())
+				&& !contestService
+						.getContestEndTimeForUser(contest,
+								userRepository.findByUsername(username))
+						.toInstant().isBefore(Instant.now());
+	}
+
+	public boolean isTaskInContest(Task task, Contest contest) {
+		return contest.getTasks().contains(task);
+	}
+
+	public boolean isTaskInCurrentContest(Task task) {
+		Contest runningContest = contestService.getRunningContest();
+		return runningContest == null
+				|| runningContest.getTasks().contains(task);
+	}
+
+	public boolean isSolutionInCurrentContest(Solution solution) {
+		Contest runningContest = contestService.getRunningContest();
+		return runningContest == null
+				|| (isTaskInContest(solution.getTask(), runningContest)
+						&& !runningContest.getStartTime().toInstant()
+								.isAfter(solution.getTimeAdded().toInstant()) && contestService
+						.getContestEndTimeForUser(runningContest,
+								solution.getUser()).toInstant()
+						.isBefore(solution.getTimeAdded().toInstant()));
 	}
 }
