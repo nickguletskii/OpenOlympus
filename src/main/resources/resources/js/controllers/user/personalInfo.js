@@ -24,7 +24,7 @@ define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
             $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService,
-            personalInfoPatchUrl, passwordPatchUrl, requireExistingPassword) {
+            personalInfoPatchUrl, passwordPatchUrl, requireExistingPassword, UserService) {
             $scope.$apply(function() {
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.userForm.forceValidation = true;
@@ -47,11 +47,7 @@ define(['oolutil', 'lodash'],
                 });
 
                 $scope.patchUser = function(user) {
-                    $http({
-                        method: 'PATCH',
-                        url: personalInfoPatchUrl,
-                        data: Util.emptyToNull(user)
-                    }).success(function(data) {
+                    UserService.patchUser(user, $stateParams.userId).success(function(data) {
                         if (data.status === "BINDING_ERROR") {
                             ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
                         } else {
@@ -62,11 +58,7 @@ define(['oolutil', 'lodash'],
                 };
 
                 $scope.changePassword = function(passwordObj) {
-                    $http({
-                        method: 'PATCH',
-                        url: passwordPatchUrl,
-                        data: Util.emptyToNull(passwordObj)
-                    }).success(function(data) {
+                    UserService.changePassword(user, $stateParams.userId).success(function(data) {
                         if (data.status === "BINDING_ERROR") {
                             ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
                         } else {

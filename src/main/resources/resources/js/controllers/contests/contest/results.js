@@ -23,26 +23,18 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+            $stateParams, users, userCount) {
 
             $scope.$apply(function() {
                 var page = $stateParams.page;
 
                 $scope.page = $stateParams.page;
 
-                $http.get('api/contest/' + $stateParams.contestId + "/results", {
-                    params: {
-                        page: page
-                    }
-                }).success(function(users) {
-                    $scope.users = users;
-                    $scope.tasks = _.map(users[0].taskScores, function(taskScore) {
-                        return taskScore.first;
-                    });
+                $scope.users = users;
+                $scope.tasks = _.map(users[0].taskScores, function(taskScore) {
+                    return taskScore.first;
                 });
-                $http.get('api/contest/' + $stateParams.contestId + '/participantsCount').then(function(response) {
-                    $scope.userCount = response.data;
-                });
+                $scope.userCount = userCount;
             });
         };
     });

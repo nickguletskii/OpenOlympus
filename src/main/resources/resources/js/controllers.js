@@ -34,13 +34,23 @@ var stateList = [{
     "url": "/task/{taskId:[0-9]+}?contestId",
     "templateUrl": "/partials/task",
     "controllerPath": "controllers/task",
-    "controller": "TaskViewController"
+    "controller": "TaskViewController",
+    "resolve": {
+        "task": function(TaskService, $stateParams) {
+            return TaskService.getTask($stateParams.taskId);
+        }
+    }
 }, {
     "name": "taskModificationView",
     "url": "/task/{taskId:[0-9]+}/edit?contestId",
     "templateUrl": "/partials/task/edit",
     "controllerPath": "controllers/task/edit",
-    "controller": "TaskModificationController"
+    "controller": "TaskModificationController",
+    "resolve": {
+        "editTaskData": function(TaskService, $stateParams) {
+            return TaskService.getTaskEditData($stateParams.taskId);
+        }
+    }
 }, {
     "name": "archiveTaskList",
     "url": "/archive/tasks?page?taskId",
@@ -50,6 +60,14 @@ var stateList = [{
     "params": {
         "page": 1,
         "taskId": null
+    },
+    "resolve": {
+        "tasks": function(TaskService, $stateParams) {
+            return TaskService.getArchiveTasksPage($stateParams.page);
+        },
+        "taskCount": function(TaskService, $stateParams) {
+            return TaskService.countArchiveTasks();
+        }
     }
 }, {
     "name": "archiveRank",
@@ -60,6 +78,14 @@ var stateList = [{
     "controller": "ArchiveRankController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "users": function(UserService, $stateParams) {
+            return UserService.getArchiveRankPage($stateParams.page);
+        },
+        "userCount": function(UserService, $stateParams) {
+            return UserService.countArchiveUsers();
+        }
     }
 }, {
     "name": "contestList",
@@ -69,6 +95,14 @@ var stateList = [{
     "controller": "ContestListController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "contests": function(ContestService, $stateParams) {
+            return ContestService.getContestsPage($stateParams.page);
+        },
+        "contestsCount": function(ContestService, $stateParams) {
+            return ContestService.countContests();
+        }
     }
 }, {
     "name": "contestView",
@@ -78,6 +112,11 @@ var stateList = [{
     "controller": "ContestViewController",
     "params": {
         "taskId": null
+    },
+    "resolve": {
+        "tasks": function(ContestService, $stateParams) {
+            return ContestService.getContestTasks($stateParams.contestId);
+        }
     }
 }, {
     "name": "contestParticipantsList",
@@ -87,6 +126,14 @@ var stateList = [{
     "controller": "ContestParticipantsListController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "users": function(ContestService, $stateParams) {
+            return ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page);
+        },
+        "userCount": function(ContestService, $stateParams) {
+            return ContestService.countContestParticipants($stateParams.contestId);
+        }
     }
 }, {
     "name": "contestResults",
@@ -98,6 +145,14 @@ var stateList = [{
     "controller": "ContestResultsController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "users": function(ContestService, $stateParams) {
+            return ContestService.getContestResultsPage($stateParams.contestId, $stateParams.page);
+        },
+        "userCount": function(ContestService, $stateParams) {
+            return ContestService.countContestParticipants($stateParams.contestId);
+        }
     }
 }, {
     "name": "userSolutionList",
@@ -107,6 +162,14 @@ var stateList = [{
     "controller": "UserSolutionListController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "solutions": function(SolutionService, $stateParams) {
+            return SolutionService.getUserSolutionsPage($stateParams.page);
+        },
+        "solutionCount": function(SolutionService, $stateParams) {
+            return SolutionService.countUserSolutions();
+        }
     }
 }, {
     "name": "adminSolutionList",
@@ -116,13 +179,26 @@ var stateList = [{
     "controller": "AdminSolutionListController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "solutions": function(SolutionService, $stateParams) {
+            return SolutionService.getSolutionsPage($stateParams.page);
+        },
+        "solutionCount": function(SolutionService, $stateParams) {
+            return SolutionService.countSolutions();
+        }
     }
 }, {
     "name": "solutionView",
     "url": "/solution/{solutionId:[0-9]+}",
     "templateUrl": "/partials/solution",
     "controllerPath": "controllers/solution",
-    "controller": "SolutionController"
+    "controller": "SolutionController",
+    "resolve": {
+        "data": function(SolutionService, $stateParams) {
+            return SolutionService.getVerdicts($stateParams.solutionId);
+        }
+    }
 }, {
     "name": "createTask",
     "url": "/archive/tasks/add",
@@ -140,7 +216,12 @@ var stateList = [{
     "url": "/contest/{contestId:[0-9]+}/edit",
     "templateUrl": "/partials/contests/contest/edit",
     "controllerPath": "controllers/contests/contest/edit",
-    "controller": "ContestModificationController"
+    "controller": "ContestModificationController",
+    "resolve": {
+        "contest": function(ContestService, $stateParams) {
+            return ContestService.getContestEditData($stateParams.contestId);
+        }
+    }
 }, {
     "name": "login",
     "url": "/login?failure",
@@ -211,6 +292,14 @@ var stateList = [{
     "controller": "PendingUsersController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "users": function(UserService, $stateParams) {
+            return UserService.getPendingUsersPage($stateParams.page);
+        },
+        "userCount": function(UserService, $stateParams) {
+            return UserService.countPendingUsers();
+        }
     }
 }, {
     "name": "adminUsersList",
@@ -221,6 +310,14 @@ var stateList = [{
     "controller": "AdministrativeUsersController",
     "params": {
         "page": 1
+    },
+    "resolve": {
+        "users": function(UserService, $stateParams) {
+            return UserService.getUsersPage($stateParams.page);
+        },
+        "userCount": function(UserService, $stateParams) {
+            return UserService.countUsers();
+        }
     }
 }];
 

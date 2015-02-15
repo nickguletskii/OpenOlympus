@@ -63,7 +63,7 @@ define(
                 "</div>");
         }]);
 
-        app.run(function($rootScope, $stateParams, AuthenticationProvider) {
+        app.run(function($rootScope, $stateParams, AuthenticationProvider, $location) {
             $rootScope.stateParams = $stateParams;
             $rootScope.$on('$stateChangeStart',
                 function(event, toState, toParams, fromState, fromParams) {
@@ -81,6 +81,15 @@ define(
             $rootScope.$on('$stateChangeSuccess',
                 function(event, toState, toParams, fromState, fromParams) {
                     $rootScope.stateConfig = toState;
+                });
+            $rootScope.$on('$stateChangeError',
+                function(event, toState, toParams, fromState, fromParams, error) {
+                    console.error(error);
+                    if (error.status == 403) {
+                        event.preventDefault();
+                        $location.path("/forbidden");
+                    } else
+                        $rootScope.showErrorModal = true;
                 });
         });
 

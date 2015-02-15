@@ -23,35 +23,27 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+            $stateParams, UserService, users, userCount) {
 
             $scope.$apply(function() {
                 var page = $stateParams.page;
 
                 $scope.page = $stateParams.page;
-
+                $scope.users = users;
+                $scope.userCount = userCount;
 
                 $scope.deleteUser = function(user) {
-                    $http.delete("/api/admin/users/deleteUser", {
-                        params: {
-                            "user": user.id
-                        }
-                    }).success(updateUsers);
+                    UserService.deleteUsers([user.id]).success(updateUsers);
                 };
 
                 function updateUsers() {
-                    $http.get('/api/admin/users', {
-                        params: {
-                            page: page
-                        }
-                    }).success(function(users) {
+                    UserService.getUsersPage(page).success(function(users) {
                         $scope.users = users;
                     });
-                    $http.get('/api/admin/usersCount').success(function(count) {
+                    UserService.countUsers().success(function(count) {
                         $scope.userCount = count;
                     });
                 }
-                updateUsers();
             });
         };
     });

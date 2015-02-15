@@ -23,12 +23,11 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+            $stateParams, tasks) {
             $scope.$apply(function() {
                 $scope.contestId = $stateParams.contestId;
-                $http.get('api/contest/' + $stateParams.contestId).success(function(tasks) {
-                    $scope.tasks = tasks;
-                });
+
+                $scope.tasks = tasks;
             });
         };
     });

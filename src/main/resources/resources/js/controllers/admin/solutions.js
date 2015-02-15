@@ -23,23 +23,15 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+            $stateParams, SolutionService, solutions, solutionCount) {
 
             $scope.$apply(function() {
                 var page = $stateParams.page;
 
                 $scope.page = $stateParams.page;
 
-                $http.get('api/admin/solutions', {
-                    params: {
-                        page: page
-                    }
-                }).success(function(solutions) {
-                    $scope.solutions = solutions;
-                });
-                $http.get('api/admin/solutionsCount').success(function(count) {
-                    $scope.solutionCount = count.data;
-                });
+                $scope.solutions = solutions;
+                $scope.solutionCount = solutionCount;
             });
         };
     });

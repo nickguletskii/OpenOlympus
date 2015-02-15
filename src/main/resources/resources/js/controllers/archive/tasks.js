@@ -23,23 +23,14 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+            $stateParams, tasks, taskCount) {
             $scope.$apply(function() {
                 var page = $stateParams.page;
 
                 $scope.page = $stateParams.page;
 
-                $http.get('api/archive/tasks', {
-                    params: {
-                        page: page
-                    }
-                }).success(function(tasks) {
-                    $scope.tasks = tasks;
-                });
-
-                $http.get('api/archive/taskCount').success(function(count) {
-                    $scope.taskCount = count;
-                });
+                $scope.tasks = tasks;
+                $scope.taskCount = taskCount;
             });
         };
     });

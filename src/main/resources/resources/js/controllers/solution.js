@@ -23,18 +23,19 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+            $stateParams, SolutionService, data) {
 
             $scope.$apply(function() {
-                function update() {
-                    $http.get("/api/solution/" + $stateParams.solutionId).success(function(response) {
-                        console.log(response);
-                        $scope.verdicts = response.verdicts;
-                        $scope.solutionMaximumScore = response.maximumScore;
-                        $scope.solutionScore = response.score;
-                    });
+                function setData(solution) {
+                    $scope.verdicts = solution.verdicts;
+                    $scope.solutionMaximumScore = solution.maximumScore;
+                    $scope.solutionScore = solution.score;
                 }
-                update();
+
+                function update() {
+                    SolutionService.getVerdicts($stateParams.solutionId).then(setData);
+                }
+                setData(data);
                 // TODO: Websocket integration: server should push verdict updates.
             });
         };

@@ -23,33 +23,27 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+            $stateParams, UserService, users, userCount) {
 
             $scope.$apply(function() {
                 var page = $stateParams.page;
 
                 $scope.page = $stateParams.page;
 
+                $scope.users = users;
+                $scope.userCount = userCount;
+
                 function updateUsers() {
-                    $http.get('api/admin/pendingUsers', {
-                        params: {
-                            page: page
-                        }
-                    }).success(function(users) {
+                    UserService.getPendingUsersPage(page).then(function(users) {
                         $scope.users = users;
                     });
-                    $http.get('api/admin/pendingUsersCount').success(function(count) {
+                    UserService.countPendingUsers().then(function(count) {
                         $scope.userCount = count;
                     });
                 }
-                updateUsers();
 
                 function handleApprovalResponse(userApprovals) {
-                    $http.get('api/admin/pendingUsers', {
-                        params: {
-                            page: page
-                        }
-                    }).success(function(users) {
+                    UserService.getPendingUsersPage(page).then(function(users) {
                         $scope.users = _.map(users, function(user) {
                             var oldUser = _.find($scope.users, function(oldUser) {
                                 return oldUser.id == user.id;
@@ -68,36 +62,36 @@ define(['oolutil', 'lodash'],
                         });
                         $scope.loading = false;
                     });
-                    $http.get('api/admin/pendingUsersCount').success(function(count) {
+                    UserService.countPendingUsers().then(function(count) {
                         $scope.userCount = count;
                     });
                 }
                 $scope.approveUsers = function() {
                     $scope.loading = true;
-                    $http.post("/api/admin/users/approve", _($scope.users).filter(function(user) {
+                    UserService.approveUsers(_($scope.users).filter(function(user) {
                         return user.checked;
                     }).map(function(user) {
                         return user.id;
-                    }).value()).success(handleApprovalResponse);
+                    }).value()).then(handleApprovalResponse);
                 };
 
 
                 $scope.retryApprovingFailedUsers = function() {
                     $scope.loading = true;
-                    $http.post("/api/admin/users/approve", _($scope.users).filter(function(user) {
+                    UserService.approveUsers(_($scope.users).filter(function(user) {
                         return !!user.error;
                     }).map(function(user) {
                         return user.id;
-                    }).value()).success(handleApprovalResponse);
+                    }).value()).then(handleApprovalResponse);
                 };
 
 
                 $scope.deleteUsersWithErrors = function() {
-                    $http.post("/api/admin/users/deleteUsers", _($scope.users).filter(function(user) {
+                    UserService.deleteUsers(_($scope.users).filter(function(user) {
                         return user.checked && !!user.error;
                     }).map(function(user) {
                         return user.id;
-                    }).value()).success(function() {
+                    }).value()).then(function() {
                         updateUsers();
                     });
                 };

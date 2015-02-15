@@ -40,6 +40,14 @@
             <input label="task.creationForm.labels.judgeFile" type="button" class="btn btn-default" ng-file-select="" ng-model="task.judgeFile" multiple="false" oolinput=""></input>
         </div>
 
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="task.published"></input>
+
+                {{'task.modificationForm.labels.published'|translate}}
+            </label>
+        </div>
+
         <div class="form-group">
             <button type="submit" class="btn btn-default">{{'task.creationForm.labels.createButton' | translate}}</button>
         </div>

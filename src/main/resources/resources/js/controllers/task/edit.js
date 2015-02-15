@@ -23,22 +23,20 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
+            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, editTaskData) {
             $scope.$apply(function() {
                 $scope.editorOptions = {
                     lineWrapping: true,
                     lineNumbers: true,
                     mode: 'markdown'
                 };
-                $http.get("/api/task/" + $stateParams.taskId + "/edit").success(
-                    function(response) {
-                        $scope.task.name = response.name;
-                        $scope.task.published = response.published;
-                        $scope.task.descriptionText = response.descriptionText;
-                    });
+                $scope.task = {};
+                $scope.task.name = editTaskData.name;
+                $scope.task.published = editTaskData.published;
+                $scope.task.descriptionText = editTaskData.descriptionText;
+
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.taskModificationForm.forceValidation = true;
-                $scope.task = {};
                 $scope.uploadProgressBarColour = function() {
                     if ($scope.uploadFailure)
                         return "danger";

@@ -34,12 +34,16 @@
 
         <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="task.descriptionText"></ui-codemirror>
 
-        <div class="form-group">
-            <input label="task.modificationForm.labels.descriptionFile" type="button" class="btn btn-default" ng-file-select="" ng-model="task.descriptionFile" multiple="false" oolinput=""></input>
-        </div>
+        <input label="task.modificationForm.labels.descriptionFile" type="button" class="btn btn-default" ng-file-select="" ng-model="task.descriptionFile" multiple="false" oolinput=""></input>
 
-        <div class="form-group">
-            <input label="task.modificationForm.labels.judgeFile" type="button" class="btn btn-default" ng-file-select="" ng-model="task.judgeFile" multiple="false" oolinput=""></input>
+        <input label="task.modificationForm.labels.judgeFile" type="button" class="btn btn-default" ng-file-select="" ng-model="task.judgeFile" multiple="false" oolinput=""></input>
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="task.published"></input>
+                
+                {{'task.modificationForm.labels.published'|translate}}
+            </label>
         </div>
 
         <div class="form-group">

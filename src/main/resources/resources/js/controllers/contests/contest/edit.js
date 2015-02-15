@@ -23,15 +23,14 @@
 define(['oolutil', 'lodash', 'moment-tz'],
     function(Util, _, moment) {
         return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
+            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, contest) {
             $scope.$apply(function() {
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.contestModificationForm.forceValidation = true;
                 $scope.contest = {};
-                $http.get("/api/contest/" + $stateParams.contestId + "/edit").success(function(contest) {
-                    $scope.contest = contest;
-                    $scope.contest.duration = contest.duration / (60 * 1000);
-                });
+
+                $scope.contest = contest;
+                $scope.contest.duration = contest.duration / (60 * 1000);
 
                 $scope.open = function($event) {
                     $event.preventDefault();
@@ -73,10 +72,9 @@ define(['oolutil', 'lodash', 'moment-tz'],
 
                 $scope.modifyContest = function(contest) {
                     $scope.isFormVisible = false;
-                    console.log(contest);
                     try {
                         var fd = new FormData();
-                        _(contest).forEach(function(value, key) {
+                        _.forEach(contest, function(value, key) {
                             fd.append(key, value);
                         });
                         ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/edit', $scope.contestModificationForm, fd, success, failure, reset);

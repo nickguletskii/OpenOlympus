@@ -23,13 +23,11 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $sce) {
+            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $sce, task) {
             $scope.$apply(function() {
-                $http.get("/api/task/" + $stateParams.taskId).success(function(response) {
-                    console.log(response);
-                    $scope.name = response.name;
-                    $scope.description = $sce.trustAsHtml(response.description);
-                });
+                $scope.name = task.name;
+                $scope.description = $sce.trustAsHtml(task.description);
+
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.solutionSubmissionForm.forceValidation = true;
                 $scope.taskId = $stateParams.taskId;
