@@ -31,9 +31,9 @@
 <body ui-sref-opts="reload" ng-cloak="">
     <div th:replace="fragments/sitewidescripts::bodyStart"></div>
     <div th:replace="fragments/header::header"></div>
-    <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'" ng-if="!showErrorModal" ng-cloak="">
+    <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'" ng-show="!showErrorModal" ng-cloak="">
         <div class="row">
-            <div ng-class="stateConfig.customWidth ? stateConfig.customWidth : 'col-md-10 col-md-offset-1'" ui-view=""></div>
+            <div class="fadeTransition" ng-class="stateConfig.customWidth ? stateConfig.customWidth : 'col-md-10 col-md-offset-1'" ui-view=""></div>
         </div>
         <div th:replace="fragments/sitewidescripts::bodyEnd"></div>
     </div>

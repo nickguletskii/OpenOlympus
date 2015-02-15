@@ -24,7 +24,8 @@
 
 define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 'controllers',
     'ui-route', 'restangular', 'bootstrap-tpls', 'angular-form-validation', 'angular-file-upload',
-    'angular-translate', "angular-translate-loader-url", "angular-ui-codemirror", "angular-no-captcha"
+    'angular-translate', "angular-translate-loader-url", "angular-ui-codemirror", "angular-no-captcha",
+    "angular-animate"
 ], function(require, angular,
     bootstrap, filters, services, directives, controllers) {
 
@@ -33,7 +34,7 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
     var app = angular.module('ool', ['pascalprecht.translate', 'restangular', 'ui.router',
         'ui.bootstrap', 'ool.filters', 'ool.controllers',
         'ool.services', 'ool.directives', 'ngFormValidation', 'angularFileUpload', 'ui.codemirror',
-        'noCAPTCHA'
+        'noCAPTCHA', 'ngAnimate'
     ]);
     app.config([
         'formValidationDecorationsProvider',
@@ -80,7 +81,7 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
                 'responseError': function(rejection) {
                     var status = rejection.status;
                     var config = rejection.config;
-                    if(!config)
+                    if (!config)
                         return $q.reject(rejection);
                     var method = config.method;
                     var url = config.url;
