@@ -67,11 +67,11 @@ define(['oolutil', 'lodash'],
                         method: 'POST',
                         url: '/api/user/register',
                         data: user
-                    }).then(function(response) {
-                        if (response.data.status === "BINDING_ERROR") {
-                            ValidationService.report($scope.serverErrorReporter, $scope.userForm, response.data.fieldErrors);
-                        } else if (response.data.status === "RECAPTCHA_ERROR") {
-                            $scope.captchaErrors = response.data.recaptchaErrorCodes;
+                    }).success(function(data) {
+                        if (data.status === "BINDING_ERROR") {
+                            ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
+                        } else if (data.status === "RECAPTCHA_ERROR") {
+                            $scope.captchaErrors = data.recaptchaErrorCodes;
                         } else {
                             $state.go("login");
                         }

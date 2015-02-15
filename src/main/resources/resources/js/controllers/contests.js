@@ -37,8 +37,8 @@ define(['oolutil', 'lodash'],
                     $scope.contests = contests;
                 });
 
-                $http.get('api/contestsCount').then(function(response) {
-                    $scope.contestsCount = response.data;
+                $http.get('api/contestsCount').success(function(count) {
+                    $scope.contestsCount = count;
                 });
             });
         };

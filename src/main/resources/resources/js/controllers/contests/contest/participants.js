@@ -37,8 +37,8 @@ define(['oolutil', 'lodash'],
                 }).success(function(users) {
                     $scope.users = users;
                 });
-                $http.get('api/contest/' + $stateParams.contestId + '/participantsCount').then(function(response) {
-                    $scope.userCount = response.data;
+                $http.get('api/contest/' + $stateParams.contestId + '/participantsCount').success(function(count) {
+                    $scope.userCount = count;
                 });
             });
         };

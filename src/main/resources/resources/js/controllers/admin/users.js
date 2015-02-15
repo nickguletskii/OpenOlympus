@@ -47,8 +47,8 @@ define(['oolutil', 'lodash'],
                     }).success(function(users) {
                         $scope.users = users;
                     });
-                    $http.get('/api/admin/usersCount').then(function(response) {
-                        $scope.userCount = response.data;
+                    $http.get('/api/admin/usersCount').success(function(count) {
+                        $scope.userCount = count;
                     });
                 }
                 updateUsers();

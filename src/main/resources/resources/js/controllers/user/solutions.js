@@ -37,8 +37,8 @@ define(['oolutil', 'lodash'],
                 }).success(function(solutions) {
                     $scope.solutions = solutions;
                 });
-                $http.get('api/user/solutionsCount').then(function(response) {
-                    $scope.solutionCount = response.data;
+                $http.get('api/user/solutionsCount').success(function(count) {
+                    $scope.solutionCount = count;
                 });
             });
         };

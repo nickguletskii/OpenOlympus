@@ -37,8 +37,8 @@ define(['oolutil', 'lodash'],
                     $scope.tasks = tasks;
                 });
 
-                $http.get('api/archive/taskCount').then(function(response) {
-                    $scope.taskCount = response.data;
+                $http.get('api/archive/taskCount').success(function(count) {
+                    $scope.taskCount = count;
                 });
             });
         };

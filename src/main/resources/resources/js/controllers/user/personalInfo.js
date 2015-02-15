@@ -51,9 +51,9 @@ define(['oolutil', 'lodash'],
                         method: 'PATCH',
                         url: personalInfoPatchUrl,
                         data: Util.emptyToNull(user)
-                    }).then(function(response) {
-                        if (response.data.status === "BINDING_ERROR") {
-                            ValidationService.report($scope.serverErrorReporter, $scope.userForm, response.data.fieldErrors);
+                    }).success(function(data) {
+                        if (data.status === "BINDING_ERROR") {
+                            ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
                         } else {
                             $scope.updatedUser = true;
                             $scope.userForm.$setPristine();
@@ -66,9 +66,9 @@ define(['oolutil', 'lodash'],
                         method: 'PATCH',
                         url: passwordPatchUrl,
                         data: Util.emptyToNull(passwordObj)
-                    }).then(function(response) {
-                        if (response.data.status === "BINDING_ERROR") {
-                            ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, response.data.fieldErrors);
+                    }).success(function(data) {
+                        if (data.status === "BINDING_ERROR") {
+                            ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
                         } else {
                             $scope.updatedPassword = true;
                             $scope.passwordForm.$setPristine();

@@ -77,8 +77,7 @@ define(['oolutil', 'lodash'],
 
                         if (!!solution.solutionFile)
                             fd.append("solutionFile", solution.solutionFile[0]);
-
-                        ValidationService.ValidationService.postToServer($scope, '/api/task/' + $stateParams.taskId + '/submitSolution', $scope.solutionSubmissionForm, fd, success, failure, reset);
+                        ValidationService.postToServer($scope, '/api/task/' + $stateParams.taskId + '/submitSolution', $scope.solutionSubmissionForm, fd, success, failure, reset);
                     } catch (err) {
                         reset();
                     }

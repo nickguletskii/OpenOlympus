@@ -30,8 +30,8 @@ define(['oolutil', 'lodash'],
                         params: {
                             "term": name
                         }
-                    }).then(function(response) {
-                        return response.data;
+                    }).success(function(data) {
+                        return data;
                     });
                 };
 

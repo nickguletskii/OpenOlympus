@@ -38,8 +38,8 @@ define(['oolutil', 'lodash'],
                     }).success(function(users) {
                         $scope.users = users;
                     });
-                    $http.get('api/admin/pendingUsersCount').then(function(response) {
-                        $scope.userCount = response.data;
+                    $http.get('api/admin/pendingUsersCount').success(function(count) {
+                        $scope.userCount = count;
                     });
                 }
                 updateUsers();
@@ -68,8 +68,8 @@ define(['oolutil', 'lodash'],
                         });
                         $scope.loading = false;
                     });
-                    $http.get('api/admin/pendingUsersCount').then(function(response) {
-                        $scope.userCount = response.data;
+                    $http.get('api/admin/pendingUsersCount').success(function(count) {
+                        $scope.userCount = count;
                     });
                 }
                 $scope.approveUsers = function() {
