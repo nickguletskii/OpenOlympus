@@ -319,6 +319,12 @@ var stateList = [{
             return UserService.countUsers();
         }
     }
+}, {
+    "name": "administrationHub",
+    "url": "/admin",
+    "templateUrl": "/partials/admin",
+    "controllerPath": "controllers/admin",
+    "controller": "AdministrationHubController"
 }];
 
 var modalStateList = [{
