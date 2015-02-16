@@ -24,18 +24,11 @@
 CREATE OR REPLACE FUNCTION maintain_solution_score() RETURNS TRIGGER
 AS $maintain_solution_score$
     BEGIN
-		IF (TG_OP = 'DELETE' OR TG_OP = 'UPDATE') THEN
-			UPDATE solutions
-			SET score=score-OLD.score
-			WHERE id=OLD.solution_id;
-		END IF;
-	
-		IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
-			UPDATE solutions
-			SET score=score+NEW.score
-			WHERE id=NEW.solution_id;
-        END IF;
-        RETURN NULL;
+	    UPDATE solutions
+		SET score=(SELECT sum(verdicts.score) FROM verdicts WHERE verdicts.solution_id=solutions.id),
+			testing=(SELECT bool_and(verdicts.score) FROM verdicts WHERE verdicts.solution_id=solutions.id)
+		WHERE id=NEW.solution_id;
+		RETURN NULL;
     END;
 $maintain_solution_score$ LANGUAGE plpgsql;
 

@@ -76,6 +76,8 @@ public class Solution implements Serializable {
 	private BigDecimal score = BigDecimal.ZERO;
 	private BigDecimal maximumScore = BigDecimal.ZERO;
 
+	private boolean tested = false;
+	
 	public Solution() {
 
 	}
@@ -181,6 +183,14 @@ public class Solution implements Serializable {
 		return String.format(
 				"Solution [id=%s, task=%s, user=%s, file=%s, timeAdded=%s]",
 				this.id, this.task, this.user, this.file, this.timeAdded);
+	}
+
+	public boolean isTested() {
+		return tested;
+	}
+
+	public void setTested(boolean tested) {
+		this.tested = tested;
 	}
 
 }

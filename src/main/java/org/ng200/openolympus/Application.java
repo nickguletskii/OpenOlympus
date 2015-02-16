@@ -45,6 +45,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -59,6 +60,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Configuration
@@ -71,9 +73,14 @@ public class Application {
 			SQLException {
 		final ConfigurableApplicationContext context = SpringApplication.run(
 				Application.class, args);
-		final UserService userService = context.getBean(UserService.class);
-		final RoleService roleService = context.getBean(RoleService.class);
-		final DataSource dataSource = context.getBean(DataSource.class);
+		setupContext(context);
+	}
+
+	public static void setupContext(final ApplicationContext webApplicationContext)
+			throws SQLException {
+		final UserService userService = webApplicationContext.getBean(UserService.class);
+		final RoleService roleService = webApplicationContext.getBean(RoleService.class);
+		final DataSource dataSource = webApplicationContext.getBean(DataSource.class);
 		ScriptUtils.executeSqlScript(dataSource.getConnection(),
 				new EncodedResource(new ClassPathResource(
 						"sql/setupTriggers.sql")), false, false,

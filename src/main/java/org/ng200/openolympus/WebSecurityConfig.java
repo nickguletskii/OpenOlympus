@@ -35,6 +35,7 @@ import org.ng200.openolympus.customPageSupport.CustomPage;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.repositories.OlympusPersistentTokenRepositoryImpl;
 import org.ng200.openolympus.services.SecurityService;
+import org.ng200.openolympus.services.UserSecurityService;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +46,7 @@ import org.springframework.security.authentication.RememberMeAuthenticationProvi
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,18 +59,16 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-@EnableWebMvcSecurity
+@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private static final String REMEMBERME_COOKIE_NAME = "openolympus-rememberme";
 	@Autowired
-	public UserService userService;
+	private UserSecurityService userSecurityService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private OlympusPersistentTokenRepositoryImpl olympusPersistentTokenRepositoryImpl;
-	@Autowired
-	private SecurityService oolsec;
 	@javax.annotation.Resource(name = "customPages")
 	List<CustomPage> customPages;
 	@Value("${persistentTokenKey}")
@@ -136,7 +136,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(final AuthenticationManagerBuilder auth)
 			throws Exception {
-		auth.userDetailsService(this.userService).passwordEncoder(
+		auth.userDetailsService(this.userSecurityService).passwordEncoder(
 				this.passwordEncoder);
 	}
 
@@ -146,7 +146,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 		.csrf().disable()
 		.headers()
-		.xssProtection().and()
+		.xssProtection().xssProtectionEnabled(true).and()
+		.and()
 		.exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
 		.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
 		.and()
@@ -165,7 +166,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.rememberMe()
 		.rememberMeServices(this.rememberMeServices())
 		.tokenRepository(this.olympusPersistentTokenRepositoryImpl)
-		.key(this.persistentTokenKey).tokenValiditySeconds(60*60*24*14).userDetailsService(this.userService).and().authenticationProvider(this.rememberMeAuthenticationProvider())
+		.key(this.persistentTokenKey).tokenValiditySeconds(60*60*24*14).userDetailsService(this.userSecurityService).and().authenticationProvider(this.rememberMeAuthenticationProvider())
 		.authorizeRequests()
 		.antMatchers(WebSecurityConfig.permittedAny).permitAll().and()
 		.authorizeRequests()
@@ -201,7 +202,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public RememberMeServices rememberMeServices() {
 		final PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-				this.persistentTokenKey, this.userService,
+				this.persistentTokenKey, this.userSecurityService,
 				this.olympusPersistentTokenRepositoryImpl) {
 
 			@Override
@@ -227,7 +228,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		};
 		rememberMeServices
-		.setCookieName(WebSecurityConfig.REMEMBERME_COOKIE_NAME);
+				.setCookieName(WebSecurityConfig.REMEMBERME_COOKIE_NAME);
 		rememberMeServices.setAlwaysRemember(true);
 		return rememberMeServices;
 	}

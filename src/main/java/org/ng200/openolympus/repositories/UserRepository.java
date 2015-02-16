@@ -65,6 +65,53 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	}
 
 	@Component
+	public class ContestTestingFinishedQuery extends ContestResultsQuery {
+
+		@Override
+		public String getSql() {
+			//@formatter:off
+			final Field<DayToSecond> timeExtensions = DSL.select(
+					DSL.field("sum(\"public\".\"time_extensions\".\"duration\") * INTERVAL '1 MILLISECOND'")
+					)
+					.from(Tables.TIME_EXTENSIONS)
+					.where(Tables.TIME_EXTENSIONS.CONTEST_ID.eq(DSL.param("contest", 0l))
+							.and(Tables.TIME_EXTENSIONS.USER_ID.eq(Tables.SOLUTIONS.USER_ID)))
+							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
+
+			final Condition taskInContest = Tables.SOLUTIONS.TASK_ID.in(
+					DSL.select(Tables.CONTESTS_TASKS.TASKS_ID)
+					.from(Tables.CONTESTS_TASKS)
+					.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l))));
+
+			final Condition solutionWithinTimeBounds =
+					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
+							DSL.param("contestEndTime", new Timestamp(0)).add(
+									timeExtensions
+									)
+							);
+			final Table<?> userTasks =
+					DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.TESTED)
+					.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
+					.from(Tables.SOLUTIONS)
+					.where(taskInContest.and(solutionWithinTimeBounds))
+					.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
+					.asTable("users_tasks");
+
+			String sql = SqlQueryProvider.DSL_CONTEXT.renderNamedParams(DSL.select(
+					DSL.field("every(users_tasks.tested)")
+					)
+					.from(Tables.USERS)
+					.leftOuterJoin(userTasks)
+					.on(Tables.USERS.ID.eq(userTasks.field(Tables.SOLUTIONS.USER_ID)))
+					);
+			//@formatter:on
+			System.out.println(sql);
+			return sql;
+		}
+
+	}
+
+	@Component
 	public class ContestResultsQuery implements SqlQueryProvider {
 
 		@Override
@@ -203,4 +250,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@QueryProvider(value = RankPageQuery.class)
 	List<Object[]> getRankPage(@Param("limit") Long limit,
 			@Param("offset") Long offset);
+
+	@Query(nativeQuery = true)
+	@QueryProvider(value = ContestTestingFinishedQuery.class)
+	boolean everySolutionInContestFinished(@Param("contest") Long contest,
+			@Param("contestStartTime") Date contestStartTime,
+			@Param("contestEndTime") Date contestEndTime);
 }

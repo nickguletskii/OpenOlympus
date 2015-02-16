@@ -136,7 +136,7 @@ public class RegistrationRestController {
 	}
 
 	@RequestMapping(value = "/api/user/register", method = RequestMethod.POST)
-	public RegistrationResponse registerUser(final HttpServletRequest request,
+	public RegistrationResponse registerUser(
 			@RequestBody @Valid final UserDto userDto,
 			final BindingResult bindingResult) throws BindException,
 			URISyntaxException, ClientProtocolException, IOException {
@@ -147,7 +147,7 @@ public class RegistrationRestController {
 					recaptchaErrorCodes, null, null);
 		}
 
-		this.validate(request, userDto, bindingResult);
+		this.validate(userDto, bindingResult);
 
 		final User user = new User(userDto.getUsername(),
 				this.passwordEncoder.encode(userDto.getPassword()),
@@ -169,7 +169,7 @@ public class RegistrationRestController {
 	}
 
 	@RequestMapping(value = "/api/user/register/validate", method = RequestMethod.POST)
-	private RegistrationResponse validate(final HttpServletRequest request,
+	private RegistrationResponse validate(
 			@RequestBody @Valid final UserDto userDto,
 			final BindingResult bindingResult) throws BindException {
 

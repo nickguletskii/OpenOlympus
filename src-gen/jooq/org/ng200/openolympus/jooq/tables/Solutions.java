@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Solutions extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.tables.records.SolutionsRecord> {
 
-	private static final long serialVersionUID = 1746960401;
+	private static final long serialVersionUID = 1261772345;
 
 	/**
 	 * The reference instance of <code>public.solutions</code>
@@ -50,6 +50,11 @@ public class Solutions extends org.jooq.impl.TableImpl<org.ng200.openolympus.joo
 	 * The column <code>public.solutions.score</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.SolutionsRecord, java.math.BigDecimal> SCORE = createField("score", org.jooq.impl.SQLDataType.NUMERIC.precision(19, 2), this, "");
+
+	/**
+	 * The column <code>public.solutions.tested</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.SolutionsRecord, java.lang.Boolean> TESTED = createField("tested", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
 	/**
 	 * The column <code>public.solutions.time_added</code>.

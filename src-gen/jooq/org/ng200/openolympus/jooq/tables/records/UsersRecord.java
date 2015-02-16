@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UsersRecord extends org.jooq.impl.UpdatableRecordImpl<org.ng200.openolympus.jooq.tables.records.UsersRecord> {
 
-	private static final long serialVersionUID = 1431755133;
+	private static final long serialVersionUID = 1651880911;
 
 	/**
 	 * Setter for <code>public.users.id</code>.
@@ -103,255 +103,269 @@ public class UsersRecord extends org.jooq.impl.UpdatableRecordImpl<org.ng200.ope
 	}
 
 	/**
+	 * Setter for <code>public.users.approval_email_sent</code>.
+	 */
+	public void setApprovalEmailSent(java.lang.Boolean value) {
+		setValue(6, value);
+	}
+
+	/**
+	 * Getter for <code>public.users.approval_email_sent</code>.
+	 */
+	public java.lang.Boolean getApprovalEmailSent() {
+		return (java.lang.Boolean) getValue(6);
+	}
+
+	/**
 	 * Setter for <code>public.users.birth_date</code>.
 	 */
 	public void setBirthDate(java.sql.Timestamp value) {
-		setValue(6, value);
+		setValue(7, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.birth_date</code>.
 	 */
 	public java.sql.Timestamp getBirthDate() {
-		return (java.sql.Timestamp) getValue(6);
+		return (java.sql.Timestamp) getValue(7);
 	}
 
 	/**
 	 * Setter for <code>public.users.email_address</code>.
 	 */
 	public void setEmailAddress(java.lang.String value) {
-		setValue(7, value);
+		setValue(8, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.email_address</code>.
 	 */
 	public java.lang.String getEmailAddress() {
-		return (java.lang.String) getValue(7);
+		return (java.lang.String) getValue(8);
 	}
 
 	/**
 	 * Setter for <code>public.users.email_confirmation_token</code>.
 	 */
 	public void setEmailConfirmationToken(java.lang.String value) {
-		setValue(8, value);
+		setValue(9, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.email_confirmation_token</code>.
 	 */
 	public java.lang.String getEmailConfirmationToken() {
-		return (java.lang.String) getValue(8);
+		return (java.lang.String) getValue(9);
 	}
 
 	/**
 	 * Setter for <code>public.users.enabled</code>.
 	 */
 	public void setEnabled(java.lang.Boolean value) {
-		setValue(9, value);
+		setValue(10, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.enabled</code>.
 	 */
 	public java.lang.Boolean getEnabled() {
-		return (java.lang.Boolean) getValue(9);
+		return (java.lang.Boolean) getValue(10);
 	}
 
 	/**
 	 * Setter for <code>public.users.first_name_localised</code>.
 	 */
 	public void setFirstNameLocalised(java.lang.String value) {
-		setValue(10, value);
+		setValue(11, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.first_name_localised</code>.
 	 */
 	public java.lang.String getFirstNameLocalised() {
-		return (java.lang.String) getValue(10);
+		return (java.lang.String) getValue(11);
 	}
 
 	/**
 	 * Setter for <code>public.users.first_name_main</code>.
 	 */
 	public void setFirstNameMain(java.lang.String value) {
-		setValue(11, value);
+		setValue(12, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.first_name_main</code>.
 	 */
 	public java.lang.String getFirstNameMain() {
-		return (java.lang.String) getValue(11);
+		return (java.lang.String) getValue(12);
 	}
 
 	/**
 	 * Setter for <code>public.users.landline</code>.
 	 */
 	public void setLandline(java.lang.String value) {
-		setValue(12, value);
+		setValue(13, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.landline</code>.
 	 */
 	public java.lang.String getLandline() {
-		return (java.lang.String) getValue(12);
+		return (java.lang.String) getValue(13);
 	}
 
 	/**
 	 * Setter for <code>public.users.last_name_localised</code>.
 	 */
 	public void setLastNameLocalised(java.lang.String value) {
-		setValue(13, value);
+		setValue(14, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.last_name_localised</code>.
 	 */
 	public java.lang.String getLastNameLocalised() {
-		return (java.lang.String) getValue(13);
+		return (java.lang.String) getValue(14);
 	}
 
 	/**
 	 * Setter for <code>public.users.last_name_main</code>.
 	 */
 	public void setLastNameMain(java.lang.String value) {
-		setValue(14, value);
+		setValue(15, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.last_name_main</code>.
 	 */
 	public java.lang.String getLastNameMain() {
-		return (java.lang.String) getValue(14);
+		return (java.lang.String) getValue(15);
 	}
 
 	/**
 	 * Setter for <code>public.users.middle_name_localised</code>.
 	 */
 	public void setMiddleNameLocalised(java.lang.String value) {
-		setValue(15, value);
+		setValue(16, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.middle_name_localised</code>.
 	 */
 	public java.lang.String getMiddleNameLocalised() {
-		return (java.lang.String) getValue(15);
+		return (java.lang.String) getValue(16);
 	}
 
 	/**
 	 * Setter for <code>public.users.middle_name_main</code>.
 	 */
 	public void setMiddleNameMain(java.lang.String value) {
-		setValue(16, value);
+		setValue(17, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.middle_name_main</code>.
 	 */
 	public java.lang.String getMiddleNameMain() {
-		return (java.lang.String) getValue(16);
+		return (java.lang.String) getValue(17);
 	}
 
 	/**
 	 * Setter for <code>public.users.mobile</code>.
 	 */
 	public void setMobile(java.lang.String value) {
-		setValue(17, value);
+		setValue(18, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.mobile</code>.
 	 */
 	public java.lang.String getMobile() {
-		return (java.lang.String) getValue(17);
+		return (java.lang.String) getValue(18);
 	}
 
 	/**
 	 * Setter for <code>public.users.password</code>.
 	 */
 	public void setPassword(java.lang.String value) {
-		setValue(18, value);
+		setValue(19, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.password</code>.
 	 */
 	public java.lang.String getPassword() {
-		return (java.lang.String) getValue(18);
+		return (java.lang.String) getValue(19);
 	}
 
 	/**
 	 * Setter for <code>public.users.school</code>.
 	 */
 	public void setSchool(java.lang.String value) {
-		setValue(19, value);
+		setValue(20, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.school</code>.
 	 */
 	public java.lang.String getSchool() {
-		return (java.lang.String) getValue(19);
+		return (java.lang.String) getValue(20);
 	}
 
 	/**
 	 * Setter for <code>public.users.teacher_first_name</code>.
 	 */
 	public void setTeacherFirstName(java.lang.String value) {
-		setValue(20, value);
+		setValue(21, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.teacher_first_name</code>.
 	 */
 	public java.lang.String getTeacherFirstName() {
-		return (java.lang.String) getValue(20);
+		return (java.lang.String) getValue(21);
 	}
 
 	/**
 	 * Setter for <code>public.users.teacher_last_name</code>.
 	 */
 	public void setTeacherLastName(java.lang.String value) {
-		setValue(21, value);
+		setValue(22, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.teacher_last_name</code>.
 	 */
 	public java.lang.String getTeacherLastName() {
-		return (java.lang.String) getValue(21);
+		return (java.lang.String) getValue(22);
 	}
 
 	/**
 	 * Setter for <code>public.users.teacher_middle_name</code>.
 	 */
 	public void setTeacherMiddleName(java.lang.String value) {
-		setValue(22, value);
+		setValue(23, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.teacher_middle_name</code>.
 	 */
 	public java.lang.String getTeacherMiddleName() {
-		return (java.lang.String) getValue(22);
+		return (java.lang.String) getValue(23);
 	}
 
 	/**
 	 * Setter for <code>public.users.username</code>.
 	 */
 	public void setUsername(java.lang.String value) {
-		setValue(23, value);
+		setValue(24, value);
 	}
 
 	/**
 	 * Getter for <code>public.users.username</code>.
 	 */
 	public java.lang.String getUsername() {
-		return (java.lang.String) getValue(23);
+		return (java.lang.String) getValue(24);
 	}
 
 	// -------------------------------------------------------------------------
@@ -380,7 +394,7 @@ public class UsersRecord extends org.jooq.impl.UpdatableRecordImpl<org.ng200.ope
 	/**
 	 * Create a detached, initialised UsersRecord
 	 */
-	public UsersRecord(java.lang.Long id, java.lang.String addressCity, java.lang.String addressCountry, java.lang.String addressLine1, java.lang.String addressLine2, java.lang.String addressState, java.sql.Timestamp birthDate, java.lang.String emailAddress, java.lang.String emailConfirmationToken, java.lang.Boolean enabled, java.lang.String firstNameLocalised, java.lang.String firstNameMain, java.lang.String landline, java.lang.String lastNameLocalised, java.lang.String lastNameMain, java.lang.String middleNameLocalised, java.lang.String middleNameMain, java.lang.String mobile, java.lang.String password, java.lang.String school, java.lang.String teacherFirstName, java.lang.String teacherLastName, java.lang.String teacherMiddleName, java.lang.String username) {
+	public UsersRecord(java.lang.Long id, java.lang.String addressCity, java.lang.String addressCountry, java.lang.String addressLine1, java.lang.String addressLine2, java.lang.String addressState, java.lang.Boolean approvalEmailSent, java.sql.Timestamp birthDate, java.lang.String emailAddress, java.lang.String emailConfirmationToken, java.lang.Boolean enabled, java.lang.String firstNameLocalised, java.lang.String firstNameMain, java.lang.String landline, java.lang.String lastNameLocalised, java.lang.String lastNameMain, java.lang.String middleNameLocalised, java.lang.String middleNameMain, java.lang.String mobile, java.lang.String password, java.lang.String school, java.lang.String teacherFirstName, java.lang.String teacherLastName, java.lang.String teacherMiddleName, java.lang.String username) {
 		super(org.ng200.openolympus.jooq.tables.Users.USERS);
 
 		setValue(0, id);
@@ -389,23 +403,24 @@ public class UsersRecord extends org.jooq.impl.UpdatableRecordImpl<org.ng200.ope
 		setValue(3, addressLine1);
 		setValue(4, addressLine2);
 		setValue(5, addressState);
-		setValue(6, birthDate);
-		setValue(7, emailAddress);
-		setValue(8, emailConfirmationToken);
-		setValue(9, enabled);
-		setValue(10, firstNameLocalised);
-		setValue(11, firstNameMain);
-		setValue(12, landline);
-		setValue(13, lastNameLocalised);
-		setValue(14, lastNameMain);
-		setValue(15, middleNameLocalised);
-		setValue(16, middleNameMain);
-		setValue(17, mobile);
-		setValue(18, password);
-		setValue(19, school);
-		setValue(20, teacherFirstName);
-		setValue(21, teacherLastName);
-		setValue(22, teacherMiddleName);
-		setValue(23, username);
+		setValue(6, approvalEmailSent);
+		setValue(7, birthDate);
+		setValue(8, emailAddress);
+		setValue(9, emailConfirmationToken);
+		setValue(10, enabled);
+		setValue(11, firstNameLocalised);
+		setValue(12, firstNameMain);
+		setValue(13, landline);
+		setValue(14, lastNameLocalised);
+		setValue(15, lastNameMain);
+		setValue(16, middleNameLocalised);
+		setValue(17, middleNameMain);
+		setValue(18, mobile);
+		setValue(19, password);
+		setValue(20, school);
+		setValue(21, teacherFirstName);
+		setValue(22, teacherLastName);
+		setValue(23, teacherMiddleName);
+		setValue(24, username);
 	}
 }

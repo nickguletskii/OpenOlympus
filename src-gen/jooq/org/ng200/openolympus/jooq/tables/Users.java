@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.tables.records.UsersRecord> {
 
-	private static final long serialVersionUID = 1312773635;
+	private static final long serialVersionUID = -118114239;
 
 	/**
 	 * The reference instance of <code>public.users</code>
@@ -60,6 +60,11 @@ public class Users extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.ta
 	 * The column <code>public.users.address_state</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.UsersRecord, java.lang.String> ADDRESS_STATE = createField("address_state", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>public.users.approval_email_sent</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.UsersRecord, java.lang.Boolean> APPROVAL_EMAIL_SENT = createField("approval_email_sent", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
 	/**
 	 * The column <code>public.users.birth_date</code>.
