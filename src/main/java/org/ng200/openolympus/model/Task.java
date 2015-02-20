@@ -49,7 +49,8 @@ import com.google.common.cache.LoadingCache;
 @Entity
 @Table(name = "Tasks", indexes = {
 		@Index(columnList = "timeAdded"),
-		@Index(columnList = "name")
+		@Index(columnList = "name"),
+		@Index(columnList = "id", unique = true)
 })
 public class Task implements Serializable {
 	/**

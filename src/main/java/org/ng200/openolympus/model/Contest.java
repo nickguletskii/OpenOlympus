@@ -46,7 +46,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity
 @Table(name = "Contests", indexes = {
-	@Index(columnList = "startTime")
+		@Index(columnList = "startTime")
 })
 public class Contest implements Serializable {
 	/**
@@ -67,7 +67,6 @@ public class Contest implements Serializable {
 	@ManyToMany(cascade = {
 			CascadeType.MERGE,
 			CascadeType.REFRESH,
-			CascadeType.PERSIST,
 			CascadeType.DETACH
 	})
 	private Set<Task> tasks;

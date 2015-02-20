@@ -49,6 +49,8 @@ import org.ng200.openolympus.repositories.ContestTimeExtensionRepository;
 import org.ng200.openolympus.repositories.SolutionRepository;
 import org.ng200.openolympus.repositories.TaskRepository;
 import org.ng200.openolympus.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -59,6 +61,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ContestService {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContestService.class);
 	private static final int CONTEST_RESULTS_PAGE_LENGTH = 10;
 	private static final int CONTEST_PARTICIPANTS_PAGE_LENGTH = 10;
 	@Autowired
@@ -169,6 +173,14 @@ public class ContestService {
 						this.userRepository.findOne(((BigInteger) arr[0])
 								.longValue()), (BigDecimal) arr[1]))
 				.collect(Collectors.toList());
+	}
+
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
+			+ ')')
+	public boolean hasContestTestingFinished(Contest contest) {
+		return this.contestRepository.hasContestTestingFinished(
+				contest.getId(), contest.getStartTime(),
+				this.getContestEndTime(contest));
 	}
 
 	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY

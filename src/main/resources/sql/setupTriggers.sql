@@ -26,7 +26,7 @@ AS $maintain_solution_score$
     BEGIN
 	    UPDATE solutions
 		SET score=(SELECT sum(verdicts.score) FROM verdicts WHERE verdicts.solution_id=solutions.id),
-			testing=(SELECT bool_and(verdicts.score) FROM verdicts WHERE verdicts.solution_id=solutions.id)
+			tested=(SELECT every(verdicts.tested) FROM verdicts WHERE verdicts.solution_id=solutions.id)
 		WHERE id=NEW.solution_id;
 		RETURN NULL;
     END;
@@ -42,3 +42,22 @@ CREATE TRIGGER update_solution_score
 	AFTER INSERT OR UPDATE OR DELETE ON verdicts
 	FOR EACH ROW
 	EXECUTE PROCEDURE maintain_solution_score();
+	
+^^^ NEW STATEMENT ^^^
+
+DO $$
+BEGIN
+
+IF NOT EXISTS (
+		SELECT 1
+	    FROM   pg_class c
+	    JOIN   pg_namespace n ON n.oid = c.relnamespace
+	    WHERE  c.relname = 'contests_tasks_contest_ind'
+    ) THEN
+	CREATE INDEX contests_tasks_contest_ind
+		ON public.contests_tasks
+		USING btree
+		(contests_id);
+END IF;
+
+END$$;

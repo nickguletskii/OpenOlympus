@@ -164,4 +164,15 @@ public class ContestResultsController {
 				.map(ranking -> new ContestUserRankingDto(contest, ranking))
 				.collect(Collectors.toList());
 	}
+
+	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + CONTEST_OVER + AND
+			+ NO_CONTEST_CURRENTLY + ')')
+	@RequestMapping(value = "/api/contest/{contest}/testingFinished", method = RequestMethod.GET)
+	public boolean hasContestTestingFinished(
+			@PathVariable(value = "contest") final Contest contest) {
+
+		Assertions.resourceExists(contest);
+
+		return this.contestService.hasContestTestingFinished(contest);
+	}
 }

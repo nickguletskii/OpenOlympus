@@ -55,7 +55,6 @@ public class Verdict implements Serializable {
 	@ManyToOne(cascade = {
 			CascadeType.DETACH,
 			CascadeType.MERGE,
-			CascadeType.PERSIST,
 			CascadeType.REFRESH
 	})
 	private Solution solution;

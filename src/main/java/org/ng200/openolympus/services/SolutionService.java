@@ -152,7 +152,7 @@ public class SolutionService {
 	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + "#solution.user"
 			+ IS_OWNER + ')')
 	public Solution saveSolution(Solution solution) {
-		return solution = this.solutionRepository.save(solution);
+		return solution = this.solutionRepository.saveAndFlush(solution);
 	}
 
 	@Transactional

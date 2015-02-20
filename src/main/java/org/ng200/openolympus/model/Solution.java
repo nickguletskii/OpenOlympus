@@ -57,7 +57,6 @@ public class Solution implements Serializable {
 	@ManyToOne(cascade = {
 			CascadeType.MERGE,
 			CascadeType.REFRESH,
-			CascadeType.PERSIST,
 			CascadeType.DETACH
 	})
 	private Task task;
@@ -65,7 +64,6 @@ public class Solution implements Serializable {
 	@ManyToOne(cascade = {
 			CascadeType.MERGE,
 			CascadeType.REFRESH,
-			CascadeType.PERSIST,
 			CascadeType.DETACH
 	})
 	private User user;

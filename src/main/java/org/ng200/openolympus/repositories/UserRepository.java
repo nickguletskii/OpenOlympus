@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.Record;
 import org.jooq.Record3;
 import org.jooq.SelectSeekStep1;
 import org.jooq.Table;
@@ -65,53 +66,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	}
 
 	@Component
-	public class ContestTestingFinishedQuery extends ContestResultsQuery {
-
-		@Override
-		public String getSql() {
-			//@formatter:off
-			final Field<DayToSecond> timeExtensions = DSL.select(
-					DSL.field("sum(\"public\".\"time_extensions\".\"duration\") * INTERVAL '1 MILLISECOND'")
-					)
-					.from(Tables.TIME_EXTENSIONS)
-					.where(Tables.TIME_EXTENSIONS.CONTEST_ID.eq(DSL.param("contest", 0l))
-							.and(Tables.TIME_EXTENSIONS.USER_ID.eq(Tables.SOLUTIONS.USER_ID)))
-							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
-
-			final Condition taskInContest = Tables.SOLUTIONS.TASK_ID.in(
-					DSL.select(Tables.CONTESTS_TASKS.TASKS_ID)
-					.from(Tables.CONTESTS_TASKS)
-					.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l))));
-
-			final Condition solutionWithinTimeBounds =
-					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
-							DSL.param("contestEndTime", new Timestamp(0)).add(
-									timeExtensions
-									)
-							);
-			final Table<?> userTasks =
-					DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.TESTED)
-					.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
-					.from(Tables.SOLUTIONS)
-					.where(taskInContest.and(solutionWithinTimeBounds))
-					.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
-					.asTable("users_tasks");
-
-			String sql = SqlQueryProvider.DSL_CONTEXT.renderNamedParams(DSL.select(
-					DSL.field("every(users_tasks.tested)")
-					)
-					.from(Tables.USERS)
-					.leftOuterJoin(userTasks)
-					.on(Tables.USERS.ID.eq(userTasks.field(Tables.SOLUTIONS.USER_ID)))
-					);
-			//@formatter:on
-			System.out.println(sql);
-			return sql;
-		}
-
-	}
-
-	@Component
 	public class ContestResultsQuery implements SqlQueryProvider {
 
 		@Override
@@ -124,52 +78,60 @@ public interface UserRepository extends JpaRepository<User, Long> {
 		protected SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> getUnlimitedQuery() {
 			//@formatter:off
 			final Field<DayToSecond> timeExtensions = DSL.select(
-					DSL.field("sum(\"public\".\"time_extensions\".\"duration\") * INTERVAL '1 MILLISECOND'")
+					DSL.field("coalesce(sum(\"public\".\"time_extensions\".\"duration\"), 0) * INTERVAL '1 MILLISECOND'")
 					)
 					.from(Tables.TIME_EXTENSIONS)
 					.where(Tables.TIME_EXTENSIONS.CONTEST_ID.eq(DSL.param("contest", 0l))
 							.and(Tables.TIME_EXTENSIONS.USER_ID.eq(Tables.SOLUTIONS.USER_ID)))
 							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
-
-			final Condition taskInContest = Tables.SOLUTIONS.TASK_ID.in(
-					DSL.select(Tables.CONTESTS_TASKS.TASKS_ID)
-					.from(Tables.CONTESTS_TASKS)
-					.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l))));
-
+			
 			final Condition solutionWithinTimeBounds =
 					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
 							DSL.param("contestEndTime", new Timestamp(0)).add(
 									timeExtensions
 									)
 							);
+			
+			Table<Record> currentTasks = DSL.select()
+											.from(Tables.CONTESTS_TASKS)
+											.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l)))
+											.asTable("current_tasks");
+			Table<?> solutionsTasks = DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.SCORE)
+										.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
+										.from(Tables.SOLUTIONS)
+										.rightOuterJoin(currentTasks)
+										.on("solutions.task_id = current_tasks.tasks_id")
+										.where(solutionWithinTimeBounds)
+										.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
+										.asTable("solutions_tasks");
 			final Table<?> userTasks =
-					DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.SCORE)
-					.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
-					.from(Tables.SOLUTIONS)
-					.where(taskInContest.and(solutionWithinTimeBounds))
-					.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
+					DSL.select(
+							solutionsTasks.field(Tables.SOLUTIONS.USER_ID),
+							solutionsTasks.field(Tables.SOLUTIONS.TASK_ID),
+							solutionsTasks.field(Tables.SOLUTIONS.SCORE)).from(Tables.CONTEST_PARTICIPATIONS)
+					.leftOuterJoin(
+							solutionsTasks
+					).on("contest_participations.user_id = solutions_tasks.user_id")
+					.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
 					.asTable("users_tasks");
 
 			final Field<BigDecimal> user_score =
 					DSL.coalesce(
 							DSL.sum(userTasks.field(Tables.SOLUTIONS.SCORE)),
 							DSL.field("0")
-							).as("user_score");
+							);
 
 			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query =
 					DSL.select(
-							Tables.USERS.ID,
-							user_score,
-							DSL.rank().over(DSL.orderBy(DSL.coalesce(
-									DSL.sum(userTasks.field(Tables.SOLUTIONS.SCORE)),
-									DSL.field("0")
-									)))
+								Tables.USERS.ID,
+								user_score.as("user_score"),
+								DSL.rank().over(DSL.orderBy(user_score.desc()))
 							)
 							.from(Tables.USERS)
-							.leftOuterJoin(userTasks)
+							.rightOuterJoin(userTasks)
 							.on(Tables.USERS.ID.eq(userTasks.field(Tables.SOLUTIONS.USER_ID)))
 							.groupBy(Tables.USERS.ID)
-							.orderBy(user_score.desc());
+							.orderBy(user_score.as("user_score").desc());
 			//@formatter:on
 			return query;
 		}
@@ -251,9 +213,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	List<Object[]> getRankPage(@Param("limit") Long limit,
 			@Param("offset") Long offset);
 
-	@Query(nativeQuery = true)
-	@QueryProvider(value = ContestTestingFinishedQuery.class)
-	boolean everySolutionInContestFinished(@Param("contest") Long contest,
-			@Param("contestStartTime") Date contestStartTime,
-			@Param("contestEndTime") Date contestEndTime);
 }

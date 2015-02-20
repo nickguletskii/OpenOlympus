@@ -96,6 +96,10 @@ public class TestingService {
 	@Autowired
 	private SolutionService solutionService;
 
+	public void shutdownNow() {
+		verdictCheckSchedulingExecutorService.shutdownNow();
+	}
+
 	@Autowired
 	public TestingService(final SolutionService solutionService,
 			final SolutionRepository solutionRepository,
@@ -222,8 +226,8 @@ public class TestingService {
 			if (verdict.getStatus() == SolutionResult.Result.WAITING) {
 				verdict.setStatus(SolutionResult.Result.INTERNAL_ERROR);
 				TestingService.logger
-				.error("Judge for task {} did not set the result status to an acceptable value: got WAITING instead.",
-						verdict.getSolution().getTask().getId());
+						.error("Judge for task {} did not set the result status to an acceptable value: got WAITING instead.",
+								verdict.getSolution().getTask().getId());
 			}
 			this.solutionService.saveVerdict(verdict);
 		}
