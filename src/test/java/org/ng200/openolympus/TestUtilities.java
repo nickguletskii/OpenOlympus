@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class TestUtilities {
 
@@ -35,9 +34,13 @@ public class TestUtilities {
 
 	public User createTestUser(String name, String password)
 			throws MessagingException, EmailException {
-		User user = new User(name, this.passwordEncoder.encode(password), "",
+		User user = userService.getUserByUsername(name);
+		if (user != null)
+			return user;
+
+		user = new User(name, this.passwordEncoder.encode(password), "", "",
 				"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-				"", Date.from(Instant.now()), UUID.randomUUID().toString());
+				Date.from(Instant.now()), UUID.randomUUID().toString());
 		user.setRoles(new HashSet<Role>());
 		user = userService.saveUser(user);
 		approveUserRegistrationController.approveUser(user);
@@ -53,5 +56,5 @@ public class TestUtilities {
 		context.setAuthentication(auth);
 		SecurityContextHolder.setContext(context);
 	}
-	
+
 }

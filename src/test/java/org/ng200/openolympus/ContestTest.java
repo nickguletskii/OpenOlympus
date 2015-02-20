@@ -1,5 +1,6 @@
 package org.ng200.openolympus;
 
+import static org.ng200.openolympus.ToStringMatcher.compareBigDecimals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashSet;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -68,6 +70,8 @@ public class ContestTest {
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
+	private static int id = 0;
+
 	private MockMvc mockMvc;
 
 	@Autowired
@@ -110,6 +114,8 @@ public class ContestTest {
 
 	private User testUser4;
 
+	private User testUser5;
+
 	@Before
 	public void setup() throws Exception {
 		this.mockMvc = webAppContextSetup(webApplicationContext).build();
@@ -121,6 +127,7 @@ public class ContestTest {
 		testUser2 = testUtilities.createTestUser("test2", "test2");
 		testUser3 = testUtilities.createTestUser("test3", "test3");
 		testUser4 = testUtilities.createTestUser("test4", "test4");
+		testUser5 = testUtilities.createTestUser("test5", "test5");
 		testUserNotInContest = testUtilities.createTestUser("testNotInContest",
 				"testNotInContest");
 	}
@@ -128,7 +135,7 @@ public class ContestTest {
 	@Test
 	public void checkContestNormalTimingsRatingAndTestingFinished()
 			throws Exception {
-		Contest contest = contestRepository.findOne(createContest());
+		Contest contest = createContestUsingAPI(100);
 		Task task1 = createDummyTask();
 		Task task2 = createDummyTask();
 		contest.setTasks(ImmutableSet.<Task> builder().add(task1).build());
@@ -138,8 +145,89 @@ public class ContestTest {
 		this.contestService.addContestParticipant(contest, testUser2);
 		this.contestService.addContestParticipant(contest, testUser3);
 		this.contestService.addContestParticipant(contest, testUser4);
+		this.contestService.addContestParticipant(contest, testUser5);
 
 		long time = System.currentTimeMillis();
+		time = dummyData(task1, task2, time);
+
+		mockMvc.perform(
+				get("/api/contest/" + contest.getId() + "/completeResults"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().contentType(contentType))
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$", Matchers.hasSize(5)))
+				.andExpect(jsonPath("$[0].username").value("test2"))
+				.andExpect(jsonPath("$[0].rank").value(1))
+				.andExpect(jsonPath("$[1].username").value("test3"))
+				.andExpect(jsonPath("$[1].rank").value(2))
+				.andExpect(jsonPath("$[2].username").value("test4"))
+				.andExpect(jsonPath("$[2].rank").value(2))
+				.andExpect(jsonPath("$[3].username").value("test1"))
+				.andExpect(jsonPath("$[3].rank").value(4))
+				.andExpect(jsonPath("$[4].username").value("test5"))
+				.andExpect(jsonPath("$[4].rank").value(5));
+
+		mockMvc.perform(
+				get("/api/contest/" + contest.getId() + "/testingFinished"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string("true"));
+
+		createDummySolution(time++, task1, testUser1, 20, 100, false);
+
+		mockMvc.perform(
+				get("/api/contest/" + contest.getId() + "/testingFinished"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string("false"));
+	}
+
+	@Test
+	public void checkContestTimeExtensions() throws Exception {
+		Contest contest = createContestDirectly(0);
+		Task task1 = createDummyTask();
+		Task task2 = createDummyTask();
+		contest.setTasks(ImmutableSet.<Task> builder().add(task1).build());
+		contestService.saveContest(contest);
+
+		this.contestService.addContestParticipant(contest, testUser1);
+		this.contestService.addContestParticipant(contest, testUser2);
+		this.contestService.addContestParticipant(contest, testUser3);
+		this.contestService.addContestParticipant(contest, testUser4);
+		this.contestService.extendTimeForUser(contest, testUser4, 1000);
+
+		long time = System.currentTimeMillis();
+		time = dummyData(task1, task2, time);
+
+		mockMvc.perform(
+				get("/api/contest/" + contest.getId() + "/completeResults"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().contentType(contentType))
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$", Matchers.hasSize(4)))
+				.andExpect(jsonPath("$[0].username").value("test4"))
+				.andExpect(jsonPath("$[0].rank").value(1))
+				.andExpect(jsonPath("$[0].score", compareBigDecimals("2.00")))
+				.andExpect(jsonPath("$[1].username").value("test2"))
+				.andExpect(jsonPath("$[1].rank").value(2))
+				.andExpect(jsonPath("$[1].score", compareBigDecimals("0.00")))
+				.andExpect(jsonPath("$[2].username").value("test3"))
+				.andExpect(jsonPath("$[2].rank").value(2))
+				.andExpect(jsonPath("$[3].username").value("test1"))
+				.andExpect(jsonPath("$[3].rank").value(2));
+
+		mockMvc.perform(
+				get("/api/contest/" + contest.getId() + "/testingFinished"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string("true"));
+
+		createDummySolution(time++, task1, testUser4, 20, 100, false);
+
+		mockMvc.perform(
+				get("/api/contest/" + contest.getId() + "/testingFinished"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string("false"));
+	}
+
+	private long dummyData(Task task1, Task task2, long time) {
 		createDummySolution(time++, task1, testUser3, 0, 0, true);
 		createDummySolution(time++, task1, testUser3, 1, 2, true);
 		createDummySolution(time++, task1, testUser1, 1, 0, true);
@@ -156,33 +244,7 @@ public class ContestTest {
 		createDummySolution(time++, task2, testUserNotInContest, 20, 100, true);
 		createDummySolution(time++, task1, testUserNotInContest, 20, 100, false);
 		createDummySolution(time++, task2, testUser1, 20, 100, false);
-
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/completeResults"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().contentType(contentType))
-				.andExpect(jsonPath("$").isArray())
-				.andExpect(jsonPath("$", Matchers.hasSize(4)))
-				.andExpect(jsonPath("$[0].username").value("test2"))
-				.andExpect(jsonPath("$[0].rank").value(1))
-				.andExpect(jsonPath("$[1].username").value("test3"))
-				.andExpect(jsonPath("$[1].rank").value(2))
-				.andExpect(jsonPath("$[2].username").value("test4"))
-				.andExpect(jsonPath("$[2].rank").value(2))
-				.andExpect(jsonPath("$[3].username").value("test1"))
-				.andExpect(jsonPath("$[3].rank").value(4));
-
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/testingFinished"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string("true"));
-
-		createDummySolution(time++, task1, testUser1, 20, 100, false);
-
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/testingFinished"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string("false"));
+		return time;
 	}
 
 	public void createDummySolution(long time, Task task, User user,
@@ -220,21 +282,26 @@ public class ContestTest {
 		return task;
 	}
 
-	public long createContest() throws Exception {
+	public Contest createContestUsingAPI(int duration) throws Exception {
 		// @formatter:off
 		ZonedDateTime now = ZonedDateTime.now();
 
 		String result = mockMvc.perform(post("/api/contests/create")
-										.param("name", "TestContest")
+										.param("name", "TestContest_" + id++)
 										.param("startTime", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-										.param("duration", "100"))
+										.param("duration", Integer.toString(duration)))
 						.andDo(print())
 						.andExpect(status().isOk())
 				        .andExpect(content().contentType(contentType))
 				        .andExpect(jsonPath("$.status").value("OK"))
 				        .andExpect(jsonPath("$.data.id").exists())
 				        .andReturn().getResponse().getContentAsString();
-		return Long.valueOf(JsonPath.read(result, "$.data.id").toString());
+		return  contestRepository.findOne(Long.valueOf(JsonPath.read(result, "$.data.id").toString()));
 		// @formatter:on
+	}
+
+	public Contest createContestDirectly(int duration) throws Exception {
+		return contestService.saveContest(new Contest(Date.from(Instant.now()),
+				duration, "TestContest_" + id++, new HashSet<Task>()));
 	}
 }

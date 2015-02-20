@@ -169,6 +169,7 @@ public class ContestService {
 				.getContestResults(contest.getId(), contest.getStartTime(),
 						this.getContestEndTime(contest))
 				.stream()
+				.filter(arr -> arr != null && arr[0] != null)
 				.map(arr -> new UserRanking((BigInteger) arr[2],
 						this.userRepository.findOne(((BigInteger) arr[0])
 								.longValue()), (BigDecimal) arr[1]))

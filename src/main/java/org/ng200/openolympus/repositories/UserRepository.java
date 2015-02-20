@@ -104,34 +104,26 @@ public interface UserRepository extends JpaRepository<User, Long> {
 										.where(solutionWithinTimeBounds)
 										.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
 										.asTable("solutions_tasks");
-			final Table<?> userTasks =
-					DSL.select(
-							solutionsTasks.field(Tables.SOLUTIONS.USER_ID),
-							solutionsTasks.field(Tables.SOLUTIONS.TASK_ID),
-							solutionsTasks.field(Tables.SOLUTIONS.SCORE)).from(Tables.CONTEST_PARTICIPATIONS)
-					.leftOuterJoin(
-							solutionsTasks
-					).on("contest_participations.user_id = solutions_tasks.user_id")
-					.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
-					.asTable("users_tasks");
 
 			final Field<BigDecimal> user_score =
 					DSL.coalesce(
-							DSL.sum(userTasks.field(Tables.SOLUTIONS.SCORE)),
+							DSL.sum(solutionsTasks.field(Tables.SOLUTIONS.SCORE)),
 							DSL.field("0")
 							);
 
 			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query =
+					
 					DSL.select(
-								Tables.USERS.ID,
-								user_score.as("user_score"),
-								DSL.rank().over(DSL.orderBy(user_score.desc()))
-							)
-							.from(Tables.USERS)
-							.rightOuterJoin(userTasks)
-							.on(Tables.USERS.ID.eq(userTasks.field(Tables.SOLUTIONS.USER_ID)))
-							.groupBy(Tables.USERS.ID)
-							.orderBy(user_score.as("user_score").desc());
+							Tables.CONTEST_PARTICIPATIONS.USER_ID,
+							user_score.as("user_score"),
+							DSL.rank().over(DSL.orderBy(user_score.desc())))
+					.from(Tables.CONTEST_PARTICIPATIONS)
+					.leftOuterJoin(
+							solutionsTasks
+					).on("contest_participations.user_id = solutions_tasks.user_id")
+					.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
+					.groupBy(Tables.CONTEST_PARTICIPATIONS.USER_ID)
+					.orderBy(user_score.as("user_score").desc());
 			//@formatter:on
 			return query;
 		}
