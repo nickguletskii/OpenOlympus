@@ -47,7 +47,7 @@ define(['oolutil', 'lodash'],
                 });
 
                 $scope.patchUser = function(user) {
-                    UserService.patchUser(user, $stateParams.userId).success(function(data) {
+                    UserService.patchUser(user, $stateParams.userId).then(function(data) {
                         if (data.status === "BINDING_ERROR") {
                             ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
                         } else {
@@ -58,7 +58,7 @@ define(['oolutil', 'lodash'],
                 };
 
                 $scope.changePassword = function(passwordObj) {
-                    UserService.changePassword(user, $stateParams.userId).success(function(data) {
+                    UserService.changePassword(passwordObj, $stateParams.userId).then(function(data) {
                         if (data.status === "BINDING_ERROR") {
                             ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
                         } else {

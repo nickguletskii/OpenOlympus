@@ -1,4 +1,4 @@
-define(requirements, function(angular, app, _) {
+define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) {
     return function(app) {
         app.factory('ContestService', function($http) {
             return {

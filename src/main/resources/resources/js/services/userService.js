@@ -1,9 +1,9 @@
-define(requirements, function(angular, app, _) {
+define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) {
     return function(app) {
         app.factory('UserService', function($http) {
             return {
                 patchUser: function(user, userId) {
-                    var passwordPatchUrl = !user ? "/api/user/personalInfo" : "/api/admin/user/" + userId + "/personalInfo";
+                    var personalInfoPatchUrl = !userId ? "/api/user/personalInfo" : "/api/admin/user/" + userId + "/personalInfo";
                     return $http({
                         method: 'PATCH',
                         url: personalInfoPatchUrl,
@@ -11,7 +11,7 @@ define(requirements, function(angular, app, _) {
                     }).then(_.property("data"));
                 },
                 changePassword: function(passwordObj, userId) {
-                    var passwordPatchUrl = !user ? "/api/user/changePassword" : "/api/admin/user/" + userId + "/changePassword";
+                    var passwordPatchUrl = !userId ? "/api/user/changePassword" : "/api/admin/user/" + userId + "/changePassword";
                     return $http({
                         method: 'PATCH',
                         url: passwordPatchUrl,

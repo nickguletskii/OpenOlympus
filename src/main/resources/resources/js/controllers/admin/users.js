@@ -33,14 +33,14 @@ define(['oolutil', 'lodash'],
                 $scope.userCount = userCount;
 
                 $scope.deleteUser = function(user) {
-                    UserService.deleteUsers([user.id]).success(updateUsers);
+                    UserService.deleteUsers([user.id]).then(updateUsers);
                 };
 
                 function updateUsers() {
-                    UserService.getUsersPage(page).success(function(users) {
+                    UserService.getUsersPage(page).then(function(users) {
                         $scope.users = users;
                     });
-                    UserService.countUsers().success(function(count) {
+                    UserService.countUsers().then(function(count) {
                         $scope.userCount = count;
                     });
                 }
