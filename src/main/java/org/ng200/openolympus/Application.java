@@ -76,17 +76,33 @@ public class Application {
 		setupContext(context);
 	}
 
-	public static void setupContext(final ApplicationContext webApplicationContext)
-			throws SQLException {
-		final UserService userService = webApplicationContext.getBean(UserService.class);
-		final RoleService roleService = webApplicationContext.getBean(RoleService.class);
-		final DataSource dataSource = webApplicationContext.getBean(DataSource.class);
+	public static void setupContext(
+			final ApplicationContext webApplicationContext) throws SQLException {
+		final UserService userService = webApplicationContext
+				.getBean(UserService.class);
+		final RoleService roleService = webApplicationContext
+				.getBean(RoleService.class);
+		final DataSource dataSource = webApplicationContext
+				.getBean(DataSource.class);
 		ScriptUtils.executeSqlScript(dataSource.getConnection(),
 				new EncodedResource(new ClassPathResource(
 						"sql/setupTriggers.sql")), false, false,
 				ScriptUtils.DEFAULT_COMMENT_PREFIX, "^^^ NEW STATEMENT ^^^",
 				ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
 				ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
+
+		if (userService.getUserByUsername("system") == null) {
+			Application.logger.info("Creating system account");
+			final User system = new User("system", null, "", "", "", "", "",
+					"", "", "", "", "", "", "", "", "", "", "", "", "", null,
+					null);
+			final Set<Role> roles = new HashSet<Role>();
+			roles.add(roleService.getRoleByName(Role.USER));
+			roles.add(roleService.getRoleByName(Role.SUPERUSER));
+			roles.add(roleService.getRoleByName(Role.SYSTEM));
+			system.setRoles(roles);
+			userService.saveUser(system);
+		}
 
 		if (userService.getUserByUsername("admin") == null) {
 			Application.logger.info("Creating administrator account");

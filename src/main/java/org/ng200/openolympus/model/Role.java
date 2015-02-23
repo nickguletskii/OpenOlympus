@@ -45,6 +45,8 @@ public class Role implements Serializable {
 
 	public static final String USER = "USER";
 
+	public static final String SYSTEM = "SYSTEM";
+	
 	public static final String SUPERUSER = "SUPERUSER";
 
 	public static final Set<String> DEFAULT_ROLE_SET = Collections
@@ -53,6 +55,7 @@ public class Role implements Serializable {
 				{
 					this.add(Role.USER);
 					this.add(Role.SUPERUSER);
+					this.add(Role.SYSTEM);
 				}
 			});
 	@Id

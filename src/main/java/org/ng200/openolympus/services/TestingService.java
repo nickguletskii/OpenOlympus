@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
@@ -48,6 +49,7 @@ import org.jppf.task.storage.MemoryMapDataProvider;
 import org.ng200.openolympus.cerberus.Janitor;
 import org.ng200.openolympus.cerberus.SolutionJudge;
 import org.ng200.openolympus.cerberus.SolutionResult;
+import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.repositories.SolutionRepository;
@@ -58,6 +60,9 @@ import org.ng200.openolympus.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
@@ -116,6 +121,7 @@ public class TestingService {
 		final HashSet<Verdict> alreadyScheduledJobs = new HashSet<>();
 		this.verdictCheckSchedulingExecutorService.scheduleAtFixedRate(
 				() -> {
+					logInAsSystem();
 					solutionService
 							.getPendingVerdicts()
 							.stream()
@@ -292,6 +298,7 @@ public class TestingService {
 				return futureJudge
 						.thenApplyAsync(
 								(final SolutionJudge judge) -> {
+									logInAsSystem();
 									try {
 										if (!judge.isCompiled()) {
 											return this.compileSolution(
@@ -315,6 +322,7 @@ public class TestingService {
 								}, this.compilationAndCheckingExecutor)
 						.thenApplyAsync(
 								(final SolutionJudge judge) -> {
+									logInAsSystem();
 									try {
 										this.checkVerdict(
 												verdict,
@@ -340,6 +348,8 @@ public class TestingService {
 								}, this.compilationAndCheckingExecutor)
 						.handle((final SolutionJudge judge,
 								final Throwable throwable) -> {
+							logInAsSystem();
+
 							if (throwable != null) {
 								throw new RuntimeException(
 										"Couldn't judge verdict: ", throwable);
@@ -347,12 +357,40 @@ public class TestingService {
 							return judge;
 						});
 			};
+			logInAsSystem();
+
 			taskContainer.applyToJudge(verdict.getSolution(),
 					functionToApplyToJudge);
 		} catch (final Exception e) {
 			TestingService.logger.error(
 					"Couldn't schedule judgement for verdict {}: ", verdict, e);
 		}
+	}
+
+	@Autowired
+	private RoleService roleService;
+
+	private UserService userService;
+
+	private void logInAsSystem() {
+		SecurityContextHolder.getContext().setAuthentication(
+				new AbstractAuthenticationToken(Stream
+						.of(Role.SYSTEM, Role.SUPERUSER, Role.USER)
+						.map(x -> new SimpleGrantedAuthority(x))
+						.collect(Collectors.toList())) {
+
+					@Override
+					public Object getCredentials() {
+						return "";
+					}
+
+					@Override
+					public Object getPrincipal() {
+						return userService.getUserByUsername("system");
+					}
+
+				});
+
 	}
 
 	public void reloadTasks() {
