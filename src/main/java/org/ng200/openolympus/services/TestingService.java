@@ -25,6 +25,7 @@ package org.ng200.openolympus.services;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -73,6 +75,31 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 @Service
 public class TestingService {
+
+	private final class SystemAuthenticationToken extends
+			AbstractAuthenticationToken {
+		private SystemAuthenticationToken(
+				Collection<? extends GrantedAuthority> authorities) {
+			super(authorities);
+		}
+
+		public SystemAuthenticationToken() {
+			super(Stream.of(Role.SYSTEM, Role.SUPERUSER, Role.USER)
+					.map(x -> new SimpleGrantedAuthority(x))
+					.collect(Collectors.toList()));
+			setAuthenticated(true);
+		}
+
+		@Override
+		public Object getCredentials() {
+			return null;
+		}
+
+		@Override
+		public Object getPrincipal() {
+			return userService.getUserByUsername("system");
+		}
+	}
 
 	private final JPPFClient jppfClient = new JPPFClient();
 	private final DataProvider dataProvider = new MemoryMapDataProvider();
@@ -92,12 +119,12 @@ public class TestingService {
 
 	private final ScheduledExecutorService verdictCheckSchedulingExecutorService = Executors
 			.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
-					.setNameFormat("Judgement scheduler {0}").build());
+					.setNameFormat("Judgement scheduler %1$d").build());
 	private final ExecutorService compilationAndCheckingExecutor = Executors
 			.newFixedThreadPool(
 					16,
 					new ThreadFactoryBuilder().setNameFormat(
-							"Judgement waiter {0}").build());
+							"Judgement awaiter %1$d").build());
 	@Autowired
 	private SolutionService solutionService;
 
@@ -224,6 +251,7 @@ public class TestingService {
 			}
 
 		} catch (final Throwable throwable) {
+			verdict.setStatus(SolutionResult.Result.INTERNAL_ERROR);
 			throw new RuntimeException("Couldn't run solution: ", throwable);
 		} finally {
 			lock.unlock();
@@ -240,12 +268,13 @@ public class TestingService {
 	}
 
 	private SolutionJudge compileSolution(final Solution solution,
-			final SolutionJudge judge) {
+			final SolutionJudge judge) throws ExecutionException {
 		if (this.dataProvider == null) {
 			throw new IllegalStateException("Shared data provider is null!");
 		}
 
-		// solution.getTask().lockRead();
+		Lock lock = solution.getTask().readLock();
+		lock.lock();
 
 		try {
 			TestingService.logger
@@ -281,7 +310,7 @@ public class TestingService {
 		} catch (final Throwable throwable) {
 			throw new RuntimeException("Couldn't compile solution: ", throwable);
 		} finally {
-			// solution.getTask().unlockRead();
+			lock.unlock();
 		}
 	}
 
@@ -295,6 +324,7 @@ public class TestingService {
 					.getTaskContainerForTask(verdict.getSolution().getTask());
 			final Function<CompletableFuture<SolutionJudge>, CompletableFuture<SolutionJudge>> functionToApplyToJudge = (
 					final CompletableFuture<SolutionJudge> futureJudge) -> {
+				logInAsSystem();
 				return futureJudge
 						.thenApplyAsync(
 								(final SolutionJudge judge) -> {
@@ -374,23 +404,7 @@ public class TestingService {
 
 	private void logInAsSystem() {
 		SecurityContextHolder.getContext().setAuthentication(
-				new AbstractAuthenticationToken(Stream
-						.of(Role.SYSTEM, Role.SUPERUSER, Role.USER)
-						.map(x -> new SimpleGrantedAuthority(x))
-						.collect(Collectors.toList())) {
-
-					@Override
-					public Object getCredentials() {
-						return "";
-					}
-
-					@Override
-					public Object getPrincipal() {
-						return userService.getUserByUsername("system");
-					}
-
-				});
-
+				new SystemAuthenticationToken());
 	}
 
 	public void reloadTasks() {
