@@ -40,7 +40,6 @@ import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -74,7 +73,9 @@ public class SolutionListController {
 
 	@PreAuthorize(IS_USER)
 	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
-	public long getSolutionCountForUser(final @AuthenticationPrincipal User user) {
+	public long getSolutionCountForUser(final Principal principal) {
+		User user = userService.getUserByUsername(principal.getName());
+
 		// TODO: replace with SQL
 		if (this.contestService.getRunningContest() == null) {
 			return this.solutionService.countUserSolutions(user);

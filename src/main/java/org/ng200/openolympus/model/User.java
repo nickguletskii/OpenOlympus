@@ -23,6 +23,7 @@
 package org.ng200.openolympus.model;
 
 import java.io.Serializable;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -51,7 +52,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Table(name = "Users", indexes = {
 	@Index(columnList = "username")
 })
-public class User implements UserDetails, Serializable {
+public class User implements UserDetails, Serializable, Principal {
 
 	/**
 	 *
@@ -430,6 +431,11 @@ public class User implements UserDetails, Serializable {
 				.format("User [id=%s, username=%s, firstNameMain=%s, middleNameMain=%s, lastNameMain=%s]",
 						this.id, this.username, this.firstNameMain,
 						this.middleNameMain, this.lastNameMain);
+	}
+
+	@Override
+	public String getName() {
+		return username;
 	}
 
 }

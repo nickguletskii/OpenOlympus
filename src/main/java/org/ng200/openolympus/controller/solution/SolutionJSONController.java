@@ -32,6 +32,7 @@ import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.controller.solution.VerdictJSONController.VerdictDto;
@@ -100,7 +101,7 @@ public class SolutionJSONController {
 	@Autowired
 	private VerdictJSONController verdictJSONController;
 	private final Cache<Pair<Locale, Solution>, SolutionDto> cache = CacheBuilder
-			.newBuilder().maximumSize(1000).build();
+			.newBuilder().maximumSize(1000).expireAfterWrite(2, TimeUnit.SECONDS).build();
 
 	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
 			+ SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST + ')')

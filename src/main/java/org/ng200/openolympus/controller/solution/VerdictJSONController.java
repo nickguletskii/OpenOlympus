@@ -37,6 +37,8 @@ import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.exceptions.ForbiddenException;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.services.ContestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,6 +50,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class VerdictJSONController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(VerdictJSONController.class);
 
 	public static class VerdictDto {
 		private long id;
@@ -170,8 +175,8 @@ public class VerdictJSONController {
 
 		return new VerdictDto(verdict.getId(), verdict.getScore(),
 				verdict.getMaximumScore(), verdict.getCpuTime(),
-				verdict.getRealTime(), verdict.getMemoryPeak(),
-				verdict.getAdditionalInformation(), verdict.isTested(), verdict
+				verdict.getRealTime(), verdict.getMemoryPeak(), verdict
+						.getStatus().toString(), verdict.isTested(), verdict
 						.getScore().signum() > 0);
 
 	}
