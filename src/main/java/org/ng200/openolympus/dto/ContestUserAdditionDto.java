@@ -25,7 +25,7 @@ package org.ng200.openolympus.dto;
 import javax.validation.constraints.NotNull;
 
 public class ContestUserAdditionDto {
-	@NotNull(message = "contest.addUser.form.errors.empty")
+	@NotNull(message = "empty")
 	private String username;
 
 	public String getUsername() {

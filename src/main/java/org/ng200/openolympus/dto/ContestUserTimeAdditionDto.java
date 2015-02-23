@@ -28,10 +28,10 @@ import javax.validation.constraints.NotNull;
 import org.ng200.openolympus.model.User;
 
 public class ContestUserTimeAdditionDto {
-	@NotNull(message = "contest.addUserTime.form.errors.empty")
+	@NotNull(message = "empty")
 	private User user;
 
-	@NotNull(message = "contest.addUserTime.form.errors.empty")
+	@NotNull(message = "empty")
 	@Min(value = 1, message = "contest.addUserTime.form.errors.mustBePositive")
 	private Long time;
 

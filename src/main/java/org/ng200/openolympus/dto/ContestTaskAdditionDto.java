@@ -25,7 +25,7 @@ package org.ng200.openolympus.dto;
 import javax.validation.constraints.NotNull;
 
 public class ContestTaskAdditionDto {
-	@NotNull(message = "contest.addTask.form.errors.empty")
+	@NotNull(message = "empty")
 	public String taskName;
 
 	public String getTaskName() {

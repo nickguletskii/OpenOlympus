@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class SolutionSubmissionDto {
 
-	@NotNull(message = "solution.form.errors.empty")
+	@NotNull(message = "empty")
 	private MultipartFile solutionFile;
 
 	public MultipartFile getSolutionFile() {

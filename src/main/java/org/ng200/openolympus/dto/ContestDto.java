@@ -24,6 +24,9 @@ package org.ng200.openolympus.dto;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -35,18 +38,19 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 public class ContestDto {
 
-	@NotNull(message = "contest.add.form.errors.empty")
-	@Size(min = 2, max = 32, message = "contest.add.form.errors.length.from6.to32")
+	@NotNull(message = "empty")
+	@Size(min = 2, max = 32, message = "length")
 	private String name;
-	@NotNull(message = "contest.add.form.errors.empty")
+	@NotNull(message = "empty")
 	@DateTimeFormat(iso = ISO.DATE_TIME)
 	private Date startTime = DateUtils
-	.roundTo30Minutes(Date.from(Instant.now()));
-	@NotNull(message = "contest.add.form.errors.empty")
-	@Min(value = 1, message = "contest.add.form.errors.mustBePositive")
+			.roundTo30Minutes(Date.from(Instant.now()));
+	@NotNull(message = "empty")
+	@Min(value = 1, message = "mustBePositive")
 	private Long duration;
 
-	public Long getDuration() {
+	public Long getDuration() {Map<String, Set> depMap = new HashMap<>();
+
 		return this.duration;
 	}
 

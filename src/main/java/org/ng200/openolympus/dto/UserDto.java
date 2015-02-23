@@ -28,12 +28,12 @@ import javax.validation.constraints.Size;
 
 public class UserDto extends UserInfoDto {
 
-	@NotNull(message = "required")
+	@NotNull(message = "empty")
 	@Size(min = 4, max = 16, message = "length")
 	@Pattern(regexp = "[a-zA-Z0-9_-]+", message = "pattern")
 	private String username;
 
-	@NotNull(message = "required")
+	@NotNull(message = "empty")
 	@Size(min = 6, max = 32, message = "length")
 	private String password;
 

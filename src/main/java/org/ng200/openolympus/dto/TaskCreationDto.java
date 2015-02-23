@@ -29,15 +29,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class TaskCreationDto implements UploadableTask {
 
-	@NotNull(message = "task.add.form.errors.empty")
+	@NotNull(message = "empty")
 	private String name;
 
 	@Transient
-	@NotNull(message = "task.add.form.errors.empty")
+	@NotNull(message = "empty")
 	private MultipartFile descriptionFile;
 
 	@Transient
-	@NotNull(message = "task.add.form.errors.empty")
+	@NotNull(message = "empty")
 	private MultipartFile judgeFile;
 
 	private boolean published;

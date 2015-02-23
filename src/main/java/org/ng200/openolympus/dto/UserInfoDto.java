@@ -37,17 +37,17 @@ public class UserInfoDto {
 	public static final String PHONE_REGEX = "\\+?[0-9]*";
 
 	@Email(message = "email")
-	@NotNull(message = "required")
+	@NotNull(message = "empty")
 	private String emailAddress;
 
-	@NotNull(message = "required")
+	@NotNull(message = "empty")
 	@Size(min = 1, message = "length")
 	private String firstNameMain;
 
-	@NotNull(message = "required")
+	@NotNull(message = "empty")
 	private String middleNameMain;
 
-	@NotNull(message = "required")
+	@NotNull(message = "empty")
 	@Size(min = 1, message = "length")
 	private String lastNameMain;
 

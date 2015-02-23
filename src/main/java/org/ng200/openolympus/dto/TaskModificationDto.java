@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class TaskModificationDto implements UploadableTask {
 
-	@NotNull(message = "task.add.form.errors.empty")
+	@NotNull(message = "empty")
 	private String name;
 
 	private boolean published;
