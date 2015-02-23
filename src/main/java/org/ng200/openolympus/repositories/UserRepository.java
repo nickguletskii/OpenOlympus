@@ -32,6 +32,7 @@ import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record3;
 import org.jooq.SelectSeekStep1;
+import org.jooq.SelectSeekStep2;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.jooq.types.DayToSecond;
@@ -56,7 +57,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 		@Override
 		public String getSql() {
-			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query = this
+			final SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> query = this
 					.getUnlimitedQuery();
 			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query.limit(
 					DSL.param("offset", 0), DSL.param("limit", 10)));
@@ -70,12 +71,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 		@Override
 		public String getSql() {
-			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query = this
+			final SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> query = this
 					.getUnlimitedQuery();
 			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query);
 		}
 
-		protected SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> getUnlimitedQuery() {
+		protected SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> getUnlimitedQuery() {
 			//@formatter:off
 			final Field<DayToSecond> timeExtensions = DSL.select(
 					DSL.field("coalesce(sum(\"public\".\"time_extensions\".\"duration\"), 0) * INTERVAL '1 MILLISECOND'")
@@ -111,7 +112,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 							DSL.field("0")
 							);
 
-			final SelectSeekStep1<Record3<Long, BigDecimal, Integer>, BigDecimal> query =
+			final SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> query =
 					
 					DSL.select(
 							Tables.CONTEST_PARTICIPATIONS.USER_ID,
@@ -121,9 +122,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 					.leftOuterJoin(
 							solutionsTasks
 					).on("contest_participations.user_id = solutions_tasks.user_id")
+					.leftOuterJoin(Tables.USERS).on("contest_participations.user_id = users.id")
 					.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
-					.groupBy(Tables.CONTEST_PARTICIPATIONS.USER_ID)
-					.orderBy(user_score.as("user_score").desc());
+					.groupBy(Tables.CONTEST_PARTICIPATIONS.USER_ID, Tables.USERS.USERNAME)
+					.orderBy(user_score.as("user_score").desc(), Tables.USERS.USERNAME.asc());
 			//@formatter:on
 			return query;
 		}

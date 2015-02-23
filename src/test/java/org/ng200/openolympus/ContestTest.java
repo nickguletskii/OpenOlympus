@@ -53,7 +53,7 @@ import com.jayway.jsonpath.JsonPath;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @TestPropertySource(properties = {
-		"spring.jpa.hibernate.ddl-auto:create",
+		"spring.jpa.hibernate.ddl-auto:create-drop",
 		"enableCaptcha:false",
 		"emailHost:",
 		"emailConfirmationEnabled:false",
@@ -206,12 +206,12 @@ public class ContestTest {
 				.andExpect(jsonPath("$[0].username").value("test4"))
 				.andExpect(jsonPath("$[0].rank").value(1))
 				.andExpect(jsonPath("$[0].score", compareBigDecimals("2.00")))
-				.andExpect(jsonPath("$[1].username").value("test2"))
+				.andExpect(jsonPath("$[1].username").value("test1"))
 				.andExpect(jsonPath("$[1].rank").value(2))
 				.andExpect(jsonPath("$[1].score", compareBigDecimals("0.00")))
-				.andExpect(jsonPath("$[2].username").value("test3"))
+				.andExpect(jsonPath("$[2].username").value("test2"))
 				.andExpect(jsonPath("$[2].rank").value(2))
-				.andExpect(jsonPath("$[3].username").value("test1"))
+				.andExpect(jsonPath("$[3].username").value("test3"))
 				.andExpect(jsonPath("$[3].rank").value(2));
 
 		mockMvc.perform(
