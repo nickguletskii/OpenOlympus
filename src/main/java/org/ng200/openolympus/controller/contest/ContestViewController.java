@@ -22,15 +22,10 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-import static org.ng200.openolympus.SecurityExpressionConstants.THIS_CONTEST_IN_PROGRESS_FOR_USER;
-
 import java.security.Principal;
 import java.util.Set;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.model.views.UnprivilegedView;
@@ -58,8 +53,12 @@ public class ContestViewController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND
-			+ THIS_CONTEST_IN_PROGRESS_FOR_USER + ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.THIS_CONTEST_IN_PROGRESS_FOR_USER
+			+ ')')
 	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public Set<Task> showContestHub(

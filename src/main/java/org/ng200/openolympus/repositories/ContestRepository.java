@@ -59,41 +59,41 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
 					.where(Tables.TIME_EXTENSIONS.CONTEST_ID.eq(DSL.param("contest", 0l))
 							.and(Tables.TIME_EXTENSIONS.USER_ID.eq(Tables.SOLUTIONS.USER_ID)))
 							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
-			
+
 			final Condition solutionWithinTimeBounds =
 					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
 							DSL.param("contestEndTime", new Timestamp(0)).add(
 									timeExtensions
 									)
 							);
-			
-			Table<Record> currentTasks = DSL.select()
-											.from(Tables.CONTESTS_TASKS)
-											.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l)))
-											.asTable("current_tasks");
-			Table<?> solutionsTasks = DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
-										.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
-										.from(Tables.SOLUTIONS)
-										.rightOuterJoin(currentTasks)
-										.on("solutions.task_id = current_tasks.tasks_id")
-										.where(solutionWithinTimeBounds
-												.and("solutions.tested = FALSE"))
-										.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
-										.asTable("solutions_tasks");
+
+			final Table<Record> currentTasks = DSL.select()
+					.from(Tables.CONTESTS_TASKS)
+					.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l)))
+					.asTable("current_tasks");
+			final Table<?> solutionsTasks = DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
+					.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
+					.from(Tables.SOLUTIONS)
+					.rightOuterJoin(currentTasks)
+					.on("solutions.task_id = current_tasks.tasks_id")
+					.where(solutionWithinTimeBounds
+							.and("solutions.tested = FALSE"))
+							.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
+							.asTable("solutions_tasks");
 			final Table<?> userTasks =
 					DSL.select(
 							solutionsTasks.field(Tables.SOLUTIONS.USER_ID),
 							solutionsTasks.field(Tables.SOLUTIONS.TASK_ID),
 							solutionsTasks.field(Tables.SOLUTIONS.TESTED))
 							.from(Tables.CONTEST_PARTICIPATIONS)
-					.rightOuterJoin(
-							solutionsTasks
-					).on("contest_participations.user_id = solutions_tasks.user_id")
-					.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
-					.asTable("users_tasks");
+							.rightOuterJoin(
+									solutionsTasks
+									).on("contest_participations.user_id = solutions_tasks.user_id")
+									.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
+									.asTable("users_tasks");
 
 			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams( DSL.select(DSL.decode().when(DSL.exists(
-						DSL.select(userTasks.field(Tables.SOLUTIONS.USER_ID)).from(userTasks)
+					DSL.select(userTasks.field(Tables.SOLUTIONS.USER_ID)).from(userTasks)
 					), DSL.field("FALSE")).otherwise(DSL.field("TRUE"))));
 			//@formatter:on
 		}

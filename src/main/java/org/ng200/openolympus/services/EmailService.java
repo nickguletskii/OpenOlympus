@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.services;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -31,6 +29,7 @@ import javax.mail.MessagingException;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,7 +58,7 @@ public class EmailService {
 	@Autowired
 	private TemplateEngine templateEngine;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void sendEmail(String emailAddress, String subject, String view,
 			String alternativeText, Map<String, Object> variables)
 			throws MessagingException, EmailException {

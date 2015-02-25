@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.services;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +36,7 @@ import java.util.UUID;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.IOUtils;
 import org.ng200.openolympus.FileAccess;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public class StorageService implements Serializable {
 	@Autowired
 	private TaskDescriptionProvider taskDescriptionProvider;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public File createSolutionDirectory() throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault()
@@ -69,7 +68,7 @@ public class StorageService implements Serializable {
 		return dir.toFile();
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public File createTaskDescriptionFileStorage(Task task) throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final String idString = System.currentTimeMillis() + "_"
@@ -82,7 +81,7 @@ public class StorageService implements Serializable {
 		return file.toFile();
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public File createTaskJudgeDirectory(Task task) throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault().getPath(this.storagePath,
@@ -142,8 +141,7 @@ public class StorageService implements Serializable {
 				.relativize(file.toPath()).toString());
 	}
 
-
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void writeTaskDescription(Task task, InputStream inputStream)
 			throws ExecuteException, IOException {
 		final File source = FileSystems

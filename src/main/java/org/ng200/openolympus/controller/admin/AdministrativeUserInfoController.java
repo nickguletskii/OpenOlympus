@@ -22,11 +22,10 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.user.AbstractUserInfoController;
 import org.ng200.openolympus.dto.UserInfoDto;
@@ -44,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdministrativeUserInfoController extends
 		AbstractUserInfoController {
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.PATCH)
 	public BindingResponse changePersonInfo(final Model model,
 			@Valid @RequestBody final UserInfoDto userInfoDto,
@@ -55,7 +54,7 @@ public class AdministrativeUserInfoController extends
 		return BindingResponse.OK;
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(
 			@PathVariable(value = "user") final User user) {

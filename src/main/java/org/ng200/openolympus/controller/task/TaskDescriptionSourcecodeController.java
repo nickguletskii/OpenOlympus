@@ -22,12 +22,11 @@
  */
 package org.ng200.openolympus.controller.task;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ TaskFilesystemManipulatingController {
 	@Autowired
 	private StorageService storageService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/taskSourcecode", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<String> getTaskSourcecode(
 			@RequestParam(value = "id") final Task task) throws IOException {

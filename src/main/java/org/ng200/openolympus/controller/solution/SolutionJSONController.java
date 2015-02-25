@@ -22,19 +22,13 @@
  */
 package org.ng200.openolympus.controller.solution;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-import static org.ng200.openolympus.SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST;
-import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.solution.VerdictJSONController.VerdictDto;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Verdict;
@@ -101,10 +95,18 @@ public class SolutionJSONController {
 	@Autowired
 	private VerdictJSONController verdictJSONController;
 	private final Cache<Pair<Locale, Solution>, SolutionDto> cache = CacheBuilder
-			.newBuilder().maximumSize(1000).expireAfterWrite(2, TimeUnit.SECONDS).build();
+			.newBuilder().maximumSize(1000)
+			.expireAfterWrite(2, TimeUnit.SECONDS).build();
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
-			+ SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST + ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR
+			+ '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.USER_IS_OWNER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST
+			+ ')')
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody SolutionDto solutionApi(
 			@PathVariable(value = "id") final Solution solution,

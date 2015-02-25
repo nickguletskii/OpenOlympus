@@ -164,12 +164,12 @@ public class Task implements Serializable {
 		return this.id;
 	}
 
-	public Date getLastModifiedDate() {
-		return this.lastModifiedDate;
-	}
-
 	public User getLastModifiedBy() {
 		return this.lastModifiedBy;
+	}
+
+	public Date getLastModifiedDate() {
+		return this.lastModifiedDate;
 	}
 
 	@JsonView(UnprivilegedView.class)
@@ -220,12 +220,12 @@ public class Task implements Serializable {
 		this.id = id;
 	}
 
-	public void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}
-
 	public void setLastModifiedBy(User lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public void setName(final String name) {

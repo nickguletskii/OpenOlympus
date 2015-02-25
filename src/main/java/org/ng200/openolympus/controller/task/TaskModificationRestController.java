@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.controller.task;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,6 +29,7 @@ import java.util.concurrent.Callable;
 
 import javax.validation.Valid;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.TaskModificationDto;
 import org.ng200.openolympus.model.Task;
@@ -62,7 +61,7 @@ public class TaskModificationRestController extends
 	@Autowired
 	private StorageService storageService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
 			throws IOException {
@@ -75,7 +74,7 @@ public class TaskModificationRestController extends
 		return taskModificationDto;
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.POST)
 	public Callable<BindingResponse> patchTask(
 			@PathVariable("task") final Task task,

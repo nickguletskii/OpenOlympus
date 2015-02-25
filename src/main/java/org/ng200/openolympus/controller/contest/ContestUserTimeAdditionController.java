@@ -22,11 +22,10 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestUserTimeAdditionDto;
 import org.ng200.openolympus.model.Contest;
@@ -55,7 +54,7 @@ public class ContestUserTimeAdditionController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/contest/{contest}/addUserTime", method = RequestMethod.POST)
 	public BindingResponse addUserTime(final Model model,
 			@PathVariable(value = "contest") final Contest contest,

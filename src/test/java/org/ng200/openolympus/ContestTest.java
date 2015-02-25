@@ -1,14 +1,5 @@
 package org.ng200.openolympus;
 
-import static org.ng200.openolympus.ToStringMatcher.compareBigDecimals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.time.Duration;
@@ -46,6 +37,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.google.common.collect.ImmutableSet;
@@ -67,7 +62,7 @@ import com.jayway.jsonpath.JsonPath;
 @WebAppConfiguration
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ContestTest {
-	private MediaType contentType = new MediaType(
+	private final MediaType contentType = new MediaType(
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
@@ -117,160 +112,198 @@ public class ContestTest {
 
 	private User testUser5;
 
-	@Before
-	public void setup() throws Exception {
-		this.mockMvc = webAppContextSetup(webApplicationContext).build();
-		Application.setupContext(webApplicationContext);
-		testingService.shutdownNow();
-
-		testUtilities.logInAsAdmin();
-		testUser1 = testUtilities.createTestUser("test1", "test1");
-		testUser2 = testUtilities.createTestUser("test2", "test2");
-		testUser3 = testUtilities.createTestUser("test3", "test3");
-		testUser4 = testUtilities.createTestUser("test4", "test4");
-		testUser5 = testUtilities.createTestUser("test5", "test5");
-		testUserNotInContest = testUtilities.createTestUser("testNotInContest",
-				"testNotInContest");
-	}
-
 	@Test
 	public void checkContestNormalTimingsRatingAndTestingFinished()
 			throws Exception {
-		Contest contest = createContestUsingAPI(1000000);
-		Task task1 = createDummyTask();
-		Task task2 = createDummyTask();
+		final Contest contest = this.createContestUsingAPI(1000000);
+		final Task task1 = this.createDummyTask();
+		final Task task2 = this.createDummyTask();
 		contest.setTasks(ImmutableSet.<Task> builder().add(task1).build());
-		contestService.saveContest(contest);
+		this.contestService.saveContest(contest);
 
-		this.contestService.addContestParticipant(contest, testUser1);
-		this.contestService.addContestParticipant(contest, testUser2);
-		this.contestService.addContestParticipant(contest, testUser3);
-		this.contestService.addContestParticipant(contest, testUser4);
-		this.contestService.addContestParticipant(contest, testUser5);
+		this.contestService.addContestParticipant(contest, this.testUser1);
+		this.contestService.addContestParticipant(contest, this.testUser2);
+		this.contestService.addContestParticipant(contest, this.testUser3);
+		this.contestService.addContestParticipant(contest, this.testUser4);
+		this.contestService.addContestParticipant(contest, this.testUser5);
 
 		long time = System.currentTimeMillis();
-		time = dummyData(task1, task2, time);
+		time = this.dummyData(task1, task2, time);
 
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/completeResults"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().contentType(contentType))
-				.andExpect(jsonPath("$").isArray())
-				.andExpect(jsonPath("$", Matchers.hasSize(5)))
-				.andExpect(jsonPath("$[0].username").value("test2"))
-				.andExpect(jsonPath("$[0].rank").value(1))
-				.andExpect(jsonPath("$[1].username").value("test3"))
-				.andExpect(jsonPath("$[1].rank").value(2))
-				.andExpect(jsonPath("$[2].username").value("test4"))
-				.andExpect(jsonPath("$[2].rank").value(2))
-				.andExpect(jsonPath("$[3].username").value("test1"))
-				.andExpect(jsonPath("$[3].rank").value(4))
-				.andExpect(jsonPath("$[4].username").value("test5"))
-				.andExpect(jsonPath("$[4].rank").value(5));
+		this.mockMvc
+		.perform(
+				MockMvcRequestBuilders.get("/api/contest/"
+						+ contest.getId() + "/completeResults"))
+						.andDo(MockMvcResultHandlers.print())
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(
+								MockMvcResultMatchers.content().contentType(
+										this.contentType))
+										.andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+										.andExpect(
+												MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(5)))
+												.andExpect(
+														MockMvcResultMatchers.jsonPath("$[0].username").value(
+																"test2"))
+																.andExpect(MockMvcResultMatchers.jsonPath("$[0].rank").value(1))
+																.andExpect(
+																		MockMvcResultMatchers.jsonPath("$[1].username").value(
+																				"test3"))
+																				.andExpect(MockMvcResultMatchers.jsonPath("$[1].rank").value(2))
+																				.andExpect(
+																						MockMvcResultMatchers.jsonPath("$[2].username").value(
+																								"test4"))
+																								.andExpect(MockMvcResultMatchers.jsonPath("$[2].rank").value(2))
+																								.andExpect(
+																										MockMvcResultMatchers.jsonPath("$[3].username").value(
+																												"test1"))
+																												.andExpect(MockMvcResultMatchers.jsonPath("$[3].rank").value(4))
+																												.andExpect(
+																														MockMvcResultMatchers.jsonPath("$[4].username").value(
+																																"test5"))
+																																.andExpect(MockMvcResultMatchers.jsonPath("$[4].rank").value(5));
 
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/testingFinished"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string("true"));
+		this.mockMvc
+		.perform(
+				MockMvcRequestBuilders.get("/api/contest/"
+						+ contest.getId() + "/testingFinished"))
+						.andDo(MockMvcResultHandlers.print())
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(MockMvcResultMatchers.content().string("true"));
 
-		createDummySolution(time++, task1, testUser1, 20, 100, false);
+		this.createDummySolution(time++, task1, this.testUser1, 20, 100, false);
 
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/testingFinished"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string("false"));
+		this.mockMvc
+		.perform(
+				MockMvcRequestBuilders.get("/api/contest/"
+						+ contest.getId() + "/testingFinished"))
+						.andDo(MockMvcResultHandlers.print())
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(MockMvcResultMatchers.content().string("false"));
 	}
 
 	@Test
 	public void checkContestTimeExtensions() throws Exception {
-		Contest contest = createContestDirectly(Duration.ofSeconds(0));
-		Task task1 = createDummyTask();
-		Task task2 = createDummyTask();
+		final Contest contest = this.createContestDirectly(Duration
+				.ofSeconds(0));
+		final Task task1 = this.createDummyTask();
+		final Task task2 = this.createDummyTask();
 		contest.setTasks(ImmutableSet.<Task> builder().add(task1).build());
-		contestService.saveContest(contest);
+		this.contestService.saveContest(contest);
 
-		this.contestService.addContestParticipant(contest, testUser1);
-		this.contestService.addContestParticipant(contest, testUser2);
-		this.contestService.addContestParticipant(contest, testUser3);
-		this.contestService.addContestParticipant(contest, testUser4);
-		this.contestService.extendTimeForUser(contest, testUser4,
+		this.contestService.addContestParticipant(contest, this.testUser1);
+		this.contestService.addContestParticipant(contest, this.testUser2);
+		this.contestService.addContestParticipant(contest, this.testUser3);
+		this.contestService.addContestParticipant(contest, this.testUser4);
+		this.contestService.extendTimeForUser(contest, this.testUser4,
 				Duration.ofSeconds(1000));
 
 		long time = System.currentTimeMillis();
-		time = dummyData(task1, task2, time);
+		time = this.dummyData(task1, task2, time);
 
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/completeResults"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().contentType(contentType))
-				.andExpect(jsonPath("$").isArray())
-				.andExpect(jsonPath("$", Matchers.hasSize(4)))
-				.andExpect(jsonPath("$[0].username").value("test4"))
-				.andExpect(jsonPath("$[0].rank").value(1))
-				.andExpect(jsonPath("$[0].score", compareBigDecimals("2.00")))
-				.andExpect(jsonPath("$[1].username").value("test1"))
-				.andExpect(jsonPath("$[1].rank").value(2))
-				.andExpect(jsonPath("$[1].score", compareBigDecimals("0.00")))
-				.andExpect(jsonPath("$[2].username").value("test2"))
-				.andExpect(jsonPath("$[2].rank").value(2))
-				.andExpect(jsonPath("$[3].username").value("test3"))
-				.andExpect(jsonPath("$[3].rank").value(2));
+		this.mockMvc
+		.perform(
+				MockMvcRequestBuilders.get("/api/contest/"
+						+ contest.getId() + "/completeResults"))
+						.andDo(MockMvcResultHandlers.print())
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(
+								MockMvcResultMatchers.content().contentType(
+										this.contentType))
+										.andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+										.andExpect(
+												MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(4)))
+												.andExpect(
+														MockMvcResultMatchers.jsonPath("$[0].username").value(
+																"test4"))
+																.andExpect(MockMvcResultMatchers.jsonPath("$[0].rank").value(1))
+																.andExpect(
+																		MockMvcResultMatchers.jsonPath("$[0].score",
+																				ToStringMatcher.compareBigDecimals("2.00")))
+																				.andExpect(
+																						MockMvcResultMatchers.jsonPath("$[1].username").value(
+																								"test1"))
+																								.andExpect(MockMvcResultMatchers.jsonPath("$[1].rank").value(2))
+																								.andExpect(
+																										MockMvcResultMatchers.jsonPath("$[1].score",
+																												ToStringMatcher.compareBigDecimals("0.00")))
+																												.andExpect(
+																														MockMvcResultMatchers.jsonPath("$[2].username").value(
+																																"test2"))
+																																.andExpect(MockMvcResultMatchers.jsonPath("$[2].rank").value(2))
+																																.andExpect(
+																																		MockMvcResultMatchers.jsonPath("$[3].username").value(
+																																				"test3"))
+																																				.andExpect(MockMvcResultMatchers.jsonPath("$[3].rank").value(2));
 
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/testingFinished"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string("true"));
+		this.mockMvc
+		.perform(
+				MockMvcRequestBuilders.get("/api/contest/"
+						+ contest.getId() + "/testingFinished"))
+						.andDo(MockMvcResultHandlers.print())
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(MockMvcResultMatchers.content().string("true"));
 
-		createDummySolution(time++, task1, testUser4, 20, 100, false);
+		this.createDummySolution(time++, task1, this.testUser4, 20, 100, false);
 
-		mockMvc.perform(
-				get("/api/contest/" + contest.getId() + "/testingFinished"))
-				.andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string("false"));
+		this.mockMvc
+		.perform(
+				MockMvcRequestBuilders.get("/api/contest/"
+						+ contest.getId() + "/testingFinished"))
+						.andDo(MockMvcResultHandlers.print())
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(MockMvcResultMatchers.content().string("false"));
 	}
 
-	private long dummyData(Task task1, Task task2, long time) {
-		createDummySolution(time++, task1, testUser3, 0, 0, true);
-		createDummySolution(time++, task1, testUser3, 1, 2, true);
-		createDummySolution(time++, task1, testUser1, 1, 0, true);
-		createDummySolution(time++, task1, testUser2, 0, 2, true);
-		createDummySolution(time++, task1, testUser3, 0, 2, true);
-		createDummySolution(time++, task1, testUser2, 0, 1, true);
-		createDummySolution(time++, task1, testUser2, 3, 2, true);
-		createDummySolution(time++, task1, testUser2, 0, 3, true);
-		createDummySolution(time++, task1, testUser2, 20, 50, true);
-		createDummySolution(time++, task1, testUser4, 0, 0, true);
-		createDummySolution(time++, task1, testUser4, 1, 2, true);
-		createDummySolution(time++, task1, testUser4, 0, 2, true);
-		createDummySolution(time++, task1, testUserNotInContest, 20, 50, true);
-		createDummySolution(time++, task2, testUserNotInContest, 20, 100, true);
-		createDummySolution(time++, task1, testUserNotInContest, 20, 100, false);
-		createDummySolution(time++, task2, testUser1, 20, 100, false);
-		return time;
+	public Contest createContestDirectly(Duration duration) throws Exception {
+		return this.contestService.saveContest(new Contest(Date.from(Instant
+				.now()), duration, "TestContest_" + ContestTest.id++,
+				new HashSet<Task>()));
+	}
+
+	public Contest createContestUsingAPI(int duration) throws Exception {
+		// @formatter:off
+		final ZonedDateTime now = ZonedDateTime.now();
+
+		final String result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/contests/create")
+				.param("name", "TestContest_" + ContestTest.id++)
+				.param("startTime", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+				.param("duration", Integer.toString(duration)))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.status").value("OK"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.id").exists())
+				.andReturn().getResponse().getContentAsString();
+		return  this.contestRepository.findOne(Long.valueOf(JsonPath.read(result, "$.data.id").toString()));
+		// @formatter:on
 	}
 
 	public void createDummySolution(long time, Task task, User user,
 			int baseTestScore, int mainTestScore, boolean tested) {
 		Solution solution = new Solution(task, user, "", new Date(time));
-		if (baseTestScore == 0 && mainTestScore == 0)
+		if (baseTestScore == 0 && mainTestScore == 0) {
 			solution.setTested(tested);
-		solution = solutionService.saveSolution(solution);
+		}
+		solution = this.solutionService.saveSolution(solution);
 		for (int i = 0; i < baseTestScore; i++) {
-			Verdict verdict = new Verdict(solution, BigDecimal.ONE, "a", true);
+			final Verdict verdict = new Verdict(solution, BigDecimal.ONE, "a",
+					true);
 			verdict.setTested(tested);
 			verdict.setScore(BigDecimal.ONE);
 			verdict.setStatus(Result.OK);
-			solutionService.saveVerdict(verdict);
+			this.solutionService.saveVerdict(verdict);
 		}
 		for (int i = 0; i < mainTestScore; i++) {
-			Verdict verdict = new Verdict(solution, BigDecimal.ONE, "a", false);
+			final Verdict verdict = new Verdict(solution, BigDecimal.ONE, "a",
+					false);
 			verdict.setTested(tested);
 			verdict.setScore(BigDecimal.ONE);
 			verdict.setStatus(Result.OK);
-			solutionService.saveVerdict(verdict);
+			this.solutionService.saveVerdict(verdict);
 		}
 
-		Assert.assertEquals(solutionRepository.findOne(solution.getId())
+		Assert.assertEquals(this.solutionRepository.findOne(solution.getId())
 				.isTested(), tested);
 	}
 
@@ -280,30 +313,47 @@ public class ContestTest {
 		task.setPublished(true);
 		task.setTaskLocation(null);
 		task.setTimeAdded(Date.from(Instant.now()));
-		task = taskService.saveTask(task);
+		task = this.taskService.saveTask(task);
 		return task;
 	}
 
-	public Contest createContestUsingAPI(int duration) throws Exception {
-		// @formatter:off
-		ZonedDateTime now = ZonedDateTime.now();
-
-		String result = mockMvc.perform(post("/api/contests/create")
-										.param("name", "TestContest_" + id++)
-										.param("startTime", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-										.param("duration", Integer.toString(duration)))
-						.andDo(print())
-						.andExpect(status().isOk())
-				        .andExpect(content().contentType(contentType))
-				        .andExpect(jsonPath("$.status").value("OK"))
-				        .andExpect(jsonPath("$.data.id").exists())
-				        .andReturn().getResponse().getContentAsString();
-		return  contestRepository.findOne(Long.valueOf(JsonPath.read(result, "$.data.id").toString()));
-		// @formatter:on
+	private long dummyData(Task task1, Task task2, long time) {
+		this.createDummySolution(time++, task1, this.testUser3, 0, 0, true);
+		this.createDummySolution(time++, task1, this.testUser3, 1, 2, true);
+		this.createDummySolution(time++, task1, this.testUser1, 1, 0, true);
+		this.createDummySolution(time++, task1, this.testUser2, 0, 2, true);
+		this.createDummySolution(time++, task1, this.testUser3, 0, 2, true);
+		this.createDummySolution(time++, task1, this.testUser2, 0, 1, true);
+		this.createDummySolution(time++, task1, this.testUser2, 3, 2, true);
+		this.createDummySolution(time++, task1, this.testUser2, 0, 3, true);
+		this.createDummySolution(time++, task1, this.testUser2, 20, 50, true);
+		this.createDummySolution(time++, task1, this.testUser4, 0, 0, true);
+		this.createDummySolution(time++, task1, this.testUser4, 1, 2, true);
+		this.createDummySolution(time++, task1, this.testUser4, 0, 2, true);
+		this.createDummySolution(time++, task1, this.testUserNotInContest, 20,
+				50, true);
+		this.createDummySolution(time++, task2, this.testUserNotInContest, 20,
+				100, true);
+		this.createDummySolution(time++, task1, this.testUserNotInContest, 20,
+				100, false);
+		this.createDummySolution(time++, task2, this.testUser1, 20, 100, false);
+		return time;
 	}
 
-	public Contest createContestDirectly(Duration duration) throws Exception {
-		return contestService.saveContest(new Contest(Date.from(Instant.now()),
-				duration, "TestContest_" + id++, new HashSet<Task>()));
+	@Before
+	public void setup() throws Exception {
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(
+				this.webApplicationContext).build();
+		Application.setupContext(this.webApplicationContext);
+		this.testingService.shutdownNow();
+
+		this.testUtilities.logInAsAdmin();
+		this.testUser1 = this.testUtilities.createTestUser("test1", "test1");
+		this.testUser2 = this.testUtilities.createTestUser("test2", "test2");
+		this.testUser3 = this.testUtilities.createTestUser("test3", "test3");
+		this.testUser4 = this.testUtilities.createTestUser("test4", "test4");
+		this.testUser5 = this.testUtilities.createTestUser("test5", "test5");
+		this.testUserNotInContest = this.testUtilities.createTestUser(
+				"testNotInContest", "testNotInContest");
 	}
 }

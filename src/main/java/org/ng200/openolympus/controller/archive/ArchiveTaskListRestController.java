@@ -22,17 +22,12 @@
  */
 package org.ng200.openolympus.controller.archive;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.views.UnprivilegedView;
@@ -92,16 +87,22 @@ public class ArchiveTaskListRestController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
-			+ ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/taskCount", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public Long countUsers() {
 		return this.taskService.countTasks();
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
-			+ ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,

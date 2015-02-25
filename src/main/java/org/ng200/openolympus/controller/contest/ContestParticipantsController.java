@@ -22,12 +22,11 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.security.Principal;
 import java.util.List;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.User;
@@ -50,7 +49,7 @@ public class ContestParticipantsController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> showParticipantsPage(

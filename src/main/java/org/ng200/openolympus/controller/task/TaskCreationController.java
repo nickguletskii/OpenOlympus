@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.controller.task;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.io.File;
 import java.time.Instant;
 import java.util.Date;
@@ -34,6 +32,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.ng200.openolympus.FileAccess;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.TaskCreationDto;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
@@ -63,7 +62,7 @@ public class TaskCreationController extends
 	@Autowired
 	private StorageService storageService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 	@ResponseBody
 	@Transactional

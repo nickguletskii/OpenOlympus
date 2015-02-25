@@ -22,14 +22,6 @@
  */
 package org.ng200.openolympus.services;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-import static org.ng200.openolympus.SecurityExpressionConstants.TASK_PUBLISHED;
-import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
-
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
@@ -43,6 +35,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Task;
@@ -81,19 +74,22 @@ public class TaskService {
 	@Autowired
 	private SecurityService securityService;
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
-			+ ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public Long countTasks() {
 		return this.taskRepository.count();
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<Task> findAFewTasksWithNameContaining(final String name) {
 		return this.taskRepository.findByNameContaining(name, new PageRequest(
 				0, TaskService.LIMIT_TASKS_WITH_NAME_CONTAINING));
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<Task> findTasksNewestFirst(final int pageNumber,
 			final int pageSize) {
 		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
@@ -101,8 +97,11 @@ public class TaskService {
 		return this.taskRepository.findAll(request).getContent();
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
-			+ ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<Task> findTasksNewestFirstAndAuthorized(Integer pageNumber,
 			int pageSize, Principal principal) {
 		if (this.securityService.isSuperuser(principal)) {
@@ -114,30 +113,48 @@ public class TaskService {
 		return this.taskRepository.findByPublished(true, request).getContent();
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
-			+ AND + TASK_PUBLISHED + ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public BigDecimal getMaximumScore(final Task task) {
 		return Lists.first(
 				this.taskRepository.getTaskMaximumScore(task.getId())).orElse(
 				BigDecimal.ZERO);
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
-			+ NO_CONTEST_CURRENTLY + AND + TASK_PUBLISHED + ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.USER_IS_OWNER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public BigDecimal getScore(final Task task, final User user) {
 		return Lists.first(
 				this.taskRepository.getTaskScore(task.getId(), user.getId()))
 				.orElse(BigDecimal.ZERO);
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
-			+ NO_CONTEST_CURRENTLY + ')')
-	@PostAuthorize(IS_ADMIN + OR + " #returnObject.published")
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.USER_IS_OWNER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
+	@PostAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + " #returnObject.published")
 	public Task getTaskByName(final String taskName) {
 		return this.taskRepository.findByName(taskName);
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@Transactional
 	public void rejudgeTask(final Task task) throws ExecutionException {
 
@@ -178,7 +195,7 @@ public class TaskService {
 		}
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public Task saveTask(Task task) {
 		return task = this.taskRepository.save(task);
 	}

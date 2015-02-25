@@ -16,16 +16,17 @@ public class SpringSecurityAuditorAware implements AuditorAware<User> {
 	@Autowired
 	private UserService userService;
 
+	@Override
 	public User getCurrentAuditor() {
 
-		Authentication authentication = SecurityContextHolder.getContext()
-				.getAuthentication();
+		final Authentication authentication = SecurityContextHolder
+				.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()) {
 			return null;
 		}
 
-		return userService.getUserByUsername(((Principal) authentication
+		return this.userService.getUserByUsername(((Principal) authentication
 				.getPrincipal()).getName());
 	}
 }

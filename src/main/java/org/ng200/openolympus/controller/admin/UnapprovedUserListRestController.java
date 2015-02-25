@@ -22,10 +22,9 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.util.List;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.UserService;
@@ -44,14 +43,14 @@ public class UnapprovedUserListRestController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/pendingUsersCount", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public long getUsers() {
 		return this.userService.countUnapprovedUsers();
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/pendingUsers", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {

@@ -34,24 +34,26 @@ public class TestUtilities {
 
 	public User createTestUser(String name, String password)
 			throws MessagingException, EmailException {
-		User user = userService.getUserByUsername(name);
-		if (user != null)
+		User user = this.userService.getUserByUsername(name);
+		if (user != null) {
 			return user;
+		}
 
 		user = new User(name, this.passwordEncoder.encode(password), "", "",
 				"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 				Date.from(Instant.now()), UUID.randomUUID().toString());
 		user.setRoles(new HashSet<Role>());
-		user = userService.saveUser(user);
-		approveUserRegistrationController.approveUser(user);
+		user = this.userService.saveUser(user);
+		this.approveUserRegistrationController.approveUser(user);
 		return user;
 	}
 
 	public void logInAsAdmin() {
-		SecurityContext context = SecurityContextHolder.createEmptyContext();
+		final SecurityContext context = SecurityContextHolder
+				.createEmptyContext();
 
-		User principal = userService.getUserByUsername("admin");
-		Authentication auth = new UsernamePasswordAuthenticationToken(
+		final User principal = this.userService.getUserByUsername("admin");
+		final Authentication auth = new UsernamePasswordAuthenticationToken(
 				principal, "admin", principal.getAuthorities());
 		context.setAuthentication(auth);
 		SecurityContextHolder.setContext(context);

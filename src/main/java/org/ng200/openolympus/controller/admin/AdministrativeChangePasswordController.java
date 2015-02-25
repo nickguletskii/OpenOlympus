@@ -22,10 +22,9 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import javax.validation.Valid;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.PasswordChangeDto;
 import org.ng200.openolympus.model.User;
@@ -50,7 +49,7 @@ public class AdministrativeChangePasswordController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/user/{user}/changePassword", method = RequestMethod.PATCH)
 	public BindingResponse changePassword(
 			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,

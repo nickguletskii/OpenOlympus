@@ -16,15 +16,17 @@ public class OlympusConverters {
 
 		@Override
 		public Long convertToDatabaseColumn(Duration attribute) {
-			if (attribute == null)
+			if (attribute == null) {
 				return null;
+			}
 			return attribute.getSeconds();
 		}
 
 		@Override
 		public Duration convertToEntityAttribute(Long dbData) {
-			if (dbData == null)
+			if (dbData == null) {
 				return null;
+			}
 			return Duration.ofMillis(dbData);
 		}
 	}

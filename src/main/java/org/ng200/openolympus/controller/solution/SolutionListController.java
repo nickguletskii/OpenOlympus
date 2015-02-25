@@ -22,14 +22,12 @@
  */
 package org.ng200.openolympus.controller.solution;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.SolutionDto;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Solution;
@@ -65,16 +63,17 @@ public class SolutionListController {
 	@Autowired
 	private TaskService taskService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCount(final User user) {
 		return this.solutionService.getSolutionCount();
 	}
 
-	@PreAuthorize(IS_USER)
+	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCountForUser(final Principal principal) {
-		User user = userService.getUserByUsername(principal.getName());
+		final User user = this.userService.getUserByUsername(principal
+				.getName());
 
 		// TODO: replace with SQL
 		if (this.contestService.getRunningContest() == null) {
@@ -88,7 +87,7 @@ public class SolutionListController {
 						user, task)).reduce((x, y) -> x + y).orElse(0l);
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/solutions", method = RequestMethod.GET)
 	public List<SolutionDto> showAllSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
@@ -99,7 +98,7 @@ public class SolutionListController {
 				.collect(Collectors.toList());
 	}
 
-	@PreAuthorize(IS_USER)
+	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
 	@JsonView(SolutionDto.SolutionDTOView.class)
 	public List<SolutionDto> showUserSolutions(

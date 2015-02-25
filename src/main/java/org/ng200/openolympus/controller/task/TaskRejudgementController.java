@@ -22,11 +22,10 @@
  */
 package org.ng200.openolympus.controller.task;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.util.concurrent.ExecutionException;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class TaskRejudgementController {
 	@Autowired
 	private TaskService taskService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void rejudgeTask(@PathVariable(value = "task") final Task task,

@@ -255,6 +255,11 @@ public class User implements UserDetails, Serializable, Principal {
 		return this.mobile;
 	}
 
+	@Override
+	public String getName() {
+		return this.username;
+	}
+
 	@JsonView(ServerView.class)
 	@Override
 	public String getPassword() {
@@ -431,11 +436,6 @@ public class User implements UserDetails, Serializable, Principal {
 				.format("User [id=%s, username=%s, firstNameMain=%s, middleNameMain=%s, lastNameMain=%s]",
 						this.id, this.username, this.firstNameMain,
 						this.middleNameMain, this.lastNameMain);
-	}
-
-	@Override
-	public String getName() {
-		return username;
 	}
 
 }

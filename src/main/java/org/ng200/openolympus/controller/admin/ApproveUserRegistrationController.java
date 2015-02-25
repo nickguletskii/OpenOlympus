@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +29,7 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.mail.EmailException;
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.auth.EmailConfirmationController;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.User;
@@ -87,7 +86,7 @@ public class ApproveUserRegistrationController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void approveUser(User user) throws MessagingException,
 			EmailException {
 		Assertions.resourceExists(user);
@@ -124,7 +123,7 @@ public class ApproveUserRegistrationController {
 		}
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
 	@JsonView(PriviligedView.class)
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {

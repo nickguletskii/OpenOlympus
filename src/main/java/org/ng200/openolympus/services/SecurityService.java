@@ -56,9 +56,34 @@ public class SecurityService {
 	@Autowired
 	private PropertyService propertyService;
 
+	public boolean isContestInProgressForUser(final Contest contest,
+			String username) {
+		return !contest.getStartTime().toInstant().isAfter(Instant.now())
+				&& !this.contestService
+						.getContestEndTimeForUser(contest,
+								this.userRepository.findByUsername(username))
+						.toInstant().isBefore(Instant.now());
+	}
+
+	public boolean isContestOver(final Contest contest) {
+		return this.contestService.getContestEndIncludingAllTimeExtensions(
+				contest).isBefore(Instant.now());
+	}
+
 	public boolean isOnLockdown() {
 		return this.propertyService.get("isOnLockdown", false).<Boolean> as()
 				.orElse(false);
+	}
+
+	public boolean isSolutionInCurrentContest(Solution solution) {
+		final Contest runningContest = this.contestService.getRunningContest();
+		return runningContest == null
+				|| (this.isTaskInContest(solution.getTask(), runningContest)
+						&& !runningContest.getStartTime().toInstant()
+								.isAfter(solution.getTimeAdded().toInstant()) && this.contestService
+						.getContestEndTimeForUser(runningContest,
+								solution.getUser()).toInstant()
+						.isBefore(solution.getTimeAdded().toInstant()));
 	}
 
 	public boolean isSuperuser(final Principal principal) {
@@ -76,46 +101,21 @@ public class SecurityService {
 		return user.hasRole(this.roleService.getRoleByName(Role.SUPERUSER));
 	}
 
+	public boolean isTaskInContest(Task task, Contest contest) {
+		return contest.getTasks().contains(task);
+	}
+
+	public boolean isTaskInCurrentContest(Task task) {
+		final Contest runningContest = this.contestService.getRunningContest();
+		return runningContest == null
+				|| runningContest.getTasks().contains(task);
+	}
+
 	public boolean noContest() {
 		return this.contestService.getRunningContest() == null;
 	}
 
 	public boolean noLockdown() {
 		return !this.isOnLockdown();
-	}
-
-	public boolean isContestOver(final Contest contest) {
-		return contestService.getContestEndIncludingAllTimeExtensions(contest)
-				.isBefore(Instant.now());
-	}
-
-	public boolean isContestInProgressForUser(final Contest contest,
-			String username) {
-		return !contest.getStartTime().toInstant().isAfter(Instant.now())
-				&& !contestService
-						.getContestEndTimeForUser(contest,
-								userRepository.findByUsername(username))
-						.toInstant().isBefore(Instant.now());
-	}
-
-	public boolean isTaskInContest(Task task, Contest contest) {
-		return contest.getTasks().contains(task);
-	}
-
-	public boolean isTaskInCurrentContest(Task task) {
-		Contest runningContest = contestService.getRunningContest();
-		return runningContest == null
-				|| runningContest.getTasks().contains(task);
-	}
-
-	public boolean isSolutionInCurrentContest(Solution solution) {
-		Contest runningContest = contestService.getRunningContest();
-		return runningContest == null
-				|| (isTaskInContest(solution.getTask(), runningContest)
-						&& !runningContest.getStartTime().toInstant()
-								.isAfter(solution.getTimeAdded().toInstant()) && contestService
-						.getContestEndTimeForUser(runningContest,
-								solution.getUser()).toInstant()
-						.isBefore(solution.getTimeAdded().toInstant()));
 	}
 }

@@ -31,7 +31,6 @@ import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record3;
-import org.jooq.SelectSeekStep1;
 import org.jooq.SelectSeekStep2;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
@@ -85,26 +84,26 @@ public interface UserRepository extends JpaRepository<User, Long> {
 					.where(Tables.TIME_EXTENSIONS.CONTEST_ID.eq(DSL.param("contest", 0l))
 							.and(Tables.TIME_EXTENSIONS.USER_ID.eq(Tables.SOLUTIONS.USER_ID)))
 							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
-			
+
 			final Condition solutionWithinTimeBounds =
 					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
 							DSL.param("contestEndTime", new Timestamp(0)).add(
 									timeExtensions
 									)
 							);
-			
-			Table<Record> currentTasks = DSL.select()
-											.from(Tables.CONTESTS_TASKS)
-											.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l)))
-											.asTable("current_tasks");
-			Table<?> solutionsTasks = DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.SCORE)
-										.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
-										.from(Tables.SOLUTIONS)
-										.rightOuterJoin(currentTasks)
-										.on("solutions.task_id = current_tasks.tasks_id")
-										.where(solutionWithinTimeBounds)
-										.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
-										.asTable("solutions_tasks");
+
+			final Table<Record> currentTasks = DSL.select()
+					.from(Tables.CONTESTS_TASKS)
+					.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l)))
+					.asTable("current_tasks");
+			final Table<?> solutionsTasks = DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.SCORE)
+					.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
+					.from(Tables.SOLUTIONS)
+					.rightOuterJoin(currentTasks)
+					.on("solutions.task_id = current_tasks.tasks_id")
+					.where(solutionWithinTimeBounds)
+					.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
+					.asTable("solutions_tasks");
 
 			final Field<BigDecimal> user_score =
 					DSL.coalesce(
@@ -113,19 +112,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
 							);
 
 			final SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> query =
-					
+
 					DSL.select(
 							Tables.CONTEST_PARTICIPATIONS.USER_ID,
 							user_score.as("user_score"),
 							DSL.rank().over(DSL.orderBy(user_score.desc())))
-					.from(Tables.CONTEST_PARTICIPATIONS)
-					.leftOuterJoin(
-							solutionsTasks
-					).on("contest_participations.user_id = solutions_tasks.user_id")
-					.leftOuterJoin(Tables.USERS).on("contest_participations.user_id = users.id")
-					.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
-					.groupBy(Tables.CONTEST_PARTICIPATIONS.USER_ID, Tables.USERS.USERNAME)
-					.orderBy(user_score.as("user_score").desc(), Tables.USERS.USERNAME.asc());
+							.from(Tables.CONTEST_PARTICIPATIONS)
+							.leftOuterJoin(
+									solutionsTasks
+									).on("contest_participations.user_id = solutions_tasks.user_id")
+									.leftOuterJoin(Tables.USERS).on("contest_participations.user_id = users.id")
+									.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
+									.groupBy(Tables.CONTEST_PARTICIPATIONS.USER_ID, Tables.USERS.USERNAME)
+									.orderBy(user_score.as("user_score").desc(), Tables.USERS.USERNAME.asc());
 			//@formatter:on
 			return query;
 		}

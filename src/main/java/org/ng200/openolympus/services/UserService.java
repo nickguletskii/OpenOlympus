@@ -22,17 +22,12 @@
  */
 package org.ng200.openolympus.services;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.User;
@@ -41,18 +36,14 @@ import org.ng200.openolympus.repositories.ContestTimeExtensionRepository;
 import org.ng200.openolympus.repositories.SolutionRepository;
 import org.ng200.openolympus.repositories.UserRepository;
 import org.ng200.openolympus.repositories.VerdictRepository;
-import org.ng200.openolympus.util.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService  {
+public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
@@ -75,18 +66,21 @@ public class UserService  {
 
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public long countUnapprovedUsers() {
 		return this.userRepository.countUnapproved();
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
-			+ ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public long countUsers() {
 		return this.userRepository.count();
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void deleteUser(final User user) {
 		// TODO: use SQL
 		this.solutionRepository.findByUser(user).forEach(
@@ -102,19 +96,22 @@ public class UserService  {
 		this.userRepository.delete(user);
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void deleteUsers(List<User> users) {
 		// TODO: use SQL
 		users.forEach(this::deleteUser);
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<User> findAFewUsersWithNameContaining(final String name) {
 		return this.userRepository.findFirst30Like("%" + name + "%");
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY
-			+ ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<UserRanking> getArchiveRankPage(final long page,
 			final long pageSize) {
 		return this.userRepository
@@ -126,14 +123,14 @@ public class UserService  {
 				.collect(Collectors.toList());
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<User> getUnapprovedUsers(int pageNumber, int pageSize) {
 		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
 				Sort.Direction.DESC, "firstNameMain");
 		return this.userRepository.findUnapproved(request);
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public User getUserById(final Long id) {
 		return this.userRepository.findOne(id);
 	}
@@ -142,7 +139,7 @@ public class UserService  {
 		return this.userRepository.findByUsername(username);
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<User> getUsersAlphabetically(final Integer pageNumber,
 			final int pageSize) {
 		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
@@ -150,7 +147,7 @@ public class UserService  {
 		return this.userRepository.findAll(request).getContent();
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public boolean isUserApproved(User user) {
 		return user.getRoles().contains(
 				this.roleService.getRoleByName(Role.USER));

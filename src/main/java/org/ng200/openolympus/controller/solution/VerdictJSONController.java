@@ -22,18 +22,11 @@
  */
 package org.ng200.openolympus.controller.solution;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_OWNER;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-import static org.ng200.openolympus.SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST;
-import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
-
 import java.math.BigDecimal;
 import java.util.Locale;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.exceptions.ForbiddenException;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.services.ContestService;
@@ -50,9 +43,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class VerdictJSONController {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(VerdictJSONController.class);
 
 	public static class VerdictDto {
 		private long id;
@@ -154,14 +144,24 @@ public class VerdictJSONController {
 
 	}
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(VerdictJSONController.class);
+
 	@Autowired
 	private AbstractMessageSource messageSource;
 
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
-			+ SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST + ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR
+			+ '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.USER_IS_OWNER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST
+			+ ')')
 	@RequestMapping(value = "/api/verdict", method = RequestMethod.GET)
 	public @ResponseBody VerdictDto showVerdict(
 			@RequestParam(value = "id") final Verdict verdict,

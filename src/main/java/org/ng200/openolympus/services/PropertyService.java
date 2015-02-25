@@ -22,10 +22,9 @@
  */
 package org.ng200.openolympus.services;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import java.io.Serializable;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Property;
 import org.ng200.openolympus.repositories.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ public class PropertyService {
 		return property;
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void set(final String key, final Serializable value) {
 		Property property = this.propertyRepository.findByKey(key);
 		if (property == null) {

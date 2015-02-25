@@ -22,9 +22,8 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.services.ContestService;
@@ -45,7 +44,7 @@ public class ContestTaskRemovalController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(method = RequestMethod.POST)
 	public String removeTask(
 			@PathVariable(value = "contest") final Contest contest,
@@ -61,7 +60,7 @@ public class ContestTaskRemovalController {
 		return null;
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(method = RequestMethod.GET)
 	public String removeTaskPrompt(
 			@PathVariable(value = "contest") final Contest contest,

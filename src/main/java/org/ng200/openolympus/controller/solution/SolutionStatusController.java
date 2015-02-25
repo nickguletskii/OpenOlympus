@@ -22,16 +22,10 @@
  */
 package org.ng200.openolympus.controller.solution;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-import static org.ng200.openolympus.SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST;
-import static org.ng200.openolympus.SecurityExpressionConstants.USER_IS_OWNER;
-
 import java.security.Principal;
 import java.util.List;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.services.SolutionService;
@@ -48,8 +42,15 @@ public class SolutionStatusController {
 	@Autowired
 	private SolutionService solutionService;
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + USER_IS_OWNER + AND
-			+ SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST + ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR
+			+ '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.USER_IS_OWNER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST
+			+ ')')
 	@RequestMapping(value = "/api/solution/{id}/verdicts", method = RequestMethod.GET)
 	public List<Verdict> viewSolutionStatus(
 			@PathVariable(value = "id") final Solution solution,

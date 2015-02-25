@@ -75,7 +75,7 @@ public class Application {
 			SQLException {
 		final ConfigurableApplicationContext context = SpringApplication.run(
 				Application.class, args);
-		setupContext(context);
+		Application.setupContext(context);
 	}
 
 	public static void setupContext(
@@ -132,6 +132,11 @@ public class Application {
 
 	@Value("${storagePath}")
 	private String storagePath;
+
+	@Bean
+	public AuditorAware<User> auditorProvider() {
+		return new SpringSecurityAuditorAware();
+	}
 
 	@Bean
 	public DataSource dataSource() {
@@ -199,11 +204,6 @@ public class Application {
 		pool.setMaxPoolSize(10);
 		pool.setWaitForTasksToCompleteOnShutdown(true);
 		return pool;
-	}
-
-	@Bean
-	public AuditorAware<User> auditorProvider() {
-		return new SpringSecurityAuditorAware();
 	}
 
 }

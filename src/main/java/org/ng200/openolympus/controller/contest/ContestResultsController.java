@@ -22,19 +22,13 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.AND;
-import static org.ng200.openolympus.SecurityExpressionConstants.CONTEST_OVER;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-import static org.ng200.openolympus.SecurityExpressionConstants.NO_CONTEST_CURRENTLY;
-import static org.ng200.openolympus.SecurityExpressionConstants.OR;
-
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.model.Contest;
@@ -131,7 +125,23 @@ public class ContestResultsController {
 	@Autowired
 	private TaskService taskService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.CONTEST_OVER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
+	@RequestMapping(value = "/api/contest/{contest}/testingFinished", method = RequestMethod.GET)
+	public boolean hasContestTestingFinished(
+			@PathVariable(value = "contest") final Contest contest) {
+
+		Assertions.resourceExists(contest);
+
+		return this.contestService.hasContestTestingFinished(contest);
+	}
+
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<ContestUserRankingDto> showCompleteResultsPage(
@@ -144,8 +154,13 @@ public class ContestResultsController {
 				.collect(Collectors.toList());
 	}
 
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + CONTEST_OVER + AND
-			+ NO_CONTEST_CURRENTLY + ')')
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.CONTEST_OVER
+			+ SecurityExpressionConstants.AND
+			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/contest/{contest}/results", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public List<ContestUserRankingDto> showResultsPage(
@@ -163,16 +178,5 @@ public class ContestResultsController {
 				.stream()
 				.map(ranking -> new ContestUserRankingDto(contest, ranking))
 				.collect(Collectors.toList());
-	}
-
-	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + CONTEST_OVER + AND
-			+ NO_CONTEST_CURRENTLY + ')')
-	@RequestMapping(value = "/api/contest/{contest}/testingFinished", method = RequestMethod.GET)
-	public boolean hasContestTestingFinished(
-			@PathVariable(value = "contest") final Contest contest) {
-
-		Assertions.resourceExists(contest);
-
-		return this.contestService.hasContestTestingFinished(contest);
 	}
 }

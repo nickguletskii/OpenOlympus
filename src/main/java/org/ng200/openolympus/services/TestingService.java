@@ -78,16 +78,21 @@ public class TestingService {
 
 	private final class SystemAuthenticationToken extends
 			AbstractAuthenticationToken {
-		private SystemAuthenticationToken(
-				Collection<? extends GrantedAuthority> authorities) {
-			super(authorities);
-		}
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = -5336945477077794036L;
 
 		public SystemAuthenticationToken() {
 			super(Stream.of(Role.SYSTEM, Role.SUPERUSER, Role.USER)
 					.map(x -> new SimpleGrantedAuthority(x))
 					.collect(Collectors.toList()));
-			setAuthenticated(true);
+			this.setAuthenticated(true);
+		}
+
+		private SystemAuthenticationToken(
+				Collection<? extends GrantedAuthority> authorities) {
+			super(authorities);
 		}
 
 		@Override
@@ -97,7 +102,7 @@ public class TestingService {
 
 		@Override
 		public Object getPrincipal() {
-			return userService.getUserByUsername("system");
+			return TestingService.this.userService.getUserByUsername("system");
 		}
 	}
 
@@ -128,9 +133,10 @@ public class TestingService {
 	@Autowired
 	private SolutionService solutionService;
 
-	public void shutdownNow() {
-		verdictCheckSchedulingExecutorService.shutdownNow();
-	}
+	@Autowired
+	private RoleService roleService;
+
+	private UserService userService;
 
 	@Autowired
 	public TestingService(final SolutionService solutionService,
@@ -148,7 +154,7 @@ public class TestingService {
 		final HashSet<Verdict> alreadyScheduledJobs = new HashSet<>();
 		this.verdictCheckSchedulingExecutorService.scheduleAtFixedRate(
 				() -> {
-					logInAsSystem();
+					this.logInAsSystem();
 					solutionService
 							.getPendingVerdicts()
 							.stream()
@@ -273,7 +279,7 @@ public class TestingService {
 			throw new IllegalStateException("Shared data provider is null!");
 		}
 
-		Lock lock = solution.getTask().readLock();
+		final Lock lock = solution.getTask().readLock();
 		lock.lock();
 
 		try {
@@ -318,17 +324,22 @@ public class TestingService {
 		return new ArrayList<>(this.internalErrors.asMap().values());
 	}
 
+	private void logInAsSystem() {
+		SecurityContextHolder.getContext().setAuthentication(
+				new SystemAuthenticationToken());
+	}
+
 	private void processVerdict(final Verdict verdict) {
 		try {
 			final TaskContainer taskContainer = this.taskContainerCache
 					.getTaskContainerForTask(verdict.getSolution().getTask());
 			final Function<CompletableFuture<SolutionJudge>, CompletableFuture<SolutionJudge>> functionToApplyToJudge = (
 					final CompletableFuture<SolutionJudge> futureJudge) -> {
-				logInAsSystem();
+				this.logInAsSystem();
 				return futureJudge
 						.thenApplyAsync(
 								(final SolutionJudge judge) -> {
-									logInAsSystem();
+									this.logInAsSystem();
 									try {
 										if (!judge.isCompiled()) {
 											return this.compileSolution(
@@ -352,7 +363,7 @@ public class TestingService {
 								}, this.compilationAndCheckingExecutor)
 						.thenApplyAsync(
 								(final SolutionJudge judge) -> {
-									logInAsSystem();
+									this.logInAsSystem();
 									try {
 										this.checkVerdict(
 												verdict,
@@ -378,7 +389,7 @@ public class TestingService {
 								}, this.compilationAndCheckingExecutor)
 						.handle((final SolutionJudge judge,
 								final Throwable throwable) -> {
-							logInAsSystem();
+							this.logInAsSystem();
 
 							if (throwable != null) {
 								throw new RuntimeException(
@@ -387,7 +398,7 @@ public class TestingService {
 							return judge;
 						});
 			};
-			logInAsSystem();
+			this.logInAsSystem();
 
 			taskContainer.applyToJudge(verdict.getSolution(),
 					functionToApplyToJudge);
@@ -397,18 +408,12 @@ public class TestingService {
 		}
 	}
 
-	@Autowired
-	private RoleService roleService;
-
-	private UserService userService;
-
-	private void logInAsSystem() {
-		SecurityContextHolder.getContext().setAuthentication(
-				new SystemAuthenticationToken());
-	}
-
 	public void reloadTasks() {
 		this.taskContainers.clear();
+	}
+
+	public void shutdownNow() {
+		this.verdictCheckSchedulingExecutorService.shutdownNow();
 	}
 
 	@Transactional

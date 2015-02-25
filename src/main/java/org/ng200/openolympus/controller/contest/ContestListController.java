@@ -22,11 +22,10 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-
 import java.security.Principal;
 import java.util.List;
 
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
@@ -46,14 +45,14 @@ public class ContestListController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(IS_USER)
+	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contestsCount")
 	@ResponseBody
 	public long contestCount() {
 		return this.contestService.countContests();
 	}
-	
-	@PreAuthorize(IS_USER)
+
+	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
 	@ResponseBody
 	public List<Contest> contestList(

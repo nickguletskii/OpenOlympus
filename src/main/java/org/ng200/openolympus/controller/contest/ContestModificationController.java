@@ -22,9 +22,6 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_ADMIN;
-import static org.ng200.openolympus.SecurityExpressionConstants.IS_USER;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +29,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestDto;
 import org.ng200.openolympus.model.Contest;
@@ -57,7 +55,7 @@ public class ContestModificationController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(method = RequestMethod.POST)
 	public BindingResponse editContest(final Model model,
 			final HttpServletRequest request,
@@ -79,7 +77,7 @@ public class ContestModificationController {
 		return BindingResponse.OK;
 	}
 
-	@PreAuthorize(IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(method = RequestMethod.GET)
 	public Contest showContestEditingForm(
 			@PathVariable("contest") final Contest contest) {
