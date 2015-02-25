@@ -24,8 +24,6 @@ package org.ng200.openolympus;
 
 import java.util.List;
 
-import org.ng200.openolympus.customPageSupport.CustomPage;
-import org.ng200.openolympus.customPageSupport.CustomPageConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,8 +46,7 @@ import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 @Configuration
 @EnableWebMvc
 @Import({
-		ThymeleafConfig.class,
-		CustomPageConfig.class
+	ThymeleafConfig.class
 })
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
@@ -66,9 +63,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MvcConfig.class);
-
-	@javax.annotation.Resource(name = "customPages")
-	List<CustomPage> customPages;
 
 	@Value("${customResourceLocation}")
 	String customResourceLocation;
@@ -94,14 +88,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	public void addViewControllers(final ViewControllerRegistry registry) {
 		registry.addViewController("/home").setViewName("home");
 		registry.addViewController("/errors/404").setViewName("errors/404");
-
-		for (final CustomPage customPage : this.customPages) {
-			MvcConfig.logger.info(
-					"Registering custom page page {}, template path: {}",
-					customPage.getURL(), customPage.getTemplatePath());
-			registry.addViewController(customPage.getURL()).setViewName(
-					customPage.getTemplatePath());
-		}
 
 		registry.addViewController("/**").setViewName("singlepage");
 		registry.setOrder(Ordered.LOWEST_PRECEDENCE);

@@ -22,21 +22,15 @@
  */
 package org.ng200.openolympus;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationFailureHandler;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationSuccessHandler;
 import org.ng200.openolympus.controller.auth.RecaptchaAuthenticationFilter;
-import org.ng200.openolympus.customPageSupport.CustomPage;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.repositories.OlympusPersistentTokenRepositoryImpl;
-import org.ng200.openolympus.services.SecurityService;
 import org.ng200.openolympus.services.UserSecurityService;
-import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +42,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
@@ -69,8 +62,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private OlympusPersistentTokenRepositoryImpl olympusPersistentTokenRepositoryImpl;
-	@javax.annotation.Resource(name = "customPages")
-	List<CustomPage> customPages;
 	@Value("${persistentTokenKey}")
 	private String persistentTokenKey;
 
@@ -171,8 +162,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers(WebSecurityConfig.permittedAny).permitAll().and()
 		.authorizeRequests()
 		.antMatchers(WebSecurityConfig.authorisedAny).hasAuthority(Role.USER).and()
-		.authorizeRequests()
-		.antMatchers(this.customPages.stream().map(x -> x.getURL()).collect(Collectors.toList()).toArray(new String[]{})).hasAuthority(Role.USER).and()
 		.authorizeRequests()
 		.antMatchers(HttpMethod.POST, WebSecurityConfig.authorisedPost).hasAuthority(Role.USER).and()
 		.authorizeRequests()
