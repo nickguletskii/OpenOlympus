@@ -23,9 +23,14 @@
 package org.ng200.openolympus.model;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,12 +38,17 @@ import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 @Entity
 @Table(name = "TimeExtensions", indexes = {
-                                           @Index(columnList = "contest_id"),
-                                           @Index(columnList = "user_id"),
-                                           @Index(columnList = "contest_id,user_id")
+		@Index(columnList = "contest_id"),
+		@Index(columnList = "user_id"),
+		@Index(columnList = "contest_id,user_id")
 })
+@EntityListeners(AuditingEntityListener.class)
 public class ContestPerUserTimeExtension implements Serializable {
 	/**
 	 *
@@ -50,24 +60,34 @@ public class ContestPerUserTimeExtension implements Serializable {
 	private long id;
 
 	@ManyToOne(cascade = {
-	                      CascadeType.MERGE,
-	                      CascadeType.REFRESH
+			CascadeType.MERGE,
+			CascadeType.REFRESH
 	})
 	private Contest contest;
 
 	@ManyToOne(cascade = {
-	                      CascadeType.MERGE,
-	                      CascadeType.REFRESH
+			CascadeType.MERGE,
+			CascadeType.REFRESH
 	})
 	private User user;
-	private long duration;
+	private Duration duration;
+
+	@CreatedDate
+	private Date createdDate = Date.from(Instant.now());
+
+	@CreatedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User createdBy;
 
 	public ContestPerUserTimeExtension() {
 		super();
 	}
 
 	public ContestPerUserTimeExtension(final Contest contest, final User user,
-			final long duration) {
+			final Duration duration) {
 		super();
 		this.contest = contest;
 		this.user = user;
@@ -78,7 +98,15 @@ public class ContestPerUserTimeExtension implements Serializable {
 		return this.contest;
 	}
 
-	public long getDuration() {
+	public User getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
+	public Duration getDuration() {
 		return this.duration;
 	}
 
@@ -94,7 +122,15 @@ public class ContestPerUserTimeExtension implements Serializable {
 		this.contest = contest;
 	}
 
-	public void setDuration(final long duration) {
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public void setDuration(final Duration duration) {
 		this.duration = duration;
 	}
 

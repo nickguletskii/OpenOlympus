@@ -71,7 +71,7 @@ public class ContestTimerController {
 				final User user = this.userService.getUserByUsername(principal
 						.getName());
 				if (user != null) {
-					end = end.plusMillis(contest.getDuration()).plusMillis(
+					end = end.plus(contest.getDuration()).plus(
 							this.contestService
 									.getTotalTimeExtensionTimeForUser(contest,
 											user));

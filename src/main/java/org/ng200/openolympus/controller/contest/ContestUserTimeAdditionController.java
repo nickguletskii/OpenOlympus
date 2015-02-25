@@ -70,7 +70,7 @@ public class ContestUserTimeAdditionController {
 		}
 		this.contestService.extendTimeForUser(contest,
 				contestUserTimeAdditionDto.getUser(),
-				contestUserTimeAdditionDto.getTime() * 60 * 1000);
+				contestUserTimeAdditionDto.getTime());
 		return BindingResponse.OK;
 	}
 

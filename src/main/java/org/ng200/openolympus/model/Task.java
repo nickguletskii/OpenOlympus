@@ -23,23 +23,33 @@
 package org.ng200.openolympus.model;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.dto.SolutionDto;
 import org.ng200.openolympus.model.views.ServerView;
 import org.ng200.openolympus.model.views.UnprivilegedView;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.cache.CacheBuilder;
@@ -52,6 +62,7 @@ import com.google.common.cache.LoadingCache;
 		@Index(columnList = "name"),
 		@Index(columnList = "id", unique = true)
 })
+@EntityListeners(AuditingEntityListener.class)
 public class Task implements Serializable {
 	/**
 	 *
@@ -70,11 +81,35 @@ public class Task implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
+
+	@CreatedDate
+	private Date createdDate = Date.from(Instant.now());
+	@LastModifiedDate
+	private Date lastModifiedDate = Date.from(Instant.now());
+
+	@CreatedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User createdBy;
+
+	@LastModifiedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User lastModifiedBy;
+
 	@Column(unique = true)
 	private String name;
+
 	private String descriptionFile;
+
 	private Date timeAdded;
+
 	private String taskLocation;
+
 	private boolean published;
 
 	public Task() {
@@ -108,6 +143,14 @@ public class Task implements Serializable {
 		return true;
 	}
 
+	public User getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
 	@JsonView(ServerView.class)
 	public String getDescriptionFile() {
 		return this.descriptionFile;
@@ -119,6 +162,14 @@ public class Task implements Serializable {
 	})
 	public long getId() {
 		return this.id;
+	}
+
+	public Date getLastModifiedDate() {
+		return this.lastModifiedDate;
+	}
+
+	public User getLastModifiedBy() {
+		return this.lastModifiedBy;
 	}
 
 	@JsonView(UnprivilegedView.class)
@@ -153,12 +204,28 @@ public class Task implements Serializable {
 		return Task.locks.get(this.id).readLock();
 	}
 
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
 	public void setDescriptionFile(final String descriptionFile) {
 		this.descriptionFile = descriptionFile;
 	}
 
 	public void setId(final long id) {
 		this.id = id;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public void setLastModifiedBy(User lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
 	}
 
 	public void setName(final String name) {

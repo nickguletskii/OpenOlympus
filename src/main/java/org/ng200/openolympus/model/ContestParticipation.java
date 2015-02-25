@@ -23,9 +23,12 @@
 package org.ng200.openolympus.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,17 +37,21 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 @Entity
 @Table(name = "ContestParticipations", uniqueConstraints = {
-                                                            @UniqueConstraint(columnNames = {
-                                                                                             "contest_id",
-                                                                                             "user_id"
-                                                            })
+	@UniqueConstraint(columnNames = {
+			"contest_id",
+			"user_id"
+	})
 }, indexes = {
-              @Index(columnList = "contest_id"),
-              @Index(columnList = "user_id"),
-              @Index(columnList = "contest_id,user_id")
+		@Index(columnList = "contest_id"),
+		@Index(columnList = "user_id"),
+		@Index(columnList = "contest_id,user_id")
 })
+@EntityListeners(AuditingEntityListener.class)
 public class ContestParticipation implements Serializable {
 	/**
 	 *
@@ -54,15 +61,24 @@ public class ContestParticipation implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	@ManyToOne(cascade = {
-	                      CascadeType.MERGE,
-	                      CascadeType.REFRESH
+			CascadeType.MERGE,
+			CascadeType.REFRESH
 	})
 	private Contest contest;
 	@ManyToOne(cascade = {
-	                      CascadeType.MERGE,
-	                      CascadeType.REFRESH
+			CascadeType.MERGE,
+			CascadeType.REFRESH
 	})
 	private User user;
+
+	@CreatedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User addedBy;
+
+	private BigDecimal score;
 
 	public ContestParticipation() {
 		super();
@@ -74,6 +90,10 @@ public class ContestParticipation implements Serializable {
 		this.user = user;
 	}
 
+	public User getAddedBy() {
+		return this.addedBy;
+	}
+
 	public Contest getContest() {
 		return this.contest;
 	}
@@ -82,8 +102,16 @@ public class ContestParticipation implements Serializable {
 		return this.id;
 	}
 
+	public BigDecimal getScore() {
+		return this.score;
+	}
+
 	public User getUser() {
 		return this.user;
+	}
+
+	public void setAddedBy(User addedBy) {
+		this.addedBy = addedBy;
 	}
 
 	public void setContest(final Contest contest) {
@@ -92,6 +120,10 @@ public class ContestParticipation implements Serializable {
 
 	public void setId(final long id) {
 		this.id = id;
+	}
+
+	public void setScore(BigDecimal score) {
+		this.score = score;
 	}
 
 	public void setUser(final User user) {

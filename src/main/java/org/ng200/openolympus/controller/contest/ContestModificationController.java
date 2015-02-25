@@ -73,7 +73,7 @@ public class ContestModificationController {
 			throw new BindException(bindingResult);
 		}
 		contest.setName(contestDto.getName());
-		contest.setDuration(contestDto.getDuration() * 60 * 1000);
+		contest.setDuration(contestDto.getDuration());
 		contest.setStartTime(contestDto.getStartTime());
 		contest = this.contestService.saveContest(contest);
 		return BindingResponse.OK;

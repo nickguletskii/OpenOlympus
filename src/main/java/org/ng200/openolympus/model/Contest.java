@@ -23,31 +23,42 @@
 package org.ng200.openolympus.model;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.IsoDateSerializer;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.model.views.UnprivilegedView;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity
 @Table(name = "Contests", indexes = {
-		@Index(columnList = "startTime")
+	@Index(columnList = "startTime")
 })
+@EntityListeners(AuditingEntityListener.class)
 public class Contest implements Serializable {
 	/**
 	 *
@@ -56,10 +67,29 @@ public class Contest implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
+
+	@CreatedDate
+	private Date createdDate = Date.from(Instant.now());
+	@LastModifiedDate
+	private Date lastModifiedDate = Date.from(Instant.now());
+
+	@CreatedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User createdBy;
+	@LastModifiedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User lastModifiedBy;
+
 	@OrderColumn
 	private Date startTime;
 
-	private long duration;
+	private Duration duration;
 
 	@Column(unique = true)
 	private String name;
@@ -75,7 +105,7 @@ public class Contest implements Serializable {
 
 	}
 
-	public Contest(final Date startTime, final long duration,
+	public Contest(final Date startTime, final Duration duration,
 			final String name, final Set<Task> tasks) {
 		super();
 		this.startTime = startTime;
@@ -102,14 +132,30 @@ public class Contest implements Serializable {
 		return true;
 	}
 
+	public User getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
 	@JsonView(UnprivilegedView.class)
-	public long getDuration() {
+	public Duration getDuration() {
 		return this.duration;
 	}
 
 	@JsonView(UnprivilegedView.class)
 	public long getId() {
 		return this.id;
+	}
+
+	public Date getLastModifiedDate() {
+		return this.lastModifiedDate;
+	}
+
+	public User getLastModifiedBy() {
+		return this.lastModifiedBy;
 	}
 
 	@JsonView(UnprivilegedView.class)
@@ -136,12 +182,28 @@ public class Contest implements Serializable {
 		return result;
 	}
 
-	public void setDuration(final long duration) {
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public void setDuration(final Duration duration) {
 		this.duration = duration;
 	}
 
 	public void setId(final long id) {
 		this.id = id;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public void setLastModifiedBy(User lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
 	}
 
 	public void setName(final String name) {

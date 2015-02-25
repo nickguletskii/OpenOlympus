@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,7 +54,7 @@ import com.jayway.jsonpath.JsonPath;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @TestPropertySource(properties = {
-		"spring.jpa.hibernate.ddl-auto:create-drop",
+		"spring.jpa.hibernate.ddl-auto:create",
 		"enableCaptcha:false",
 		"emailHost:",
 		"emailConfirmationEnabled:false",
@@ -135,7 +136,7 @@ public class ContestTest {
 	@Test
 	public void checkContestNormalTimingsRatingAndTestingFinished()
 			throws Exception {
-		Contest contest = createContestUsingAPI(100);
+		Contest contest = createContestUsingAPI(1000000);
 		Task task1 = createDummyTask();
 		Task task2 = createDummyTask();
 		contest.setTasks(ImmutableSet.<Task> builder().add(task1).build());
@@ -182,7 +183,7 @@ public class ContestTest {
 
 	@Test
 	public void checkContestTimeExtensions() throws Exception {
-		Contest contest = createContestDirectly(0);
+		Contest contest = createContestDirectly(Duration.ofSeconds(0));
 		Task task1 = createDummyTask();
 		Task task2 = createDummyTask();
 		contest.setTasks(ImmutableSet.<Task> builder().add(task1).build());
@@ -192,7 +193,8 @@ public class ContestTest {
 		this.contestService.addContestParticipant(contest, testUser2);
 		this.contestService.addContestParticipant(contest, testUser3);
 		this.contestService.addContestParticipant(contest, testUser4);
-		this.contestService.extendTimeForUser(contest, testUser4, 1000);
+		this.contestService.extendTimeForUser(contest, testUser4,
+				Duration.ofSeconds(1000));
 
 		long time = System.currentTimeMillis();
 		time = dummyData(task1, task2, time);
@@ -300,7 +302,7 @@ public class ContestTest {
 		// @formatter:on
 	}
 
-	public Contest createContestDirectly(int duration) throws Exception {
+	public Contest createContestDirectly(Duration duration) throws Exception {
 		return contestService.saveContest(new Contest(Date.from(Instant.now()),
 				duration, "TestContest_" + id++, new HashSet<Task>()));
 	}

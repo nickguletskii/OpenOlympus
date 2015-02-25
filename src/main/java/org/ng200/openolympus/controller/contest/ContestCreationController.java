@@ -71,8 +71,7 @@ public class ContestCreationController {
 			throw new BindException(bindingResult);
 		}
 		Contest contest = new Contest(contestDto.getStartTime(),
-				contestDto.getDuration() * 60 * 1000, contestDto.getName(),
-				new HashSet<>());
+				contestDto.getDuration(), contestDto.getName(), new HashSet<>());
 		contest = this.contestService.saveContest(contest);
 		return new BindingResponse(Status.OK, null,
 				new ImmutableMap.Builder<String, Object>().put("id",

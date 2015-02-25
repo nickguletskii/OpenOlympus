@@ -51,7 +51,7 @@ public class ContestDtoValidator {
 
 		final Date start = contestDto.getStartTime();
 		final Date end = Date.from(contestDto.getStartTime().toInstant()
-				.plusMillis(contestDto.getDuration() * 1000 * 60));
+				.plus(contestDto.getDuration()));
 		final Contest runningContest = this.contestService
 				.getContestThatIntersects(start, end);
 		if (runningContest != null && !runningContest.equals(contest)) {

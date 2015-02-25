@@ -23,23 +23,34 @@
 package org.ng200.openolympus.model;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 @Entity
-@Table(name = "ContestQuestions", indexes = {
+@Table(name = "ContestMessages", indexes = {
 		@Index(columnList = "contest_id"),
-		@Index(columnList = "user_id"),
-		@Index(columnList = "contest_id,user_id")
+		@Index(columnList = "contest_id,createdDate")
 })
-public class ContestAnnouncement implements Serializable {
+@EntityListeners(AuditingEntityListener.class)
+public class ContestMessage implements Serializable {
 	/**
 	 *
 	 */
@@ -48,6 +59,26 @@ public class ContestAnnouncement implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
+
+	@CreatedDate
+	@OrderColumn
+	private Date createdDate = Date.from(Instant.now());
+	@LastModifiedDate
+	private Date lastModifiedDate = Date.from(Instant.now());
+
+	@CreatedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User createdBy;
+
+	@LastModifiedBy
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {
+			CascadeType.REFRESH,
+			CascadeType.DETACH
+	})
+	private User lastModifiedBy;
 
 	@ManyToOne(cascade = {
 			CascadeType.MERGE,
@@ -59,12 +90,60 @@ public class ContestAnnouncement implements Serializable {
 
 	private String response;
 
+	public Contest getContest() {
+		return this.contest;
+	}
+
+	public User getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public Date getCreatedDate() {
+		return this.createdDate;
+	}
+
+	public long getId() {
+		return this.id;
+	}
+
+	public Date getLastModifiedDate() {
+		return this.lastModifiedDate;
+	}
+
+	public User getLastModifiedBy() {
+		return this.lastModifiedBy;
+	}
+
 	public String getQuestion() {
 		return this.question;
 	}
 
 	public String getResponse() {
 		return this.response;
+	}
+
+	public void setContest(Contest contest) {
+		this.contest = contest;
+	}
+
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public void setLastModifiedBy(User lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
 	}
 
 	public void setQuestion(String question) {

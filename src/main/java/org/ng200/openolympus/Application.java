@@ -54,13 +54,14 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.jdbc.datasource.init.ScriptException;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Configuration
@@ -68,6 +69,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 @EnableAutoConfiguration
 @PropertySource("classpath:openolympus.properties")
 @EnableAspectJAutoProxy(proxyTargetClass = true)
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class Application {
 	public static void main(final String[] args) throws ScriptException,
 			SQLException {
@@ -198,4 +200,10 @@ public class Application {
 		pool.setWaitForTasksToCompleteOnShutdown(true);
 		return pool;
 	}
+
+	@Bean
+	public AuditorAware<User> auditorProvider() {
+		return new SpringSecurityAuditorAware();
+	}
+
 }

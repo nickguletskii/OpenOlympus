@@ -30,6 +30,7 @@ import static org.ng200.openolympus.SecurityExpressionConstants.OR;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -109,7 +110,7 @@ public class ContestService {
 
 	@PreAuthorize(IS_ADMIN)
 	public void extendTimeForUser(final Contest contest, final User user,
-			final long time) {
+			final Duration time) {
 		this.contestTimeExtensionRepository
 				.save(new ContestPerUserTimeExtension(contest, user, time));
 	}
@@ -124,43 +125,37 @@ public class ContestService {
 		return contest
 				.getStartTime()
 				.toInstant()
-				.plusMillis(contest.getDuration())
-				.plusMillis(
-						this.contestTimeExtensionRepository
-								.findByContest(contest)
+				.plus(contest.getDuration())
+				.plus(this.contestTimeExtensionRepository
+						.findByContest(contest)
+						.stream()
+						.collect(
+								Collectors
+										.groupingBy(timeExtension -> timeExtension
+												.getContest()))
+						.values()
+						.stream()
+						.map(group -> group
 								.stream()
-								.collect(
-										Collectors
-												.groupingBy(timeExtension -> timeExtension
-														.getContest()))
-								.values()
-								.stream()
-								.map(group -> group
-										.stream()
-										.map(timeExtension -> timeExtension
-												.getDuration())
-										.reduce((l, r) -> l + r))
-								.max((l, r) -> l.orElse(0l).compareTo(
-										r.orElse(0l))).orElse(Optional.of(0l))
-								.orElse(0l));
+								.map(timeExtension -> timeExtension
+										.getDuration())
+								.reduce((l, r) -> l.plus(r)))
+						.map(x -> x.orElse(Duration.ZERO))
+						.max((l, r) -> l.compareTo(r)).orElse(Duration.ZERO));
 	}
 
 	@PreAuthorize(IS_USER)
 	public Date getContestEndTime(final Contest contest) {
 		return Date.from(contest.getStartTime().toInstant()
-				.plusMillis(contest.getDuration()));
+				.plus(contest.getDuration()));
 	}
 
 	@PreAuthorize(IS_ADMIN + OR + '('
 			+ " #user.username == authentication.name " + ')')
 	public Date getContestEndTimeForUser(final Contest contest, final User user) {
-		return Date.from(contest
-				.getStartTime()
-				.toInstant()
-				.plusMillis(
-						contest.getDuration()
-								+ this.getTotalTimeExtensionTimeForUser(
-										contest, user)));
+		return Date.from(contest.getStartTime().toInstant()
+				.plus(contest.getDuration())
+				.plus(this.getTotalTimeExtensionTimeForUser(contest, user)));
 	}
 
 	@PreAuthorize(IS_ADMIN)
@@ -226,12 +221,12 @@ public class ContestService {
 	}
 
 	@PreAuthorize(IS_USER)
-	public long getTotalTimeExtensionTimeForUser(final Contest contest,
+	public Duration getTotalTimeExtensionTimeForUser(final Contest contest,
 			final User user) {
 		return this.contestTimeExtensionRepository
 				.findByUserAndContest(user, contest).stream()
 				.map((timeExtension) -> timeExtension.getDuration())
-				.reduce((x, y) -> (x + y)).orElse(0l);
+				.reduce((x, y) -> (x.plus(y))).orElse(Duration.ZERO);
 	}
 
 	@PreAuthorize(IS_ADMIN + OR + '(' + IS_USER + AND + NO_CONTEST_CURRENTLY

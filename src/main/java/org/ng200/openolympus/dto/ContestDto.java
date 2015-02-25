@@ -22,6 +22,7 @@
  */
 package org.ng200.openolympus.dto;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,11 +47,9 @@ public class ContestDto {
 	private Date startTime = DateUtils
 			.roundTo30Minutes(Date.from(Instant.now()));
 	@NotNull(message = "empty")
-	@Min(value = 1, message = "mustBePositive")
-	private Long duration;
+	private Duration duration;
 
-	public Long getDuration() {Map<String, Set> depMap = new HashMap<>();
-
+	public Duration getDuration() {
 		return this.duration;
 	}
 
@@ -62,7 +61,7 @@ public class ContestDto {
 		return this.startTime;
 	}
 
-	public void setDuration(final Long duration) {
+	public void setDuration(final Duration duration) {
 		this.duration = duration;
 	}
 

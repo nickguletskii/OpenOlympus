@@ -25,14 +25,14 @@ package org.ng200.openolympus.repositories;
 import java.util.List;
 
 import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.ContestAnnouncement;
+import org.ng200.openolympus.model.ContestMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ContestAnnouncementRepository extends
-		JpaRepository<ContestAnnouncement, Long> {
+		JpaRepository<ContestMessage, Long> {
 
-	public List<ContestAnnouncement> findByContest(Contest contest);
+	public List<ContestMessage> findByContest(Contest contest);
 
 }

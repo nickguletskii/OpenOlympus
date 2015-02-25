@@ -28,12 +28,15 @@ import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "Solutions", indexes = {
@@ -44,6 +47,7 @@ import javax.persistence.Table;
 		@Index(name = "user_task_score_ind", columnList = "user_id,task_id,score DESC"),
 		@Index(name = "user_task_time_ind", columnList = "user_id,task_id,timeAdded")
 })
+@EntityListeners(AuditingEntityListener.class)
 public class Solution implements Serializable {
 	/**
 	 *
@@ -75,7 +79,7 @@ public class Solution implements Serializable {
 	private BigDecimal maximumScore = BigDecimal.ZERO;
 
 	private boolean tested = false;
-	
+
 	public Solution() {
 
 	}
@@ -148,6 +152,10 @@ public class Solution implements Serializable {
 		return result;
 	}
 
+	public boolean isTested() {
+		return this.tested;
+	}
+
 	public void setFile(final String file) {
 		this.file = file;
 	}
@@ -168,6 +176,10 @@ public class Solution implements Serializable {
 		this.task = task;
 	}
 
+	public void setTested(boolean tested) {
+		this.tested = tested;
+	}
+
 	public void setTimeAdded(final Date timeAdded) {
 		this.timeAdded = timeAdded;
 	}
@@ -181,14 +193,6 @@ public class Solution implements Serializable {
 		return String.format(
 				"Solution [id=%s, task=%s, user=%s, file=%s, timeAdded=%s]",
 				this.id, this.task, this.user, this.file, this.timeAdded);
-	}
-
-	public boolean isTested() {
-		return tested;
-	}
-
-	public void setTested(boolean tested) {
-		this.tested = tested;
 	}
 
 }
