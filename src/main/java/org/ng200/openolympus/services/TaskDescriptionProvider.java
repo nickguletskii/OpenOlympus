@@ -23,29 +23,36 @@
 package org.ng200.openolympus.services;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TaskDescriptionProvider {
+
 	public void transform(File from, File to) throws ExecuteException,
-	IOException {
+			IOException {
 		final CommandLine commandLine = new CommandLine("pandoc");
 		commandLine.addArgument("-f");
 		commandLine.addArgument("markdown");
 		commandLine.addArgument("-t");
 		commandLine.addArgument("html5");
-		commandLine.addArgument("-o");
-		commandLine.addArgument(to.getAbsolutePath(), true);
-		commandLine.addArgument(from.getAbsolutePath(), true);
-
 		final DefaultExecutor executor = new DefaultExecutor();
-		executor.setWatchdog(new ExecuteWatchdog(10 * 1000));
-		executor.execute(commandLine);
+
+		try (InputStream f = new FileInputStream(from);
+				OutputStream t = new FileOutputStream(to)) {
+			executor.setStreamHandler(new PumpStreamHandler(t, System.err, f));
+			executor.setWatchdog(new ExecuteWatchdog(10 * 1000));
+			executor.execute(commandLine);
+		}
 	}
 }
