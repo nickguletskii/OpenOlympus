@@ -17,6 +17,21 @@ package org.ng200.openolympus.jooq;
 public class Tables {
 
 	/**
+	 * The table public.contest_at
+	 */
+	public static final org.ng200.openolympus.jooq.tables.ContestAt CONTEST_AT = org.ng200.openolympus.jooq.tables.ContestAt.CONTEST_AT;
+
+	/**
+	 * The table public.contest_at_for_user
+	 */
+	public static final org.ng200.openolympus.jooq.tables.ContestAtForUser CONTEST_AT_FOR_USER = org.ng200.openolympus.jooq.tables.ContestAtForUser.CONTEST_AT_FOR_USER;
+
+	/**
+	 * The table public.contest_messages
+	 */
+	public static final org.ng200.openolympus.jooq.tables.ContestMessages CONTEST_MESSAGES = org.ng200.openolympus.jooq.tables.ContestMessages.CONTEST_MESSAGES;
+
+	/**
 	 * The table public.contest_participations
 	 */
 	public static final org.ng200.openolympus.jooq.tables.ContestParticipations CONTEST_PARTICIPATIONS = org.ng200.openolympus.jooq.tables.ContestParticipations.CONTEST_PARTICIPATIONS;

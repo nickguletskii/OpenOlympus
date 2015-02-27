@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tasks extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.tables.records.TasksRecord> {
 
-	private static final long serialVersionUID = 1726823570;
+	private static final long serialVersionUID = -768950322;
 
 	/**
 	 * The reference instance of <code>public.tasks</code>
@@ -37,9 +37,19 @@ public class Tasks extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.ta
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TasksRecord, java.lang.Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
+	 * The column <code>public.tasks.created_date</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TasksRecord, java.sql.Timestamp> CREATED_DATE = createField("created_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
 	 * The column <code>public.tasks.description_file</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TasksRecord, java.lang.String> DESCRIPTION_FILE = createField("description_file", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>public.tasks.last_modified_date</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TasksRecord, java.sql.Timestamp> LAST_MODIFIED_DATE = createField("last_modified_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
 	/**
 	 * The column <code>public.tasks.name</code>.
@@ -60,6 +70,16 @@ public class Tasks extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.ta
 	 * The column <code>public.tasks.time_added</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TasksRecord, java.sql.Timestamp> TIME_ADDED = createField("time_added", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
+	 * The column <code>public.tasks.created_by_id</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TasksRecord, java.lang.Long> CREATED_BY_ID = createField("created_by_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+	/**
+	 * The column <code>public.tasks.last_modified_by_id</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TasksRecord, java.lang.Long> LAST_MODIFIED_BY_ID = createField("last_modified_by_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * Create a <code>public.tasks</code> table reference
@@ -97,6 +117,14 @@ public class Tasks extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.ta
 	@Override
 	public java.util.List<org.jooq.UniqueKey<org.ng200.openolympus.jooq.tables.records.TasksRecord>> getKeys() {
 		return java.util.Arrays.<org.jooq.UniqueKey<org.ng200.openolympus.jooq.tables.records.TasksRecord>>asList(org.ng200.openolympus.jooq.Keys.TASKS_PKEY, org.ng200.openolympus.jooq.Keys.UK_S90MH6056FM69W0ILWKA74VUT);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public java.util.List<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.TasksRecord, ?>> getReferences() {
+		return java.util.Arrays.<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.TasksRecord, ?>>asList(org.ng200.openolympus.jooq.Keys.TASKS__FK_HR2PN4D0HJJA48GGB9D3ARXKM, org.ng200.openolympus.jooq.Keys.TASKS__FK_O3O2CVAWIWCQVTARDOQS7U0G0);
 	}
 
 	/**

@@ -156,8 +156,7 @@ public class ContestService {
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<UserRanking> getContestResults(Contest contest) {
 		return this.userRepository
-				.getContestResults(contest.getId(), contest.getStartTime(),
-						this.getContestEndTime(contest))
+				.getContestResults(contest.getId())
 				.stream()
 				.filter(arr -> arr != null && arr[0] != null)
 				.map(arr -> new UserRanking((BigInteger) arr[2],
@@ -173,8 +172,7 @@ public class ContestService {
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<UserRanking> getContestResultsPage(Contest contest, int page) {
 		return this.userRepository
-				.getContestResultsPage(contest.getId(), contest.getStartTime(),
-						this.getContestEndTime(contest),
+				.getContestResultsPage(contest.getId(),
 						ContestService.CONTEST_RESULTS_PAGE_LENGTH,
 						(page - 1) * ContestService.CONTEST_RESULTS_PAGE_LENGTH)
 				.stream()

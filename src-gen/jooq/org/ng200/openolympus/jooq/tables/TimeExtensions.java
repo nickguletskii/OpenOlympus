@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TimeExtensions extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord> {
 
-	private static final long serialVersionUID = -1874146922;
+	private static final long serialVersionUID = -112771372;
 
 	/**
 	 * The reference instance of <code>public.time_extensions</code>
@@ -37,14 +37,24 @@ public class TimeExtensions extends org.jooq.impl.TableImpl<org.ng200.openolympu
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, java.lang.Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
+	 * The column <code>public.time_extensions.created_date</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, java.sql.Timestamp> CREATED_DATE = createField("created_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
 	 * The column <code>public.time_extensions.duration</code>.
 	 */
-	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, java.lang.Long> DURATION = createField("duration", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, java.lang.Long> DURATION = createField("duration", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>public.time_extensions.contest_id</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, java.lang.Long> CONTEST_ID = createField("contest_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+	/**
+	 * The column <code>public.time_extensions.created_by_id</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, java.lang.Long> CREATED_BY_ID = createField("created_by_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>public.time_extensions.user_id</code>.
@@ -94,7 +104,7 @@ public class TimeExtensions extends org.jooq.impl.TableImpl<org.ng200.openolympu
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, ?>>asList(org.ng200.openolympus.jooq.Keys.TIME_EXTENSIONS__FK_J75FK0IL41W1UFG63GDD6UF1X, org.ng200.openolympus.jooq.Keys.TIME_EXTENSIONS__FK_RYAJBO9L2EXD4A7N9G75YLWMY);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.TimeExtensionsRecord, ?>>asList(org.ng200.openolympus.jooq.Keys.TIME_EXTENSIONS__FK_J75FK0IL41W1UFG63GDD6UF1X, org.ng200.openolympus.jooq.Keys.TIME_EXTENSIONS__FK_3X7FM9IWVB3I265PBEIGLGBFG, org.ng200.openolympus.jooq.Keys.TIME_EXTENSIONS__FK_RYAJBO9L2EXD4A7N9G75YLWMY);
 	}
 
 	/**

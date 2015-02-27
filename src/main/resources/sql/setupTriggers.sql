@@ -21,15 +21,150 @@
 -- THE SOFTWARE.
 --
 
+CREATE OR REPLACE FUNCTION get_contest_end(in int8, out f1 timestamp)
+    AS $$
+	SELECT (contests.start_time +
+		(contests.duration * INTERVAL '1 MILLISECOND') +
+		(
+			SELECT
+			(COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
+			FROM (
+				SELECT COALESCE (sum(time_extensions.duration), 0) as duration
+				FROM time_extensions
+				WHERE time_extensions.contest_id = contests.id
+				GROUP BY time_extensions.user_id
+			) AS extensions_per_user
+		)
+	)
+	FROM contests
+	WHERE contests.id = $1
+    $$
+    LANGUAGE SQL;
+    
+^^^ NEW STATEMENT ^^^
+
+CREATE OR REPLACE FUNCTION get_contest_start(in int8, out f1 timestamp)
+    AS $$
+	SELECT contests.start_time
+	FROM contests
+	WHERE contests.id = $1
+    $$
+    LANGUAGE SQL;
+    
+^^^ NEW STATEMENT ^^^
+
+CREATE OR REPLACE FUNCTION get_solution_author(in bigint, out f1 bigint)
+    AS $$
+	SELECT user_id
+	FROM solutions
+	WHERE solutions.id = $1
+    $$
+    LANGUAGE SQL;
+^^^ NEW STATEMENT ^^^
+
+CREATE OR REPLACE FUNCTION get_solution_time_added(in bigint, out f1 timestamp)
+    AS $$
+	SELECT time_added
+	FROM solutions
+	WHERE solutions.id = $1
+    $$
+    LANGUAGE SQL;
+
+^^^ NEW STATEMENT ^^^
+
+CREATE OR REPLACE FUNCTION get_contest_end_for_user(in int8, in int8, out f1 timestamp)
+    AS $$
+	SELECT (contests.start_time +
+		(contests.duration * INTERVAL '1 MILLISECOND') +
+		(
+			SELECT
+			(COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
+			FROM (
+				SELECT COALESCE (sum(time_extensions.duration), 0) as duration
+				FROM time_extensions
+				WHERE time_extensions.contest_id = contests.id
+				AND time_extensions.user_id = $2
+				GROUP BY time_extensions.user_id
+			) AS extensions_per_user
+		)
+	)
+	FROM contests
+	WHERE contests.id = $1
+    $$
+    LANGUAGE SQL;
+    
+^^^ NEW STATEMENT ^^^
+
+CREATE OR REPLACE FUNCTION get_contest_start_for_user(in int8, in int8, out f1 timestamp)
+    AS $$
+	SELECT contests.start_time
+	FROM contests
+	WHERE contests.id = $1
+    $$
+    LANGUAGE SQL;
+
+^^^ NEW STATEMENT ^^^
+
+CREATE OR REPLACE FUNCTION contest_at(in timestamp) RETURNS table(f1 int8)
+    AS $$
+	SELECT id
+	FROM contests
+	WHERE $1 BETWEEN contests.start_time AND (SELECT get_contest_end(contests.id))
+    $$
+    LANGUAGE SQL;
+
+^^^ NEW STATEMENT ^^^
+    
+CREATE OR REPLACE FUNCTION contest_at_for_user(timestamp, int8) RETURNS table(f1 int8)
+    AS $$
+	SELECT id
+	FROM contests
+	WHERE $1 BETWEEN contests.start_time AND (SELECT get_contest_end_for_user(contests.id, $2))
+    $$
+    LANGUAGE SQL;
+
+^^^ NEW STATEMENT ^^^
+
 CREATE OR REPLACE FUNCTION maintain_solution_score() RETURNS TRIGGER
 AS $maintain_solution_score$
-    BEGIN
-	    UPDATE solutions
+	BEGIN
+		UPDATE solutions
 		SET score=(SELECT sum(verdicts.score) FROM verdicts WHERE verdicts.solution_id=solutions.id),
 			tested=(SELECT every(verdicts.tested) FROM verdicts WHERE verdicts.solution_id=solutions.id)
 		WHERE id=NEW.solution_id;
+		UPDATE contest_participations
+		SET score =
+			(
+				SELECT
+				coalesce(sum(sols.score), 0)
+				FROM(
+					SELECT DISTINCT ON(solutions.task_id)
+					score
+					FROM solutions
+					RIGHT OUTER JOIN
+					contests_tasks
+					ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id
+					WHERE					
+						solutions.user_id=get_solution_author(NEW.solution_id)
+					AND 
+						(
+							solutions.time_added BETWEEN
+							(SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id))
+							AND
+							(SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id))
+						)
+					ORDER BY
+						solutions.task_id asc,
+						solutions.time_added desc
+				) AS sols
+			)
+		WHERE 
+			contest_participations.user_id=get_solution_author(NEW.solution_id)
+			AND
+			contest_participations.contest_id IN (SELECT contest_at_for_user(get_solution_time_added(NEW.solution_id), get_solution_author(NEW.solution_id)));
+			
 		RETURN NULL;
-    END;
+	END;
 $maintain_solution_score$ LANGUAGE plpgsql;
 
 ^^^ NEW STATEMENT ^^^

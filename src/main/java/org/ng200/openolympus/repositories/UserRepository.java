@@ -23,19 +23,13 @@
 package org.ng200.openolympus.repositories;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
-import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.Record;
 import org.jooq.Record3;
-import org.jooq.SelectSeekStep2;
+import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
-import org.jooq.types.DayToSecond;
-import org.jooq.util.postgres.PostgresDataType;
 import org.ng200.openolympus.annotations.QueryProvider;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.model.Contest;
@@ -56,7 +50,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 		@Override
 		public String getSql() {
-			final SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> query = this
+			final SelectConditionStep<Record3<Long, BigDecimal, Integer>> query = this
 					.getUnlimitedQuery();
 			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query.limit(
 					DSL.param("offset", 0), DSL.param("limit", 10)));
@@ -70,61 +64,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 		@Override
 		public String getSql() {
-			final SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> query = this
+			final SelectConditionStep<Record3<Long, BigDecimal, Integer>> query = this
 					.getUnlimitedQuery();
 			return SqlQueryProvider.DSL_CONTEXT.renderNamedParams(query);
 		}
 
-		protected SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> getUnlimitedQuery() {
+		protected SelectConditionStep<Record3<Long, BigDecimal, Integer>> getUnlimitedQuery() {
 			//@formatter:off
-			final Field<DayToSecond> timeExtensions = DSL.select(
-					DSL.field("coalesce(sum(\"public\".\"time_extensions\".\"duration\"), 0) * INTERVAL '1 MILLISECOND'")
-					)
-					.from(Tables.TIME_EXTENSIONS)
-					.where(Tables.TIME_EXTENSIONS.CONTEST_ID.eq(DSL.param("contest", 0l))
-							.and(Tables.TIME_EXTENSIONS.USER_ID.eq(Tables.SOLUTIONS.USER_ID)))
-							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
 
-			final Condition solutionWithinTimeBounds =
-					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
-							DSL.param("contestEndTime", new Timestamp(0)).add(
-									timeExtensions
-									)
-							);
-
-			final Table<Record> currentTasks = DSL.select()
-					.from(Tables.CONTESTS_TASKS)
-					.where(Tables.CONTESTS_TASKS.CONTESTS_ID.eq(DSL.param("contest", 0l)))
-					.asTable("current_tasks");
-			final Table<?> solutionsTasks = DSL.select(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID, Tables.SOLUTIONS.SCORE)
-					.distinctOn(Tables.SOLUTIONS.USER_ID, Tables.SOLUTIONS.TASK_ID)
-					.from(Tables.SOLUTIONS)
-					.rightOuterJoin(currentTasks)
-					.on("solutions.task_id = current_tasks.tasks_id")
-					.where(solutionWithinTimeBounds)
-					.orderBy(Tables.SOLUTIONS.USER_ID.asc(), Tables.SOLUTIONS.TASK_ID.asc(), Tables.SOLUTIONS.TIME_ADDED.desc())
-					.asTable("solutions_tasks");
-
-			final Field<BigDecimal> user_score =
-					DSL.coalesce(
-							DSL.sum(solutionsTasks.field(Tables.SOLUTIONS.SCORE)),
-							DSL.field("0")
-							);
-
-			final SelectSeekStep2<Record3<Long, BigDecimal, Integer>, BigDecimal, String> query =
+			final SelectConditionStep<Record3<Long, BigDecimal, Integer>> query =
 
 					DSL.select(
 							Tables.CONTEST_PARTICIPATIONS.USER_ID,
-							user_score.as("user_score"),
-							DSL.rank().over(DSL.orderBy(user_score.desc())))
+							DSL.coalesce(Tables.CONTEST_PARTICIPATIONS.SCORE, DSL.field("0")),
+							DSL.rank().over(DSL.orderBy(DSL.coalesce(Tables.CONTEST_PARTICIPATIONS.SCORE, DSL.field("0")).desc())))
 							.from(Tables.CONTEST_PARTICIPATIONS)
-							.leftOuterJoin(
-									solutionsTasks
-									).on("contest_participations.user_id = solutions_tasks.user_id")
-									.leftOuterJoin(Tables.USERS).on("contest_participations.user_id = users.id")
-									.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)))
-									.groupBy(Tables.CONTEST_PARTICIPATIONS.USER_ID, Tables.USERS.USERNAME)
-									.orderBy(user_score.as("user_score").desc(), Tables.USERS.USERNAME.asc());
+							.where(Tables.CONTEST_PARTICIPATIONS.CONTEST_ID.eq(DSL.param("contest", 0l)));
 			//@formatter:on
 			return query;
 		}
@@ -190,15 +145,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query(nativeQuery = true)
 	@QueryProvider(value = ContestResultsQuery.class)
-	List<Object[]> getContestResults(@Param("contest") Long contest,
-			@Param("contestStartTime") Date contestStartTime,
-			@Param("contestEndTime") Date contestEndTime);
+	List<Object[]> getContestResults(@Param("contest") Long contest);
 
 	@Query(nativeQuery = true)
 	@QueryProvider(value = ContestResultsPageQuery.class)
 	List<Object[]> getContestResultsPage(@Param("contest") Long contest,
-			@Param("contestStartTime") Date contestStartTime,
-			@Param("contestEndTime") Date contestEndTime,
 			@Param("limit") int limit, @Param("offset") int offset);
 
 	@Query(nativeQuery = true)

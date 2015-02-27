@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ContestQuestions extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord> {
 
-	private static final long serialVersionUID = -1606505584;
+	private static final long serialVersionUID = 1542330966;
 
 	/**
 	 * The reference instance of <code>public.contest_questions</code>
@@ -37,6 +37,16 @@ public class ContestQuestions extends org.jooq.impl.TableImpl<org.ng200.openolym
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, java.lang.Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
+	 * The column <code>public.contest_questions.created_date</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, java.sql.Timestamp> CREATED_DATE = createField("created_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
+	 * The column <code>public.contest_questions.last_modified_date</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, java.sql.Timestamp> LAST_MODIFIED_DATE = createField("last_modified_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
 	 * The column <code>public.contest_questions.question</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, java.lang.String> QUESTION = createField("question", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
@@ -50,6 +60,16 @@ public class ContestQuestions extends org.jooq.impl.TableImpl<org.ng200.openolym
 	 * The column <code>public.contest_questions.contest_id</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, java.lang.Long> CONTEST_ID = createField("contest_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+	/**
+	 * The column <code>public.contest_questions.created_by_id</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, java.lang.Long> CREATED_BY_ID = createField("created_by_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+	/**
+	 * The column <code>public.contest_questions.last_modified_by_id</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, java.lang.Long> LAST_MODIFIED_BY_ID = createField("last_modified_by_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>public.contest_questions.user_id</code>.
@@ -99,7 +119,7 @@ public class ContestQuestions extends org.jooq.impl.TableImpl<org.ng200.openolym
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, ?>>asList(org.ng200.openolympus.jooq.Keys.CONTEST_QUESTIONS__FK_6FQYKIQBJNVDU7QFUOSV95IKW, org.ng200.openolympus.jooq.Keys.CONTEST_QUESTIONS__FK_PY8FJ36W1K14S310T0YRC72D0);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.ContestQuestionsRecord, ?>>asList(org.ng200.openolympus.jooq.Keys.CONTEST_QUESTIONS__FK_6FQYKIQBJNVDU7QFUOSV95IKW, org.ng200.openolympus.jooq.Keys.CONTEST_QUESTIONS__FK_NNNILJ5LPLC8GY15SEGSB5VUI, org.ng200.openolympus.jooq.Keys.CONTEST_QUESTIONS__FK_DO6VS8XP449PK0001124M05R6, org.ng200.openolympus.jooq.Keys.CONTEST_QUESTIONS__FK_PY8FJ36W1K14S310T0YRC72D0);
 	}
 
 	/**

@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ContestParticipations extends org.jooq.impl.TableImpl<org.ng200.openolympus.jooq.tables.records.ContestParticipationsRecord> {
 
-	private static final long serialVersionUID = -940734495;
+	private static final long serialVersionUID = -693307197;
 
 	/**
 	 * The reference instance of <code>public.contest_participations</code>
@@ -35,6 +35,16 @@ public class ContestParticipations extends org.jooq.impl.TableImpl<org.ng200.ope
 	 * The column <code>public.contest_participations.id</code>.
 	 */
 	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestParticipationsRecord, java.lang.Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+	/**
+	 * The column <code>public.contest_participations.score</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestParticipationsRecord, java.math.BigDecimal> SCORE = createField("score", org.jooq.impl.SQLDataType.NUMERIC.precision(19, 2), this, "");
+
+	/**
+	 * The column <code>public.contest_participations.added_by_id</code>.
+	 */
+	public final org.jooq.TableField<org.ng200.openolympus.jooq.tables.records.ContestParticipationsRecord, java.lang.Long> ADDED_BY_ID = createField("added_by_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>public.contest_participations.contest_id</code>.
@@ -89,7 +99,7 @@ public class ContestParticipations extends org.jooq.impl.TableImpl<org.ng200.ope
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.ContestParticipationsRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.ContestParticipationsRecord, ?>>asList(org.ng200.openolympus.jooq.Keys.CONTEST_PARTICIPATIONS__FK_3D5UN8TADWLT9LJ18JL1C1ML5, org.ng200.openolympus.jooq.Keys.CONTEST_PARTICIPATIONS__FK_9AT56TMLJJ7OIMLP6BEKJL66F);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.ng200.openolympus.jooq.tables.records.ContestParticipationsRecord, ?>>asList(org.ng200.openolympus.jooq.Keys.CONTEST_PARTICIPATIONS__FK_C7VE7NYQ30P4JL4I7MN3YWDUL, org.ng200.openolympus.jooq.Keys.CONTEST_PARTICIPATIONS__FK_3D5UN8TADWLT9LJ18JL1C1ML5, org.ng200.openolympus.jooq.Keys.CONTEST_PARTICIPATIONS__FK_9AT56TMLJJ7OIMLP6BEKJL66F);
 	}
 
 	/**

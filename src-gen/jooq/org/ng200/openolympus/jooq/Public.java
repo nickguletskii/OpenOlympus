@@ -16,7 +16,7 @@ package org.ng200.openolympus.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 1185274575;
+	private static final long serialVersionUID = 571363791;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -52,6 +52,9 @@ public class Public extends org.jooq.impl.SchemaImpl {
 
 	private final java.util.List<org.jooq.Table<?>> getTables0() {
 		return java.util.Arrays.<org.jooq.Table<?>>asList(
+			org.ng200.openolympus.jooq.tables.ContestAt.CONTEST_AT,
+			org.ng200.openolympus.jooq.tables.ContestAtForUser.CONTEST_AT_FOR_USER,
+			org.ng200.openolympus.jooq.tables.ContestMessages.CONTEST_MESSAGES,
 			org.ng200.openolympus.jooq.tables.ContestParticipations.CONTEST_PARTICIPATIONS,
 			org.ng200.openolympus.jooq.tables.ContestQuestions.CONTEST_QUESTIONS,
 			org.ng200.openolympus.jooq.tables.Contests.CONTESTS,
