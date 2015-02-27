@@ -23,7 +23,6 @@
 package org.ng200.openolympus.controller.task;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -49,12 +48,12 @@ public class TaskFilesystemManipulatingController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	private void extractZipFile(final InputStream zipFile,
-			final File destination) throws Exception {
+			final Path destination) throws Exception {
 		try (ArchiveInputStream input = new ArchiveStreamFactory()
 				.createArchiveInputStream(new BufferedInputStream(zipFile))) {
 			ArchiveEntry entry;
 			while ((entry = input.getNextEntry()) != null) {
-				final Path dest = destination.toPath().resolve(entry.getName());
+				final Path dest = destination.resolve(entry.getName());
 				if (entry.isDirectory()) {
 					FileAccess.createDirectories(dest);
 				} else {
@@ -75,11 +74,11 @@ public class TaskFilesystemManipulatingController {
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	protected void uploadJudgeFile(final Task task, final UploadableTask taskDto)
 			throws IOException, Exception {
-		final File judgeFile = this.storageService.getTaskJudgeFile(task);
-		if (judgeFile.exists()) {
-			FileAccess.deleteDirectory(judgeFile);
+		final Path judgeFile = this.storageService.getTaskJudgeFile(task);
+		if (FileAccess.exists(judgeFile)) {
+			FileAccess.deleteDirectoryByWalking(judgeFile);
 		}
-		judgeFile.mkdirs();
+		FileAccess.createDirectories(judgeFile);
 
 		this.extractZipFile(taskDto.getJudgeFile().getInputStream(), judgeFile);
 	}

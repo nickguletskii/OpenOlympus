@@ -22,6 +22,7 @@
  */
 package org.ng200.openolympus.services;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
@@ -156,7 +157,8 @@ public class TaskService {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@Transactional
-	public void rejudgeTask(final Task task) throws ExecutionException {
+	public void rejudgeTask(final Task task) throws ExecutionException,
+			IOException {
 
 		final Lock lock = task.writeLock();
 		lock.lock();

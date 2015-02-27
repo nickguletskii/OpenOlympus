@@ -81,9 +81,9 @@ public class SolutionDownloadController {
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.setContentDispositionFormData("attachment", this.storageService
-				.getSolutionFile(solution).getName());
+				.getSolutionFile(solution).getFileName().toString());
 		return new ResponseEntity<FileSystemResource>(new FileSystemResource(
-				this.storageService.getSolutionFile(solution)), headers,
-				HttpStatus.OK);
+				this.storageService.getSolutionFile(solution).toFile()),
+				headers, HttpStatus.OK);
 	}
 }

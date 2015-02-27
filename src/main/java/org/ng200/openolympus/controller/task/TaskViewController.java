@@ -22,8 +22,8 @@
  */
 package org.ng200.openolympus.controller.task;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.Date;
@@ -162,12 +162,12 @@ public class TaskViewController {
 			throw new BindException(bindingResult);
 		}
 
-		final File solutionFile = new File(
-				this.storageService.createSolutionDirectory(),
-				this.storageService.sanitizeName(solutionDto.getSolutionFile()
-						.getOriginalFilename()));
+		final Path solutionFile = this.storageService.createSolutionDirectory()
+				.resolve(
+						this.storageService.sanitizeName(solutionDto
+								.getSolutionFile().getOriginalFilename()));
 
-		solutionDto.getSolutionFile().transferTo(solutionFile);
+		solutionDto.getSolutionFile().transferTo(solutionFile.toFile());
 
 		Solution solution = new Solution(task, user, "", Date.from(Instant
 				.now()));

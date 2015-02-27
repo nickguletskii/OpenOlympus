@@ -22,7 +22,7 @@
  */
 package org.ng200.openolympus.controller.task;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.Callable;
@@ -77,9 +77,9 @@ public class TaskCreationController extends
 			}
 			Task task = new Task(taskCreationDto.getName(), "", "",
 					Date.from(Instant.now()), taskCreationDto.isPublished());
-			final File localDescriptionFile = this.storageService
+			final Path localDescriptionFile = this.storageService
 					.createTaskDescriptionFileStorage(task);
-			final File judgeDir = this.storageService
+			final Path judgeDir = this.storageService
 					.createTaskJudgeDirectory(task);
 
 			task = this.taskService.saveTask(task);

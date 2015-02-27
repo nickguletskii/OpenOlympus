@@ -22,8 +22,8 @@
  */
 package org.ng200.openolympus.services;
 
-import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,12 +42,12 @@ AbstractTask<Pair<SolutionJudge, SolutionResult>> {
 	private static final long serialVersionUID = 7829416558485210184L;
 	private final Verdict verdict;
 	private final SolutionJudge judge;
-	private final List<File> testFiles;
+	private final List<Path> testFiles;
 	private final BigDecimal maximumScore;
 	private final Properties properties;
 
 	public VerdictCheckingTask(final Verdict verdict,
-			final SolutionJudge judge, final List<File> testFiles,
+			final SolutionJudge judge, final List<Path> testFiles,
 			final BigDecimal maximumScore, final Properties properties) {
 		this.verdict = verdict;
 		this.judge = judge;

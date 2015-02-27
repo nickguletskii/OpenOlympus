@@ -23,13 +23,12 @@
 package org.ng200.openolympus.tasks;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
@@ -57,7 +56,7 @@ import com.google.common.collect.ForwardingConcurrentMap;
 public class TaskContainer {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TaskContainer.class);
-	private final File path;
+	private final Path path;
 	private final Properties properties = new Properties();
 	private String factoryClassName;
 	private final SolutionJudgeFactory solutionJudgeFactory;
@@ -76,21 +75,21 @@ public class TaskContainer {
 					.remove(object);
 			if (futureJudge != null) {
 				futureJudge
-				.whenComplete((judge, throwable) -> {
-					if (judge != null) {
-						try {
-							judge.closeShared();
-							TaskContainer.logger
-							.info("Cleaned up after judge");
-						} catch (final Exception e) {
-							throw new RuntimeException(
-									"Couldn't close judge: ", e);
-						}
-					}
-					if (throwable != null) {
-						throw new RuntimeException(throwable);
-					}
-				});
+						.whenComplete((judge, throwable) -> {
+							if (judge != null) {
+								try {
+									judge.closeShared();
+									TaskContainer.logger
+											.info("Cleaned up after judge");
+								} catch (final Exception e) {
+									throw new RuntimeException(
+											"Couldn't close judge: ", e);
+								}
+							}
+							if (throwable != null) {
+								throw new RuntimeException(throwable);
+							}
+						});
 			}
 			return futureJudge;
 		}
@@ -100,7 +99,7 @@ public class TaskContainer {
 	private final SharedTemporaryStorageFactory sharedTemporaryStorageFactory;
 	private final ExecutorService executorService;
 
-	public TaskContainer(final File path,
+	public TaskContainer(final Path path,
 			final SharedTemporaryStorageFactory sharedTemporaryStorageFactory,
 			final ExecutorService executorService) throws IOException,
 			ClassNotFoundException, InstantiationException,
@@ -117,58 +116,61 @@ public class TaskContainer {
 	public void applyToJudge(
 			final Solution solution,
 			final Function<CompletableFuture<SolutionJudge>, CompletableFuture<SolutionJudge>> function)
-					throws ExecutionException {
+			throws ExecutionException {
 		synchronized (solution) {
 			this.judgeCache
-			.compute(
-					solution,
-					(sol, futureJudge) -> {
-						if (futureJudge == null) {
-							futureJudge = CompletableFuture
-									.supplyAsync(
-											() -> TaskContainer.this.solutionJudgeFactory
-											.createJudge(
-													TaskContainer.this.properties,
-													this.sharedTemporaryStorageFactory),
+					.compute(
+							solution,
+							(sol, futureJudge) -> {
+								if (futureJudge == null) {
+									futureJudge = CompletableFuture
+											.supplyAsync(
+													() -> TaskContainer.this.solutionJudgeFactory
+															.createJudge(
+																	TaskContainer.this.properties,
+																	this.sharedTemporaryStorageFactory),
 													this.executorService);
-						}
-						return function.apply(futureJudge);
-					});
+								}
+								return function.apply(futureJudge);
+							});
 		}
 	}
 
 	public void collectGarbage(final SolutionService solutionService) {
 		this.judgeCache
-		.keySet()
-		.stream()
-		.filter(solution -> solutionService
-				.getNumberOfPendingVerdicts(solution) == 0)
+				.keySet()
+				.stream()
+				.filter(solution -> solutionService
+						.getNumberOfPendingVerdicts(solution) == 0)
 				.forEach(this.judgeCache::remove);
 	}
 
-	public List<Verdict> generateTestVerdicts(final Solution solution) {
-		final List<Pair<File, Boolean>> testDirs = new ArrayList<>();
-		testDirs.addAll(Arrays
-				.asList(new File(this.path, "mainTests").listFiles()).stream()
-				.map(x -> new Pair<>(x, false)).collect(Collectors.toList()));
-		testDirs.addAll(Arrays
-				.asList(new File(this.path, "baseTests").listFiles()).stream()
-				.map(x -> new Pair<>(x, true)).collect(Collectors.toList()));
+	public List<Verdict> generateTestVerdicts(final Solution solution)
+			throws IOException {
+		final List<Pair<Path, Boolean>> testDirs = new ArrayList<>();
+		testDirs.addAll(FileAccess.actOnChildren(
+				this.path.resolve("mainTests"),
+				(paths) -> paths.map(x -> new Pair<>(x, false)).collect(
+						Collectors.toList())));
+		testDirs.addAll(FileAccess.actOnChildren(
+				this.path.resolve("baseTests"),
+				(paths) -> paths.map(x -> new Pair<>(x, true)).collect(
+						Collectors.toList())));
 
 		final List<Verdict> verdicts = testDirs
 				.stream()
 				.sorted((x, y) -> Integer.compare(
-						Integer.valueOf(x.getFirst().getName()),
-						Integer.valueOf(y.getFirst().getName())))
-						.map((test) -> {
-							final String relativePath = this.path.toPath()
-									.relativize(test.getFirst().toPath()).toString();
+						Integer.valueOf(x.getFirst().getFileName().toString()),
+						Integer.valueOf(y.getFirst().getFileName().toString())))
+				.map((test) -> {
+					final String relativePath = this.path.relativize(
+							test.getFirst()).toString();
 
-							return new Verdict(solution, this.solutionJudgeFactory
-									.getMaximumScoreForTest(relativePath,
-											this.properties), relativePath, test
-											.getSecond());
-						}).collect(Collectors.toList());
+					return new Verdict(solution, this.solutionJudgeFactory
+							.getMaximumScoreForTest(relativePath,
+									this.properties), relativePath, test
+							.getSecond());
+				}).collect(Collectors.toList());
 		return verdicts;
 	}
 
@@ -176,9 +178,9 @@ public class TaskContainer {
 		return this.properties;
 	}
 
-	public List<File> getTestFiles(final String testPath) {
-		final File base = new File(this.path, testPath);
-		try (Stream<File> files = FileAccess.walkFiles(base)) {
+	public List<Path> getTestFiles(final String testPath) {
+		final Path base = this.path.resolve(testPath);
+		try (Stream<Path> files = FileAccess.walkPaths(base)) {
 			return (files.filter(p -> !p.equals(base))).collect(Collectors
 					.toList());
 		} catch (final IOException e) {
@@ -194,10 +196,10 @@ public class TaskContainer {
 			return (Class<? extends SolutionJudgeFactory>) TaskContainer.class
 					.getClassLoader().loadClass(className);
 		} catch (final ClassNotFoundException e) {
-			final File jarFile = new File(this.path, "task.jar");
-			final URL url = jarFile.toURI().toURL();
+			final Path jarFile = this.path.resolve("task.jar");
+			final URL url = jarFile.toUri().toURL();
 			final URL[] urls = new URL[] {
-			                              url
+				url
 			};
 			@SuppressWarnings("resource")
 			final ClassLoader classLoader = new URLClassLoader(urls);
@@ -209,7 +211,7 @@ public class TaskContainer {
 
 	public void loadSettings() throws IOException {
 		try (BufferedReader reader = FileAccess.newBufferedReader(this.path
-				.toPath().resolve("task.properties"))) {
+				.resolve("task.properties"))) {
 			this.properties.load(reader);
 		}
 		this.factoryClassName = this.properties.getProperty("judgeFactory",

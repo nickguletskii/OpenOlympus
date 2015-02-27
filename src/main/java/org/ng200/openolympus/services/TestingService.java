@@ -22,8 +22,9 @@
  */
 package org.ng200.openolympus.services;
 
-import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -177,7 +178,7 @@ public class TestingService {
 	}
 
 	private void checkVerdict(final Verdict verdict, final SolutionJudge judge,
-			final List<File> testFiles, final BigDecimal maximumScore,
+			final List<Path> testFiles, final BigDecimal maximumScore,
 			final Properties properties) throws ExecutionException {
 		if (this.dataProvider == null) {
 			throw new IllegalStateException("Shared data provider is null!");
@@ -274,7 +275,8 @@ public class TestingService {
 	}
 
 	private SolutionJudge compileSolution(final Solution solution,
-			final SolutionJudge judge) throws ExecutionException {
+			final SolutionJudge judge, final Properties properties)
+			throws ExecutionException {
 		if (this.dataProvider == null) {
 			throw new IllegalStateException("Shared data provider is null!");
 		}
@@ -299,7 +301,7 @@ public class TestingService {
 					.setDispatchExpirationSchedule(new JPPFSchedule(20000L));
 			job.getSLA().setMaxDispatchExpirations(5);
 
-			job.add(new SolutionCompilationTask(judge, solution));
+			job.add(new SolutionCompilationTask(judge, solution, properties));
 
 			job.setBlocking(false);
 
@@ -342,9 +344,10 @@ public class TestingService {
 									this.logInAsSystem();
 									try {
 										if (!judge.isCompiled()) {
-											return this.compileSolution(
-													verdict.getSolution(),
-													judge);
+											return this.compileSolution(verdict
+													.getSolution(), judge,
+													taskContainer
+															.getProperties());
 										}
 									} catch (final Exception e) {
 										TestingService.logger.error(
@@ -417,7 +420,7 @@ public class TestingService {
 	}
 
 	@Transactional
-	public void testSolutionOnAllTests(Solution solution) {
+	public void testSolutionOnAllTests(Solution solution) throws IOException {
 		solution = this.solutionService.saveSolution(solution);
 		final List<Verdict> verdicts = this.taskContainerCache
 				.getTaskContainerForTask(solution.getTask())

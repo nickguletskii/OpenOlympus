@@ -23,6 +23,7 @@
 package org.ng200.openolympus.services;
 
 import java.io.Serializable;
+import java.util.Properties;
 
 import org.jppf.client.taskwrapper.DataProviderHolder;
 import org.jppf.node.protocol.AbstractTask;
@@ -42,10 +43,13 @@ public class SolutionCompilationTask extends AbstractTask<SolutionJudge>
 	private final SolutionJudge judge;
 
 	private final Solution solution;
+	private final Properties properties;
 
-	public SolutionCompilationTask(SolutionJudge judge, Solution solution) {
+	public SolutionCompilationTask(SolutionJudge judge, Solution solution,
+			Properties properties) {
 		this.judge = judge;
 		this.solution = solution;
+		this.properties = properties;
 	}
 
 	@Override
@@ -53,8 +57,9 @@ public class SolutionCompilationTask extends AbstractTask<SolutionJudge>
 		try {
 			final StorageService storageService = ((StorageService) this.dataProvider
 					.getParameter("storageService"));
-			this.judge.compile(Lists.from(storageService
-					.getSolutionFile(this.solution)));
+			this.judge.compile(
+					Lists.from(storageService.getSolutionFile(this.solution)),
+					this.properties);
 		} finally {
 			Janitor.cleanUp(this.judge);
 			this.setResult(this.judge);

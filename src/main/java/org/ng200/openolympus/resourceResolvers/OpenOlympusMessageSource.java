@@ -22,8 +22,9 @@
  */
 package org.ng200.openolympus.resourceResolvers;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Locale;
@@ -32,7 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
+import org.ng200.openolympus.FileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,16 +75,16 @@ public final class OpenOlympusMessageSource extends
 			if (code.isEmpty() || Character.isUpperCase(code.charAt(0))) {
 				return;
 			}
-			final File file = new File(new File(this.storagePath),
-					"missingLocalisation.txt");
-			if (!file.exists()) {
-				file.getParentFile().mkdirs();
-				file.createNewFile();
+			final Path file = FileSystems.getDefault().getPath(
+					this.storagePath, "missingLocalisation.txt");
+			if (!FileAccess.exists(file)) {
+				FileAccess.createDirectories(file.getParent());
+				FileAccess.createFile(file);
 			}
-			final Set<String> s = new TreeSet<>(Arrays.asList(FileUtils
-					.readFileToString(file).split("\n")));
+			final Set<String> s = new TreeSet<>(Arrays.asList(FileAccess
+					.readUTF8String(file).split("\n")));
 			s.add(code);
-			FileUtils.writeStringToFile(file,
+			FileAccess.writeUTFStringToFile(file,
 					s.stream().collect(Collectors.joining("\n")));
 		} catch (final IOException e) {
 			OpenOlympusMessageSource.logger.error(

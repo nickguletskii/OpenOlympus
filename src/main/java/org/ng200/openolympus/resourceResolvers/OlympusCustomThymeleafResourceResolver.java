@@ -23,10 +23,11 @@
 package org.ng200.openolympus.resourceResolvers;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
@@ -37,7 +38,7 @@ import org.thymeleaf.TemplateProcessingParameters;
 import org.thymeleaf.resourceresolver.IResourceResolver;
 
 public class OlympusCustomThymeleafResourceResolver implements
-IResourceResolver {
+		IResourceResolver {
 	public static final String DESCRIPTION_SUFFIX = "</div>\n</body>\n\n</html>";
 	public static final String DESCRIPTION_PREFIX = "<!DOCTYPE html>\n<html\n\txmlns=\"http://www.w3.org/1999/xhtml\"\n\txmlns:th=\"http://www.thymeleaf.org\" xmlns:oo=\"http://openolympus\"\n>\n<head>\n</head>\n\n<body><div th:fragment=\"content\">";
 	public static final Whitelist HTML_WHITELIST = Whitelist.relaxed()
@@ -56,17 +57,14 @@ IResourceResolver {
 	public InputStream getResourceAsStream(
 			final TemplateProcessingParameters templateProcessingParameters,
 			final String resourceName) {
-		final File file = new File(resourceName);
-
-		if (!file.exists()) {
+		final Path file = FileSystems.getDefault().getPath(resourceName);
+		if (!FileAccess.exists(file)) {
 			return null;
 		}
 
 		String taskDescription;
 		try {
-			taskDescription = Jsoup.clean(
-					new String(FileAccess.readAllBytes(file), Charset
-							.forName("UTF-8")),
+			taskDescription = Jsoup.clean(FileAccess.readUTF8String(file),
 					OlympusCustomThymeleafResourceResolver.HTML_WHITELIST);
 
 			return new ByteArrayInputStream(

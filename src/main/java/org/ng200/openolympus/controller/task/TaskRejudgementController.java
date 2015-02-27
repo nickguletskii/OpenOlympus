@@ -22,6 +22,7 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.ng200.openolympus.Assertions;
@@ -48,7 +49,7 @@ public class TaskRejudgementController {
 	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void rejudgeTask(@PathVariable(value = "task") final Task task,
-			final Model model) throws ExecutionException {
+			final Model model) throws ExecutionException, IOException {
 		Assertions.resourceExists(task);
 
 		this.taskService.rejudgeTask(task);
