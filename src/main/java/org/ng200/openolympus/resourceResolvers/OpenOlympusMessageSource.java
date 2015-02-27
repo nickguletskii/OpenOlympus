@@ -84,7 +84,7 @@ public final class OpenOlympusMessageSource extends
 			final Set<String> s = new TreeSet<>(Arrays.asList(FileAccess
 					.readUTF8String(file).split("\n")));
 			s.add(code);
-			FileAccess.writeUTFStringToFile(file,
+			FileAccess.writeUTF8StringToFile(file,
 					s.stream().collect(Collectors.joining("\n")));
 		} catch (final IOException e) {
 			OpenOlympusMessageSource.logger.error(
