@@ -1,3 +1,4 @@
+
 --
 -- The MIT License
 -- Copyright (c) 2014-2015 Nick Guletskii
@@ -21,7 +22,7 @@
 -- THE SOFTWARE.
 --
 
-CREATE OR REPLACE FUNCTION get_contest_end(in int8, out f1 timestamp)
+CREATE OR REPLACE FUNCTION get_contest_end(in bigint) RETURNS timestamp
     AS $$
 	SELECT (contests.start_time +
 		(contests.duration * INTERVAL '1 MILLISECOND') +
@@ -43,7 +44,7 @@ CREATE OR REPLACE FUNCTION get_contest_end(in int8, out f1 timestamp)
     
 ^^^ NEW STATEMENT ^^^
 
-CREATE OR REPLACE FUNCTION get_contest_start(in int8, out f1 timestamp)
+CREATE OR REPLACE FUNCTION get_contest_start(in bigint) RETURNS timestamp
     AS $$
 	SELECT contests.start_time
 	FROM contests
@@ -53,7 +54,7 @@ CREATE OR REPLACE FUNCTION get_contest_start(in int8, out f1 timestamp)
     
 ^^^ NEW STATEMENT ^^^
 
-CREATE OR REPLACE FUNCTION get_solution_author(in bigint, out f1 bigint)
+CREATE OR REPLACE FUNCTION get_solution_author(in bigint) RETURNS bigint
     AS $$
 	SELECT user_id
 	FROM solutions
@@ -62,7 +63,7 @@ CREATE OR REPLACE FUNCTION get_solution_author(in bigint, out f1 bigint)
     LANGUAGE SQL;
 ^^^ NEW STATEMENT ^^^
 
-CREATE OR REPLACE FUNCTION get_solution_time_added(in bigint, out f1 timestamp)
+CREATE OR REPLACE FUNCTION get_solution_time_added(in bigint) RETURNS timestamp
     AS $$
 	SELECT time_added
 	FROM solutions
@@ -72,7 +73,7 @@ CREATE OR REPLACE FUNCTION get_solution_time_added(in bigint, out f1 timestamp)
 
 ^^^ NEW STATEMENT ^^^
 
-CREATE OR REPLACE FUNCTION get_contest_end_for_user(in int8, in int8, out f1 timestamp)
+CREATE OR REPLACE FUNCTION get_contest_end_for_user(in bigint, in bigint) RETURNS timestamp
     AS $$
 	SELECT (contests.start_time +
 		(contests.duration * INTERVAL '1 MILLISECOND') +
@@ -95,7 +96,7 @@ CREATE OR REPLACE FUNCTION get_contest_end_for_user(in int8, in int8, out f1 tim
     
 ^^^ NEW STATEMENT ^^^
 
-CREATE OR REPLACE FUNCTION get_contest_start_for_user(in int8, in int8, out f1 timestamp)
+CREATE OR REPLACE FUNCTION get_contest_start_for_user(in bigint, in bigint) RETURNS timestamp
     AS $$
 	SELECT contests.start_time
 	FROM contests
@@ -105,7 +106,7 @@ CREATE OR REPLACE FUNCTION get_contest_start_for_user(in int8, in int8, out f1 t
 
 ^^^ NEW STATEMENT ^^^
 
-CREATE OR REPLACE FUNCTION contest_at(in timestamp) RETURNS table(f1 int8)
+CREATE OR REPLACE FUNCTION contest_at(in timestamp) RETURNS table(f1 bigint)
     AS $$
 	SELECT id
 	FROM contests
@@ -115,7 +116,7 @@ CREATE OR REPLACE FUNCTION contest_at(in timestamp) RETURNS table(f1 int8)
 
 ^^^ NEW STATEMENT ^^^
     
-CREATE OR REPLACE FUNCTION contest_at_for_user(timestamp, int8) RETURNS table(f1 int8)
+CREATE OR REPLACE FUNCTION contest_at_for_user(timestamp, bigint) RETURNS table(f1 bigint)
     AS $$
 	SELECT id
 	FROM contests

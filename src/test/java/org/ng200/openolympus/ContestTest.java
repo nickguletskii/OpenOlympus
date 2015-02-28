@@ -153,55 +153,55 @@ public class ContestTest {
 		time = this.dummyData(task1, task2, time);
 
 		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/api/contest/"
-						+ contest.getId() + "/completeResults"))
-						.andDo(MockMvcResultHandlers.print())
-						.andExpect(MockMvcResultMatchers.status().isOk())
-						.andExpect(
-								MockMvcResultMatchers.content().contentType(
-										this.contentType))
-										.andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
-										.andExpect(
-												MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(5)))
-												.andExpect(
-														MockMvcResultMatchers.jsonPath("$[0].username").value(
-																"test2"))
-																.andExpect(MockMvcResultMatchers.jsonPath("$[0].rank").value(1))
-																.andExpect(
-																		MockMvcResultMatchers.jsonPath("$[1].username").value(
-																				"test3"))
-																				.andExpect(MockMvcResultMatchers.jsonPath("$[1].rank").value(2))
-																				.andExpect(
-																						MockMvcResultMatchers.jsonPath("$[2].username").value(
-																								"test4"))
-																								.andExpect(MockMvcResultMatchers.jsonPath("$[2].rank").value(2))
-																								.andExpect(
-																										MockMvcResultMatchers.jsonPath("$[3].username").value(
-																												"test1"))
-																												.andExpect(MockMvcResultMatchers.jsonPath("$[3].rank").value(4))
-																												.andExpect(
-																														MockMvcResultMatchers.jsonPath("$[4].username").value(
-																																"test5"))
-																																.andExpect(MockMvcResultMatchers.jsonPath("$[4].rank").value(5));
+				.perform(
+						MockMvcRequestBuilders.get("/api/contest/"
+								+ contest.getId() + "/completeResults"))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(
+						MockMvcResultMatchers.content().contentType(
+								this.contentType))
+				.andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(5)))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[0].username").value(
+								"test2"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].rank").value(1))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[1].username").value(
+								"test3"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[1].rank").value(2))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[2].username").value(
+								"test4"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[2].rank").value(2))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[3].username").value(
+								"test1"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[3].rank").value(4))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[4].username").value(
+								"test5"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[4].rank").value(5));
 
 		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/api/contest/"
-						+ contest.getId() + "/testingFinished"))
-						.andDo(MockMvcResultHandlers.print())
-						.andExpect(MockMvcResultMatchers.status().isOk())
-						.andExpect(MockMvcResultMatchers.content().string("true"));
+				.perform(
+						MockMvcRequestBuilders.get("/api/contest/"
+								+ contest.getId() + "/testingFinished"))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("true"));
 
 		this.createDummySolution(time++, task1, this.testUser1, 20, 100, false);
 
 		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/api/contest/"
-						+ contest.getId() + "/testingFinished"))
-						.andDo(MockMvcResultHandlers.print())
-						.andExpect(MockMvcResultMatchers.status().isOk())
-						.andExpect(MockMvcResultMatchers.content().string("false"));
+				.perform(
+						MockMvcRequestBuilders.get("/api/contest/"
+								+ contest.getId() + "/testingFinished"))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("false"));
 	}
 
 	@Test
@@ -224,57 +224,57 @@ public class ContestTest {
 		time = this.dummyData(task1, task2, time);
 
 		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/api/contest/"
-						+ contest.getId() + "/completeResults"))
-						.andDo(MockMvcResultHandlers.print())
-						.andExpect(MockMvcResultMatchers.status().isOk())
-						.andExpect(
-								MockMvcResultMatchers.content().contentType(
-										this.contentType))
-										.andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
-										.andExpect(
-												MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(4)))
-												.andExpect(
-														MockMvcResultMatchers.jsonPath("$[0].username").value(
-																"test4"))
-																.andExpect(MockMvcResultMatchers.jsonPath("$[0].rank").value(1))
-																.andExpect(
-																		MockMvcResultMatchers.jsonPath("$[0].score",
-																				ToStringMatcher.compareBigDecimals("2.00")))
-																				.andExpect(
-																						MockMvcResultMatchers.jsonPath("$[1].username").value(
-																								"test1"))
-																								.andExpect(MockMvcResultMatchers.jsonPath("$[1].rank").value(2))
-																								.andExpect(
-																										MockMvcResultMatchers.jsonPath("$[1].score",
-																												ToStringMatcher.compareBigDecimals("0.00")))
-																												.andExpect(
-																														MockMvcResultMatchers.jsonPath("$[2].username").value(
-																																"test2"))
-																																.andExpect(MockMvcResultMatchers.jsonPath("$[2].rank").value(2))
-																																.andExpect(
-																																		MockMvcResultMatchers.jsonPath("$[3].username").value(
-																																				"test3"))
-																																				.andExpect(MockMvcResultMatchers.jsonPath("$[3].rank").value(2));
+				.perform(
+						MockMvcRequestBuilders.get("/api/contest/"
+								+ contest.getId() + "/completeResults"))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(
+						MockMvcResultMatchers.content().contentType(
+								this.contentType))
+				.andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(4)))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[0].username").value(
+								"test4"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].rank").value(1))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[0].score",
+								ToStringMatcher.compareBigDecimals("2.00")))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[1].username").value(
+								"test1"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[1].rank").value(2))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[1].score",
+								ToStringMatcher.compareBigDecimals("0.00")))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[2].username").value(
+								"test2"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[2].rank").value(2))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[3].username").value(
+								"test3"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[3].rank").value(2));
 
 		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/api/contest/"
-						+ contest.getId() + "/testingFinished"))
-						.andDo(MockMvcResultHandlers.print())
-						.andExpect(MockMvcResultMatchers.status().isOk())
-						.andExpect(MockMvcResultMatchers.content().string("true"));
+				.perform(
+						MockMvcRequestBuilders.get("/api/contest/"
+								+ contest.getId() + "/testingFinished"))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("true"));
 
 		this.createDummySolution(time++, task1, this.testUser4, 20, 100, false);
 
 		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/api/contest/"
-						+ contest.getId() + "/testingFinished"))
-						.andDo(MockMvcResultHandlers.print())
-						.andExpect(MockMvcResultMatchers.status().isOk())
-						.andExpect(MockMvcResultMatchers.content().string("false"));
+				.perform(
+						MockMvcRequestBuilders.get("/api/contest/"
+								+ contest.getId() + "/testingFinished"))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("false"));
 	}
 
 	public Contest createContestDirectly(Duration duration) throws Exception {

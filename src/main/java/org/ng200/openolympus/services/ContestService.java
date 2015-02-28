@@ -116,41 +116,12 @@ public class ContestService {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public Instant getContestEndIncludingAllTimeExtensions(final Contest contest) {
-		return contest
-				.getStartTime()
-				.toInstant()
-				.plus(contest.getDuration())
-				.plus(this.contestTimeExtensionRepository
-						.findByContest(contest)
-						.stream()
-						.collect(
-								Collectors
-										.groupingBy(timeExtension -> timeExtension
-												.getContest()))
-						.values()
-						.stream()
-						.map(group -> group
-								.stream()
-								.map(timeExtension -> timeExtension
-										.getDuration())
-								.reduce((l, r) -> l.plus(r)))
-						.map(x -> x.orElse(Duration.ZERO))
-						.max((l, r) -> l.compareTo(r)).orElse(Duration.ZERO));
+		return contestRepository.getContestEndTime(contest.getId()).toInstant();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public Date getContestEndTime(final Contest contest) {
-		return Date.from(contest.getStartTime().toInstant()
-				.plus(contest.getDuration()));
-	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
-			+ SecurityExpressionConstants.OR + '('
-			+ " #user.username == authentication.name " + ')')
-	public Date getContestEndTimeForUser(final Contest contest, final User user) {
-		return Date.from(contest.getStartTime().toInstant()
-				.plus(contest.getDuration())
-				.plus(this.getTotalTimeExtensionTimeForUser(contest, user)));
+		return contestRepository.getContestEndTime(contest.getId());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
@@ -244,9 +215,8 @@ public class ContestService {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public boolean hasContestTestingFinished(Contest contest) {
-		return this.contestRepository.hasContestTestingFinished(
-				contest.getId(), contest.getStartTime(),
-				this.getContestEndTime(contest));
+		return this.contestRepository
+				.hasContestTestingFinished(contest.getId());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
@@ -257,6 +227,12 @@ public class ContestService {
 		}
 		return !this.getContestEndTimeForUser(contest, user).toInstant()
 				.isAfter(Instant.now());
+	}
+
+	@PreAuthorize(SecurityExpressionConstants.IS_USER)
+	public Date getContestEndTimeForUser(Contest contest, User user) {
+		return contestRepository.getContestEndTimeForUser(contest.getId(),
+				user.getId());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)

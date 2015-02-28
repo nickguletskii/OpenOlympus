@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.repositories;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 import org.jooq.Condition;
@@ -33,6 +32,7 @@ import org.jooq.impl.DSL;
 import org.jooq.types.DayToSecond;
 import org.jooq.util.postgres.PostgresDataType;
 import org.ng200.openolympus.annotations.QueryProvider;
+import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.repositories.UserRepository.ContestResultsQuery;
@@ -61,10 +61,9 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
 							.asField().cast(PostgresDataType.INTERVALDAYTOSECOND);
 
 			final Condition solutionWithinTimeBounds =
-					Tables.SOLUTIONS.TIME_ADDED.between(DSL.param("contestStartTime", new Timestamp(0)),
-							DSL.param("contestEndTime", new Timestamp(0)).add(
-									timeExtensions
-									)
+					Tables.SOLUTIONS.TIME_ADDED.between(
+							Routines.getContestStartForUser(DSL.param("contest", 0l),Tables.SOLUTIONS.USER_ID),
+							Routines.getContestEndForUser(DSL.param("contest", 0l), Tables.SOLUTIONS.USER_ID)
 							);
 
 			final Table<Record> currentTasks = DSL.select()
@@ -101,13 +100,21 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
 
 	public Contest findByName(String name);
 
-	@Query("select c from Contest c where\n:startTime >= c.startTime and :startTime <= add_time(c.startTime, c.duration)\nor :endTime >= c.startTime and :endTime <= add_time(c.startTime, c.duration)\nor c.startTime >= :startTime and c.startTime <= :endTime\nor add_time(c.startTime, c.duration) >= :startTime and add_time(c.startTime, c.duration) <= :endTime ")
+	@Query("select c from Contest c where\n"
+			+ "(:startTime<=get_contest_start(c.id) and :endTime>=get_contest_end(c.id)) or "
+			+ "(:startTime>=get_contest_start(c.id) and :startTime<=get_contest_end(c.id)) or "
+			+ "(:endTime>=get_contest_start(c.id) and :endTime<=get_contest_end(c.id))")
 	public Contest findIntersects(@Param("startTime") Date start,
 			@Param("endTime") Date end);
 
 	@Query(nativeQuery = true)
 	@QueryProvider(value = ContestTestingFinishedQuery.class)
-	boolean hasContestTestingFinished(@Param("contest") Long contest,
-			@Param("contestStartTime") Date contestStartTime,
-			@Param("contestEndTime") Date contestEndTime);
+	boolean hasContestTestingFinished(@Param("contest") Long contest);
+
+	@Query(nativeQuery = true, value = "SELECT get_contest_end(:id)")
+	public Date getContestEndTime(@Param("id") long id);
+
+	@Query(nativeQuery = true, value = "SELECT get_contest_end_for_user(:contestId, :userId)")
+	public Date getContestEndTimeForUser(@Param("contestId") long contestId,
+			@Param("userId") long userId);
 }
