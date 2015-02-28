@@ -22,8 +22,11 @@
  */
 package org.ng200.openolympus;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +36,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -64,6 +69,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Value("${customResourceLocation}")
 	String customResourceLocation;
+
+	@Autowired
+	private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
@@ -108,5 +116,12 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		r.setDefaultErrorView("error");
 		r.setExceptionAttribute("exception");
 		return r;
+	}
+
+	@Override
+	public void configureMessageConverters(
+			List<HttpMessageConverter<?>> converters) {
+		converters.add(jacksonMessageConverter);
+		super.configureMessageConverters(converters);
 	}
 }

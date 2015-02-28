@@ -76,7 +76,7 @@ define(['oolutil', 'lodash', 'moment'],
                     console.log(contest);
                     try {
                         var fd = new FormData();
-                        _(contest).forEach(function(value, key) {
+                        _.forEach(contest, function(value, key) {
                             fd.append(key, value);
                         });
                         ValidationService.postToServer($scope, '/api/contests/create', $scope.contestCreationForm, fd, success, failure, reset);
