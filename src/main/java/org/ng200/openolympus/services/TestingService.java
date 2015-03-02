@@ -51,6 +51,12 @@ import org.jppf.task.storage.MemoryMapDataProvider;
 import org.ng200.openolympus.cerberus.Janitor;
 import org.ng200.openolympus.cerberus.SolutionJudge;
 import org.ng200.openolympus.cerberus.SolutionResult;
+import org.ng200.openolympus.cerberus.util.Lists;
+import org.ng200.openolympus.factory.JacksonSerializationFactory;
+import org.ng200.openolympus.jppfsupport.JacksonSerializationDelegatingTask;
+import org.ng200.openolympus.jppfsupport.JsonTaskExecutionResult;
+import org.ng200.openolympus.jppfsupport.SolutionCompilationTask;
+import org.ng200.openolympus.jppfsupport.VerdictCheckingTask;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Verdict;
@@ -70,6 +76,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -140,6 +147,9 @@ public class TestingService {
 	private UserService userService;
 
 	@Autowired
+	private StorageService storageService;
+
+	@Autowired
 	public TestingService(final SolutionService solutionService,
 			final SolutionRepository solutionRepository,
 			final UserRepository userRepository,
@@ -205,21 +215,33 @@ public class TestingService {
 					.setDispatchExpirationSchedule(new JPPFSchedule(60000L));
 			job.getSLA().setMaxDispatchExpirations(3);
 
-			job.add(new VerdictCheckingTask(verdict, judge, testFiles,
-					maximumScore, properties));
+			job.add(new JacksonSerializationDelegatingTask<>(
+					new VerdictCheckingTask(judge, testFiles, maximumScore,
+							properties)));
 
 			job.setBlocking(true);
 
 			this.jppfClient.submitJob(job);
 			@SuppressWarnings("unchecked")
-			final org.jppf.node.protocol.Task<Pair<SolutionJudge, SolutionResult>> task = (org.jppf.node.protocol.Task<Pair<SolutionJudge, SolutionResult>>) job
+			final org.jppf.node.protocol.Task<String> task = (org.jppf.node.protocol.Task<String>) job
 					.awaitResults().get(0);
 
 			if (task.getThrowable() != null) {
 				throw task.getThrowable();
 			}
 
-			final SolutionResult result = task.getResult().getSecond();
+			ObjectMapper objectMapper = JacksonSerializationFactory
+					.createObjectMapper();
+
+			final JsonTaskExecutionResult<Pair<SolutionJudge, SolutionResult>> checkingResult = ((JacksonSerializationDelegatingTask<Pair<SolutionJudge, SolutionResult>, VerdictCheckingTask>) job
+					.awaitResults().get(0)).getResultOrThrowable();
+
+			if (checkingResult.getError() != null) {
+				throw checkingResult.getError();
+			}
+
+			final SolutionResult result = checkingResult.getResult()
+					.getSecond();
 
 			verdict.setScore(result.getScore());
 			verdict.setMemoryPeak(result.getMemoryPeak());
@@ -301,19 +323,22 @@ public class TestingService {
 					.setDispatchExpirationSchedule(new JPPFSchedule(20000L));
 			job.getSLA().setMaxDispatchExpirations(5);
 
-			job.add(new SolutionCompilationTask(judge, solution, properties));
+			job.add(new JacksonSerializationDelegatingTask<>(
+					new SolutionCompilationTask(judge, Lists
+							.from(storageService.getSolutionFile(solution)),
+							properties)));
 
 			job.setBlocking(false);
 
 			this.jppfClient.submitJob(job);
-			final org.jppf.node.protocol.Task<SolutionJudge> task = (org.jppf.node.protocol.Task<SolutionJudge>) job
-					.awaitResults().get(0);
+			final JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) job
+					.awaitResults().get(0)).getResultOrThrowable();
 
-			if (task.getThrowable() != null) {
-				throw task.getThrowable();
+			if (result.getError() != null) {
+				throw result.getError();
 			}
 
-			return task.getResult();
+			return result.getResult();
 
 		} catch (final Throwable throwable) {
 			throw new RuntimeException("Couldn't compile solution: ", throwable);

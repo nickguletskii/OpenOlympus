@@ -55,7 +55,7 @@ public class StorageService implements Serializable {
 	private String storagePath;
 
 	@Autowired
-	private TaskDescriptionProvider taskDescriptionProvider;
+	private transient TaskDescriptionProvider taskDescriptionProvider;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public Path createSolutionDirectory() throws IOException {

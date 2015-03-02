@@ -26,6 +26,8 @@ import java.io.Serializable;
 
 import org.ng200.openolympus.model.views.UnprivilegedView;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 public class Pair<F, S> implements Serializable {
@@ -38,7 +40,9 @@ public class Pair<F, S> implements Serializable {
 
 	private S second;
 
-	public Pair(final F first, final S second) {
+	@JsonCreator
+	public Pair(@JsonProperty("first") final F first,
+			@JsonProperty("second") final S second) {
 		super();
 		this.first = first;
 		this.second = second;
@@ -73,11 +77,13 @@ public class Pair<F, S> implements Serializable {
 		return true;
 	}
 
+	@JsonProperty("first")
 	@JsonView(UnprivilegedView.class)
 	public F getFirst() {
 		return this.first;
 	}
 
+	@JsonProperty("second")
 	@JsonView(UnprivilegedView.class)
 	public S getSecond() {
 		return this.second;
@@ -94,10 +100,12 @@ public class Pair<F, S> implements Serializable {
 		return result;
 	}
 
+	@JsonProperty("first")
 	public void setFirst(final F first) {
 		this.first = first;
 	}
 
+	@JsonProperty("second")
 	public void setSecond(final S second) {
 		this.second = second;
 	}
