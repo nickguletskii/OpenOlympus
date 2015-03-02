@@ -39,23 +39,23 @@
                 <th width="50">{{ 'solution.verdict.memory' | translate }}</th>
                 <th>{{ 'solution.verdict.message' | translate}}</th>
             </tr>
-            <tr id="totalHeader" class="active">
-                <td>{{solutionScore}}</td>
-                <td>{{solutionMaximumScore}}</td>
+            <tr id="totalHeader" class="total">
+                <td>{{solution.score}}</td>
+                <td>{{solution.maximumScore}}</td>
                 <td>-</td>
                 <td>-</td>
                 <td>-</td>
-                <td>{{solutionTotal}}</td>
+                <td>-</td>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="verdict in verdicts">
+            <tr ng-repeat="verdict in solution.verdicts" ng-class="{success: verdict.score===verdict.maximumScore, danger: verdict.score!==verdict.maximumScore &amp;&amp; verdict.tested}">
                 <td>{{verdict.score | minusOneNoValue}}</td>
                 <td>{{verdict.maximumScore | minusOneNoValue}}</td>
                 <td>{{verdict.cpuTime | minusOneNoValue}}</td>
                 <td>{{verdict.realTime | minusOneNoValue}}</td>
                 <td>{{verdict.memoryPeak | minusOneNoValue}}</td>
-                <td>{{verdict.additionalInformation}}</td>
+                <td>{{verdict.message | translate}}</td>
             </tr>
         </tbody>
     </table>

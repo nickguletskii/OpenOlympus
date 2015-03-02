@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(function() {
+define(['lodash'], function(_) {
     String.prototype.endsWith = function(suffix) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
@@ -30,6 +30,14 @@ define(function() {
         return this.replace(/{(\d+)}/g, function(match, number) {
             return typeof args[number] != 'undefined' ? args[number] : match;
         });
+    };
+
+    var removeAngularElements = function(obj) {
+        return _.mapValues(_.pick(obj, function(name) {
+            if (typeof name == "string")
+                return name.substring(0, 1) == "$";
+            return true;
+        }), removeAngularElements);
     };
 
     var util = {
@@ -54,10 +62,14 @@ define(function() {
         },
         emptyToNull: function(obj) {
             return _.mapValues(obj, function(value) {
-            	if(value === "")
-            		return null;
+                if (value === "")
+                    return null;
                 return value;
             });
+        },
+        removeAngularElements: removeAngularElements,
+        equalsWithoutAngular: function(obj1, obj2) {
+            return _.isEqual(removeAngularElements(obj1), removeAngularElements(obj2));
         }
     };
     return util;

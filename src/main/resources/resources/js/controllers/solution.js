@@ -20,16 +20,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
+define(['oolutil', 'lodash', 'angular'],
+    function(Util, _, angular) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
             $stateParams, SolutionService, data) {
 
             $scope.$apply(function() {
+                var DELAY_MIN = 100;
+                var DELAY_STEP = 100;
+                var DELAY_MAX = 1000;
+                var delay = DELAY_MIN;
+
                 function setData(solution) {
-                    $scope.verdicts = solution.verdicts;
-                    $scope.solutionMaximumScore = solution.maximumScore;
-                    $scope.solutionScore = solution.score;
+                    if(!Util.equalsWithoutAngular($scope.solution, solution)){
+                        $scope.solution = solution;
+                        delay = DELAY_MIN;
+                    }
                 }
 
                 function update() {
@@ -39,10 +45,11 @@ define(['oolutil', 'lodash'],
 
                 var promise;
                 function poller(){
+                    delay = Math.min(delay + DELAY_STEP, DELAY_MAX);
                     update();
-                    promise = $timeout(poller, 300);
+                    promise = $timeout(poller, delay);
                 }
-                promise = $timeout(poller, 300);
+                promise = $timeout(poller, delay);
                 $scope.$on('$destroy', function(){
                     $timeout.cancel(promise);
                 });
