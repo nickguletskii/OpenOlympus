@@ -68,6 +68,7 @@ import org.ng200.openolympus.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -445,6 +446,7 @@ public class TestingService {
 	}
 
 	@Transactional
+	@CacheEvict(value = "solutions", key = "#solution.id")
 	public void testSolutionOnAllTests(Solution solution) throws IOException {
 		solution = this.solutionService.saveSolution(solution);
 		final List<Verdict> verdicts = this.taskContainerCache

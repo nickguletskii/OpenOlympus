@@ -31,6 +31,7 @@ import javax.servlet.MultipartConfigElement;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
@@ -45,6 +46,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -74,6 +79,7 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 @PropertySource("classpath:openolympus.properties")
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+@EnableCaching
 public class Application {
 	public static void main(final String[] args) throws ScriptException,
 			SQLException {
@@ -219,5 +225,14 @@ public class Application {
 
 		messageConverter.setObjectMapper(mapper);
 		return messageConverter;
+	}
+
+	@Bean
+	public SimpleCacheManager cacheManager() {
+		SimpleCacheManager cacheManager = new SimpleCacheManager();
+		Cache cache = new ConcurrentMapCache("solutions");
+
+		cacheManager.setCaches(Lists.from(cache));
+		return cacheManager;
 	}
 }

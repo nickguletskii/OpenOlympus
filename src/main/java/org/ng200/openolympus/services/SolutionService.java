@@ -34,6 +34,7 @@ import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.repositories.SolutionRepository;
 import org.ng200.openolympus.repositories.VerdictRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -178,22 +179,15 @@ public class SolutionService {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + "#solution.user"
 			+ SecurityExpressionConstants.IS_OWNER + ')')
+	@CacheEvict(value = "solutions", key = "#solution.id")
 	public Solution saveSolution(Solution solution) {
 		return solution = this.solutionRepository.saveAndFlush(solution);
 	}
 
+	@CacheEvict(value = "solutions", key = "#verdict.solution.id")
 	@Transactional
 	public synchronized Verdict saveVerdict(Verdict verdict) {
 		verdict = this.verdictRepository.saveAndFlush(verdict);
 		return verdict;
-	}
-
-	@Transactional
-	public List<Verdict> saveVerdicts(final List<Verdict> verdicts) {
-		final List<Verdict> savedVerdicts = this.verdictRepository
-				.save(verdicts);
-		this.verdictRepository.flush();
-
-		return savedVerdicts;
 	}
 }

@@ -34,7 +34,10 @@ import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -108,6 +111,7 @@ public class SolutionJSONController {
 			+ SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST
 			+ ')')
 	@RequestMapping(method = RequestMethod.GET)
+	@Cacheable(value = "solutions", key = "#solution.id")
 	public @ResponseBody SolutionDto solutionApi(
 			@PathVariable(value = "id") final Solution solution,
 			final Locale locale) {
