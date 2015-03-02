@@ -40,13 +40,13 @@ public class BinderAdvice {
 
 		@Override
 		public String getAsText() {
-			return Long.toString(((Duration) this.getValue()).getSeconds());
+			return Long.toString(((Duration) this.getValue()).toMillis());
 		}
 
 		@Override
 		public void setAsText(String text) throws IllegalArgumentException {
 
-			this.setValue(Duration.ofSeconds(Long.valueOf(text)));
+			this.setValue(Duration.ofMillis(Long.valueOf(text)));
 		}
 
 	}

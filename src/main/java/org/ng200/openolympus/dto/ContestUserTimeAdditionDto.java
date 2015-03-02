@@ -24,7 +24,6 @@ package org.ng200.openolympus.dto;
 
 import java.time.Duration;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.ng200.openolympus.model.User;
@@ -34,7 +33,6 @@ public class ContestUserTimeAdditionDto {
 	private User user;
 
 	@NotNull(message = "empty")
-	@Min(value = 1, message = "contest.addUserTime.form.errors.mustBePositive")
 	private Duration time;
 
 	public Duration getTime() {

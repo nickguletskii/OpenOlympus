@@ -41,7 +41,7 @@ public class OlympusConverters {
 			if (attribute == null) {
 				return null;
 			}
-			return attribute.getSeconds();
+			return attribute.toMillis();
 		}
 
 		@Override

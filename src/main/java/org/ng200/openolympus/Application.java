@@ -60,7 +60,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.init.ScriptException;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
@@ -78,7 +77,6 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 @EnableAutoConfiguration
 @PropertySource("classpath:openolympus.properties")
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 @EnableCaching
 public class Application {
 	public static void main(final String[] args) throws ScriptException,
@@ -222,7 +220,7 @@ public class Application {
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Hibernate4Module());
-
+		mapper.registerModule(new DurationJacksonModule());
 		messageConverter.setObjectMapper(mapper);
 		return messageConverter;
 	}
