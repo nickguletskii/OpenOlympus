@@ -36,6 +36,17 @@ define(['oolutil', 'lodash'],
                     SolutionService.getVerdicts($stateParams.solutionId).then(setData);
                 }
                 setData(data);
+
+                var promise;
+                function poller(){
+                    update();
+                    promise = $timeout(poller, 300);
+                }
+                promise = $timeout(poller, 300);
+                $scope.$on('$destroy', function(){
+                    $timeout.cancel(promise);
+                });
+
                 // TODO: Websocket integration: server should push verdict updates.
             });
         };

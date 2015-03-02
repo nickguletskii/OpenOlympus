@@ -43,7 +43,7 @@ define(['oolutil', 'lodash'],
                 };
                 $scope.isFormVisible = true;
 
-                function success() {
+                function success(response) {
                     $state.go("solutionView", {
                         'solutionId': response.data.id
                     });
