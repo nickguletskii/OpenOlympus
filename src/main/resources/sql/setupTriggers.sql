@@ -123,50 +123,106 @@ CREATE OR REPLACE FUNCTION contest_at_for_user(timestamp, bigint) RETURNS table(
 	WHERE $1 BETWEEN contests.start_time AND (SELECT get_contest_end_for_user(contests.id, $2))
     $$
     LANGUAGE SQL;
-
+^^^ NEW STATEMENT ^^^
+CREATE OR REPLACE FUNCTION update_contest(in bigint) RETURNS void
+    AS $$
+	UPDATE contest_participations
+	SET score =
+		(
+			SELECT
+			coalesce(sum(sols.score), 0)
+			FROM(
+				SELECT DISTINCT ON(solutions.task_id)
+				score
+				FROM solutions
+				RIGHT OUTER JOIN
+				contests_tasks
+				ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id
+				WHERE					
+					solutions.user_id=contest_participations.user_id
+				AND 
+					(
+						solutions.time_added BETWEEN
+						(SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id))
+						AND
+						(SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id))
+					)
+				ORDER BY
+					solutions.task_id asc,
+					solutions.time_added desc
+			) AS sols
+		)
+	WHERE
+		contest_participations.contest_id=$1
+	$$
+	LANGUAGE SQL;
+^^^ NEW STATEMENT ^^^
+CREATE OR REPLACE FUNCTION update_solution(in bigint) RETURNS void
+    AS $$
+	UPDATE solutions
+		SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id),
+			maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id),
+			tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id)
+		WHERE id=$1;
+	UPDATE contest_participations
+	SET score =
+		(
+			SELECT
+			coalesce(sum(sols.score), 0)
+			FROM(
+				SELECT DISTINCT ON(solutions.task_id)
+				score
+				FROM solutions
+				RIGHT OUTER JOIN
+				contests_tasks
+				ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id
+				WHERE					
+					solutions.user_id=contest_participations.user_id
+				AND 
+					(
+						solutions.time_added BETWEEN
+						(SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id))
+						AND
+						(SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id))
+					)
+				ORDER BY
+					solutions.task_id asc,
+					solutions.time_added desc
+			) AS sols
+		)
+	WHERE 
+		contest_participations.user_id=get_solution_author($1)
+		AND
+		contest_participations.contest_id IN (SELECT contest_at_for_user(get_solution_time_added($1), get_solution_author($1)))
+	$$
+	LANGUAGE SQL;
 ^^^ NEW STATEMENT ^^^
 
 CREATE OR REPLACE FUNCTION maintain_solution_score() RETURNS TRIGGER
 AS $maintain_solution_score$
 	BEGIN
-		UPDATE solutions
-		SET score=(SELECT sum(verdicts.score) FROM verdicts WHERE verdicts.solution_id=solutions.id),
-			tested=(SELECT every(verdicts.tested) FROM verdicts WHERE verdicts.solution_id=solutions.id)
-		WHERE id=NEW.solution_id;
-		UPDATE contest_participations
-		SET score =
-			(
-				SELECT
-				coalesce(sum(sols.score), 0)
-				FROM(
-					SELECT DISTINCT ON(solutions.task_id)
-					score
-					FROM solutions
-					RIGHT OUTER JOIN
-					contests_tasks
-					ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id
-					WHERE					
-						solutions.user_id=get_solution_author(NEW.solution_id)
-					AND 
-						(
-							solutions.time_added BETWEEN
-							(SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id))
-							AND
-							(SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id))
-						)
-					ORDER BY
-						solutions.task_id asc,
-						solutions.time_added desc
-				) AS sols
-			)
-		WHERE 
-			contest_participations.user_id=get_solution_author(NEW.solution_id)
-			AND
-			contest_participations.contest_id IN (SELECT contest_at_for_user(get_solution_time_added(NEW.solution_id), get_solution_author(NEW.solution_id)));
-			
-		RETURN NULL;
+		IF (TG_OP = 'DELETE') THEN
+			PERFORM update_solution(OLD.solution_id);
+		END IF;
+	
+		IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+			PERFORM update_solution(NEW.solution_id);
+        END IF;
+        RETURN NULL;
 	END;
 $maintain_solution_score$ LANGUAGE plpgsql;
+
+^^^ NEW STATEMENT ^^^
+
+CREATE OR REPLACE FUNCTION maintain_contest_rank() RETURNS TRIGGER
+AS $maintain_contest_rank$
+	BEGIN
+		IF (TG_OP = 'UPDATE') THEN
+			PERFORM update_contest(NEW.id);
+        END IF;
+        RETURN NULL;
+	END;
+$maintain_contest_rank$ LANGUAGE plpgsql;
 
 ^^^ NEW STATEMENT ^^^
 
@@ -174,10 +230,21 @@ DROP TRIGGER IF EXISTS update_solution_score ON verdicts;
 
 ^^^ NEW STATEMENT ^^^
 
+DROP TRIGGER IF EXISTS maintain_contest_rank ON contests;
+
+^^^ NEW STATEMENT ^^^
+
 CREATE TRIGGER update_solution_score
 	AFTER INSERT OR UPDATE OR DELETE ON verdicts
 	FOR EACH ROW
 	EXECUTE PROCEDURE maintain_solution_score();
+	
+^^^ NEW STATEMENT ^^^
+
+CREATE TRIGGER maintain_contest_rank
+	AFTER UPDATE ON contests
+	FOR EACH ROW
+	EXECUTE PROCEDURE maintain_contest_rank();
 	
 ^^^ NEW STATEMENT ^^^
 

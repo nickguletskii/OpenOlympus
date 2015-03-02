@@ -66,7 +66,7 @@ define(['oolutil', 'lodash'],
                         var fd = new FormData();
                         fd.append("user", $stateParams.userId);
                         if (time)
-                            fd.append("time", time);
+                            fd.append("time", time * (60 * 1000));
 
                         ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUserTime', $scope.userTimeAdditionForm, fd, success, failure, reset);
                     } catch (err) {

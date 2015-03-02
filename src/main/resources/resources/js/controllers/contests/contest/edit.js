@@ -75,7 +75,10 @@ define(['oolutil', 'lodash', 'moment-tz'],
                     try {
                         var fd = new FormData();
                         _.forEach(contest, function(value, key) {
-                            fd.append(key, value);
+                            if (key === "duration")
+                                fd.append(key, value * (60 * 1000));
+                            else
+                                fd.append(key, value);
                         });
                         ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/edit', $scope.contestModificationForm, fd, success, failure, reset);
                     } catch (err) {
