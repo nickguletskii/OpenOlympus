@@ -22,14 +22,14 @@
  */
 'use strict';
 
-define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 'controllers',
+define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 'controllers', "codemirror",
     'ui-route', 'restangular', 'bootstrap-tpls', 'angular-form-validation', 'angular-file-upload',
     'angular-translate', "angular-translate-loader-url", "angular-ui-codemirror", "angular-no-captcha",
     "angular-animate"
 ], function(require, angular,
-    bootstrap, filters, services, directives, controllers) {
+    bootstrap, filters, services, directives, controllers, codemirror) {
 
-    window.CodeMirror = require('codemirror');
+    window.CodeMirror = codemirror;
 
     var app = angular.module('ool', ['pascalprecht.translate', 'restangular', 'ui.router',
         'ui.bootstrap', 'ool.filters', 'ool.controllers',
@@ -61,6 +61,7 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
         $rootScope.$on('$translateChangeSuccess',
             function(event, language) {
                 dictionary.instantTranslationFunc = $translate.instant;
+                $rootScope.currentLanguage = language.language;
             });
         $rootScope.availableLanguages = ["en", "ru"]; // TODO: Make this dynamic
         $rootScope.changeLanguage = $translate.use;

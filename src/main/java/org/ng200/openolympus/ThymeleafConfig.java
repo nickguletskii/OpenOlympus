@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus;
 
-import org.ng200.openolympus.markup.OpenOlympusThymeleafDialect;
 import org.ng200.openolympus.resourceResolvers.OlympusCustomThymeleafResourceResolver;
 import org.ng200.openolympus.services.StorageService;
 import org.slf4j.Logger;
@@ -103,7 +102,6 @@ public class ThymeleafConfig {
 		engine.addTemplateResolver(this.taskTemplateResolver());
 		engine.addTemplateResolver(this.emailTemplateResolver());
 		engine.addDialect(new SpringSecurityDialect());
-		engine.addDialect(new OpenOlympusThymeleafDialect());
 		return engine;
 	}
 

@@ -39,6 +39,7 @@
 	<link rel="stylesheet" href="/resources/css/spinkit.css"></link>
 
 	<link rel="stylesheet" href="/resources/lib/codemirror/lib/codemirror.css"></link>
+	<link rel="stylesheet" href="/resources/lib/codemirror/theme/solarized.css"></link>
 
 
 	<script>
@@ -54,7 +55,6 @@
 			"ui-route-extras": lib("ui-router-extras/release/ct-ui-router-extras"),
 			"bootstrap": lib("angular-bootstrap/ui-bootstrap"),
 			"bootstrap-tpls": lib("angular-bootstrap/ui-bootstrap-tpls"),
-			"codemirror": lib("codemirror/lib/codemirror"),
 			"jquery": lib("jquery/dist/jquery"),
 			"restangular": lib("restangular/dist/restangular"),
 			"angular-animate": lib("angular-animate/angular-animate"),
@@ -77,6 +77,10 @@
 			name: "rest",
 			location: lib("rest/"),
 			main: "browser"
+		}, {
+			name: "codemirror",
+			location: lib("codemirror/"),
+			main: "lib/codemirror"
 		}],
 		shim: {
 			'angular': {
@@ -129,6 +133,9 @@
 			},
 			'codemirror': {
 				exports: 'CodeMirror'
+			},
+			'codemirror-textile': {
+				deps: ['codemirror']
 			},
 			'moment-tz': {
 				deps: ['moment']

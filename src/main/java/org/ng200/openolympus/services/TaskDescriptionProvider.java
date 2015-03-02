@@ -23,15 +23,11 @@
 package org.ng200.openolympus.services;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
+import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
+import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
 import org.ng200.openolympus.FileAccess;
 import org.springframework.stereotype.Service;
 
@@ -40,18 +36,9 @@ public class TaskDescriptionProvider {
 
 	public void transform(Path from, Path to) throws ExecuteException,
 			IOException {
-		final CommandLine commandLine = new CommandLine("pandoc");
-		commandLine.addArgument("-f");
-		commandLine.addArgument("markdown");
-		commandLine.addArgument("-t");
-		commandLine.addArgument("html5");
-		final DefaultExecutor executor = new DefaultExecutor();
-
-		try (InputStream f = FileAccess.newBufferedInputStream(from);
-				OutputStream t = FileAccess.newBufferedOutputStream(to)) {
-			executor.setStreamHandler(new PumpStreamHandler(t, System.err, f));
-			executor.setWatchdog(new ExecuteWatchdog(10 * 1000));
-			executor.execute(commandLine);
-		}
+		MarkupParser markupParser = new MarkupParser();
+		markupParser.setMarkupLanguage(new TextileLanguage());
+		FileAccess.writeUTF8StringToFile(to,
+				markupParser.parseToHtml(FileAccess.readUTF8String(from)));
 	}
 }

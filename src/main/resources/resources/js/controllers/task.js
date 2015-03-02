@@ -23,10 +23,10 @@
 define(['oolutil', 'lodash'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $sce, task) {
+            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $sce, task, $compile) {
             $scope.$apply(function() {
                 $scope.name = task.name;
-                $scope.description = $sce.trustAsHtml(task.description);
+                $scope.description = task.description;
 
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.solutionSubmissionForm.forceValidation = true;

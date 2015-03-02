@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
+define(['oolutil', 'lodash', 'codemirror/mode/textile/textile'],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http,
             $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, editTaskData) {
@@ -28,7 +28,8 @@ define(['oolutil', 'lodash'],
                 $scope.editorOptions = {
                     lineWrapping: true,
                     lineNumbers: true,
-                    mode: 'markdown'
+                    mode: 'textile',
+                    theme: 'solarized light'
                 };
                 $scope.task = {};
                 $scope.task.name = editTaskData.name;

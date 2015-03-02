@@ -238,5 +238,33 @@ define(['angular', 'services', 'lodash', 'moment'], function(angular, services, 
                 }
             };
         }
-    ]);
+    ]).directive("lang", ['$compile', '$translate', '$rootScope', function($compile, $translate, $rootScope) {
+        return {
+            restrict: "AE",
+            link: function(scope, element, attrs, ctrl, transclude) {
+                var name = attrs.lang;
+
+                function changeTranslation() {
+                    if (name && name !== $rootScope.currentLanguage) {
+                        element[0].hidden = true;
+                    } else {
+                        element[0].hidden = false;
+                    }
+                }
+                changeTranslation();
+                $rootScope.$watch("currentLanguage", changeTranslation);
+            }
+        };
+    }]).directive('dynamic', function($compile) {
+        return {
+            restrict: 'A',
+            replace: true,
+            link: function(scope, element, attrs) {
+                scope.$watch(attrs.dynamic, function(html) {
+                    element.html(html);
+                    $compile(element.contents())(scope);
+                });
+            }
+        };
+    });
 });
