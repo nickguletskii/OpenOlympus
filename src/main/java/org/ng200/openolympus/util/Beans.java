@@ -37,7 +37,7 @@ public class Beans {
 		for (final String propertyName : Stream
 				.of(src.getPropertyDescriptors()).map(pd -> pd.getName())
 				.collect(Collectors.toList())) {
-			if (trg.getPropertyDescriptor(propertyName).getWriteMethod() == null) {
+			if (!trg.isWritableProperty(propertyName)) {
 				continue;
 			}
 
