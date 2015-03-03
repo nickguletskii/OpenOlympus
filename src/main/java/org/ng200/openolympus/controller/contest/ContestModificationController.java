@@ -36,7 +36,9 @@ import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -57,6 +59,8 @@ public class ContestModificationController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(method = RequestMethod.POST)
+	@Transactional
+	@CacheEvict(value = "contests", key = "#contest.id")
 	public BindingResponse editContest(final Model model,
 			final HttpServletRequest request,
 			@PathVariable("contest") Contest contest,

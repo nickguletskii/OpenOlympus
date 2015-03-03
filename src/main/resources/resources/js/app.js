@@ -22,12 +22,12 @@
  */
 'use strict';
 
-define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 'controllers', "codemirror",
+define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 'controllers', "codemirror", "moment",
     'ui-route', 'restangular', 'bootstrap-tpls', 'angular-form-validation', 'angular-file-upload',
     'angular-translate', "angular-translate-loader-url", "angular-ui-codemirror", "angular-no-captcha",
     "angular-animate"
 ], function(require, angular,
-    bootstrap, filters, services, directives, controllers, codemirror) {
+    bootstrap, filters, services, directives, controllers, codemirror, moment) {
 
     window.CodeMirror = codemirror;
 
@@ -62,6 +62,7 @@ define(['require', 'angular', 'bootstrap', 'filters', 'services', 'directives', 
             function(event, language) {
                 dictionary.instantTranslationFunc = $translate.instant;
                 $rootScope.currentLanguage = language.language;
+                moment.locale(language.language);
             });
         $rootScope.availableLanguages = ["en", "ru"]; // TODO: Make this dynamic
         $rootScope.changeLanguage = $translate.use;

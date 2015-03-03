@@ -29,7 +29,8 @@ var services = ["authenticationProvider",
     "userService",
     "solutionService",
     "taskService",
-    "contestService"
+    "contestService",
+    "timeService"
 ];
 
 var requirements = ['angular', 'app', 'lodash'].concat(services.map(function(service) {

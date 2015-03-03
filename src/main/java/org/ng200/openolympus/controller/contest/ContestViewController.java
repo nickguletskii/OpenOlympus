@@ -23,16 +23,20 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.Set;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SecurityService;
 import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,17 +57,103 @@ public class ContestViewController {
 	@Autowired
 	private ContestService contestService;
 
+	@Autowired
+	private UserService userService;
+
+	public static class ContestDTO {
+		private String name;
+		private TimingDTO timings;
+		private Set<Task> tasks;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public TimingDTO getTimings() {
+			return timings;
+		}
+
+		public void setTimings(TimingDTO timings) {
+			this.timings = timings;
+		}
+
+		public Set<Task> getTasks() {
+			return tasks;
+		}
+
+		public void setTasks(Set<Task> tasks) {
+			this.tasks = tasks;
+		}
+
+		public ContestDTO(String name, TimingDTO timings, Set<Task> tasks) {
+			super();
+			this.name = name;
+			this.timings = timings;
+			this.tasks = tasks;
+		}
+	}
+
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.THIS_CONTEST_IN_PROGRESS_FOR_USER
 			+ ')')
+	@Cacheable(value = "contests", key = "#contest.id", unless="#result == null")
 	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
-	public Set<Task> showContestHub(
+	public ContestDTO showContestHub(
 			@PathVariable(value = "contest") final Contest contest,
 			final Principal principal) {
-		return contest.getTasks();
+		User user = userService.getUserByUsername(principal.getName());
+		return new ContestDTO(contest.getName(), new TimingDTO(
+				contest.getStartTime(), Date.from(contest.getStartTime()
+						.toInstant().plus(contest.getDuration())),
+				contestService.getContestEndTimeForUser(contest, user)),
+				contest.getTasks());
 	}
+
+	public static class TimingDTO {
+		private Date startTime;
+		private Date endTime;
+		private Date endTimeIncludingTimeExtensions;
+
+		public Date getStartTime() {
+			return startTime;
+		}
+
+		public void setStartTime(Date startTime) {
+			this.startTime = startTime;
+		}
+
+		public Date getEndTime() {
+			return endTime;
+		}
+
+		public void setEndTime(Date endTime) {
+			this.endTime = endTime;
+		}
+
+		public Date getEndTimeIncludingTimeExtensions() {
+			return endTimeIncludingTimeExtensions;
+		}
+
+		public void setEndTimeIncludingTimeExtensions(
+				Date endTimeIncludingTimeExtensions) {
+			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
+		}
+
+		public TimingDTO(Date startTime, Date endTime,
+				Date endTimeIncludingTimeExtensions) {
+			this.startTime = startTime;
+			this.endTime = endTime;
+			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
+		}
+
+	}
+
 }

@@ -29,6 +29,8 @@
 </head>
 
 <body th:fragment="content">
+	<h1>{{contest.name}}</h1>
+	<h2>{{contest.countdownKey | translate : contest}}</h2>
 	<a ng-if="security.isAdmin()" translate="contest.edit" class="hidden-print btn btn-primary btn-sm" ui-sref="editContest({contestId: contestId})"></a>
 	<button type="button" ng-if="security.isAdmin()" translate="contest.addUserButton" class="hidden-print btn btn-primary btn-sm" ui-sref=".addUser"></button>
 	<button type="button" ng-if="security.isAdmin()" translate="contest.addTaskButton" class="hidden-print btn btn-primary btn-sm" ui-sref=".addTask"></button>
@@ -41,7 +43,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="task in tasks">
+			<tr ng-repeat="task in contest.tasks">
 				<td><a ui-sref="taskView({taskId: task.id, contestId: contestId})">{{task.name}}</a>
 					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id, contestId: contestId})">
 					</button>

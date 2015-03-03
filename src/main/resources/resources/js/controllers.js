@@ -114,8 +114,8 @@ var stateList = [{
         "taskId": null
     },
     "resolve": {
-        "tasks": function(ContestService, $stateParams) {
-            return ContestService.getContestTasks($stateParams.contestId);
+        "contest": function(ContestService, $stateParams) {
+            return ContestService.getContestInfo($stateParams.contestId);
         }
     }
 }, {

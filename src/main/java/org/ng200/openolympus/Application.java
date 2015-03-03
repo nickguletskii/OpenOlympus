@@ -228,9 +228,9 @@ public class Application {
 	@Bean
 	public SimpleCacheManager cacheManager() {
 		SimpleCacheManager cacheManager = new SimpleCacheManager();
-		Cache cache = new ConcurrentMapCache("solutions");
 
-		cacheManager.setCaches(Lists.from(cache));
+		cacheManager.setCaches(Lists.from(new ConcurrentMapCache("solutions"),
+				new ConcurrentMapCache("contests")));
 		return cacheManager;
 	}
 }

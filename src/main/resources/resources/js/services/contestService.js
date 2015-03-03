@@ -34,7 +34,7 @@ define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) 
                 countContests: function() {
                     return $http.get('/api/contestsCount').then(_.property("data"));
                 },
-                getContestTasks: function(contestId) {
+                getContestInfo: function(contestId) {
                     return $http.get('/api/contest/' + contestId).then(_.property("data"));
                 },
                 countContestParticipants: function(contestId) {

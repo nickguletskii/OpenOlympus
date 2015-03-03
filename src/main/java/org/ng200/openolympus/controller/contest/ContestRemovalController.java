@@ -26,34 +26,22 @@ import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.model.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-//TODO: Port contest removal to new API
-@RequestMapping(value = "/contest/{contest}/remove")
 public class ContestRemovalController {
 
 	@Autowired
 	private ContestService contestService;
 
-	@RequestMapping(method = RequestMethod.POST)
-	public String removeContest(Model model,
-			@PathVariable(value = "contest") Contest contest) {
+	@CacheEvict(value = "contest", key = "#contest.id")
+	@RequestMapping(value = "/api/contest/{contest}/remove", method = RequestMethod.POST)
+	public void removeContest(@PathVariable(value = "contest") Contest contest) {
 		Assertions.resourceExists(contest);
-
 		this.contestService.deleteContest(contest);
-		model.addAttribute("message", "contests.list.removeContest.success");
-		return "redirect:/contests";
+		return;
 	}
 
-	@RequestMapping(method = RequestMethod.GET)
-	public String removeContestPrompt(Model model,
-			@PathVariable(value = "contest") Contest contest) {
-		Assertions.resourceExists(contest);
-
-		model.addAttribute("contest", contest);
-		return "contest/removeContest";
-	}
 }

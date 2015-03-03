@@ -20,14 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
+define(['oolutil', 'lodash', 'moment'],
+    function(Util, _, moment) {
         return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, tasks) {
+            $stateParams, contest, datetime) {
             $scope.$apply(function() {
                 $scope.contestId = $stateParams.contestId;
-
-                $scope.tasks = tasks;
+                $scope.contest = contest;
             });
+            var tick = function() {
+                $scope.$apply(function() {
+                    if (datetime.currentServerTime().isBefore(moment(contest.timings.startTime))) {
+                        $scope.contest.countdown = datetime.timeTo(contest.timings.startTime);
+                        $scope.contest.countdownKey = "contest.timeToStart";
+                    } else if (datetime.currentServerTime().isBefore(moment(contest.timings.endTimeIncludingTimeExtensions))) {
+                        $scope.contest.countdown = datetime.timeTo(contest.timings.endTimeIncludingTimeExtensions);
+                        $scope.contest.countdownKey = "contest.timeToEnd";
+                    } else {
+                    	$scope.contest.countdownKey = "contest.ended";
+                    }
+                });
+                $timeout(tick, 500);
+            };
+            tick();
         };
     });

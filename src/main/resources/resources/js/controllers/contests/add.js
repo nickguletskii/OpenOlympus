@@ -73,7 +73,6 @@ define(['oolutil', 'lodash', 'moment'],
 
                 $scope.createContest = function(contest) {
                     $scope.isFormVisible = false;
-                    console.log(contest);
                     try {
                         var fd = new FormData();
                         _.forEach(contest, function(value, key) {
