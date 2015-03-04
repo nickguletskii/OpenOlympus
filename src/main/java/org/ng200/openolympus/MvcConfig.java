@@ -70,6 +70,15 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	@Value("${customResourceLocation}")
 	String customResourceLocation;
 
+	Integer cachePeriod;
+
+	@Value("${cachePeriod:}")
+	public void setCachePeriod(String cachePeriod) {
+		if (StringUtils.isEmpty(cachePeriod))
+			return;
+		this.cachePeriod = Integer.valueOf(cachePeriod);
+	}
+
 	@Autowired
 	private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -83,11 +92,13 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 					.addResourceLocations(this.customResourceLocation);
 		}
 
-		registry.addResourceHandler("/resources/**").addResourceLocations(
-				"classpath:resources/");
+		registry.addResourceHandler("/resources/**")
+				.addResourceLocations("classpath:resources/")
+				.setCachePeriod(cachePeriod);
 
-		registry.addResourceHandler("/favicon.png").addResourceLocations(
-				"classpath:resources/");
+		registry.addResourceHandler("/favicon.png")
+				.addResourceLocations("classpath:resources/")
+				.setCachePeriod(cachePeriod);
 	}
 
 	@Override
