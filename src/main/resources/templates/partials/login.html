@@ -32,7 +32,14 @@
 
     <div class="spinner" ng-if="!loaded"></div>
     <form name="loginForm" role="form" ng-show="!!loaded">
-        
+        <div class="panel panel-success" ng-if="showAdministratorApprovalRequiredMessage">
+            <div class="panel-heading">
+                <h3 class="panel-title" translate="login.administratorApprovalRequired.title"></h3>
+                <div class="panel-body" translate="login.administratorApprovalRequired.body">
+                </div>
+            </div>
+        </div>
+
         <input label="login.username" type="text" ng-model="user.username" required="" oolinput=""></input>
         <input label="login.password" type="password" ng-model="user.password" required="" oolinput=""></input>
 

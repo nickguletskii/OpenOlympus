@@ -75,7 +75,9 @@ define(['oolutil', 'lodash'],
                         } else if (data.status === "RECAPTCHA_ERROR") {
                             $scope.captchaErrors = data.recaptchaErrorCodes;
                         } else {
-                            $state.go("login");
+                            $state.go("login", {
+                                showAdministratorApprovalRequiredMessage: true
+                            });
                         }
                     });
                 };

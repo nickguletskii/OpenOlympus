@@ -234,7 +234,8 @@ var stateList = [{
     "controller": "LoginController",
     "customWidth": NARROW,
     "params": {
-        "failure": false
+        "failure": false,
+        "showAdministratorApprovalRequiredMessage": false
     }
 }, {
     "name": "register",
