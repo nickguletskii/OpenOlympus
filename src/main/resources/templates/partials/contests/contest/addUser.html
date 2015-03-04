@@ -38,7 +38,7 @@
 	</div>
 	<div class="modal-body">
 		<form name="userAdditionForm" role="form" novalidate="" ng-submit="addUser(username)">
-			<input label="{{ 'contest.addUser.username' | translate }}" type="text" ng-model="username" placeholder="{{ 'contest.addUser.placeholder' | translate }}" typeahead="user for user in getUserSuggestions($viewValue)" typeahead-loading="{{ 'contest.addUser.loadingSuggestions' | translate }}" class="form-control" oolinput=""></input>
+			<input label="{{ 'contest.addUser.username' | translate }}" type="text" ng-model="username" placeholder="{{ 'contest.addUser.placeholder' | translate }}" typeahead="user as user.username + ' (' + user.firstNameMain + ' ' + user.middleNameMain + ' ' + user.lastNameMain +')' for user in getUserSuggestions($viewValue)" typeahead-loading="typeaheadLoading" class="form-control" oolinput=""></input>
 
 			<div class="form-group">
 				<button type="submit" class="btn btn-default">

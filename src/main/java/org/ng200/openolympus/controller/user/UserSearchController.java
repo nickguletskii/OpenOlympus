@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
+import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,20 +38,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Controller
 @RequestMapping(value = "/api/userCompletion")
-public class UserSearchController {
+public class UserSearchController { 
 
 	@Autowired
 	private UserService userService;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(method = RequestMethod.GET)
-	public @ResponseBody List<String> searchUsers(
+	@JsonView(UnprivilegedView.class)
+	public @ResponseBody List<User> searchUsers(
 			@RequestParam(value = "term") final String name) {
 		Assertions.resourceExists(name);
 
-		return this.userService.findAFewUsersWithNameContaining(name).stream()
-				.map((user) -> user.getUsername()).collect(Collectors.toList());
+		return this.userService.findAFewUsersWithNameContaining(name);
 	}
 }
