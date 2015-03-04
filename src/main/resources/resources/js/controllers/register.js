@@ -63,7 +63,7 @@ define(['oolutil', 'lodash'],
                 });
 
                 $scope.register = function(user) {
-                    if (!eulaAccepted)
+                    if (!($scope.eulaAccepted))
                         return;
                     $http({
                         method: 'POST',
