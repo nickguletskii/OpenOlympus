@@ -75,8 +75,11 @@ define(['oolutil', 'lodash', 'moment'],
                     $scope.isFormVisible = false;
                     try {
                         var fd = new FormData();
-                        _.forEach(contest, function(value, key) {
-                            fd.append(key, value);
+                         _.forEach(contest, function(value, key) {
+                            if (key === "duration")
+                                fd.append(key, value * (60 * 1000));
+                            else
+                                fd.append(key, value);
                         });
                         ValidationService.postToServer($scope, '/api/contests/create', $scope.contestCreationForm, fd, success, failure, reset);
 
