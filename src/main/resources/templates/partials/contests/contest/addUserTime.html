@@ -41,7 +41,7 @@
 			<input label="{{ 'contest.addUserTime.time' | translate }}" type="number" ng-model="time" class="form-control" oolinput=""></input>
 
 			<div class="form-group">
-				<button type="submit" class="btn btn-success" ng-disabled="isSubmitting || userTimeAdditionForm.$invalid || userTimeAdditionForm.$pristine">
+				<button type="submit" class="btn btn-success" ng-disabled="isSubmitting">
 					<span class="glyphicon glyphicon-refresh" ng-show="isSubmitting"></span> {{'contest.addUserTime.addUserTimeButton' | translate}}
 				</button>
 			</div>
