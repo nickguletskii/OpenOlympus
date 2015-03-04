@@ -252,4 +252,13 @@ public class ContestService {
 		return contest = this.contestRepository.save(contest);
 	}
 
+	@Transactional
+	public void removeUserFromContest(Contest contest, User user) {
+		contestTimeExtensionRepository
+				.deleteInBatch(contestTimeExtensionRepository
+						.findByUserAndContest(user, contest));
+		contestParticipationRepository.delete(contestParticipationRepository
+				.findOneByContestAndUser(contest, user));
+	}
+
 }

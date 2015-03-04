@@ -34,6 +34,7 @@ import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
@@ -57,6 +58,7 @@ public class ContestTaskAdditionController {
 	private ContestService contestService;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@CacheEvict(value = "contests", key = "#contest.id")
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addTask")
 	public BindingResponse addTask(final Model model,
 			@PathVariable(value = "contest") final Contest contest,

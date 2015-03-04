@@ -169,7 +169,7 @@ public class Contest implements Serializable {
 		return this.startTime;
 	}
 
-	@JsonView(PriviligedView.class)
+	@JsonView(UnprivilegedView.class)
 	public Set<Task> getTasks() {
 		return this.tasks;
 	}

@@ -281,6 +281,21 @@ $maintain_contest_rank_with_time_extensions$ LANGUAGE plpgsql;
  
 ^^^ NEW STATEMENT ^^^
 
+CREATE OR REPLACE FUNCTION maintain_contest_rank_with_task() RETURNS TRIGGER
+AS $maintain_contest_rank_with_task$
+	BEGIN
+		IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+			PERFORM update_contest(NEW.contests_id);
+        END IF;
+		IF (TG_OP = 'DELETE') THEN
+			PERFORM update_contest(OLD.contests_id);
+        END IF;
+        RETURN NULL;
+	END;
+$maintain_contest_rank_with_task$ LANGUAGE plpgsql;
+ 
+^^^ NEW STATEMENT ^^^
+
 DROP TRIGGER IF EXISTS update_solution_score ON verdicts;
 
 ^^^ NEW STATEMENT ^^^
@@ -290,6 +305,10 @@ DROP TRIGGER IF EXISTS maintain_contest_rank ON contests;
 ^^^ NEW STATEMENT ^^^
 
 DROP TRIGGER IF EXISTS maintain_contest_rank_with_time_extensions ON time_extensions;
+
+^^^ NEW STATEMENT ^^^
+
+DROP TRIGGER IF EXISTS maintain_contest_rank_with_task ON contests_tasks;
 
 ^^^ NEW STATEMENT ^^^
 
@@ -311,6 +330,13 @@ CREATE TRIGGER maintain_contest_rank
 	AFTER UPDATE ON contests
 	FOR EACH ROW
 	EXECUTE PROCEDURE maintain_contest_rank();
+	
+^^^ NEW STATEMENT ^^^
+
+CREATE TRIGGER maintain_contest_rank_with_task
+	AFTER INSERT OR UPDATE OR DELETE ON contests_tasks
+	FOR EACH ROW
+	EXECUTE PROCEDURE maintain_contest_rank_with_task();
 	
 ^^^ NEW STATEMENT ^^^
 

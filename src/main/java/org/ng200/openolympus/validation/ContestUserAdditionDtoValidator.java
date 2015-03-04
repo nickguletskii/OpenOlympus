@@ -49,17 +49,17 @@ public class ContestUserAdditionDtoValidator {
 				.getUsername());
 		if (user == null) {
 			errors.rejectValue("username", "",
-					"contest.addUser.form.errors.userNull");
+					"empty");
 			return;
 		}
 		if (contest == null) {
 			errors.rejectValue("contestId", "",
-					"contest.addUser.form.errors.badContest");
+					"badContest");
 			return;
 		}
 		if (this.contestService.isUserParticipatingIn(user, contest)) {
 			errors.rejectValue("username", "",
-					"contest.addUser.form.errors.userAlreadyInContest");
+					"userAlreadyInContest");
 			return;
 		}
 	}

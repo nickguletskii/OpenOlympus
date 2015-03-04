@@ -76,7 +76,6 @@ define(['oolutil', 'lodash'],
                                 $state.go("home");
                             } else if (response.auth === "failed") {
                                 $scope.authError = true;
-                                console.log($scope.loginForm);
                                 $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", false);
                             }
                             if (response.captchas) {

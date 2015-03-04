@@ -24,6 +24,7 @@ package org.ng200.openolympus.controller.contest;
 
 import java.security.Principal;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
@@ -35,6 +36,8 @@ import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SecurityService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,6 +51,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 @RestController
 public class ContestViewController {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContestViewController.class);
 	@Autowired
 	private SecurityService securityService;
 
@@ -103,18 +108,18 @@ public class ContestViewController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.THIS_CONTEST_IN_PROGRESS_FOR_USER
 			+ ')')
-	@Cacheable(value = "contests", key = "#contest.id", unless="#result == null")
+	@Cacheable(value = "contests", key = "#contest.id", unless = "#result == null")
 	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public ContestDTO showContestHub(
 			@PathVariable(value = "contest") final Contest contest,
 			final Principal principal) {
 		User user = userService.getUserByUsername(principal.getName());
+		Set<Task> tasks = new HashSet<Task>(contest.getTasks());
 		return new ContestDTO(contest.getName(), new TimingDTO(
 				contest.getStartTime(), Date.from(contest.getStartTime()
 						.toInstant().plus(contest.getDuration())),
-				contestService.getContestEndTimeForUser(contest, user)),
-				contest.getTasks());
+				contestService.getContestEndTimeForUser(contest, user)),tasks);
 	}
 
 	public static class TimingDTO {

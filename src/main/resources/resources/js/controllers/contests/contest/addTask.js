@@ -57,6 +57,9 @@ define(['oolutil', 'lodash'],
                     }).then(function(d) {
                         $scope.taskAddedMessage = d;
                     });
+                    $scope.taskAdditionForm.taskName.$setUntouched();
+                    $scope.taskAdditionForm.taskName.$setPristine();
+                    $rootScope.$emit("taskAddedToContest");
                 }
 
                 function failure() {

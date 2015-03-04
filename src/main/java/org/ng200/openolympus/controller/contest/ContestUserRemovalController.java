@@ -22,15 +22,12 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import java.util.HashSet;
-
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.model.User;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,25 +37,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ContestTaskRemovalController {
+public class ContestUserRemovalController {
 
 	@Autowired
 	private ContestService contestService;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	@CacheEvict(value = "contests", key = "#contest.id")
-	@RequestMapping(value = "/api/contest/{contest}/removeTask", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/api/contest/{contest}/removeUser", method = RequestMethod.DELETE)
 	public void removeTask(
 			@PathVariable(value = "contest") final Contest contest,
-			@RequestParam(value = "task") final Task task, final Model model) {
+			@RequestParam(value = "user") final User user, final Model model) {
 		Assertions.resourceExists(contest);
-		Assertions.resourceExists(task);
-		HashSet<Task> tasks = new HashSet<>(contest.getTasks());
-		if (tasks.contains(task)) {
-			tasks.remove(task);
-			contest.setTasks(tasks);
-			this.contestService.saveContest(contest);
-		}
+		Assertions.resourceExists(user);
+		contestService.removeUserFromContest(contest, user);
 	}
 
 }

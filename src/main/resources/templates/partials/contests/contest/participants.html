@@ -47,6 +47,8 @@
 				<td>{{user.lastNameMain}}</td>
 				<td>
 					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.participants.addUserTimeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-time " ui-sref=".addUserTime({userId: user.id})"> </button>
+					<button class="btn btn-danger btn-xs glyphicon glyphicon-remove pull-right" ng-really-click="removeUser(item)" item="user" ng-really-yes-button="{{'contest.participants.remove.confirmationButton'|translate}}" ng-really-message="{{'contest.participants.remove.confirmation' |translate}}">
+					</button>
 				</td>
 			</tr>
 		</tbody>

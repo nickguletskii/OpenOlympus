@@ -57,6 +57,8 @@ define(['oolutil', 'lodash'],
                     }).then(function(d) {
                         $scope.userAddedMessage = d;
                     });
+                    $scope.userAdditionForm.username.$setUntouched();
+                    $scope.userAdditionForm.username.$setPristine();
                 }
 
                 function failure() {
@@ -73,12 +75,12 @@ define(['oolutil', 'lodash'],
                     $scope.processing = false;
                 }
 
-                $scope.addUser = function(username) {
+                $scope.addUser = function(user) {
                     $scope.isSubmitting = true;
 
                     try {
                         var fd = new FormData();
-                        fd.append("username", username);
+                        fd.append("username", user.username);
 
                         ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUser', $scope.userAdditionForm, fd, success, failure, reset);
                     } catch (err) {

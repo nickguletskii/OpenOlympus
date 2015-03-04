@@ -56,6 +56,20 @@ define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) 
                 },
                 getContestEditData: function(contestId) {
                     return $http.get("/api/contest/" + contestId + "/edit").then(_.property("data"));
+                },
+                removeParticipant: function(contestId, id) {
+                    return $http.delete("/api/contest/" + contestId + "/removeUser", {
+                        params: {
+                            user: id
+                        }
+                    });
+                },
+                removeTask: function(contestId, id) {
+                    return $http.delete("/api/contest/" + contestId + "/removeTask", {
+                        params: {
+                            task: id
+                        }
+                    });
                 }
             };
         });
