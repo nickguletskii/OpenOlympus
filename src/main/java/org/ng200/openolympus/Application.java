@@ -69,6 +69,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 
@@ -221,6 +222,8 @@ public class Application {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Hibernate4Module());
 		mapper.registerModule(new DurationJacksonModule());
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+				false);
 		messageConverter.setObjectMapper(mapper);
 		return messageConverter;
 	}
