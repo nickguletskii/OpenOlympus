@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class VerdictJSONController {
+public class VerdictStatusController {
 
 	public static class VerdictDto {
 		private long id;
@@ -145,7 +145,7 @@ public class VerdictJSONController {
 	}
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(VerdictJSONController.class);
+			.getLogger(VerdictStatusController.class);
 
 	@Autowired
 	private AbstractMessageSource messageSource;

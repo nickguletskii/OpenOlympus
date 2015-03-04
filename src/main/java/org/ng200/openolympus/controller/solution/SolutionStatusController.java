@@ -22,25 +22,82 @@
  */
 package org.ng200.openolympus.controller.solution;
 
-import java.security.Principal;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
+import org.ng200.openolympus.controller.solution.VerdictStatusController.VerdictDto;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.services.SolutionService;
+import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 @Controller
+@RequestMapping(value = "/api/solution/{id}")
 public class SolutionStatusController {
+
+	public static class SolutionDto {
+		private BigDecimal score;
+		private BigDecimal maximumScore;
+		private List<VerdictDto> verdicts;
+
+		public SolutionDto(List<VerdictDto> verdicts) {
+			super();
+			this.score = verdicts.stream().map(verdict -> verdict.getScore())
+					.reduce((x, y) -> x.add(y)).orElse(null);
+			this.maximumScore = verdicts.stream()
+					.map(verdict -> verdict.getMaximumScore())
+					.reduce((x, y) -> x.add(y)).orElse(null);
+			this.verdicts = verdicts;
+		}
+
+		public BigDecimal getMaximumScore() {
+			return this.maximumScore;
+		}
+
+		public BigDecimal getScore() {
+			return this.score;
+		}
+
+		public List<VerdictDto> getVerdicts() {
+			return this.verdicts;
+		}
+
+		public void setMaximumScore(BigDecimal maximumScore) {
+			this.maximumScore = maximumScore;
+		}
+
+		public void setScore(BigDecimal score) {
+			this.score = score;
+		}
+
+		public void setVerdicts(List<VerdictDto> verdicts) {
+			this.verdicts = verdicts;
+		}
+	}
 
 	@Autowired
 	private SolutionService solutionService;
+
+	@Autowired
+	private VerdictStatusController verdictJSONController;
+	private final Cache<Pair<Locale, Solution>, SolutionDto> cache = CacheBuilder
+			.newBuilder().maximumSize(1000)
+			.expireAfterWrite(2, TimeUnit.SECONDS).build();
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
 			+ SecurityExpressionConstants.OR
@@ -51,10 +108,26 @@ public class SolutionStatusController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST
 			+ ')')
-	@RequestMapping(value = "/api/solution/{id}/verdicts", method = RequestMethod.GET)
-	public List<Verdict> viewSolutionStatus(
+	@RequestMapping(method = RequestMethod.GET)
+	@Cacheable(value = "solutions", key = "#solution.id")
+	public @ResponseBody SolutionDto solutionApi(
 			@PathVariable(value = "id") final Solution solution,
-			final Principal principal) {
-		return this.solutionService.getVerdictsVisibleDuringContest(solution);
+			final Locale locale) {
+		SolutionDto cached = null;
+		if ((cached = this.cache.getIfPresent(new Pair<>(locale, solution))) != null) {
+			return cached;
+		}
+		final List<Verdict> verdicts = this.solutionService
+				.getVerdictsVisibleDuringContest(solution);
+		final SolutionDto dto = new SolutionDto(verdicts
+				.stream()
+				.sorted((l, r) -> Long.compare(l.getId(), r.getId()))
+				.map(verdict -> this.verdictJSONController.showVerdict(verdict,
+						locale)).collect(Collectors.toList()));
+		if (verdicts.stream().anyMatch(verdict -> !verdict.isTested())) {
+			return dto;
+		}
+		this.cache.put(new Pair<>(locale, solution), dto);
+		return dto;
 	}
 }
