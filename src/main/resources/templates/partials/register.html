@@ -67,7 +67,16 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-default">{{'register.registerButton' | translate}}</button>
+        <a ui-sref="eula" translate="register.form.eulaLabel"></a>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="eulaAccepted"></input>
+
+                {{'register.form.eulaCheckbox'|translate}}
+            </label>
+        </div>
+       
+        <button type="submit" class="btn btn-default" ng-disabled="!eulaAccepted">{{'register.registerButton' | translate}}</button>
     </form>
 </body>
 

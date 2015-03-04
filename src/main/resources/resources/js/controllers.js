@@ -30,6 +30,10 @@ var stateList = [{
     "url": "/forbidden",
     "templateUrl": "/partials/forbidden"
 }, {
+    "name": "eula",
+    "url": "/eula",
+    "templateUrl": "/partials/eula"
+}, {
     "name": "taskView",
     "url": "/task/{taskId:[0-9]+}?contestId",
     "templateUrl": "/partials/task",
