@@ -37,7 +37,7 @@ define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) 
                     return $http({
                         method: 'PATCH',
                         url: passwordPatchUrl,
-                        data: Util.emptyToNull(passwordObj)
+                        data: _.omit(Util.emptyToNull(passwordObj), "passwordConfirmation")
                     }).then(_.property("data"));
                 },
                 countPendingUsers: function() {
