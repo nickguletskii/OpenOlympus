@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.MultipartConfigElement;
 import javax.sql.DataSource;
@@ -202,7 +203,7 @@ public class Application {
 	public EmbeddedServletContainerFactory servletContainer() {
 		final TomcatEmbeddedServletContainerFactory containerFactory = new TomcatEmbeddedServletContainerFactory(
 				this.serverPort);
-		containerFactory.setSessionTimeout(30);
+		containerFactory.setSessionTimeout(30, TimeUnit.DAYS);
 		return containerFactory;
 	}
 
