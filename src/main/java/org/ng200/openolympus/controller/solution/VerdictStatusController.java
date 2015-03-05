@@ -23,6 +23,7 @@
 package org.ng200.openolympus.controller.solution;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Locale;
 
 import org.ng200.openolympus.Assertions;
@@ -48,16 +49,16 @@ public class VerdictStatusController {
 		private long id;
 		private BigDecimal score;
 		private BigDecimal maximumScore;
-		private long cpuTime;
-		private long realTime;
+		private Duration cpuTime;
+		private Duration realTime;
 		private long memoryPeak;
 		private String message;
 		boolean tested;
 		boolean success;
 
 		public VerdictDto(long id, BigDecimal score, BigDecimal maximumScore,
-				long cpuTime, long realTime, long memoryPeak, String message,
-				boolean tested, boolean success) {
+				Duration cpuTime, Duration realTime, long memoryPeak,
+				String message, boolean tested, boolean success) {
 			super();
 			this.id = id;
 			this.score = score;
@@ -68,10 +69,6 @@ public class VerdictStatusController {
 			this.message = message;
 			this.tested = tested;
 			this.success = success;
-		}
-
-		public long getCpuTime() {
-			return this.cpuTime;
 		}
 
 		public long getId() {
@@ -90,10 +87,6 @@ public class VerdictStatusController {
 			return this.message;
 		}
 
-		public long getRealTime() {
-			return this.realTime;
-		}
-
 		public BigDecimal getScore() {
 			return this.score;
 		}
@@ -104,10 +97,6 @@ public class VerdictStatusController {
 
 		public boolean isTested() {
 			return this.tested;
-		}
-
-		public void setCpuTime(long cpuTime) {
-			this.cpuTime = cpuTime;
 		}
 
 		public void setId(long id) {
@@ -126,7 +115,19 @@ public class VerdictStatusController {
 			this.message = message;
 		}
 
-		public void setRealTime(long realTime) {
+		public Duration getCpuTime() {
+			return cpuTime;
+		}
+
+		public void setCpuTime(Duration cpuTime) {
+			this.cpuTime = cpuTime;
+		}
+
+		public Duration getRealTime() {
+			return realTime;
+		}
+
+		public void setRealTime(Duration realTime) {
 			this.realTime = realTime;
 		}
 

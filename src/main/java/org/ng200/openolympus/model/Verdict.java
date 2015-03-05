@@ -24,6 +24,7 @@ package org.ng200.openolympus.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Duration;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -59,6 +60,22 @@ public class Verdict implements Serializable {
 	})
 	private Solution solution;
 
+	public Duration getCpuTime() {
+		return cpuTime;
+	}
+
+	public void setCpuTime(Duration cpuTime) {
+		this.cpuTime = cpuTime;
+	}
+
+	public Duration getRealTime() {
+		return realTime;
+	}
+
+	public void setRealTime(Duration realTime) {
+		this.realTime = realTime;
+	}
+
 	private SolutionResult.Result status = SolutionResult.Result.WAITING;
 
 	private BigDecimal score = BigDecimal.ZERO;
@@ -66,8 +83,8 @@ public class Verdict implements Serializable {
 	private BigDecimal maximumScore = BigDecimal.ONE;
 
 	private String pathToTest;
-	private long cpuTime = -1;
-	private long realTime = -1;
+	private Duration cpuTime = null;
+	private Duration realTime = null;
 	private long memoryPeak = -1;
 	private boolean isViewableWhenContestRunning;
 	private long unauthorisedSyscall;
@@ -108,10 +125,6 @@ public class Verdict implements Serializable {
 		return this.additionalInformation;
 	}
 
-	public long getCpuTime() {
-		return this.cpuTime;
-	}
-
 	public long getId() {
 		return this.id;
 	}
@@ -126,10 +139,6 @@ public class Verdict implements Serializable {
 
 	public String getPathToTest() {
 		return this.pathToTest;
-	}
-
-	public long getRealTime() {
-		return this.realTime;
 	}
 
 	public BigDecimal getScore() {
@@ -172,10 +181,6 @@ public class Verdict implements Serializable {
 		this.additionalInformation = additionalInformation;
 	}
 
-	public void setCpuTime(final long cpuTime) {
-		this.cpuTime = cpuTime;
-	}
-
 	public void setId(final long id) {
 		this.id = id;
 	}
@@ -190,10 +195,6 @@ public class Verdict implements Serializable {
 
 	public void setPathToTest(final String pathToTest) {
 		this.pathToTest = pathToTest;
-	}
-
-	public void setRealTime(final long realTime) {
-		this.realTime = realTime;
 	}
 
 	public void setScore(final BigDecimal score) {

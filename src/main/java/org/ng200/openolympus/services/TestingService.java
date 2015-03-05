@@ -25,6 +25,7 @@ package org.ng200.openolympus.services;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -243,11 +244,11 @@ public class TestingService {
 
 			final SolutionResult result = checkingResult.getResult()
 					.getSecond();
-
+			
 			verdict.setScore(result.getScore());
 			verdict.setMemoryPeak(result.getMemoryPeak());
-			verdict.setCpuTime(result.getCpuTime());
-			verdict.setRealTime(result.getRealTime());
+			verdict.setCpuTime(Duration.ofMillis(result.getCpuTime()));
+			verdict.setRealTime(Duration.ofMillis(result.getRealTime()));
 
 			verdict.setStatus(result.getResult());
 			switch (result.getResult()) {
