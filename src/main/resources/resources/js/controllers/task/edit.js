@@ -25,6 +25,8 @@ define(['oolutil', 'lodash', 'codemirror/mode/textile/textile', "textile"],
         return function($timeout, $q, $scope, $rootScope, $http,
             $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, editTaskData) {
             $scope.$apply(function() {
+                $scope.taskId = $stateParams.taskId;
+
                 $scope.editorOptions = {
                     lineWrapping: true,
                     lineNumbers: true,
@@ -70,6 +72,7 @@ define(['oolutil', 'lodash', 'codemirror/mode/textile/textile', "textile"],
                     $scope.uploadFailure = false;
                     $scope.processing = false;
                 }
+                $scope.reset = reset;
 
                 $scope.modifyTask = function(task) {
                     $scope.isFormVisible = false;

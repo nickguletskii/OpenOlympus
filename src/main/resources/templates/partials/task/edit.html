@@ -89,8 +89,9 @@
                 <progressbar value="uploadProgress" type="{{ uploadProgressBarColour() }}" class="progress-striped" ng-class="{'active': uploading }"><b>{{uploadProgress}}%</b>
                 </progressbar>
                 <label ng-if="processing">{{'task.modificationForm.labels.processing' | translate}}</label>
-                <button class="btn btn-danger" ng-if="uploadFailure">{{'task.modificationForm.labels.back' | translate}}</button>
-                <button class="btn btn-success" ng-if="uploadSuccess">{{'task.modificationForm.labels.again' | translate}}</button>
+                <button class="btn btn-danger" ng-if="uploadFailure" ng-click="reset()">{{'task.modificationForm.labels.back' | translate}}</button>
+                <button class="btn btn-success" ng-if="uploadSuccess" ng-click="reset()">{{'task.modificationForm.labels.again' | translate}}</button>
+                <a class="btn btn-success" ng-if="uploadSuccess" ui-sref="taskView({taskId: taskId})">{{'task.modificationForm.labels.toTask' | translate}}</a>
             </div>
         </div>
     </form>
