@@ -45,6 +45,16 @@ public class ContestDto {
 	@NotNull(message = "empty")
 	private Duration duration;
 
+	private boolean showFullTestsDuringContest;
+
+	public boolean isShowFullTestsDuringContest() {
+		return showFullTestsDuringContest;
+	}
+
+	public void setShowFullTestsDuringContest(boolean showFullTestsDuringContest) {
+		this.showFullTestsDuringContest = showFullTestsDuringContest;
+	}
+
 	public Duration getDuration() {
 		return this.duration;
 	}

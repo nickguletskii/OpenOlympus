@@ -146,8 +146,6 @@ public class TaskService {
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER
-			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@PostAuthorize(SecurityExpressionConstants.IS_ADMIN
 			+ SecurityExpressionConstants.OR + " #returnObject.published")

@@ -57,7 +57,6 @@ public class StorageService implements Serializable {
 	@Autowired
 	private transient TaskDescriptionProvider taskDescriptionProvider;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public Path createSolutionDirectory() throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault()

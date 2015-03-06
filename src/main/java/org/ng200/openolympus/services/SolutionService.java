@@ -163,10 +163,12 @@ public class SolutionService {
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND + "#solution.user"
-			+ SecurityExpressionConstants.IS_OWNER + ')')
+			+ SecurityExpressionConstants.AND + '(' + "#solution.user"
+			+ SecurityExpressionConstants.IS_OWNER + ')' + ')')
 	public List<Verdict> getVerdictsVisibleDuringContest(final Solution solution) {
-		if (this.contestService.getRunningContest() == null) {
+		if (this.contestService.getRunningContest() == null
+				|| this.contestService.getRunningContest()
+						.isShowFullTestsDuringContest()) {
 			return this.verdictRepository.findBySolutionOrderByIdAsc(solution);
 		}
 		return this.verdictRepository

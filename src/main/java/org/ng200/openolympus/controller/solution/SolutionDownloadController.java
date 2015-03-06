@@ -63,7 +63,7 @@ public class SolutionDownloadController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.USER_IS_OWNER
 			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST
+			+ "@oolsec.isSolutionInCurrentContest(#solution)"
 			+ ')')
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<FileSystemResource> solutionDownload(

@@ -73,6 +73,8 @@ public class Contest implements Serializable {
 	@LastModifiedDate
 	private Date lastModifiedDate = Date.from(Instant.now());
 
+	private boolean showFullTestsDuringContest;
+	
 	@CreatedBy
 	@ManyToOne(fetch = FetchType.LAZY, cascade = {
 			CascadeType.REFRESH,
@@ -106,12 +108,13 @@ public class Contest implements Serializable {
 	}
 
 	public Contest(final Date startTime, final Duration duration,
-			final String name, final Set<Task> tasks) {
+			final String name, final Set<Task> tasks, boolean showFullTestsDuringContest) {
 		super();
 		this.startTime = startTime;
 		this.duration = duration;
 		this.name = name;
 		this.tasks = tasks;
+		this.showFullTestsDuringContest = showFullTestsDuringContest;
 	}
 
 	@Override
@@ -216,5 +219,13 @@ public class Contest implements Serializable {
 
 	public void setTasks(final Set<Task> tasks) {
 		this.tasks = tasks;
+	}
+
+	public boolean isShowFullTestsDuringContest() {
+		return showFullTestsDuringContest;
+	}
+
+	public void setShowFullTestsDuringContest(boolean showFullTestsDuringContest) {
+		this.showFullTestsDuringContest = showFullTestsDuringContest;
 	}
 }

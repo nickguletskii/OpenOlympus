@@ -30,6 +30,7 @@ import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Task;
 import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.repositories.ContestParticipationRepository;
 import org.ng200.openolympus.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,11 +80,13 @@ public class SecurityService {
 		final Contest runningContest = this.contestService.getRunningContest();
 		return runningContest == null
 				|| (this.isTaskInContest(solution.getTask(), runningContest)
-						&& !runningContest.getStartTime().toInstant()
-								.isAfter(solution.getTimeAdded().toInstant()) && this.contestService
+						&&
+
+						runningContest.getStartTime().toInstant()
+								.isBefore(solution.getTimeAdded().toInstant()) && this.contestService
 						.getContestEndTimeForUser(runningContest,
 								solution.getUser()).toInstant()
-						.isBefore(solution.getTimeAdded().toInstant()));
+						.isAfter(solution.getTimeAdded().toInstant()));
 	}
 
 	public boolean isSuperuser(final Principal principal) {
@@ -102,6 +105,8 @@ public class SecurityService {
 	}
 
 	public boolean isTaskInContest(Task task, Contest contest) {
+		if (contest.getTasks() == null)
+			return false;
 		return contest.getTasks().contains(task);
 	}
 
@@ -117,5 +122,12 @@ public class SecurityService {
 
 	public boolean noLockdown() {
 		return !this.isOnLockdown();
+	}
+
+	public boolean canViewVerdictDuringContest(Verdict verdict) {
+		final Contest runningContest = this.contestService.getRunningContest();
+		return runningContest == null
+				|| runningContest.isShowFullTestsDuringContest()
+				|| verdict.isViewableWhenContestRunning();
 	}
 }

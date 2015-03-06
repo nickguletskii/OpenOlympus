@@ -280,7 +280,7 @@ public class ContestTest {
 	public Contest createContestDirectly(Duration duration) throws Exception {
 		return this.contestService.saveContest(new Contest(Date.from(Instant
 				.now()), duration, "TestContest_" + ContestTest.id++,
-				new HashSet<Task>()));
+				new HashSet<Task>(), false));
 	}
 
 	public Contest createContestUsingAPI(int duration) throws Exception {

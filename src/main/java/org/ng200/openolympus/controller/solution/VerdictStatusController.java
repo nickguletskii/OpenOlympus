@@ -155,23 +155,16 @@ public class VerdictStatusController {
 	private ContestService contestService;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
-			+ SecurityExpressionConstants.OR
-			+ '('
+			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
+			+ SecurityExpressionConstants.AND + '(' + "#verdict.solution.user"
+			+ SecurityExpressionConstants.IS_OWNER + ')'
 			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.SOLUTION_INSIDE_CURRENT_CONTEST_OR_NO_CONTEST
-			+ ')')
+			+ " @oolsec.isSolutionInCurrentContest(#verdict.solution) and @oolsec.canViewVerdictDuringContest(#verdict) " + ')')
 	@RequestMapping(value = "/api/verdict", method = RequestMethod.GET)
 	public @ResponseBody VerdictDto showVerdict(
 			@RequestParam(value = "id") final Verdict verdict,
 			final Locale locale) {
-		if (this.contestService.getRunningContest() != null
-				&& !verdict.isViewableWhenContestRunning()) {
-			throw new ForbiddenException(
-					"security.contest.cantAccessDuringContest");
-		}
 		Assertions.resourceExists(verdict);
 
 		return new VerdictDto(verdict.getId(), verdict.getScore(),
