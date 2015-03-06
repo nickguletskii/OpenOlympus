@@ -25,6 +25,7 @@ define(['oolutil', 'lodash'],
         return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
             $location, $stateParams, $state, AuthenticationProvider, $translate) {
             $scope.$apply(function() {
+                AuthenticationProvider.update();
                 $scope.showAdministratorApprovalRequiredMessage = $stateParams.showAdministratorApprovalRequiredMessage;
 
                 $http.get("/api/security/userStatus").success(function(response) {
