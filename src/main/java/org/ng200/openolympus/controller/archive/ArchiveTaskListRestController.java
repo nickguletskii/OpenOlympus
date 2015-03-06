@@ -92,7 +92,7 @@ public class ArchiveTaskListRestController {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
-	@RequestMapping(value = "/api/archive/taskCount", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/archive/tasksCount", method = RequestMethod.GET)
 	@JsonView(UnprivilegedView.class)
 	public Long countUsers() {
 		return this.taskService.countTasks();
