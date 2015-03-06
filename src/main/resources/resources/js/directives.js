@@ -22,7 +22,7 @@
  */
 'use strict';
 
-define(['angular', 'services', 'lodash', 'moment'], function(angular, services, _, moment) {
+define(['angular', 'services', 'lodash', 'moment', 'textile'], function(angular, services, _, moment, textile) {
 
     /* Directives */
 
@@ -263,6 +263,16 @@ define(['angular', 'services', 'lodash', 'moment'], function(angular, services, 
                 scope.$watch(attrs.dynamic, function(html) {
                     element.html(html);
                     $compile(element.contents())(scope);
+                });
+            }
+        };
+    }).directive('textile', function($compile) {
+        return {
+            restrict: 'EA',
+            replace: true,
+            link: function(scope, element, attrs) {
+                scope.$watch(attrs.textile, function(txtl) {
+                    element.html(textile(txtl || ""));
                 });
             }
         };

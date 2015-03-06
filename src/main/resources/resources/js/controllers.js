@@ -50,6 +50,7 @@ var stateList = [{
     "templateUrl": "/partials/task/edit",
     "controllerPath": "controllers/task/edit",
     "controller": "TaskModificationController",
+    "fluidContainer": true,
     "resolve": {
         "editTaskData": function(TaskService, $stateParams) {
             return TaskService.getTaskEditData($stateParams.taskId);

@@ -28,7 +28,7 @@
 <head th:replace="fragments/head::head (title=#{openolympus.title})">
 </head>
 
-<body ui-sref-opts="reload" ng-cloak="">
+<body ui-sref-opts="reload" ng-cloak="" ng-class="{fullScreen: fullScreen}">
     <div th:replace="fragments/sitewidescripts::bodyStart"></div>
     <div th:replace="fragments/header::header"></div>
     <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'" ng-show="!showErrorModal" ng-cloak="">

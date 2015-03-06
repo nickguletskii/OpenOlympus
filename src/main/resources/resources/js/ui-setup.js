@@ -91,6 +91,9 @@ define(
                     } else
                         $rootScope.showErrorModal = true;
                 });
+            $rootScope.toggleFullscreen = function(fullScreen) {
+                $rootScope.fullScreen = fullScreen;
+            };
         });
 
         angular.bootstrap(document, ['ool']);

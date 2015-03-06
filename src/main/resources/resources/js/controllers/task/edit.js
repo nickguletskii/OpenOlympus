@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash', 'codemirror/mode/textile/textile'],
+define(['oolutil', 'lodash', 'codemirror/mode/textile/textile', "textile"],
     function(Util, _) {
         return function($timeout, $q, $scope, $rootScope, $http,
             $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, editTaskData) {
@@ -31,10 +31,13 @@ define(['oolutil', 'lodash', 'codemirror/mode/textile/textile'],
                     mode: 'textile',
                     theme: 'solarized light'
                 };
-                $scope.task = {};
-                $scope.task.name = editTaskData.name;
-                $scope.task.published = editTaskData.published;
-                $scope.task.descriptionText = editTaskData.descriptionText;
+                $timeout(function() {
+                    $scope.task = {
+                        name: editTaskData.name,
+                        published: editTaskData.published,
+                        descriptionText: editTaskData.descriptionText
+                    };
+                }, 1);
 
                 $scope.serverErrorReporter = new ServersideFormErrorReporter();
                 $scope.taskModificationForm.forceValidation = true;

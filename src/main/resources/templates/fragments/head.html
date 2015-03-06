@@ -67,7 +67,8 @@
 			"angular-no-captcha": lib("angular-no-captcha/src/angular-no-captcha"),
 			"codemirror": lib("codemirror/lib/codemirror.min"),
 			"moment": lib("moment/moment"),
-			"moment-tz": lib("moment/moment-tz")
+			"moment-tz": lib("moment/moment-tz"),
+			"textile": lib("textile-js/lib/textile")
 		},
 		packages: [{
 			name: "when",
@@ -139,6 +140,9 @@
 			},
 			'moment-tz': {
 				deps: ['moment']
+			},
+			'textile': {
+				exports: 'textile'
 			}
 		},
 		priority: ["angular", "restangular"]
