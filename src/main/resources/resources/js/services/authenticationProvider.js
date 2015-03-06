@@ -92,7 +92,7 @@ define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) 
                         url: '/logout',
                         transformRequest: transform,
                         data: {}
-                    }).success(function(x) {
+                    }).then(function() {
                         update();
                     });
                 }
