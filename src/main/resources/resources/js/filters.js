@@ -49,5 +49,11 @@ define(['angular', 'services', 'lodash'], function(angular, services, _) {
             return function(input) {
                 return "recaptcha." + input;
             };
+        }).filter("toKB", function() {
+            return function(input) {
+                if (input === -1)
+                    return -1;
+                return Math.floor(input / 1024);
+            };
         });
 });

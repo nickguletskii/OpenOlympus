@@ -49,12 +49,12 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="verdict in solution.verdicts" ng-class="{success: verdict.score===verdict.maximumScore, danger: verdict.score!==verdict.maximumScore &amp;&amp; verdict.tested}">
+            <tr ng-repeat="verdict in solution.verdicts track by verdict.id" ng-class="{success: verdict.score===verdict.maximumScore, danger: verdict.score!==verdict.maximumScore &amp;&amp; verdict.tested}">
                 <td>{{verdict.score | minusOneNoValue}}</td>
                 <td>{{verdict.maximumScore | minusOneNoValue}}</td>
                 <td>{{verdict.cpuTime | minusOneNoValue}}</td>
                 <td>{{verdict.realTime | minusOneNoValue}}</td>
-                <td>{{verdict.memoryPeak | minusOneNoValue}}</td>
+                <td>{{verdict.memoryPeak | toKB | minusOneNoValue}} KB</td>
                 <td>{{verdict.message | translate}}</td>
             </tr>
         </tbody>

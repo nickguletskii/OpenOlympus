@@ -32,25 +32,28 @@ define(['oolutil', 'lodash', 'angular'],
                 var delay = DELAY_MIN;
 
                 function setData(solution) {
-                    if(!Util.equalsWithoutAngular($scope.solution, solution)){
+                    if (!Util.equalsWithoutAngular($scope.solution, solution)) {
                         $scope.solution = solution;
                         delay = DELAY_MIN;
                     }
+                    return solution;
                 }
 
-                function update() {
-                    SolutionService.getVerdicts($stateParams.solutionId).then(setData);
+                function update(callback) {
+                    SolutionService.getVerdicts($stateParams.solutionId).then(setData).then(callback);
                 }
                 setData(data);
 
                 var promise;
-                function poller(){
+
+                function poller() {
                     delay = Math.min(delay + DELAY_STEP, DELAY_MAX);
-                    update();
-                    promise = $timeout(poller, delay);
+                    update(function() {
+                        promise = $timeout(poller, delay);
+                    });
                 }
                 promise = $timeout(poller, delay);
-                $scope.$on('$destroy', function(){
+                $scope.$on('$destroy', function() {
                     $timeout.cancel(promise);
                 });
 

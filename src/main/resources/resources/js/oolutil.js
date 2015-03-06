@@ -33,6 +33,8 @@ define(['lodash'], function(_) {
     };
 
     var removeAngularElements = function(obj) {
+        if((typeof obj) !== "object")
+            return obj;
         return _.mapValues(_.pick(obj, function(name) {
             if (typeof name == "string")
                 return name.substring(0, 1) == "$";
