@@ -29,7 +29,6 @@ import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationFailureHan
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationSuccessHandler;
 import org.ng200.openolympus.controller.auth.RecaptchaAuthenticationFilter;
 import org.ng200.openolympus.model.Role;
-import org.ng200.openolympus.repositories.OlympusPersistentTokenRepositoryImpl;
 import org.ng200.openolympus.services.UserSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +46,9 @@ import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -60,10 +61,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private UserSecurityService userSecurityService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	@Autowired
-	private OlympusPersistentTokenRepositoryImpl olympusPersistentTokenRepositoryImpl;
 	@Value("${persistentTokenKey}")
 	private String persistentTokenKey;
+	@Autowired
+	private PersistentTokenRepository persistentTokenRepository;
 
 	private static String[] permittedAny = {
 			"/",
@@ -156,7 +157,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.permitAll().and()
 		.rememberMe()
 		.rememberMeServices(this.rememberMeServices())
-		.tokenRepository(this.olympusPersistentTokenRepositoryImpl)
+		.tokenRepository(persistentTokenRepository)
 		.key(this.persistentTokenKey).tokenValiditySeconds(60*60*24*14).userDetailsService(this.userSecurityService).and().authenticationProvider(this.rememberMeAuthenticationProvider())
 		.authorizeRequests()
 		.antMatchers(WebSecurityConfig.permittedAny).permitAll().and()
@@ -192,7 +193,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public RememberMeServices rememberMeServices() {
 		final PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
 				this.persistentTokenKey, this.userSecurityService,
-				this.olympusPersistentTokenRepositoryImpl) {
+				this.persistentTokenRepository) {
 
 			@Override
 			protected String extractRememberMeCookie(HttpServletRequest request) {

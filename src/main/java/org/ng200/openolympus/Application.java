@@ -68,6 +68,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -236,5 +238,22 @@ public class Application {
 		cacheManager.setCaches(Lists.from(new ConcurrentMapCache("solutions"),
 				new ConcurrentMapCache("contests")));
 		return cacheManager;
+	}
+
+	@Bean
+	public PersistentTokenRepository persistentTokenRepository() {
+		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl() {
+
+			@Override
+			protected void initDao() {
+				getJdbcTemplate()
+						.execute(
+								"create table if not exists persistent_logins (username varchar(64) not null, series varchar(64) primary key, "
+										+ "token varchar(64) not null, last_used timestamp not null)");
+			}
+
+		};
+		db.setDataSource(dataSource());
+		return db;
 	}
 }
