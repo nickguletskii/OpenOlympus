@@ -28,7 +28,14 @@
 <head th:replace="fragments/head::head (title=#{openolympus.title})">
 </head>
 
-<body ui-sref-opts="reload" ng-cloak="" ng-class="{fullScreen: fullScreen}">
+<body ui-sref-opts="reload" ng-class="{fullScreen: fullScreen}">
+    <div ng-show="!hideResourcesLoading" class="loadingResourcesOverlay">
+        <div class="loadingResourcesOverlayMid text-center">
+            <div class="spinner-4em"></div>
+            <h1 class="bg-primary">OpenOlympus</h1>
+            <h3 class="bg-primary">Loading...</h3>
+        </div>
+    </div>
     <div th:replace="fragments/sitewidescripts::bodyStart"></div>
     <div th:replace="fragments/header::header"></div>
     <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'" ng-show="!showErrorModal" ng-cloak="">
@@ -47,6 +54,7 @@
             <button class="btn btn-danger" onClick="window.location.reload()">{{'error.reloadPage' | translate}}</button>
         </div>
     </div>
+
 </body>
 
 </html>

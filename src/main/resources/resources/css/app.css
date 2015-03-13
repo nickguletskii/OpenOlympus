@@ -112,3 +112,30 @@ body {
 .fullScreen {
     overflow: hidden;
 }
+.loadingResourcesOverlay {
+    background-color: #2c3e50;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 200000 !important;
+    display: table;
+}
+.loadingResourcesOverlayMid {
+    display: table-cell;
+    vertical-align: middle;
+    width:100%;
+}
+.loadingResourcesOverlayMid > .spinner-4em {
+    margin: auto;
+    background-color: white;
+    text-align: center !important;
+}
+
+.loadingResourcesOverlay.ng-hide {
+    -webkit-animation-name: slideOutUp;
+    -webkit-animation-duration: 0.2s;
+    animation-name: slideOutUp;
+    animation-duration: 0.2s;
+}

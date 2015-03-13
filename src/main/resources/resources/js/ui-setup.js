@@ -21,8 +21,14 @@
  * THE SOFTWARE.
  */
 define(
-    ["jquery", "bootstrap", "angular", "app", "oolutil"],
+    ["jquery", "bootstrap", "angular", "app", "oolutil", "angular-animate"],
     function($, bootstrap, angular, app, Util) {
+        app
+            .run(function($rootScope,$timeout) {
+                $timeout(function() {
+                    $rootScope.hideResourcesLoading = true;
+                }, 1);
+            });
         var ie = (function() {
             var undef, v = 3,
                 div = document.createElement('div');
@@ -63,7 +69,7 @@ define(
                 "</div>");
         }]);
 
-        app.run(function($rootScope, $stateParams, AuthenticationProvider, $location) {
+        app.run(function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout) {
             $rootScope.stateParams = $stateParams;
             $rootScope.$on('$stateChangeStart',
                 function(event, toState, toParams, fromState, fromParams) {
