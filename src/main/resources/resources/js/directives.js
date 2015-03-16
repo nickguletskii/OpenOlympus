@@ -73,7 +73,6 @@ define(['angular', 'services', 'lodash', 'moment', 'textile'], function(angular,
                 }).html("{{'" + attrs.label + "' | translate}}");
                 element.after(wrapper);
                 element.removeAttr("oolinput");
-                element.addClass("form-control");
                 attrs.$set("name", name);
                 wrapper.append(label);
                 var children = element.parent().children();
