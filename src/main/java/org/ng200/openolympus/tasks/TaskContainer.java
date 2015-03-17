@@ -195,14 +195,8 @@ public class TaskContainer {
 	public Class<? extends SolutionJudgeFactory> loadFactoryClass(
 			final String className) throws MalformedURLException,
 			ClassNotFoundException {
-		try {
-			return (Class<? extends SolutionJudgeFactory>) TaskContainer.class
-					.getClassLoader().loadClass(className);
-		} catch (final ClassNotFoundException e) {
-
-			return (Class<? extends SolutionJudgeFactory>) getClassLoader()
-					.loadClass(className);
-		}
+		return (Class<? extends SolutionJudgeFactory>) getClassLoader()
+				.loadClass(className);
 	}
 
 	public void loadSettings() throws IOException {
@@ -217,7 +211,8 @@ public class TaskContainer {
 	public ClassLoader getClassLoader() throws MalformedURLException {
 		@SuppressWarnings("resource")
 		final ClassLoader classLoader = new URLClassLoader(getClassLoaderURLs()
-				.toArray(new URL[0]));
+				.toArray(new URL[0]), Thread.currentThread()
+				.getContextClassLoader());
 		return classLoader;
 	}
 
