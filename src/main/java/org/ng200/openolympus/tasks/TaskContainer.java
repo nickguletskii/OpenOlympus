@@ -44,6 +44,7 @@ import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SharedTemporaryStorageFactory;
 import org.ng200.openolympus.cerberus.SolutionJudge;
 import org.ng200.openolympus.cerberus.SolutionJudgeFactory;
+import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.model.Solution;
 import org.ng200.openolympus.model.Verdict;
 import org.ng200.openolympus.services.SolutionService;
@@ -111,6 +112,8 @@ public class TaskContainer {
 		this.solutionJudgeFactory = this.loadFactoryClass(
 				this.factoryClassName.trim()).newInstance();
 
+		logger.info("Creating solution judge factory: {}", solutionJudgeFactory
+				.getClass().toString());
 	}
 
 	public void applyToJudge(
@@ -196,15 +199,8 @@ public class TaskContainer {
 			return (Class<? extends SolutionJudgeFactory>) TaskContainer.class
 					.getClassLoader().loadClass(className);
 		} catch (final ClassNotFoundException e) {
-			final Path jarFile = this.path.resolve("task.jar");
-			final URL url = jarFile.toUri().toURL();
-			final URL[] urls = new URL[] {
-				url
-			};
-			@SuppressWarnings("resource")
-			final ClassLoader classLoader = new URLClassLoader(urls);
 
-			return (Class<? extends SolutionJudgeFactory>) classLoader
+			return (Class<? extends SolutionJudgeFactory>) getClassLoader()
 					.loadClass(className);
 		}
 	}
@@ -216,6 +212,22 @@ public class TaskContainer {
 		}
 		this.factoryClassName = this.properties.getProperty("judgeFactory",
 				"org.ng200.openolympus.cerberus.DefaultSolutionJudgeFactory");
+	}
+
+	public ClassLoader getClassLoader() throws MalformedURLException {
+		@SuppressWarnings("resource")
+		final ClassLoader classLoader = new URLClassLoader(getClassLoaderURLs()
+				.toArray(new URL[0]));
+		return classLoader;
+	}
+
+	public List<URL> getClassLoaderURLs() throws MalformedURLException {
+		final Path jarFile = this.path.resolve("task.jar");
+		final URL url = jarFile.toUri().toURL();
+		final URL[] urls = new URL[] {
+			url
+		};
+		return Lists.from(urls);
 	}
 
 }

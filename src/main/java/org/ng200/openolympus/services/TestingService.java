@@ -24,14 +24,14 @@ package org.ng200.openolympus.services;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -125,7 +125,6 @@ public class TestingService {
 	private VerdictRepository verdictRepository;
 
 	private TaskContainerCache taskContainerCache;
-	private final Map<Long, TaskContainer> taskContainers = new HashMap<>();
 
 	private final Cache<Integer, Pair<String, String>> internalErrors = CacheBuilder
 			.newBuilder().maximumSize(30).build();
@@ -217,12 +216,22 @@ public class TestingService {
 					.setDispatchExpirationSchedule(new JPPFSchedule(60000L));
 			job.getSLA().setMaxDispatchExpirations(3);
 
+			TaskContainer taskContainer = taskContainerCache
+					.getTaskContainerForTask(verdict.getSolution().getTask());
+
+			Thread.currentThread().setContextClassLoader(
+					new URLClassLoader(taskContainer.getClassLoaderURLs()
+							.toArray(new URL[0]), Thread.currentThread()
+							.getContextClassLoader()));
+			
 			job.add(new JacksonSerializationDelegatingTask<>(
 					new VerdictCheckingTask(judge, testFiles, maximumScore,
-							properties)));
+							properties), taskContainer.getClassLoaderURLs()));
 
 			job.setBlocking(true);
 
+			jppfClient.registerClassLoader(taskContainer.getClassLoader(),
+					job.getUuid());
 			this.jppfClient.submitJob(job);
 			@SuppressWarnings("unchecked")
 			final org.jppf.node.protocol.Task<String> task = (org.jppf.node.protocol.Task<String>) job
@@ -244,7 +253,7 @@ public class TestingService {
 
 			final SolutionResult result = checkingResult.getResult()
 					.getSecond();
-			
+
 			verdict.setScore(result.getScore());
 			verdict.setMemoryPeak(result.getMemoryPeak());
 			verdict.setCpuTime(Duration.ofMillis(result.getCpuTime()));
@@ -325,13 +334,22 @@ public class TestingService {
 					.setDispatchExpirationSchedule(new JPPFSchedule(20000L));
 			job.getSLA().setMaxDispatchExpirations(5);
 
+			TaskContainer taskContainer = taskContainerCache
+					.getTaskContainerForTask(solution.getTask());
+
+			Thread.currentThread().setContextClassLoader(
+					new URLClassLoader(taskContainer.getClassLoaderURLs()
+							.toArray(new URL[0]), Thread.currentThread()
+							.getContextClassLoader()));
 			job.add(new JacksonSerializationDelegatingTask<>(
 					new SolutionCompilationTask(judge, Lists
 							.from(storageService.getSolutionFile(solution)),
-							properties)));
+							properties), taskContainer.getClassLoaderURLs()));
 
 			job.setBlocking(false);
 
+			jppfClient.registerClassLoader(taskContainer.getClassLoader(),
+					job.getUuid());
 			this.jppfClient.submitJob(job);
 			final JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) job
 					.awaitResults().get(0)).getResultOrThrowable();
@@ -439,7 +457,7 @@ public class TestingService {
 	}
 
 	public void reloadTasks() {
-		this.taskContainers.clear();
+		this.taskContainerCache.clear();
 	}
 
 	public void shutdownNow() {

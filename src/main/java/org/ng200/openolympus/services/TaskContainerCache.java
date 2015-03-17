@@ -77,4 +77,8 @@ public class TaskContainerCache {
 					}
 				});
 	}
+
+	public void clear() {
+		taskContainers.clear();
+	}
 }
