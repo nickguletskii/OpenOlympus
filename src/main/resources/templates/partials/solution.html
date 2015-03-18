@@ -37,7 +37,7 @@
                 <th width="50">{{ 'solution.verdict.cpuTime' | translate }}</th>
                 <th width="50">{{ 'solution.verdict.realTime' | translate }}</th>
                 <th width="50">{{ 'solution.verdict.memory' | translate }}</th>
-                <th>{{ 'solution.verdict.message' | translate}}</th>
+                <th>{{ 'solution.verdict.message' | translate }}</th>
             </tr>
             <tr id="totalHeader" class="total">
                 <td>{{solution.score}}</td>
@@ -55,7 +55,7 @@
                 <td>{{verdict.cpuTime | minusOneNoValue}}</td>
                 <td>{{verdict.realTime | minusOneNoValue}}</td>
                 <td>{{verdict.memoryPeak | toKB | minusOneNoValue}} KB</td>
-                <td>{{verdict.message | translate}}</td>
+                <td translate="{{verdict.message}}" translate-values="{info: verdict.additionalInformation}"></td>
             </tr>
         </tbody>
     </table>

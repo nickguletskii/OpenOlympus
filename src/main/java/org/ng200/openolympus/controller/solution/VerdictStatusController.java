@@ -55,10 +55,20 @@ public class VerdictStatusController {
 		private String message;
 		boolean tested;
 		boolean success;
+		private String additionalInformation;
+
+		public String getAdditionalInformation() {
+			return additionalInformation;
+		}
+
+		public void setAdditionalInformation(String additionalInformation) {
+			this.additionalInformation = additionalInformation;
+		}
 
 		public VerdictDto(long id, BigDecimal score, BigDecimal maximumScore,
 				Duration cpuTime, Duration realTime, long memoryPeak,
-				String message, boolean tested, boolean success) {
+				String message, boolean tested, boolean success,
+				String additionalInformation) {
 			super();
 			this.id = id;
 			this.score = score;
@@ -69,6 +79,7 @@ public class VerdictStatusController {
 			this.message = message;
 			this.tested = tested;
 			this.success = success;
+			this.additionalInformation = additionalInformation;
 		}
 
 		public long getId() {
@@ -155,12 +166,17 @@ public class VerdictStatusController {
 	private ContestService contestService;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
-			+ SecurityExpressionConstants.OR + '('
+			+ SecurityExpressionConstants.OR
+			+ '('
 			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND + '(' + "#verdict.solution.user"
-			+ SecurityExpressionConstants.IS_OWNER + ')'
 			+ SecurityExpressionConstants.AND
-			+ " @oolsec.isSolutionInCurrentContest(#verdict.solution) and @oolsec.canViewVerdictDuringContest(#verdict) " + ')')
+			+ '('
+			+ "#verdict.solution.user"
+			+ SecurityExpressionConstants.IS_OWNER
+			+ ')'
+			+ SecurityExpressionConstants.AND
+			+ " @oolsec.isSolutionInCurrentContest(#verdict.solution) and @oolsec.canViewVerdictDuringContest(#verdict) "
+			+ ')')
 	@RequestMapping(value = "/api/verdict", method = RequestMethod.GET)
 	public @ResponseBody VerdictDto showVerdict(
 			@RequestParam(value = "id") final Verdict verdict,
@@ -171,7 +187,8 @@ public class VerdictStatusController {
 				verdict.getMaximumScore(), verdict.getCpuTime(),
 				verdict.getRealTime(), verdict.getMemoryPeak(), verdict
 						.getStatus().toString(), verdict.isTested(), verdict
-						.getScore().signum() > 0);
+						.getScore().signum() > 0,
+				verdict.getAdditionalInformation());
 
 	}
 }
