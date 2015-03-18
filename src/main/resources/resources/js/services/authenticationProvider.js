@@ -22,7 +22,7 @@
  */
 define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) {
     return function(app) {
-        app.factory('AuthenticationProvider', function($rootScope, $http, $timeout) {
+        app.factory('AuthenticationProvider', function($rootScope, $http, $timeout, $state) {
             var data = {
                 loggedIn: false,
                 user: null,
@@ -93,6 +93,7 @@ define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) 
                         transformRequest: transform,
                         data: {}
                     }).then(function() {
+                        $state.go("home", {}, { reload: true });
                         update();
                     });
                 }

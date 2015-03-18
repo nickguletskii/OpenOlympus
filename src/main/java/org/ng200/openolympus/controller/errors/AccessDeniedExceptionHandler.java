@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,5 +47,15 @@ public class AccessDeniedExceptionHandler {
 	@ResponseBody
 	public String handleAccessDeniedException(AccessDeniedException exception) {
 		return "{\"error\":\"auth.accessdenied\"}";
+	}
+	
+	@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+	@ExceptionHandler({
+		CookieTheftException.class
+	})
+	@RequestMapping(produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public String handleCookieTheftException(CookieTheftException exception) {
+		return "{\"error\":\"auth.cookieTheftException\"}";
 	}
 }

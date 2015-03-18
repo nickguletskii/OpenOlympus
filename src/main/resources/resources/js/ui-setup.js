@@ -69,7 +69,7 @@ define(
                 "</div>");
         }]);
 
-        app.run(function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout) {
+        app.run(function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout, $state) {
             $rootScope.stateParams = $stateParams;
             $rootScope.$on('$stateChangeStart',
                 function(event, toState, toParams, fromState, fromParams) {
@@ -83,6 +83,14 @@ define(
                 });
             $rootScope.$on('securityInfoChanged', function() {
                 $rootScope.security = AuthenticationProvider;
+            });
+            $rootScope.$on('$stateChangeStart',
+                function(event, toState, toParams, fromState, fromParams){
+                if($rootScope.showErrorModal) {
+                    event.preventDefault();
+                    $rootScope.showErrorModal = false;
+                    $state.go(toState, toParams, {reload: true});
+                }
             });
             $rootScope.$on('$stateChangeSuccess',
                 function(event, toState, toParams, fromState, fromParams) {

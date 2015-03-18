@@ -88,6 +88,9 @@
 							</li>
 						</ul>
 					</li>
+					<li ng-if="security.isLoggedIn() &amp;&amp; !security.isUser()">
+						<button type="button" class="btn btn-warning navbar-btn" tooltip-placement="bottom" tooltip="{{'login.administratorApprovalRequired.body' | translate}}"><span class="glyphicon glyphicon-warning-sign"></span></button>
+					</li>
 					<li ng-if="security.isLoggedIn()">
 						<a ui-sref="personalInfoModificationView" id="headerUserInfoLink">{{security.getUsername()}}</a>
 					</li>

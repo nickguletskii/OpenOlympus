@@ -44,7 +44,6 @@ public class UserInfoDto {
 	@Size(min = 1, message = "length")
 	private String firstNameMain;
 
-	@NotNull(message = "empty")
 	private String middleNameMain;
 
 	@NotNull(message = "empty")
@@ -54,7 +53,6 @@ public class UserInfoDto {
 	@Size(min = 1, message = "length")
 	private String firstNameLocalised;
 
-	@Size(min = 1, message = "length")
 	private String middleNameLocalised;
 
 	@Size(min = 1, message = "length")
