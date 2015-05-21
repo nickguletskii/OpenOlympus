@@ -24,6 +24,7 @@ package org.ng200.openolympus.services;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.exec.ExecuteException;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
@@ -36,9 +37,6 @@ public class TaskDescriptionProvider {
 
 	public void transform(Path from, Path to) throws ExecuteException,
 			IOException {
-		MarkupParser markupParser = new MarkupParser();
-		markupParser.setMarkupLanguage(new TextileLanguage());
-		FileAccess.writeUTF8StringToFile(to,
-				markupParser.parseToHtml(FileAccess.readUTF8String(from)));
+		FileAccess.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
 	}
 }

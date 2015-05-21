@@ -45,7 +45,7 @@
                     <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="task.descriptionText"></ui-codemirror>
                 </div>
                 <div class="col-lg-6 miniTextilePreview" style="overflow-y: scroll;">
-                    <textile textile="task.descriptionText"></textile>
+                    <div dynamic="task.descriptionText"></div>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
                     <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="task.descriptionText"></ui-codemirror>
                 </div>
                 <div class="col-lg-6 fullScreenTextilePreview" style="overflow-y: scroll; height:100%">
-                    <textile textile="task.descriptionText"></textile>
+                    <div dynamic="task.descriptionText"></div>
                 </div>
             </div>
         </div>
