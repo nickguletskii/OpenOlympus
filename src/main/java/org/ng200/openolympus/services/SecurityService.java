@@ -130,4 +130,8 @@ public class SecurityService {
 				|| runningContest.isShowFullTestsDuringContest()
 				|| verdict.isViewableWhenContestRunning();
 	}
+
+	public Contest getCurrentContest() {
+		return contestService.getRunningContest();
+	}
 }
