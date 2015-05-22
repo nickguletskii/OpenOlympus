@@ -33,5 +33,5 @@ public class SecurityExpressionConstants {
 	public static final String TASK_PUBLISHED = " (#task.published or @oolsec.isTaskInCurrentContest(#task)) ";
 	public static final String CONTEST_OVER = " @oolsec.isContestOver(#contest) ";
 	public static final String THIS_CONTEST_IN_PROGRESS_FOR_USER = " @oolsec.isContestInProgressForUser(#contest, authentication.name) ";
-	public static final String TASK_IN_CONTEST = " (@oolsec.noContest() or (@oolsec.isTaskInCurrentContest(#task) and @oolsec.isContestInrogressForUser(@oolsec.getCurrentContest(), authentication.name))) ";
+	public static final String TASK_IN_CONTEST = " (@oolsec.noContest() or (@oolsec.isTaskInCurrentContest(#task) and @oolsec.isContestInProgressForUser(@oolsec.getCurrentContest(), authentication.name))) ";
 }
