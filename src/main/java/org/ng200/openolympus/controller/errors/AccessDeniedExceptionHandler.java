@@ -24,6 +24,8 @@ package org.ng200.openolympus.controller.errors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.authentication.rememberme.CookieTheftException;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class AccessDeniedExceptionHandler {
 
 	private static final Logger logger = LoggerFactory
@@ -48,7 +51,7 @@ public class AccessDeniedExceptionHandler {
 	public String handleAccessDeniedException(AccessDeniedException exception) {
 		return "{\"error\":\"auth.accessdenied\"}";
 	}
-	
+
 	@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler({
 		CookieTheftException.class
