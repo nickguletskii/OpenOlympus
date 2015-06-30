@@ -25,7 +25,7 @@ package org.ng200.openolympus.controller.admin;
 import java.util.List;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

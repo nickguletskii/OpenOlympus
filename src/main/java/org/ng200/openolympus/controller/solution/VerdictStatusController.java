@@ -29,7 +29,8 @@ import java.util.Locale;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.exceptions.ForbiddenException;
-import org.ng200.openolympus.model.Verdict;
+import org.ng200.openolympus.jooq.enums.VerdictStatusType;
+import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.services.ContestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,11 +183,11 @@ public class VerdictStatusController {
 			@RequestParam(value = "id") final Verdict verdict,
 			final Locale locale) {
 		Assertions.resourceExists(verdict);
-
 		return new VerdictDto(verdict.getId(), verdict.getScore(),
 				verdict.getMaximumScore(), verdict.getCpuTime(),
 				verdict.getRealTime(), verdict.getMemoryPeak(), verdict
-						.getStatus().toString(), verdict.isTested(), verdict
+						.getStatus().toString(),
+				verdict.getStatus() != VerdictStatusType.waiting, verdict
 						.getScore().signum() > 0,
 				verdict.getAdditionalInformation());
 

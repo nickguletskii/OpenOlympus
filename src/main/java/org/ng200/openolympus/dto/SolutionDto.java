@@ -26,8 +26,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.ng200.openolympus.model.Solution;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -51,12 +51,12 @@ public class SolutionDto implements Serializable {
 	private Date submissionTime;
 	private Task task;
 
-	public SolutionDto(Solution solution) {
+	public SolutionDto(Solution solution, Task task) {
 		this.id = solution.getId();
-		this.userId = solution.getUser().getId();
+		this.userId = solution.getUserId();
 		this.score = solution.getScore();
 		this.maximumScore = solution.getMaximumScore();
-		this.setTask(solution.getTask());
+		this.setTask(task);
 		this.submissionTime = solution.getTimeAdded();
 	}
 

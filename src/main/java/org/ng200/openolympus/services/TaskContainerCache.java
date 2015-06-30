@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.ng200.openolympus.SharedTemporaryStorageFactory;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.tasks.TaskContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

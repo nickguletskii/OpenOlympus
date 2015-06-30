@@ -23,30 +23,40 @@
 package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import org.jooq.DSLContext;
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.model.Solution;
-import org.ng200.openolympus.model.Task;
-import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.model.Verdict;
-import org.ng200.openolympus.repositories.SolutionRepository;
-import org.ng200.openolympus.repositories.VerdictRepository;
+import org.ng200.openolympus.jooq.Routines;
+import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.enums.VerdictStatusType;
+import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.pojos.Verdict;
+import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
+import org.ng200.openolympus.jooq.tables.records.VerdictRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class SolutionService {
+public class SolutionService extends GenericCreateUpdateRepository {
+
 	@Autowired
-	private SolutionRepository solutionRepository;
+	private SolutionDao solutionDao;
+
 	@Autowired
-	private VerdictRepository verdictRepository;
+	private DSLContext dslContext;
+
 	@Autowired
 	private ContestService contestService;
 
@@ -55,8 +65,10 @@ public class SolutionService {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.USER_IS_OWNER + ')')
-	public long countUserSolutions(final User user) {
-		return this.solutionRepository.countByUser(user);
+	public int countUserSolutions(final User user) {
+		return dslContext.selectCount().from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.USER_ID.eq(user.getId())).fetchOne()
+				.value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -66,13 +78,20 @@ public class SolutionService {
 			+ SecurityExpressionConstants.USER_IS_OWNER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
-	public long countUserSolutionsForTask(final User user, final Task task) {
-		return this.solutionRepository.countByUserAndTask(user, task);
+	public int countUserSolutionsForTask(final User user, final Task task) {
+		return dslContext
+				.selectCount()
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
+						Tables.SOLUTION.TASK_ID.eq(task.getId()))).fetchOne()
+				.value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public long getNumberOfPendingVerdicts() {
-		return this.verdictRepository.countByTested(false);
+	public int getNumberOfPendingVerdicts() {
+		return dslContext.selectCount().from(Tables.VERDICT)
+				.where(Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting))
+				.fetchOne().value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -81,14 +100,20 @@ public class SolutionService {
 			+ SecurityExpressionConstants.AND + "#solution.user"
 			+ SecurityExpressionConstants.IS_OWNER + ')')
 	public long getNumberOfPendingVerdicts(final Solution solution) {
-		return this.verdictRepository.countBySolutionAndTested(solution, false);
+		return dslContext
+				.selectCount()
+				.from(Tables.VERDICT)
+				.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()).and(
+						Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting)))
+				.fetchOne().value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<Solution> getPage(final int pageNumber, final int pageSize) {
-		return this.solutionRepository.findAll(
-				new PageRequest(pageNumber - 1, pageSize, Direction.DESC,
-						"timeAdded")).getContent();
+		return dslContext.selectCount().from(Tables.SOLUTION)
+				.groupBy(Tables.SOLUTION.ID)
+				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
+				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -98,10 +123,16 @@ public class SolutionService {
 			+ SecurityExpressionConstants.USER_IS_OWNER + ')')
 	public List<Solution> getPage(final User user, final Integer pageNumber,
 			final int pageSize, final Date startTime, final Date endTime) {
-		return this.solutionRepository
-				.findByUserAndTimeAddedBetweenOrderByTimeAddedDesc(user,
-						startTime, endTime, new PageRequest(pageNumber - 1,
-								pageSize));
+		return dslContext
+				.selectCount()
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
+						Tables.SOLUTION.TIME_ADDED.between(
+								Timestamp.from(startTime.toInstant()),
+								Timestamp.from(endTime.toInstant()))))
+				.groupBy(Tables.SOLUTION.ID)
+				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
+				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -113,37 +144,32 @@ public class SolutionService {
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<Solution> getPageOutsideOfContest(final User user,
 			final Integer pageNumber, final int pageSize) {
-		return this.solutionRepository.findByUser(user, new PageRequest(
-				pageNumber - 1, pageSize, Direction.DESC, "timeAdded"));
+		return dslContext.selectCount().from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.USER_ID.eq(user.getId()))
+				.groupBy(Tables.SOLUTION.TIME_ADDED)
+				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
+				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public List<Verdict> getPendingVerdicts() {
-		return this.verdictRepository.findByTestedOrderByIdAsc(false);
+	public Stream<Verdict> getPendingVerdicts() {
+		return StreamSupport.stream(
+				dslContext
+						.selectFrom(Tables.VERDICT)
+						.where(Tables.VERDICT.STATUS
+								.eq(VerdictStatusType.waiting)).spliterator(),
+				false).map(record -> record.into(Verdict.class));
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public long getSolutionCount() {
-		return this.solutionRepository.count();
+		return solutionDao.count();
 	}
 
 	public BigDecimal getSolutionMaximumScore(final Solution solution) {
 		return this.getVerdictsVisibleDuringContest(solution).stream()
 				.map((verdict) -> verdict.getMaximumScore())
 				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
-	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
-	public List<Solution> getSolutionsByUserAndTaskNewestFirst(final User user,
-			final Task task, final PageRequest pageRequest) {
-		return this.solutionRepository.findByUserAndTaskOrderByTimeAddedDesc(
-				user, task, pageRequest);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -166,14 +192,13 @@ public class SolutionService {
 			+ SecurityExpressionConstants.AND + '(' + "#solution.user"
 			+ SecurityExpressionConstants.IS_OWNER + ')' + ')')
 	public List<Verdict> getVerdictsVisibleDuringContest(final Solution solution) {
-		if (this.contestService.getRunningContest() == null
-				|| this.contestService.getRunningContest()
-						.isShowFullTestsDuringContest()) {
-			return this.verdictRepository.findBySolutionOrderByIdAsc(solution);
+		// TODO: show full tests during contest should be an option
+		if (this.contestService.getRunningContest() == null) {
+			return dslContext.selectFrom(Tables.VERDICT)
+					.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()))
+					.fetchInto(Verdict.class);
 		}
-		return this.verdictRepository
-				.findBySolutionAndIsViewableWhenContestRunningOrderByIdAsc(
-						solution, true);
+		return getVerdictsVisibleDuringContest(solution);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -182,14 +207,25 @@ public class SolutionService {
 			+ SecurityExpressionConstants.AND + "#solution.user"
 			+ SecurityExpressionConstants.IS_OWNER + ')')
 	@CacheEvict(value = "solutions", key = "#solution.id")
-	public Solution saveSolution(Solution solution) {
-		return solution = this.solutionRepository.saveAndFlush(solution);
+	public Solution insertSolution(Solution solution) {
+		return insert(solution, Tables.SOLUTION);
 	}
 
 	@CacheEvict(value = "solutions", key = "#verdict.solution.id")
 	@Transactional
-	public synchronized Verdict saveVerdict(Verdict verdict) {
-		verdict = this.verdictRepository.saveAndFlush(verdict);
-		return verdict;
+	public synchronized Verdict updateVerdict(Verdict verdict) {
+		return update(verdict, Tables.VERDICT);
+	}
+
+	public long countUserSolutionsInContest(User user, Contest contest) {
+		return dslContext
+				.selectCount()
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
+						Tables.SOLUTION.TIME_ADDED.between(
+								Routines.getContestStartForUser(
+										contest.getId(), user.getId())).and(
+								Routines.getContestEndForUser(contest.getId(),
+										user.getId())))).execute();
 	}
 }

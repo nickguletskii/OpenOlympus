@@ -28,8 +28,8 @@ import java.util.List;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
-import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +63,7 @@ public class ContestParticipantsController {
 
 		Assertions.resourceExists(contest);
 
-		return this.contestService.getPariticipantsPage(contest, pageNumber);
+		return this.contestService
+				.getPariticipantsPage(contest, pageNumber, 10);
 	}
 }

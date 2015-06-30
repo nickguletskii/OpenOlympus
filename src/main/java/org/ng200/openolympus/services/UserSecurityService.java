@@ -22,8 +22,8 @@
  */
 package org.ng200.openolympus.services;
 
-import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.repositories.UserRepository;
+import org.ng200.openolympus.jooq.tables.daos.UserDao;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,16 +34,15 @@ import org.springframework.stereotype.Service;
 public class UserSecurityService implements UserDetailsService {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserDao userDao;
 
 	@Override
-	public UserDetails loadUserByUsername(final String username)
+	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
-		final User user = this.userRepository.findByUsername(username);
-		if (user == null) {
+		User user = userDao.fetchOneByUsername(username);
+		if (user == null)
 			throw new UsernameNotFoundException(
-					"No user with that username exists.");
-		}
+					"The requested user does not exist!");
 		return user;
 	}
 

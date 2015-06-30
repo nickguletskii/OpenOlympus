@@ -23,44 +23,44 @@
 package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.UserRanking;
-import org.ng200.openolympus.model.Role;
-import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.repositories.ContestParticipationRepository;
-import org.ng200.openolympus.repositories.ContestTimeExtensionRepository;
-import org.ng200.openolympus.repositories.SolutionRepository;
-import org.ng200.openolympus.repositories.UserRepository;
-import org.ng200.openolympus.repositories.VerdictRepository;
+import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
+import org.ng200.openolympus.jooq.tables.daos.GroupDao;
+import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
+import org.ng200.openolympus.jooq.tables.daos.UserDao;
+import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.records.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.ImmutableList;
 
 @Service
 public class UserService {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserDao userDao;
 
 	@Autowired
-	private VerdictRepository verdictRepository;
+	private ContestParticipationDao contestParticipationDao;
 
 	@Autowired
-	private RoleService roleService;
+	private TimeExtensionDao timeExtensionDao;
 
 	@Autowired
-	private SolutionRepository solutionRepository;
+	private GroupDao groupDao;
 
 	@Autowired
-	private ContestParticipationRepository contestParticipationRepository;
-	@Autowired
-	private ContestTimeExtensionRepository contestTimeExtensionRepository;
+	private DSLContext dslContext;
 
 	public UserService() {
 
@@ -68,7 +68,9 @@ public class UserService {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public long countUnapprovedUsers() {
-		return this.userRepository.countUnapproved();
+		// TODO: Check
+		return dslContext.selectCount().from(Tables.USER)
+				.where(Tables.USER.APPROVED.eq(false)).execute();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -77,34 +79,38 @@ public class UserService {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public long countUsers() {
-		return this.userRepository.count();
+		return userDao.count();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void deleteUser(final User user) {
-		// TODO: use SQL
-		this.solutionRepository.findByUser(user).forEach(
-				solution -> {
-					this.verdictRepository.delete(this.verdictRepository
-							.findBySolution(solution));
-					this.solutionRepository.delete(solution);
-				});
-		this.contestParticipationRepository
-				.delete(this.contestParticipationRepository.findByUser(user));
-		this.contestTimeExtensionRepository
-				.delete(this.contestTimeExtensionRepository.findByUser(user));
-		this.userRepository.delete(user);
+		userDao.delete(user);
+
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void deleteUsers(List<User> users) {
-		// TODO: use SQL
-		users.forEach(this::deleteUser);
+		userDao.delete(users);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<User> findAFewUsersWithNameContaining(final String name) {
-		return this.userRepository.findFirst30Like("%" + name + "%");
+		// TODO: use something better for searching...
+		String pattern = "%" + name + "%";
+		return dslContext
+				.select(Tables.USER.fields())
+				.from(Tables.USER)
+				.where(
+
+				Tables.USER.USERNAME.like(pattern)
+						.or(Tables.USER.FIRST_NAME_MAIN.like(pattern))
+						.or(Tables.USER.MIDDLE_NAME_MAIN.like(pattern))
+						.or(Tables.USER.LAST_NAME_MAIN.like(pattern))
+						.or(Tables.USER.FIRST_NAME_LOCALISED.like(pattern))
+						.or(Tables.USER.MIDDLE_NAME_LOCALISED.like(pattern))
+						.or(Tables.USER.LAST_NAME_LOCALISED.like(pattern))
+
+				).limit(30).fetchInto(User.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -112,48 +118,75 @@ public class UserService {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
-	public List<UserRanking> getArchiveRankPage(final long page,
-			final long pageSize) {
-		return this.userRepository
-				.getRankPage(pageSize, (page - 1) * pageSize)
-				.stream()
-				.map(arr -> new UserRanking((BigInteger) arr[2],
-						this.userRepository.findOne(((BigInteger) arr[0])
-								.longValue()), (BigDecimal) arr[1]))
-				.collect(Collectors.toList());
+	public List<UserRanking> getArchiveRankPage(final int page,
+			final int pageSize) {
+
+		final Table<?> userTasks = dslContext
+				.select(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID,
+						Tables.SOLUTION.SCORE)
+				.distinctOn(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID)
+				.from(Tables.SOLUTION)
+				.groupBy(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID,
+						Tables.SOLUTION.SCORE)
+				.orderBy(Tables.SOLUTION.USER_ID.asc(),
+						Tables.SOLUTION.TASK_ID.asc(),
+						Tables.SOLUTION.SCORE.desc()).asTable("users_tasks");
+
+		final Field<BigDecimal> user_score = DSL
+				.coalesce(DSL.sum(userTasks.field(Tables.SOLUTION.SCORE)),
+						DSL.field("0")).as("user_score");
+		List<Field<?>> fields = ImmutableList
+				.<Field<?>> builder()
+				.add(user_score)
+				.add(
+
+				DSL.rank()
+						.over(DSL.orderBy(DSL.coalesce(
+								DSL.sum(userTasks.field(Tables.SOLUTION.SCORE)),
+								DSL.field("0")))).as("rank"))
+				.add(Tables.USER.fields())
+
+				.build();
+		return dslContext
+				.select(fields)
+				.from(Tables.USER)
+				.leftOuterJoin(userTasks)
+				.on(Tables.USER.ID.eq(userTasks.field(Tables.SOLUTION.USER_ID)))
+				.groupBy(Tables.USER.ID).orderBy(user_score).limit(pageSize)
+				.offset(pageSize * (page - 1)).fetchInto(UserRanking.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public List<User> getUnapprovedUsers(int pageNumber, int pageSize) {
-		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
-				Sort.Direction.DESC, "firstNameMain");
-		return this.userRepository.findUnapproved(request);
+	public List<User> getPendingUsers(int pageNumber, int pageSize) {
+		return dslContext.selectFrom(Tables.USER)
+				.where(Tables.USER.APPROVAL_EMAIL_SENT.eq(false))
+				.limit(pageSize).offset((pageNumber - 1) * pageSize)
+				.fetchInto(User.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public User getUserById(final Long id) {
-		return this.userRepository.findOne(id);
+		return userDao.findById(id);
 	}
 
 	public User getUserByUsername(final String username) {
-		return this.userRepository.findByUsername(username);
+		return userDao.fetchOneByUsername(username);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<User> getUsersAlphabetically(final Integer pageNumber,
 			final int pageSize) {
-		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
-				Sort.Direction.DESC, "firstNameMain");
-		return this.userRepository.findAll(request).getContent();
-	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public boolean isUserApproved(User user) {
-		return user.getRoles().contains(
-				this.roleService.getRoleByName(Role.USER));
+		return dslContext.select(Tables.USER.fields())
+				.groupBy(Tables.USER.ID)
+				.orderBy(Tables.USER.USERNAME).limit(pageSize)
+				.offset(pageSize * (pageNumber - 1)).fetchInto(User.class);
 	}
 
 	public User saveUser(User user) {
-		return user = this.userRepository.save(user);
+		UserRecord userRecord = dslContext.newRecord(Tables.USER);
+		userRecord.from(user);
+		userRecord.store();
+		userRecord.into(user);
+		return user;
 	}
 }

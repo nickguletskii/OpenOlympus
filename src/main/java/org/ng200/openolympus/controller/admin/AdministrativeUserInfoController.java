@@ -29,7 +29,7 @@ import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.user.AbstractUserInfoController;
 import org.ng200.openolympus.dto.UserInfoDto;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

@@ -24,6 +24,7 @@ package org.ng200.openolympus.controller.user;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ import javax.validation.Valid;
 import org.apache.http.client.ClientProtocolException;
 import org.ng200.openolympus.controller.user.RegistrationRestController.RegistrationResponse.Status;
 import org.ng200.openolympus.dto.UserDto;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.CaptchaService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.UserDtoValidator;
@@ -148,21 +149,32 @@ public class RegistrationRestController {
 
 		this.validate(userDto, bindingResult);
 
-		final User user = new User(userDto.getUsername(),
-				this.passwordEncoder.encode(userDto.getPassword()),
-				userDto.getEmailAddress(), userDto.getFirstNameMain(),
-				userDto.getMiddleNameMain(), userDto.getLastNameMain(),
-				userDto.getFirstNameLocalised(),
-				userDto.getMiddleNameLocalised(),
-				userDto.getLastNameLocalised(), userDto.getTeacherFirstName(),
-				userDto.getTeacherMiddleName(), userDto.getTeacherLastName(),
-				userDto.getAddressLine1(), userDto.getAddressLine2(),
-				userDto.getAddressCity(), userDto.getAddressState(),
-				userDto.getAddressCountry(), userDto.getLandline(),
-				userDto.getMobile(), userDto.getSchool(),
-				userDto.getDateOfBirth(), UUID.randomUUID().toString());
+		User user = new User()
+				.setAddressCity(userDto.getAddressCity())
+				.setAddressCountry(userDto.getAddressCountry())
+				.setAddressLine1(userDto.getAddressLine1())
+				.setAddressLine2(userDto.getAddressLine2())
+				.setAddressState(userDto.getAddressState())
+				.setBirthDate(
+						Timestamp.from(userDto.getDateOfBirth().toInstant()))
+				.setEmailAddress(userDto.getEmailAddress())
+				.setFirstNameLocalised(userDto.getFirstNameLocalised())
+				.setFirstNameMain(userDto.getFirstNameMain())
+				.setLandline(userDto.getLandline())
+				.setLastNameLocalised(userDto.getLastNameLocalised())
+				.setLastNameMain(userDto.getLastNameMain())
+				.setMiddleNameLocalised(userDto.getMiddleNameLocalised())
+				.setMiddleNameMain(userDto.getMiddleNameLocalised())
+				.setMobile(userDto.getMobile())
+				.setPassword(passwordEncoder.encode(userDto.getPassword()))
+				.setSchool(userDto.getSchool())
+				.setTeacherFirstName(userDto.getTeacherFirstName())
+				.setTeacherLastName(userDto.getTeacherLastName())
+				.setTeacherMiddleName(userDto.getTeacherMiddleName())
+				.setUsername(userDto.getUsername()).setSuperuser(false)
+				.setApprovalEmailSent(false).setEnabled(true);
 
-		this.userService.saveUser(user);
+		userService.saveUser(user);
 
 		return new RegistrationResponse(Status.OK, null, null, null);
 	}

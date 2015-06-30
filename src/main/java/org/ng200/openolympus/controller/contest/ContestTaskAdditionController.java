@@ -29,7 +29,7 @@ import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestTaskAdditionDto;
-import org.ng200.openolympus.model.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
@@ -74,10 +74,9 @@ public class ContestTaskAdditionController {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
-		contest.getTasks().add(
-				this.taskService.getTaskByName(contestTaskAdditionDto
-						.getTaskName()));
-		this.contestService.saveContest(contest);
+		contestService
+				.addContestTask(contest, taskService
+						.getTaskByName(contestTaskAdditionDto.getTaskName()));
 		return new BindingResponse(Status.OK, null, ImmutableMap
 				.<String, Object> builder()
 				.put("taskName", contestTaskAdditionDto.getTaskName()).build());

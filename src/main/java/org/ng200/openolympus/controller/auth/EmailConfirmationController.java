@@ -22,9 +22,7 @@
  */
 package org.ng200.openolympus.controller.auth;
 
-import org.ng200.openolympus.model.Role;
-import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.services.RoleService;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,9 +45,6 @@ public class EmailConfirmationController {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	private RoleService roleService;
-
 	@RequestMapping(method = RequestMethod.GET)
 	public String confirm(@RequestParam(value = "user") User user,
 			@RequestParam(value = "token") String token) {
@@ -58,10 +53,8 @@ public class EmailConfirmationController {
 			return "redirect:errors/403";
 		}
 
-		final Role role = this.roleService.getRoleByName(Role.USER);
-
-		user.getRoles().add(role);
 		user.setEmailConfirmationToken(null);
+		user.setApproved(true);
 		user = this.userService.saveUser(user);
 
 		return "redirect:/login";

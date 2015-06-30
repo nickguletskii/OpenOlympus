@@ -23,8 +23,8 @@
 package org.ng200.openolympus.validation;
 
 import org.ng200.openolympus.dto.ContestUserAdditionDto;
-import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

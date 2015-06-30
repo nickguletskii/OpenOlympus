@@ -93,11 +93,11 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		}
 
 		registry.addResourceHandler("/resources/**")
-				.addResourceLocations("classpath:resources/")
+				.addResourceLocations("classpath:/")
 				.setCachePeriod(cachePeriod);
 
 		registry.addResourceHandler("/favicon.png")
-				.addResourceLocations("classpath:resources/")
+				.addResourceLocations("classpath:/")
 				.setCachePeriod(cachePeriod);
 	}
 

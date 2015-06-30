@@ -25,7 +25,7 @@ package org.ng200.openolympus.validation;
 import java.util.Date;
 
 import org.ng200.openolympus.dto.ContestDto;
-import org.ng200.openolympus.model.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

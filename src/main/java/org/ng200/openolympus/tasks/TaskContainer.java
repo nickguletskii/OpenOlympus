@@ -45,8 +45,8 @@ import org.ng200.openolympus.SharedTemporaryStorageFactory;
 import org.ng200.openolympus.cerberus.SolutionJudge;
 import org.ng200.openolympus.cerberus.SolutionJudgeFactory;
 import org.ng200.openolympus.cerberus.util.Lists;
-import org.ng200.openolympus.model.Solution;
-import org.ng200.openolympus.model.Verdict;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.util.Pair;
 import org.slf4j.Logger;
@@ -168,11 +168,15 @@ public class TaskContainer {
 				.map((test) -> {
 					final String relativePath = this.path.relativize(
 							test.getFirst()).toString();
-
-					return new Verdict(solution, this.solutionJudgeFactory
-							.getMaximumScoreForTest(relativePath,
-									this.properties), relativePath, test
-							.getSecond());
+					return new Verdict()
+							.setSolutionId(solution.getId())
+							.setMaximumScore(
+									this.solutionJudgeFactory
+											.getMaximumScoreForTest(
+													relativePath,
+													this.properties))
+							.setPath(relativePath)
+							.setViewableDuringContest(test.getSecond());
 				}).collect(Collectors.toList());
 		return verdicts;
 	}

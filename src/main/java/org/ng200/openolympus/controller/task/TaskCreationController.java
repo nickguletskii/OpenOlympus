@@ -23,7 +23,9 @@
 package org.ng200.openolympus.controller.task;
 
 import java.nio.file.Path;
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
@@ -36,7 +38,7 @@ import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.TaskCreationDto;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.TaskValidator;
@@ -49,6 +51,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import scala.annotation.meta.setter;
 
 @RestController
 public class TaskCreationController extends
@@ -75,24 +79,24 @@ public class TaskCreationController extends
 			if (bindingResult.hasErrors()) {
 				throw new BindException(bindingResult);
 			}
-			Task task = new Task(taskCreationDto.getName(), "", "",
-					Date.from(Instant.now()), taskCreationDto.isPublished());
+			Task task = new Task().setName(taskCreationDto.getName())
+					.setCreatedDate(LocalDateTime.now());
 			final Path localDescriptionFile = this.storageService
 					.createTaskDescriptionFileStorage(task);
 			final Path judgeDir = this.storageService
 					.createTaskJudgeDirectory(task);
 
-			task = this.taskService.saveTask(task);
+			task = this.taskService.insertTask(task);
 
 			final Lock lock = task.writeLock();
-			lock.lock();
+//			lock.lock();
 
 			try {
 				this.uploadDescription(task, taskCreationDto
 						.getDescriptionFile().getInputStream());
 				this.uploadJudgeFile(task, taskCreationDto);
 
-				task = this.taskService.saveTask(task);
+				task = this.taskService.updateTask(task);
 			} catch (final ArchiveException e) {
 				bindingResult.rejectValue("judgeFile", "",
 						"task.add.form.errors.judgeArchive.invalid");

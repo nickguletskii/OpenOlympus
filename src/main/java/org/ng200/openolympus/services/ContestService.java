@@ -23,117 +23,119 @@
 package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Param;
+import org.jooq.Record;
+import org.jooq.Record3;
+import org.jooq.SelectConditionStep;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
+import org.jooq.util.postgres.PostgresDataType;
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.dto.UserRanking;
-import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.ContestParticipation;
-import org.ng200.openolympus.model.ContestPerUserTimeExtension;
-import org.ng200.openolympus.model.Task;
-import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.repositories.ContestParticipationRepository;
-import org.ng200.openolympus.repositories.ContestRepository;
-import org.ng200.openolympus.repositories.ContestTimeExtensionRepository;
-import org.ng200.openolympus.repositories.SolutionRepository;
-import org.ng200.openolympus.repositories.TaskRepository;
-import org.ng200.openolympus.repositories.UserRepository;
+import org.ng200.openolympus.jooq.Routines;
+import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.routines.GetContestEnd;
+import org.ng200.openolympus.jooq.routines.GetContestEndForUser;
+import org.ng200.openolympus.jooq.tables.daos.ContestDao;
+import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
+import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.ContestParticipation;
+import org.ng200.openolympus.jooq.tables.pojos.ContestTasks;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.jooq.tables.pojos.TimeExtension;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class ContestService {
+public class ContestService extends GenericCreateUpdateRepository {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ContestService.class);
 	private static final int CONTEST_RESULTS_PAGE_LENGTH = 10;
 	private static final int CONTEST_PARTICIPANTS_PAGE_LENGTH = 10;
-	@Autowired
-	private ContestRepository contestRepository;
-	@Autowired
-	private ContestParticipationRepository contestParticipationRepository;
-	@Autowired
-	private ContestTimeExtensionRepository contestTimeExtensionRepository;
 
 	@Autowired
-	private SolutionRepository solutionRepository;
+	private ContestDao contestDao;
+	@Autowired
+	private ContestParticipationDao contestParticipationDao;
 
 	@Autowired
-	private TaskRepository taskRepository;
+	private TimeExtensionDao timeExtensionDao;
 
 	@Autowired
-	private UserRepository userRepository;
+	private DSLContext dslContext;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void addContestParticipant(final Contest contest, final User user) {
-		this.contestParticipationRepository.save(new ContestParticipation(
-				contest, user));
+		contestParticipationDao.insert(new ContestParticipation(null, null,
+				user.getId(), contest.getId()));
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public long countContests() {
-		return this.contestRepository.count();
+		return contestDao.count();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@Transactional
 	public void deleteContest(Contest contest) {
-		contest = this.contestRepository.findOne(contest.getId());
-		contest.getTasks().clear();
-		contest = this.contestRepository.save(contest);
-		this.contestParticipationRepository
-				.delete(this.contestParticipationRepository
-						.findByContest(contest));
-		this.contestTimeExtensionRepository
-				.delete(this.contestTimeExtensionRepository
-						.findByContest(contest));
-		this.contestRepository.delete(contest);
+		contestDao.delete(contest);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public void extendTimeForUser(final Contest contest, final User user,
 			final Duration time) {
-		this.contestTimeExtensionRepository
-				.save(new ContestPerUserTimeExtension(contest, user, time));
+		timeExtensionDao.insert(new TimeExtension(null, time, null, user
+				.getId(), contest.getId()));
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public Contest getContestByName(final String name) {
-		return this.contestRepository.findByName(name);
+		return contestDao.fetchOneByName(name);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public Instant getContestEndIncludingAllTimeExtensions(final Contest contest) {
-		return contestRepository.getContestEndTime(contest.getId()).toInstant();
-	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
-	public Date getContestEndTime(final Contest contest) {
-		return contestRepository.getContestEndTime(contest.getId());
+		GetContestEnd procedure = new GetContestEnd();
+		procedure.setContestId(contest.getId());
+		procedure.attach(dslContext.configuration());
+		procedure.execute();
+		return procedure.getReturnValue().toInstant();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<UserRanking> getContestResults(Contest contest) {
-		return this.userRepository
-				.getContestResults(contest.getId())
-				.stream()
-				.filter(arr -> arr != null && arr[0] != null)
-				.map(arr -> new UserRanking((BigInteger) arr[2],
-						this.userRepository.findOne(((BigInteger) arr[0])
-								.longValue()), (BigDecimal) arr[1]))
-				.collect(Collectors.toList());
+		return getContestResultsQuery(contest).fetchInto(UserRanking.class);
+	}
+
+	private SelectConditionStep<Record3<Long, BigDecimal, Integer>> getContestResultsQuery(
+			Contest contest) {
+		return dslContext
+				.select(Tables.CONTEST_PARTICIPATION.USER_ID,
+						DSL.coalesce(Tables.CONTEST_PARTICIPATION.SCORE,
+								DSL.field("0")).as("score"),
+						DSL.rank()
+								.over(DSL.orderBy(DSL.coalesce(
+										Tables.CONTEST_PARTICIPATION.SCORE,
+										DSL.field("0")).desc())).as("rank"))
+				.from(Tables.CONTEST_PARTICIPATION)
+				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
+						.getId()));
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -141,51 +143,63 @@ public class ContestService {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
-	public List<UserRanking> getContestResultsPage(Contest contest, int page) {
-		return this.userRepository
-				.getContestResultsPage(contest.getId(),
-						ContestService.CONTEST_RESULTS_PAGE_LENGTH,
-						(page - 1) * ContestService.CONTEST_RESULTS_PAGE_LENGTH)
-				.stream()
-				.map(arr -> new UserRanking((BigInteger) arr[2],
-						this.userRepository.findOne(((BigInteger) arr[0])
-								.longValue()), (BigDecimal) arr[1]))
-				.collect(Collectors.toList());
+	public List<UserRanking> getContestResultsPage(Contest contest, int page,
+			int pageSize) {
+		return getContestResultsQuery(contest).limit(pageSize)
+				.offset((page - 1) * pageSize).fetchInto(UserRanking.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
 			final int pageSize) {
-		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
-				Direction.DESC, "startTime");
-		return this.contestRepository.findAll(request).getContent();
+		return dslContext.selectFrom(Tables.CONTEST).limit(pageSize)
+				.offset((pageNumber - 1) * pageSize).fetchInto(Contest.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public Contest getContestThatIntersects(final Date startDate,
 			final Date endDate) {
-		return this.contestRepository.findIntersects(startDate, endDate);
+		return dslContext
+				.selectFrom(Tables.CONTEST)
+				.where(
+
+				Routines.getContestStart(Tables.CONTEST.ID)
+						.between(Timestamp.from(startDate.toInstant()))
+						.and(Timestamp.from(endDate.toInstant()))
+
+						.or(Routines.getContestEnd(Tables.CONTEST.ID)
+								.between(Timestamp.from(startDate.toInstant()))
+								.and(Timestamp.from(endDate.toInstant())))
+
+						.or(DSL.val(Timestamp.from(startDate.toInstant()))
+								.between(
+										Routines.getContestStart(Tables.CONTEST.ID))
+								.and(Routines.getContestEnd(Tables.CONTEST.ID)))
+
+						.or(DSL.val(Timestamp.from(endDate.toInstant()))
+								.between(
+										Routines.getContestStart(Tables.CONTEST.ID))
+								.and(Routines.getContestEnd(Tables.CONTEST.ID)))
+
+				).fetchOneInto(Contest.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber) {
-		return this.userRepository.findPartiticpants(contest,
-				new PageRequest(pageNumber - 1,
-						ContestService.CONTEST_PARTICIPANTS_PAGE_LENGTH));
+	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber,
+			int pageSize) {
+		return dslContext
+				.select(Tables.USER.fields())
+				.from(Tables.CONTEST_PARTICIPATION)
+				.leftOuterJoin(Tables.USER)
+				.on(Tables.CONTEST_PARTICIPATION.USER_ID.eq(Tables.USER.ID))
+				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
+						.getId())).limit(pageSize)
+				.offset((pageNumber - 1) * pageSize).fetchInto(User.class);
 	}
 
 	public Contest getRunningContest() {
 		return this.getContestThatIntersects(Date.from(Instant.now()),
 				Date.from(Instant.now()));
-	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
-	public Duration getTotalTimeExtensionTimeForUser(final Contest contest,
-			final User user) {
-		return this.contestTimeExtensionRepository
-				.findByUserAndContest(user, contest).stream()
-				.map((timeExtension) -> timeExtension.getDuration())
-				.reduce((x, y) -> (x.plus(y))).orElse(Duration.ZERO);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -195,11 +209,21 @@ public class ContestService {
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public BigDecimal getUserTaskScoreInContest(final Contest contest,
 			final User user, final Task task) {
-		return Lists.first(
-				this.taskRepository.getTaskScoreForContest(contest
-						.getStartTime(), Date.from(this
-						.getContestEndIncludingAllTimeExtensions(contest)),
-						task.getId(), user.getId())).orElse(BigDecimal.ZERO);
+		return dslContext
+				.select(Tables.SOLUTION.SCORE)
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.TASK_ID
+						.eq(task.getId())
+						.and(Tables.SOLUTION.USER_ID.eq(user.getId()))
+						.and(Tables.SOLUTION.TIME_ADDED.ge(Routines
+								.getContestStartForUser(contest.getId(),
+										user.getId())))
+						.and(Tables.SOLUTION.TIME_ADDED.le(Routines
+								.getContestEndForUser(contest.getId(),
+										user.getId()))))
+				.groupBy(Tables.SOLUTION.ID)
+				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(1).fetchOne()
+				.value1();
 	}
 
 	public boolean hasContestStarted(final Contest contest) {
@@ -214,9 +238,50 @@ public class ContestService {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
+	@SuppressWarnings("unchecked")
 	public boolean hasContestTestingFinished(Contest contest) {
-		return this.contestRepository
-				.hasContestTestingFinished(contest.getId());
+		Param<Integer> contestF = DSL.val(contest.getId(),
+				PostgresDataType.INTEGER);
+		final Condition solutionWithinTimeBounds = Tables.SOLUTION.TIME_ADDED
+				.between(Routines.getContestStartForUser(contestF,
+						Tables.SOLUTION.USER_ID),
+						Routines.getContestEndForUser(contestF,
+								Tables.SOLUTION.USER_ID));
+
+		final Table<Record> currentTasks = dslContext.select()
+				.from(Tables.CONTEST_TASKS)
+				.where(Tables.CONTEST_TASKS.ID_CONTEST.eq(contestF))
+				.asTable("current_tasks");
+		final Table<?> solutionsTasks = DSL
+				.select(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID)
+				.distinctOn(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID)
+				.from(Tables.SOLUTION)
+				.rightOuterJoin(currentTasks)
+				.on(Tables.SOLUTION.TASK_ID.eq((Field<Integer>) currentTasks
+						.field("task_id")))
+				.where(solutionWithinTimeBounds.and(Tables.SOLUTION.TESTED
+						.eq(false)))
+				.orderBy(Tables.SOLUTION.USER_ID.asc(),
+						Tables.SOLUTION.TASK_ID.asc(),
+						Tables.SOLUTION.TIME_ADDED.desc())
+				.asTable("solutions_tasks");
+		final Table<?> userTasks = DSL
+				.select(solutionsTasks.field(Tables.SOLUTION.USER_ID),
+						solutionsTasks.field(Tables.SOLUTION.TASK_ID),
+						solutionsTasks.field(Tables.SOLUTION.TESTED))
+				.from(Tables.CONTEST_PARTICIPATION)
+				.rightOuterJoin(solutionsTasks)
+				.on(Tables.CONTEST_PARTICIPATION.USER_ID
+						.eq((Field<Long>) solutionsTasks.field("user_id")))
+				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contestF))
+				.asTable("users_tasks");
+		return dslContext
+				.select(DSL
+						.decode()
+						.when(DSL.exists(dslContext.select(
+								userTasks.field(Tables.SOLUTION.USER_ID)).from(
+								userTasks)), false).otherwise(true)).fetchOne()
+				.value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
@@ -231,8 +296,12 @@ public class ContestService {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public Date getContestEndTimeForUser(Contest contest, User user) {
-		return contestRepository.getContestEndTimeForUser(contest.getId(),
-				user.getId());
+		GetContestEndForUser procedure = new GetContestEndForUser();
+		procedure.setContestId(contest.getId());
+		procedure.setUserId(user.getId());
+		procedure.attach(dslContext.configuration());
+		procedure.execute();
+		return Date.from(procedure.getReturnValue().toInstant());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
@@ -243,22 +312,59 @@ public class ContestService {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public boolean isUserParticipatingIn(final User user, final Contest contest) {
-		return this.contestParticipationRepository.findOneByContestAndUser(
-				contest, user) != null;
+		return dslContext
+				.select(DSL
+						.decode()
+						.when(DSL
+								.exists(dslContext
+										.select(Tables.CONTEST_PARTICIPATION.ID)
+										.from(Tables.CONTEST_PARTICIPATION)
+										.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID
+												.eq(contest.getId())
+												.and(Tables.CONTEST_PARTICIPATION.USER_ID
+														.eq(user.getId())))),
+								true).otherwise(false)).fetchOne().value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public Contest saveContest(Contest contest) {
-		return contest = this.contestRepository.save(contest);
+	public Contest insertContest(Contest contest) {
+		return insert(contest, Tables.CONTEST);
+	}
+
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	public Contest updateContest(Contest contest) {
+		return update(contest, Tables.CONTEST);
 	}
 
 	@Transactional
 	public void removeUserFromContest(Contest contest, User user) {
-		contestTimeExtensionRepository
-				.deleteInBatch(contestTimeExtensionRepository
-						.findByUserAndContest(user, contest));
-		contestParticipationRepository.delete(contestParticipationRepository
-				.findOneByContestAndUser(contest, user));
+		dslContext
+				.delete(Tables.CONTEST_PARTICIPATION)
+				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
+						.getId()),
+						Tables.CONTEST_PARTICIPATION.USER_ID.eq(user.getId()))
+				.execute();
+	}
+
+	public List<Task> getContestTasks(Contest contest) {
+		return dslContext
+				.selectFrom(Tables.TASK)
+				.where(Tables.TASK.ID.in(dslContext
+						.select(Tables.CONTEST_TASKS.ID_TASK)
+						.from(Tables.CONTEST_TASKS)
+						.where(Tables.CONTEST_TASKS.ID_CONTEST.eq(contest
+								.getId())))).fetchInto(Task.class);
+	}
+
+	public void removeTaskFromContest(Task task, Contest contest) {
+		dslContext.delete(Tables.CONTEST_TASKS).where(
+				Tables.CONTEST_TASKS.ID_CONTEST.eq(contest.getId()));
+	}
+
+	public void addContestTask(Contest contest, Task taskByName) {
+		dslContext.insertInto(Tables.CONTEST_TASKS)
+				.values(new ContestTasks(contest.getId(), taskByName.getId()))
+				.execute();
 	}
 
 }

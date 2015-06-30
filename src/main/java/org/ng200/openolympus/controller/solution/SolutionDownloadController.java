@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.model.Role;
-import org.ng200.openolympus.model.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.StorageService;
+import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -56,27 +56,21 @@ public class SolutionDownloadController {
 	@Autowired
 	private StorageService storageService;
 
+	@Autowired
+	private UserService userService;
+
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
-			+ SecurityExpressionConstants.OR
-			+ '('
+			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.USER_IS_OWNER
 			+ SecurityExpressionConstants.AND
-			+ "@oolsec.isSolutionInCurrentContest(#solution)"
-			+ ')')
+			+ "@oolsec.isSolutionInCurrentContest(#solution)" + ')')
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<FileSystemResource> solutionDownload(
 			final HttpServletRequest request, final Model model,
 			@RequestParam(value = "id") final Solution solution,
 			final Principal principal) {
-		if (principal == null
-				|| (!solution.getUser().getUsername()
-						.equals(principal.getName()) && !request
-						.isUserInRole(Role.SUPERUSER))) {
-			throw new InsufficientAuthenticationException(
-					"You attempted to download a solution that doesn't belong to you!");
-		}
 		Assertions.resourceExists(solution);
 
 		final HttpHeaders headers = new HttpHeaders();

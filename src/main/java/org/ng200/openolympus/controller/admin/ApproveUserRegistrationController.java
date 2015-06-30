@@ -31,11 +31,9 @@ import org.apache.commons.mail.EmailException;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.auth.EmailConfirmationController;
-import org.ng200.openolympus.model.Role;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.EmailService;
-import org.ng200.openolympus.services.RoleService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,8 +78,6 @@ public class ApproveUserRegistrationController {
 
 	@Autowired
 	private EmailService emailService;
-	@Autowired
-	private RoleService roleService;
 
 	@Autowired
 	private UserService userService;
@@ -115,9 +111,7 @@ public class ApproveUserRegistrationController {
 			user.setApprovalEmailSent(true);
 			user = this.userService.saveUser(user);
 		} else {
-			final Role role = this.roleService.getRoleByName(Role.USER);
-
-			user.getRoles().add(role);
+			user.setApproved(true);
 			user.setEmailConfirmationToken(null);
 			this.userService.saveUser(user);
 		}
@@ -128,8 +122,7 @@ public class ApproveUserRegistrationController {
 	@JsonView(PriviligedView.class)
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
-				.filter(user -> !this.userService.isUserApproved(user))
-				.map(u -> {
+				.filter(user -> !user.getApprovalEmailSent()).map(u -> {
 					try {
 						this.approveUser(u);
 					} catch (MessagingException | EmailException e) {

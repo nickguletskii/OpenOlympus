@@ -22,10 +22,13 @@
  */
 package org.ng200.openolympus.controller.user;
 
+import java.sql.Timestamp;
+
 import javax.validation.Valid;
 
+import org.jooq.impl.DSL;
 import org.ng200.openolympus.dto.UserInfoDto;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -55,7 +58,7 @@ public class AbstractUserInfoController {
 		user.setLandline(userInfoDto.getLandline());
 		user.setMobile(userInfoDto.getMobile());
 		user.setSchool(userInfoDto.getSchool());
-		user.setBirthDate(userInfoDto.getDateOfBirth());
+		user.setBirthDate(new Timestamp(userInfoDto.getDateOfBirth().getTime()));
 		this.userService.saveUser(user);
 	}
 

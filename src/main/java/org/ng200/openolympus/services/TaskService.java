@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus.services;
 
+import static org.jooq.impl.DSL.max;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -29,73 +31,69 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 
-import javax.persistence.EntityManager;
-
-import org.hibernate.Query;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
-import org.hibernate.Session;
-import org.hibernate.StatelessSession;
+import org.apache.commons.lang3.NotImplementedException;
+import org.jooq.Cursor;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.cerberus.util.Lists;
-import org.ng200.openolympus.model.Solution;
-import org.ng200.openolympus.model.Task;
-import org.ng200.openolympus.model.User;
-import org.ng200.openolympus.repositories.SolutionRepository;
-import org.ng200.openolympus.repositories.TaskRepository;
-import org.ng200.openolympus.repositories.VerdictRepository;
+import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.tables.daos.TaskDao;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.pojos.Verdict;
+import org.ng200.openolympus.jooq.tables.records.ContestRecord;
+import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
+import org.ng200.openolympus.jooq.tables.records.TaskRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class TaskService {
+public class TaskService extends GenericCreateUpdateRepository {
 
 	/**
 	 * Number of tasks with names containing a string that should be returned
 	 */
 	private static final int LIMIT_TASKS_WITH_NAME_CONTAINING = 30;
-	@Autowired
-	private TaskRepository taskRepository;
-	@Autowired
-	private SolutionRepository solutionRepository;
-
-	@Autowired
-	private VerdictRepository verdictRepository;
 
 	@Autowired
 	private TestingService testingService;
-	@Autowired
-	private EntityManager entityManager;
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private TaskDao taskDao;
+
+	@Autowired
+	private DSLContext dslContext;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
-	public Long countTasks() {
-		return this.taskRepository.count();
+	public long countTasks() {
+		return taskDao.count();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<Task> findAFewTasksWithNameContaining(final String name) {
-		return this.taskRepository.findByNameContaining(name, new PageRequest(
-				0, TaskService.LIMIT_TASKS_WITH_NAME_CONTAINING));
+		return dslContext.selectFrom(Tables.TASK)
+				.where(Tables.TASK.NAME.like(name))
+				.limit(LIMIT_TASKS_WITH_NAME_CONTAINING).fetchInto(Task.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<Task> findTasksNewestFirst(final int pageNumber,
 			final int pageSize) {
-		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
-				Sort.Direction.DESC, "timeAdded");
-		return this.taskRepository.findAll(request).getContent();
+		return dslContext.selectFrom(Tables.TASK).groupBy(Tables.TASK.ID)
+				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
+				.offset((pageNumber - 1) * pageSize).fetchInto(Task.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -108,10 +106,16 @@ public class TaskService {
 		if (this.securityService.isSuperuser(principal)) {
 			return this.findTasksNewestFirst(pageNumber, pageSize);
 		}
-
-		final PageRequest request = new PageRequest(pageNumber - 1, pageSize,
-				Sort.Direction.DESC, "timeAdded");
-		return this.taskRepository.findByPublished(true, request).getContent();
+		return dslContext
+				.select(Tables.TASK.fields())
+				.from(Tables.TASK_PERMISSION_PRINCIPAL)
+				.join(Tables.TASK_PERMISSION)
+				.on(Tables.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID
+						.eq(Tables.TASK_PERMISSION.ID)).join(Tables.TASK)
+				.on(Tables.TASK_PERMISSION.TASK_ID.eq(Tables.TASK.ID))
+				.groupBy(Tables.TASK.CREATED_DATE)
+				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
+				.offset((pageNumber - 1) * pageSize).fetchInto(Task.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -122,9 +126,10 @@ public class TaskService {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public BigDecimal getMaximumScore(final Task task) {
-		return Lists.first(
-				this.taskRepository.getTaskMaximumScore(task.getId())).orElse(
-				BigDecimal.ZERO);
+		return dslContext.select(max(Tables.SOLUTION.MAXIMUM_SCORE))
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchOne()
+				.value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -137,9 +142,12 @@ public class TaskService {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public BigDecimal getScore(final Task task, final User user) {
-		return Lists.first(
-				this.taskRepository.getTaskScore(task.getId(), user.getId()))
-				.orElse(BigDecimal.ZERO);
+		return dslContext
+				.select(max(Tables.SOLUTION.SCORE))
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.TASK_ID.eq(task.getId()).and(
+						Tables.SOLUTION.USER_ID.eq(user.getId()))).fetchOne()
+				.value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -150,53 +158,46 @@ public class TaskService {
 	@PostAuthorize(SecurityExpressionConstants.IS_ADMIN
 			+ SecurityExpressionConstants.OR + " #returnObject.published")
 	public Task getTaskByName(final String taskName) {
-		return this.taskRepository.findByName(taskName);
+		return taskDao.fetchOneByName(taskName);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@Transactional
 	public void rejudgeTask(final Task task) throws ExecutionException,
 			IOException {
-
-		final Lock lock = task.writeLock();
-		lock.lock();
-
-		try {
-
-			this.verdictRepository.flush();
-			this.solutionRepository.flush();
-
-			this.verdictRepository.deleteBySolutionTask(task);
-			this.verdictRepository.flush();
-
-			final StatelessSession session = ((Session) this.entityManager
-					.getDelegate()).getSessionFactory().openStatelessSession();
-			try {
-				final Query query = session
-						.createQuery("from Solution where task_id=:taskID");
-				query.setParameter("taskID", task.getId());
-				query.setFetchSize(Integer.valueOf(1000));
-				query.setReadOnly(false);
-				final ScrollableResults results = query
-						.scroll(ScrollMode.FORWARD_ONLY);
-				try {
-					while (results.next()) {
-						final Solution solution = (Solution) results.get(0);
-						this.testingService.testSolutionOnAllTests(solution);
-					}
-				} finally {
-					results.close();
-				}
-			} finally {
-				session.close();
-			}
-		} finally {
-			lock.unlock();
+		dslContext.delete(Tables.VERDICT).where(
+				Tables.VERDICT.SOLUTION_ID.in(dslContext
+						.select(Tables.SOLUTION.ID).from(Tables.SOLUTION)
+						.where(Tables.SOLUTION.TASK_ID.eq(task.getId()))));
+		Cursor<SolutionRecord> solutions = dslContext
+				.selectFrom(Tables.SOLUTION)
+				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchLazy();
+		while (solutions.hasNext()) {
+			Solution solution = solutions.fetchOneInto(Solution.class);
+			testingService.testSolutionOnAllTests(solution);
 		}
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public Task saveTask(Task task) {
-		return task = this.taskRepository.save(task);
+	public Task insertTask(Task task) {
+		return insert(task, Tables.TASK);
+	}
+
+	public Task getTaskFromVerdict(Verdict verdict) {
+		return dslContext.select(Tables.TASK.fields()).from(Tables.VERDICT)
+				.join(Tables.SOLUTION)
+				.on(Tables.SOLUTION.ID.eq(Tables.VERDICT.ID)).join(Tables.TASK)
+				.on(Tables.TASK.ID.eq(Tables.SOLUTION.TASK_ID))
+				.where(Tables.VERDICT.ID.eq(verdict.getId()))
+				.fetchOneInto(Task.class);
+	}
+
+	public Task getById(Integer id) {
+		return taskDao.findById(id);
+	}
+
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	public Task updateTask(Task task) {
+		return update(task, Tables.TASK);
 	}
 }

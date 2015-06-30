@@ -34,6 +34,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -180,6 +181,11 @@ public class JacksonSerializationFactory {
 		@Override
 		public Id getMechanism() {
 			return JsonTypeInfo.Id.CLASS;
+		}
+
+		@Override
+		public JavaType typeFromId(DatabindContext context, String id) {
+			return SimpleType.construct(Path.class);
 		}
 
 	}

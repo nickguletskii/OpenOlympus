@@ -23,7 +23,7 @@
 package org.ng200.openolympus.validation;
 
 import org.ng200.openolympus.dto.PasswordChangeDto;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.SolutionDto;
-import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.Solution;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.TaskService;
@@ -79,12 +79,8 @@ public class SolutionListController {
 		if (this.contestService.getRunningContest() == null) {
 			return this.solutionService.countUserSolutions(user);
 		}
-		return this.contestService
-				.getRunningContest()
-				.getTasks()
-				.stream()
-				.map(task -> this.solutionService.countUserSolutionsForTask(
-						user, task)).reduce((x, y) -> x + y).orElse(0l);
+		return solutionService.countUserSolutionsInContest(user,
+				this.contestService.getRunningContest());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
@@ -93,8 +89,10 @@ public class SolutionListController {
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
 			final Model model) {
 		return this.solutionService
-				.getPage(pageNumber, SolutionListController.PAGE_SIZE).stream()
-				.map(solution -> new SolutionDto(solution))
+				.getPage(pageNumber, SolutionListController.PAGE_SIZE)
+				.stream()
+				.map(solution -> new SolutionDto(solution, taskService
+						.getById(solution.getTaskId())))
 				.collect(Collectors.toList());
 	}
 
@@ -119,8 +117,10 @@ public class SolutionListController {
 					pageNumber, SolutionListController.PAGE_SIZE));
 		}
 
-		return solutions.stream().map(solution -> new SolutionDto(solution))
-				.map(dto -> {
+		return solutions
+				.stream()
+				.map(solution -> new SolutionDto(solution, taskService
+						.getById(solution.getTaskId()))).map(dto -> {
 					if (contest != null) {
 						dto.setScore(null);
 					}

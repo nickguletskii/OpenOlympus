@@ -36,7 +36,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.UploadableTask;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

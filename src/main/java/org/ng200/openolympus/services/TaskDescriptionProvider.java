@@ -27,8 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.exec.ExecuteException;
-import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
-import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
 import org.ng200.openolympus.FileAccess;
 import org.springframework.stereotype.Service;
 

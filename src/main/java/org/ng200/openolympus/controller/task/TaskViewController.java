@@ -23,22 +23,25 @@
 package org.ng200.openolympus.controller.task;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Locale;
 
 import javax.validation.Valid;
 
+import org.jooq.impl.DSL;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.SolutionSubmissionDto;
-import org.ng200.openolympus.model.Solution;
-import org.ng200.openolympus.model.Task;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TestingService;
@@ -169,12 +172,13 @@ public class TaskViewController {
 
 		solutionDto.getSolutionFile().transferTo(solutionFile.toFile());
 
-		Solution solution = new Solution(task, user, "", Date.from(Instant
-				.now()));
+		Solution solution = new Solution().setTaskId(task.getId())
+				.setUserId(user.getId())
+				.setTimeAdded(Timestamp.from(Instant.now()));
 
 		this.storageService.setSolutionFile(solution, solutionFile);
 
-		solution = this.solutionService.saveSolution(solution);
+		solution = this.solutionService.insertSolution(solution);
 		this.testingService.testSolutionOnAllTests(solution);
 
 		final long id = solution.getId();

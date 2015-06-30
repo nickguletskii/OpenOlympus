@@ -23,22 +23,31 @@
 package org.ng200.openolympus;
 
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.MultipartConfigElement;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.jooq.impl.DefaultConfiguration;
 import org.ng200.openolympus.cerberus.util.Lists;
-import org.ng200.openolympus.model.Role;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.daos.ContestDao;
+import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
+import org.ng200.openolympus.jooq.tables.daos.ContestTasksDao;
+import org.ng200.openolympus.jooq.tables.daos.GroupDao;
+import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
+import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
+import org.ng200.openolympus.jooq.tables.daos.TaskDao;
+import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
+import org.ng200.openolympus.jooq.tables.daos.UserDao;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
-import org.ng200.openolympus.services.RoleService;
+import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.UserService;
-import org.ng200.openolympus.sqlSupport.OpenOlympusPostgreDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +56,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
-import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.support.SimpleCacheManager;
@@ -58,13 +66,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.support.EncodedResource;
-import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.jdbc.datasource.init.ScriptException;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -74,7 +76,6 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 
 @Configuration
 @ComponentScan(basePackages = "org.ng200.openolympus")
@@ -83,8 +84,7 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableCaching
 public class Application {
-	public static void main(final String[] args) throws ScriptException,
-			SQLException {
+	public static void main(final String[] args) throws SQLException {
 		final ConfigurableApplicationContext context = SpringApplication.run(
 				Application.class, args);
 		Application.setupContext(context);
@@ -94,42 +94,7 @@ public class Application {
 			final ApplicationContext webApplicationContext) throws SQLException {
 		final UserService userService = webApplicationContext
 				.getBean(UserService.class);
-		final RoleService roleService = webApplicationContext
-				.getBean(RoleService.class);
-		final DataSource dataSource = webApplicationContext
-				.getBean(DataSource.class);
-		ScriptUtils.executeSqlScript(dataSource.getConnection(),
-				new EncodedResource(new ClassPathResource(
-						"sql/setupTriggers.sql")), false, false,
-				ScriptUtils.DEFAULT_COMMENT_PREFIX, "^^^ NEW STATEMENT ^^^",
-				ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
-				ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
 
-		if (userService.getUserByUsername("system") == null) {
-			Application.logger.info("Creating system account");
-			final User system = new User("system", null, "", "", "", "", "",
-					"", "", "", "", "", "", "", "", "", "", "", "", "", null,
-					null);
-			final Set<Role> roles = new HashSet<Role>();
-			roles.add(roleService.getRoleByName(Role.USER));
-			roles.add(roleService.getRoleByName(Role.SUPERUSER));
-			roles.add(roleService.getRoleByName(Role.SYSTEM));
-			system.setRoles(roles);
-			userService.saveUser(system);
-		}
-
-		if (userService.getUserByUsername("admin") == null) {
-			Application.logger.info("Creating administrator account");
-			final User admin = new User("admin",
-					new BCryptPasswordEncoder().encode("admin"), "", "", "",
-					"", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-					null, null);
-			final Set<Role> roles = new HashSet<Role>();
-			roles.add(roleService.getRoleByName(Role.USER));
-			roles.add(roleService.getRoleByName(Role.SUPERUSER));
-			admin.setRoles(roles);
-			userService.saveUser(admin);
-		}
 	}
 
 	static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -146,11 +111,6 @@ public class Application {
 	private String storagePath;
 
 	@Bean
-	public AuditorAware<User> auditorProvider() {
-		return new SpringSecurityAuditorAware();
-	}
-
-	@Bean
 	public DataSource dataSource() {
 		final BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName("org.postgresql.Driver");
@@ -163,13 +123,74 @@ public class Application {
 	}
 
 	@Bean
-	public HibernateJpaVendorAdapter jpaVendorAdapter() {
-		final HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-		adapter.setShowSql(false);
-		adapter.setGenerateDdl(true);
-		adapter.setDatabasePlatform(OpenOlympusPostgreDialect.class
-				.getCanonicalName());
-		return adapter;
+	public SolutionDao solutionDao() {
+		return new SolutionDao(dslContext().configuration());
+	}
+
+	@Bean
+	public UserDao userDao() {
+		UserDao userDao = new UserDao(dslContext().configuration());
+		if (userDao.fetchOneByUsername("admin") == null) {
+			logger.info("The administrative account doesn't exist. Creating...");
+			userDao.insert(new User().setUsername("admin")
+					.setPassword(passwordEncoder().encode("admin"))
+					.setSuperuser(true).setEnabled(true).setApproved(true)
+					.setApprovalEmailSent(false));
+		}
+		if (userDao.fetchOneByUsername("system") == null) {
+			logger.info("The system account doesn't exist. Creating...");
+			userDao.insert(new User().setUsername("system").setPassword(null)
+					.setSuperuser(true).setEnabled(true).setApproved(true)
+					.setApprovalEmailSent(false));
+		}
+
+		return userDao;
+	}
+
+	@Bean
+	public TaskDao taskDao() {
+		return new TaskDao(dslContext().configuration());
+	}
+
+	@Bean
+	public ContestDao contestDao() {
+		return new ContestDao(dslContext().configuration());
+	}
+
+	@Bean
+	public ContestParticipationDao contestParticipationDao() {
+		return new ContestParticipationDao(dslContext().configuration());
+	}
+
+	@Bean
+	public ContestTasksDao contestTasksDao() {
+		return new ContestTasksDao(dslContext().configuration());
+	}
+
+	@Bean
+	public TimeExtensionDao timeExtensionDao() {
+		return new TimeExtensionDao(dslContext().configuration());
+	}
+
+	@Bean
+	public GroupDao groupDao() {
+		return new GroupDao(dslContext().configuration());
+	}
+
+	@Bean
+	public PropertyDao propertyDao() {
+		return new PropertyDao(dslContext().configuration());
+	}
+
+	@Bean
+	public DSLContext dslContext() {
+		return DSL.using(new DefaultConfiguration().set(dataSource()).set(
+				SQLDialect.POSTGRES));
+	}
+
+	@Bean
+	public StorageService storageService() {
+		return new StorageService();
 	}
 
 	@Bean
@@ -223,7 +244,6 @@ public class Application {
 		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
 
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new Hibernate4Module());
 		mapper.registerModule(new DurationJacksonModule());
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
 				false);

@@ -23,14 +23,16 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.Task;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SecurityService;
@@ -68,7 +70,7 @@ public class ContestViewController {
 	public static class ContestDTO {
 		private String name;
 		private TimingDTO timings;
-		private Set<Task> tasks;
+		private List<Task> tasks;
 
 		public String getName() {
 			return name;
@@ -86,15 +88,15 @@ public class ContestViewController {
 			this.timings = timings;
 		}
 
-		public Set<Task> getTasks() {
+		public List<Task> getTasks() {
 			return tasks;
 		}
 
-		public void setTasks(Set<Task> tasks) {
+		public void setTasks(List<Task> tasks) {
 			this.tasks = tasks;
 		}
 
-		public ContestDTO(String name, TimingDTO timings, Set<Task> tasks) {
+		public ContestDTO(String name, TimingDTO timings, List<Task> tasks) {
 			super();
 			this.name = name;
 			this.timings = timings;
@@ -115,11 +117,11 @@ public class ContestViewController {
 			@PathVariable(value = "contest") final Contest contest,
 			final Principal principal) {
 		User user = userService.getUserByUsername(principal.getName());
-		Set<Task> tasks = new HashSet<Task>(contest.getTasks());
+		List<Task> tasks = contestService.getContestTasks(contest);
 		return new ContestDTO(contest.getName(), new TimingDTO(
 				contest.getStartTime(), Date.from(contest.getStartTime()
 						.toInstant().plus(contest.getDuration())),
-				contestService.getContestEndTimeForUser(contest, user)),tasks);
+				contestService.getContestEndTimeForUser(contest, user)), tasks);
 	}
 
 	public static class TimingDTO {

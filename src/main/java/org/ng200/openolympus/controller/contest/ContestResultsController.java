@@ -31,8 +31,8 @@ import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
-import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.ContestService;
@@ -66,14 +66,7 @@ public class ContestResultsController {
 
 		public ContestUserRankingDto(Contest contest, UserRanking ranking) {
 			Beans.copy(ranking, this);
-			this.setTaskScores(contest
-					.getTasks()
-					.stream()
-					.map(task -> new Pair<Task, BigDecimal>(task,
-							ContestResultsController.this.contestService
-									.getUserTaskScoreInContest(contest,
-											ranking, task)))
-					.collect(Collectors.toList()));
+			// TODO: fix contest ranking DTO
 		}
 
 		@JsonView(UnprivilegedView.class)
@@ -174,8 +167,8 @@ public class ContestResultsController {
 
 		Assertions.resourceExists(contest);
 
-		return this.contestService.getContestResultsPage(contest, pageNumber)
-				.stream()
+		return this.contestService
+				.getContestResultsPage(contest, pageNumber, 10).stream()
 				.map(ranking -> new ContestUserRankingDto(contest, ranking))
 				.collect(Collectors.toList());
 	}

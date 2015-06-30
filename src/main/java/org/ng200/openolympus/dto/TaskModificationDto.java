@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.dto;
 
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +40,6 @@ public class TaskModificationDto implements UploadableTask {
 	private String descriptionText;
 
 	@Override
-	@Transient
 	public MultipartFile getDescriptionFile() {
 		return this.descriptionFile;
 	}
@@ -51,7 +49,6 @@ public class TaskModificationDto implements UploadableTask {
 	}
 
 	@Override
-	@Transient
 	public MultipartFile getJudgeFile() {
 		return this.judgeFile;
 	}

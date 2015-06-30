@@ -23,16 +23,18 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.HashSet;
 
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.jooq.impl.DSL;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestDto;
-import org.ng200.openolympus.model.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,10 +71,14 @@ public class ContestCreationController {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
-		Contest contest = new Contest(contestDto.getStartTime(),
-				contestDto.getDuration(), contestDto.getName(),
-				new HashSet<>(), contestDto.isShowFullTestsDuringContest());
-		contest = this.contestService.saveContest(contest);
+		Contest contest = new Contest()
+				.setDuration(contestDto.getDuration())
+				.setName(contestDto.getName())
+				.setShowFullTestsDuringContest(
+						contestDto.isShowFullTestsDuringContest())
+				.setStartTime(
+						Timestamp.from(contestDto.getStartTime().toInstant()));
+		contest = this.contestService.insertContest(contest);
 		return new BindingResponse(Status.OK, null,
 				new ImmutableMap.Builder<String, Object>().put("id",
 						contest.getId()).build());

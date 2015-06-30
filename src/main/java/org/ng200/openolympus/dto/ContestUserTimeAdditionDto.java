@@ -26,7 +26,7 @@ import java.time.Duration;
 
 import javax.validation.constraints.NotNull;
 
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 
 public class ContestUserTimeAdditionDto {
 	@NotNull(message = "empty")

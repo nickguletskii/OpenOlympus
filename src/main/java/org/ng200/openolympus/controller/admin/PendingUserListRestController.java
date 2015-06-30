@@ -25,7 +25,7 @@ package org.ng200.openolympus.controller.admin;
 import java.util.List;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
-public class UnapprovedUserListRestController {
+public class PendingUserListRestController {
 	private static final int PAGE_SIZE = 10;
 	@Autowired
 	private UserService userService;
@@ -54,8 +54,8 @@ public class UnapprovedUserListRestController {
 	@RequestMapping(value = "/api/admin/pendingUsers", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {
-		return this.userService.getUnapprovedUsers(page,
-				UnapprovedUserListRestController.PAGE_SIZE);
+		return this.userService.getPendingUsers(page,
+				PendingUserListRestController.PAGE_SIZE);
 	}
 
 }

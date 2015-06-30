@@ -44,7 +44,7 @@ public class LockdownController {
 	@RequestMapping(value = "/admin/lockdown/enabled", method = RequestMethod.POST)
 	public void endLockdown(
 			@RequestParam(value = "enabled", required = true) boolean enabled) {
-		this.propertyService.set("isOnLockdown", enabled);
+		// TODO: fix lockdowns
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)

@@ -26,8 +26,8 @@ import java.util.HashSet;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.model.Contest;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -53,12 +53,8 @@ public class ContestTaskRemovalController {
 			@RequestParam(value = "task") final Task task, final Model model) {
 		Assertions.resourceExists(contest);
 		Assertions.resourceExists(task);
-		HashSet<Task> tasks = new HashSet<>(contest.getTasks());
-		if (tasks.contains(task)) {
-			tasks.remove(task);
-			contest.setTasks(tasks);
-			this.contestService.saveContest(contest);
-		}
+
+		contestService.removeTaskFromContest(task, contest);
 	}
 
 }

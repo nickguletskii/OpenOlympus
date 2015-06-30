@@ -22,11 +22,20 @@
  */
 package org.ng200.openolympus.services;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.jooq.DSLContext;
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.model.Property;
-import org.ng200.openolympus.repositories.PropertyRepository;
+import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
+import org.ng200.openolympus.jooq.tables.pojos.Property;
+import org.ng200.openolympus.jooq.tables.records.PropertyRecord;
+import org.ng200.openolympus.jooq.tables.records.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -35,25 +44,45 @@ import org.springframework.stereotype.Service;
 public class PropertyService {
 
 	@Autowired
-	private PropertyRepository propertyRepository;
+	private PropertyDao propertyDao;
 
-	public Property get(final String key, final Serializable defaultValue) {
-		Property property = this.propertyRepository.findByKey(key);
+	@Autowired
+	private DSLContext dslContext;
+
+	private byte[] serializeObject(Serializable serializable)
+			throws IOException {
+		try (ByteArrayOutputStream b = new ByteArrayOutputStream();
+				ObjectOutputStream o = new ObjectOutputStream(b);) {
+			o.writeObject(serializable);
+			return b.toByteArray();
+		}
+	}
+
+	private Object deserializeObject(byte[] obj) throws IOException,
+			ClassNotFoundException {
+		try (ByteArrayInputStream b = new ByteArrayInputStream(obj);
+				ObjectInputStream o = new ObjectInputStream(b);) {
+			return o.readObject();
+		}
+	}
+
+	public Property get(final String key, final Serializable defaultValue)
+			throws IOException {
+		Property property = this.propertyDao.fetchOneByPropertyKey(key);
 		if (property == null) {
-			property = new Property(key, defaultValue);
-			property = this.propertyRepository.save(property);
+			property = new Property(null, key, serializeObject(defaultValue));
+			propertyDao.insert(property);
 		}
 		return property;
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public void set(final String key, final Serializable value) {
-		Property property = this.propertyRepository.findByKey(key);
-		if (property == null) {
-			property = new Property(key, value);
-			property = this.propertyRepository.save(property);
-		}
-		property.setValue(value);
-		property = this.propertyRepository.save(property);
+	public void set(final String key, final Serializable value)
+			throws IOException {
+		Property property = get(key, value);
+		property.setPropertyValue(serializeObject(value));
+		PropertyRecord propertyRecord = dslContext.newRecord(Tables.PROPERTY);
+		propertyRecord.from(property);
+		propertyRecord.store();
 	}
 }

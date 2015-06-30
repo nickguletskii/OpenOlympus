@@ -23,16 +23,18 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.jooq.impl.DSL;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestDto;
-import org.ng200.openolympus.model.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,10 +82,10 @@ public class ContestModificationController {
 		}
 		contest.setName(contestDto.getName());
 		contest.setDuration(contestDto.getDuration());
-		contest.setStartTime(contestDto.getStartTime());
+		contest.setStartTime(new Timestamp(contestDto.getStartTime().getTime()));
 		contest.setShowFullTestsDuringContest(contestDto
 				.isShowFullTestsDuringContest());
-		contest = this.contestService.saveContest(contest);
+		contest = this.contestService.updateContest(contest);
 		return BindingResponse.OK;
 	}
 

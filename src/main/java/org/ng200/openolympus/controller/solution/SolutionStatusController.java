@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.solution.VerdictStatusController.VerdictDto;
-import org.ng200.openolympus.model.Solution;
-import org.ng200.openolympus.model.Verdict;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.services.SolutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,9 +116,6 @@ public class SolutionStatusController {
 				.sorted((l, r) -> Long.compare(l.getId(), r.getId()))
 				.map(verdict -> this.verdictJSONController.showVerdict(verdict,
 						locale)).collect(Collectors.toList()));
-		if (verdicts.stream().anyMatch(verdict -> !verdict.isTested())) {
-			return dto;
-		}
 		return dto;
 	}
 }

@@ -32,7 +32,7 @@ import javax.validation.Valid;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.TaskModificationDto;
-import org.ng200.openolympus.model.Task;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.TestingService;
@@ -67,7 +67,6 @@ public class TaskModificationRestController extends
 			throws IOException {
 
 		final TaskModificationDto taskModificationDto = new TaskModificationDto();
-		taskModificationDto.setPublished(task.isPublished());
 		taskModificationDto.setName(task.getName());
 		taskModificationDto.setDescriptionText(this.storageService
 				.getTaskDescriptionSourcecode(task));
@@ -91,7 +90,6 @@ public class TaskModificationRestController extends
 			}
 
 			task.setName(taskModificationDto.getName());
-			task.setPublished(taskModificationDto.isPublished());
 
 			if (taskModificationDto.getDescriptionFile() != null) {
 				this.uploadDescription(task, taskModificationDto
@@ -107,7 +105,7 @@ public class TaskModificationRestController extends
 				this.uploadJudgeFile(task, taskModificationDto);
 			}
 
-			this.taskService.saveTask(task);
+			this.taskService.updateTask(task);
 			this.testingService.reloadTasks();
 			return BindingResponse.OK;
 		};

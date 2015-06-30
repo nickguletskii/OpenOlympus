@@ -29,7 +29,7 @@ import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestUserAdditionDto;
-import org.ng200.openolympus.model.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.ContestUserAdditionDtoValidator;

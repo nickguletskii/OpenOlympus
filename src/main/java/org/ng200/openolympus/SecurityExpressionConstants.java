@@ -25,7 +25,7 @@ package org.ng200.openolympus;
 public class SecurityExpressionConstants {
 	public static final String OR = " or ";
 	public static final String AND = " and ";
-	public static final String IS_ADMIN = " (hasAuthority('SYSTEM') or hasAuthority('SUPERUSER')) ";
+	public static final String IS_ADMIN = " (hasAuthority('SYSTEM') or hasAuthority('ADMINISTRATOR')) ";
 	public static final String IS_USER = " hasAuthority('USER') ";
 	public static final String NO_CONTEST_CURRENTLY = " @oolsec.noContest() ";
 	public static final String USER_IS_OWNER = " (#user.username == authentication.name) ";

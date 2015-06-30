@@ -24,8 +24,9 @@ package org.ng200.openolympus.dto;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 
-import org.ng200.openolympus.model.User;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.util.Beans;
 
@@ -43,6 +44,29 @@ public class UserRanking extends User {
 	private BigInteger rank;
 
 	public UserRanking() {
+	}
+
+	public UserRanking(Long id, String username, String firstNameMain,
+			String addressCity, String addressCountry, String addressLine1,
+			String addressLine2, String addressState,
+			Boolean approvalEmailSent, Timestamp birthDate,
+			String emailAddress, String emailConfirmationToken,
+			Boolean enabled, String firstNameLocalised, String landline,
+			String lastNameLocalised, String lastNameMain,
+			String middleNameLocalised, String middleNameMain, String mobile,
+			String password, String school, String teacherFirstName,
+			String teacherLastName, String teacherMiddleName,
+			Boolean superuser, Boolean approved, BigDecimal score,
+			BigInteger rank) {
+		super(id, username, firstNameMain, addressCity, addressCountry,
+				addressLine1, addressLine2, addressState, approvalEmailSent,
+				birthDate, emailAddress, emailConfirmationToken, enabled,
+				firstNameLocalised, landline, lastNameLocalised, lastNameMain,
+				middleNameLocalised, middleNameMain, mobile, password, school,
+				teacherFirstName, teacherLastName, teacherMiddleName,
+				superuser, approved);
+		this.score = score;
+		this.rank = rank;
 	}
 
 	public UserRanking(BigInteger rank, User user, BigDecimal score) {

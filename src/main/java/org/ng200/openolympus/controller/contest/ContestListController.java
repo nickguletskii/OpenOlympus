@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
-import org.ng200.openolympus.model.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

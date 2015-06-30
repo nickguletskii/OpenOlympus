@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationFailureHandler;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationSuccessHandler;
 import org.ng200.openolympus.controller.auth.RecaptchaAuthenticationFilter;
-import org.ng200.openolympus.model.Role;
 import org.ng200.openolympus.services.UserSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +45,6 @@ import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -138,7 +136,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 		.csrf().disable()
 		.headers()
-		.xssProtection().xssProtectionEnabled(true).and()
+		.xssProtection().disable()
 		.and()
 		.exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
 		.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
@@ -162,15 +160,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.authorizeRequests()
 		.antMatchers(WebSecurityConfig.permittedAny).permitAll().and()
 		.authorizeRequests()
-		.antMatchers(WebSecurityConfig.authorisedAny).hasAuthority(Role.USER).and()
+		.antMatchers(WebSecurityConfig.authorisedAny).hasAuthority(Authorities.USER.getAuthority()).and()
 		.authorizeRequests()
-		.antMatchers(HttpMethod.POST, WebSecurityConfig.authorisedPost).hasAuthority(Role.USER).and()
+		.antMatchers(HttpMethod.POST, WebSecurityConfig.authorisedPost).hasAuthority(Authorities.USER.getAuthority()).and()
 		.authorizeRequests()
-		.antMatchers(HttpMethod.GET, WebSecurityConfig.authorisedGet).hasAuthority(Role.USER).and()
+		.antMatchers(HttpMethod.GET, WebSecurityConfig.authorisedGet).hasAuthority(Authorities.USER.getAuthority()).and()
 		.authorizeRequests()
 		.antMatchers(HttpMethod.GET, WebSecurityConfig.permittedGet).permitAll().and()
 		.authorizeRequests()
-		.antMatchers(WebSecurityConfig.administrativeAny).hasAuthority(Role.SUPERUSER).and()
+		.antMatchers(WebSecurityConfig.administrativeAny).hasAuthority(Authorities.ADMINISTRATOR.getAuthority()).and()
 		.addFilterBefore(this.reCaptchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter
 				.class)
 				.httpBasic();
