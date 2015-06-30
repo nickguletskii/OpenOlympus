@@ -22,23 +22,23 @@
  */
 'use strict';
 
-var services = ["authenticationProvider",
-    "serversideFormErrorReporter",
-    "validationService",
-    "modalState",
-    "userService",
-    "solutionService",
-    "taskService",
-    "contestService",
-    "timeService"
-];
+var angular = require("angular");
+var app = require("app");
+var _ = require("lodash");
 
-var requirements = ['angular', 'app', 'lodash'].concat(services.map(function(service) {
-    return "services/" + service;
-}));
-define(requirements, function(angular, app, _) {
-    var module = angular.module('ool.services', []);
-    _.forEach(_.takeRight(arguments, services.length), function(registrator) {
-        registrator(module);
-    });
+var services = [
+    require("services/authenticationProvider"),
+    require("services/serversideFormErrorReporter"),
+    require("services/validationService"),
+    require("services/modalState"),
+    require("services/userService"),
+    require("services/solutionService"),
+    require("services/taskService"),
+    require("services/contestService"),
+    require("services/timeService")
+];
+console.log(angular);
+var module = angular.module('ool.services', []);
+_.forEach(services, function(registrator) {
+    registrator(module);
 });

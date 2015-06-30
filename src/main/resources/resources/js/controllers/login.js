@@ -20,71 +20,70 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
-            $location, $stateParams, $state, AuthenticationProvider, $translate) {
-            $scope.$apply(function() {
-                AuthenticationProvider.update();
-                $scope.showAdministratorApprovalRequiredMessage = $stateParams.showAdministratorApprovalRequiredMessage;
 
-                $http.get("/api/security/userStatus").success(function(response) {
-                    if (response.loggedIn) {
-                        $state.go("home");
-                    } else {
-                        $scope.logInFormVisible = true;
-                    }
-                });
+var Util = require("oolutil");
+var _ = require("lodash");
 
-                $scope.resetCaptcha = function() {};
-                $scope.user = {};
+module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
+    $location, $stateParams, $state, AuthenticationProvider, $translate) {
+    AuthenticationProvider.update();
+    $scope.showAdministratorApprovalRequiredMessage = $stateParams.showAdministratorApprovalRequiredMessage;
 
-                $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
-                    if (_.isEmpty(recaptchaPublicKey)) {
-                        $scope.captchaDisabled = true;
-                        $scope.loaded = true;
-                        return;
-                    }
-                    googleGrecaptcha.then(function() {
-                        widgetId = grecaptcha.render(
-                            document.getElementById("no-captcha"), {
-                                "theme": "light",
-                                "sitekey": recaptchaPublicKey,
-                                "callback": function(r) {
-                                    $scope.$apply(function() {
-                                        $scope.recaptchaResponse = r;
-                                        $scope.captchaErrors = null;
-                                    });
-                                }
-                            }
-                        );
-                        $scope.resetCaptcha = function() {
-                            grecaptcha.reset(widgetId);
-                            $scope.recaptchaResponse = null;
-                        };
-                        $scope.loaded = true;
-                    });
-                });
-
-                $scope.login = function() {
-
-                    AuthenticationProvider.login($scope.user.username, $scope.user.password, $scope.recaptchaResponse)
-                        .success(function(response) {
-                            console.log(response);
-                            if (response.auth === "succeded") {
-                                $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", true);
-                                AuthenticationProvider.update();
-                                $state.go("home");
-                            } else if (response.auth === "failed") {
-                                $scope.authError = true;
-                                $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", false);
-                            }
-                            if (response.captchas) {
-                                $scope.captchaErrors = response.captchas;
-                            }
-                        });
-                    $scope.resetCaptcha();
-                };
-            });
-        };
+    $http.get("/api/security/userStatus").success(function(response) {
+        if (response != null) {
+            $state.go("home");
+        } else {
+            $scope.logInFormVisible = true;
+        }
     });
+
+    $scope.resetCaptcha = function() {};
+    $scope.user = {};
+
+    $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
+        if (_.isEmpty(recaptchaPublicKey)) {
+            $scope.captchaDisabled = true;
+            $scope.loaded = true;
+            return;
+        }
+        googleGrecaptcha.then(function() {
+            widgetId = grecaptcha.render(
+                document.getElementById("no-captcha"), {
+                    "theme": "light",
+                    "sitekey": recaptchaPublicKey,
+                    "callback": function(r) {
+                        $scope.$apply(function() {
+                            $scope.recaptchaResponse = r;
+                            $scope.captchaErrors = null;
+                        });
+                    }
+                }
+            );
+            $scope.resetCaptcha = function() {
+                grecaptcha.reset(widgetId);
+                $scope.recaptchaResponse = null;
+            };
+            $scope.loaded = true;
+        });
+    });
+
+    $scope.login = function() {
+
+        AuthenticationProvider.login($scope.user.username, $scope.user.password, $scope.recaptchaResponse)
+            .success(function(response) {
+                console.log(response);
+                if (response.auth === "succeded") {
+                    $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", true);
+                    AuthenticationProvider.update();
+                    $state.go("home");
+                } else if (response.auth === "failed") {
+                    $scope.authError = true;
+                    $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", false);
+                }
+                if (response.captchas) {
+                    $scope.captchaErrors = response.captchas;
+                }
+            });
+        $scope.resetCaptcha();
+    };
+};

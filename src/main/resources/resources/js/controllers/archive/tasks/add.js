@@ -20,63 +20,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
-            $scope.$apply(function() {
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.taskCreationForm.forceValidation = true;
-                $scope.task = {};
-                $scope.uploadProgressBarColour = function() {
-                    if ($scope.uploadFailure)
-                        return "danger";
-                    if ($scope.uploadSuccess)
-                        return "success";
-                    return "info";
-                };
-                $scope.isFormVisible = true;
 
-                function success() {
-                    $scope.isFormVisible = false;
-                    $scope.uploadSuccess = true;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                function failure() {
-                    $scope.isFormVisible = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = true;
-                    $scope.processing = false;
-                }
+module.exports = function($timeout, $q, $scope, $rootScope, $http,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.task = {};
+    $scope.uploadProgressBarColour = function() {
+        if ($scope.uploadFailure)
+            return "danger";
+        if ($scope.uploadSuccess)
+            return "success";
+        return "info";
+    };
+    $scope.isFormVisible = true;
 
-                function reset() {
-                    $scope.isFormVisible = true;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
+    function success() {
+        $scope.isFormVisible = false;
+        $scope.uploadSuccess = true;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
 
-                $scope.createTask = function(task) {
-                    $scope.isFormVisible = false;
+    function failure() {
+        $scope.isFormVisible = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = true;
+        $scope.processing = false;
+    }
 
-                    try {
-                        var fd = new FormData();
+    function reset() {
+        $scope.isFormVisible = true;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
 
-                        _.forEach(task, function(value, key) {
-                            fd.append(key, value);
-                        });
-                        if (!!task.judgeFile)
-                            fd.append("judgeFile", task.judgeFile[0]);
-                        if (!!task.descriptionFile)
-                            fd.append("descriptionFile", task.descriptionFile[0]);
-                        ValidationService.postToServer($scope, '/api/task/create', $scope.taskCreationForm, fd, success, failure, reset);
-                    } catch (err) {
-                        reset();
-                    }
-                };
+    $scope.createTask = function(task) {
+        $scope.isFormVisible = false;
 
+        try {
+            var fd = new FormData();
+
+            _.forEach(task, function(value, key) {
+                fd.append(key, value);
             });
-        };
-    });
+            if (!!task.judgeFile)
+                fd.append("judgeFile", task.judgeFile[0]);
+            if (!!task.descriptionFile)
+                fd.append("descriptionFile", task.descriptionFile[0]);
+            ValidationService.postToServer($scope, '/api/task/create', $scope.taskCreationForm, fd, success, failure, reset);
+        } catch (err) {
+            reset();
+        }
+    };
+};

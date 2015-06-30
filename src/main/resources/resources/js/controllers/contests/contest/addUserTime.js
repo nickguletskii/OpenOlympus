@@ -20,60 +20,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
-            $scope.$apply(function() {
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.userTimeAdditionForm.forceValidation = true;
-                $scope.task = {};
-                $scope.uploadProgressBarColour = function() {
-                    if ($scope.uploadFailure)
-                        return "danger";
-                    if ($scope.uploadSuccess)
-                        return "success";
-                    return "info";
-                };
-                $scope.isFormVisible = true;
 
-                function success(response) {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = true;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                    $scope.$dismiss('close');
-                }
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                function failure() {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = true;
-                    $scope.processing = false;
-                }
+module.exports = function($timeout, $q, $scope, $rootScope, $http,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.task = {};
+    $scope.uploadProgressBarColour = function() {
+        if ($scope.uploadFailure)
+            return "danger";
+        if ($scope.uploadSuccess)
+            return "success";
+        return "info";
+    };
+    $scope.isFormVisible = true;
 
-                function reset() {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
+    function success(response) {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = true;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+        $scope.$dismiss('close');
+    }
 
-                $scope.addUserTime = function(time) {
-                    $scope.isSubmitting = true;
+    function failure() {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = true;
+        $scope.processing = false;
+    }
 
-                    try {
-                        var fd = new FormData();
-                        fd.append("user", $stateParams.userId);
-                        if (time)
-                            fd.append("time", time * (60 * 1000));
+    function reset() {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
 
-                        ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUserTime', $scope.userTimeAdditionForm, fd, success, failure, reset);
-                    } catch (err) {
-                        reset();
-                    }
-                };
+    $scope.addUserTime = function(time) {
+        $scope.isSubmitting = true;
 
-            });
-        };
-    });
+        try {
+            var fd = new FormData();
+            fd.append("user", $stateParams.userId);
+            if (time)
+                fd.append("time", time * (60 * 1000));
+
+            ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUserTime', $scope.userTimeAdditionForm, fd, success, failure, reset);
+        } catch (err) {
+            reset();
+        }
+    };
+};

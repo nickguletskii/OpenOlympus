@@ -20,40 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash', 'moment'],
-    function(Util, _, moment) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, contest, datetime, ContestService) {
-            function updateTasks() {
-                ContestService.getContestInfo($stateParams.contestId).then(function(contest) {
-                    $scope.contest = contest;
-                });
-            }
-            $scope.$apply(function() {
-                $scope.contestId = $stateParams.contestId;
-                $scope.contest = contest;
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
+var moment = require("moment");
 
-                $scope.removeTask = function(task) {
-                    ContestService.removeTask($stateParams.contestId, task.id).then(updateTasks);
-                };
-            });
-            var tick = function() {
-                $scope.$apply(function() {
-                    if (datetime.currentServerTime().isBefore(moment(contest.timings.startTime))) {
-                        $scope.contest.countdown = datetime.timeTo(contest.timings.startTime);
-                        $scope.contest.countdownKey = "contest.timeToStart";
-                    } else if (datetime.currentServerTime().isBefore(moment(contest.timings.endTimeIncludingTimeExtensions))) {
-                        $scope.contest.countdown = datetime.timeTo(contest.timings.endTimeIncludingTimeExtensions);
-                        $scope.contest.countdownKey = "contest.timeToEnd";
-                    } else {
-                        $scope.contest.countdownKey = "contest.ended";
-                    }
-                });
-                $timeout(tick, 500);
-            };
-            tick();
-            $rootScope.$on('taskAddedToContest', function() {
-                updateTasks();
-            });
-        };
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams, contest, datetime, ContestService) {
+    function updateTasks() {
+        ContestService.getContestInfo($stateParams.contestId).then(function(contest) {
+            $scope.contest = contest;
+        });
+    }
+    $scope.contestId = $stateParams.contestId;
+    $scope.contest = contest;
+
+    $scope.removeTask = function(task) {
+        ContestService.removeTask($stateParams.contestId, task.id).then(updateTasks);
+    };
+    var tick = function() {
+        $scope.$apply(function() {
+            if (datetime.currentServerTime().isBefore(moment(contest.timings.startTime))) {
+                $scope.contest.countdown = datetime.timeTo(contest.timings.startTime);
+                $scope.contest.countdownKey = "contest.timeToStart";
+            } else if (datetime.currentServerTime().isBefore(moment(contest.timings.endTimeIncludingTimeExtensions))) {
+                $scope.contest.countdown = datetime.timeTo(contest.timings.endTimeIncludingTimeExtensions);
+                $scope.contest.countdownKey = "contest.timeToEnd";
+            } else {
+                $scope.contest.countdownKey = "contest.ended";
+            }
+        });
+        $timeout(tick, 500);
+    };
+    tick();
+    $rootScope.$on('taskAddedToContest', function() {
+        updateTasks();
     });
+};

@@ -23,11 +23,7 @@
 define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) {
     return function(app) {
         app.factory('AuthenticationProvider', function($rootScope, $http, $timeout, $state) {
-            var data = {
-                loggedIn: false,
-                user: null,
-                roles: []
-            };
+            var data  = null;
             var poller = function() {
                 $http.get('/api/security/userStatus').then(function(r) {
                     data = r.data;
@@ -51,21 +47,21 @@ define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) 
             return {
                 data: data,
                 isLoggedIn: function() {
-                    return data.loggedIn;
+                    return !!data;
                 },
                 getUsername: function() {
-                    if (!data.user)
+                    if (!data)
                         return null;
-                    return data.user.username;
+                    return data.username;
                 },
                 getUser: function() {
-                    return data.user;
+                    return data;
                 },
                 isUser: function() {
-                    return _.contains(data.roles, "USER");
+                    return !!data && data.approved;
                 },
                 isAdmin: function() {
-                    return _.contains(data.roles, "SUPERUSER");
+                    return !!data && data.superuser;
                 },
                 update: update,
                 login: function(username, password, recaptchaResponse) {

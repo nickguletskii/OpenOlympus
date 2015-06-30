@@ -20,74 +20,72 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash', 'moment'],
-    function(Util, _, moment) {
-        return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
-            $scope.$apply(function() {
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.contestCreationForm.forceValidation = true;
-                $scope.contest = {
-                    duration: 0,
-                    startTime: moment().format("YYYY-MM-DDTHH:mm:ss.SSSZ")
-                };
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                $scope.open = function($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
+module.exports = function($timeout, $q, $scope, $rootScope, $http,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.contest = {
+        duration: 0,
+        startTime: moment().format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+    };
 
-                    $scope.opened = true;
-                };
+    $scope.open = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
 
-                $scope.uploadProgressBarColour = function() {
-                    if ($scope.uploadFailure)
-                        return "danger";
-                    if ($scope.uploadSuccess)
-                        return "success";
-                    return "info";
-                };
-                $scope.isFormVisible = true;
+        $scope.opened = true;
+    };
 
-                function success(response) {
-                    $scope.createdContestId = response.data.id;
-                    $scope.isFormVisible = false;
-                    $scope.uploadSuccess = true;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
+    $scope.uploadProgressBarColour = function() {
+        if ($scope.uploadFailure)
+            return "danger";
+        if ($scope.uploadSuccess)
+            return "success";
+        return "info";
+    };
+    $scope.isFormVisible = true;
 
-                function failure() {
-                    $scope.isFormVisible = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = true;
-                    $scope.processing = false;
-                }
+    function success(response) {
+        $scope.createdContestId = response.data.id;
+        $scope.isFormVisible = false;
+        $scope.uploadSuccess = true;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
 
-                function reset() {
-                    $scope.isFormVisible = true;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
-                $scope.reset = reset;
+    function failure() {
+        $scope.isFormVisible = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = true;
+        $scope.processing = false;
+    }
 
-                $scope.createContest = function(contest) {
-                    $scope.isFormVisible = false;
-                    try {
-                        var fd = new FormData();
-                         _.forEach(contest, function(value, key) {
-                            if (key === "duration")
-                                fd.append(key, value * (60 * 1000));
-                            else
-                                fd.append(key, value);
-                        });
-                        ValidationService.postToServer($scope, '/api/contests/create', $scope.contestCreationForm, fd, success, failure, reset);
+    function reset() {
+        $scope.isFormVisible = true;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
+    $scope.reset = reset;
 
-                    } catch (err) {
-                        reset();
-                    }
-                };
-
+    $scope.createContest = function(contest) {
+        $scope.isFormVisible = false;
+        try {
+            var fd = new FormData();
+            _.forEach(contest, function(value, key) {
+                if (key === "duration")
+                    fd.append(key, value * (60 * 1000));
+                else
+                    fd.append(key, value);
             });
-        };
-    });
+            ValidationService.postToServer($scope, '/api/contests/create', $scope.contestCreationForm, fd, success, failure, reset);
+
+        } catch (err) {
+            reset();
+        }
+    };
+};

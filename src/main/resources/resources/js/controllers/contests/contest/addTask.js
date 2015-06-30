@@ -20,75 +20,74 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
-            $scope.$apply(function() {
-                $scope.getTaskSuggestions = function(name) {
-                    return $http.get("/api/taskCompletion", {
-                        params: {
-                            "term": name
-                        }
-                    }).then(function(response) {
-                        return response.data;
-                    });
-                };
 
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.taskAdditionForm.forceValidation = true;
-                $scope.uploadProgressBarColour = function() {
-                    if ($scope.uploadFailure)
-                        return "danger";
-                    if ($scope.uploadSuccess)
-                        return "success";
-                    return "info";
-                };
-                $scope.isFormVisible = true;
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                function success(response) {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = true;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                    $scope.taskName = "";
-                    $translate('contest.addTask.lastAdded', {
-                        taskName: response.data.taskName
-                    }).then(function(d) {
-                        $scope.taskAddedMessage = d;
-                    });
-                    $scope.taskAdditionForm.taskName.$setUntouched();
-                    $scope.taskAdditionForm.taskName.$setPristine();
-                    $rootScope.$emit("taskAddedToContest");
-                }
+module.exports = function($timeout, $q, $scope, $rootScope, $http,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
+    $scope.getTaskSuggestions = function(name) {
+        return $http.get("/api/taskCompletion", {
+            params: {
+                "term": name
+            }
+        }).then(function(response) {
+            return response.data;
+        });
+    };
 
-                function failure() {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = true;
-                    $scope.processing = false;
-                }
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.uploadProgressBarColour = function() {
+        if ($scope.uploadFailure)
+            return "danger";
+        if ($scope.uploadSuccess)
+            return "success";
+        return "info";
+    };
+    $scope.isFormVisible = true;
 
-                function reset() {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
+    function success(response) {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = true;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+        $scope.taskName = "";
+        $translate('contest.addTask.lastAdded', {
+            taskName: response.data.taskName
+        }).then(function(d) {
+            $scope.taskAddedMessage = d;
+        });
+        $scope.taskAdditionForm.taskName.$setUntouched();
+        $scope.taskAdditionForm.taskName.$setPristine();
+        $rootScope.$emit("taskAddedToContest");
+    }
 
-                $scope.addTask = function(taskName) {
-                    $scope.isSubmitting = true;
+    function failure() {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = true;
+        $scope.processing = false;
+    }
 
-                    try {
-                        var fd = new FormData();
-                        fd.append("taskName", taskName);
+    function reset() {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
 
-                        ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addTask', $scope.taskAdditionForm, fd, success, failure, reset);
-                    } catch (err) {
-                        reset();
-                    }
-                };
+    $scope.addTask = function(taskName) {
+        $scope.isSubmitting = true;
 
-            });
-        };
-    });
+        try {
+            var fd = new FormData();
+            fd.append("taskName", taskName);
+
+            ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addTask', $scope.taskAdditionForm, fd, success, failure, reset);
+        } catch (err) {
+            reset();
+        }
+    };
+};

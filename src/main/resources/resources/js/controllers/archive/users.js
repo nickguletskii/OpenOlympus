@@ -20,26 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
 
-            $scope.$apply(function() {
-                var page = $stateParams.page;
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                $scope.page = $stateParams.page;
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams) {
 
-                $http.get('api/archive/rank', {
-                    params: {
-                        page: page
-                    }
-                }).success(function(users) {
-                    $scope.users = users;
-                });
-                $http.get('api/archive/rankCount').success(function(count) {
-                    $scope.userCount = count;
-                });
-            });
-        };
+    var page = $stateParams.page;
+
+    $scope.page = $stateParams.page;
+
+    $http.get('api/archive/rank', {
+        params: {
+            page: page
+        }
+    }).success(function(users) {
+        $scope.users = users;
     });
+    $http.get('api/archive/rankCount').success(function(count) {
+        $scope.userCount = count;
+    });
+};

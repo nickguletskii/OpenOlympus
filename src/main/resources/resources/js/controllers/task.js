@@ -20,67 +20,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $sce, task, $compile) {
-            $scope.$apply(function() {
-                $scope.name = task.name;
-                $scope.description = task.description;
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.solutionSubmissionForm.forceValidation = true;
-                $scope.taskId = $stateParams.taskId;
-                $scope.task = {};
-                $scope.isFormVisible = true;
+module.exports = function($timeout, $q, $scope, $rootScope, $http,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $sce, task, $compile) {
+    $scope.name = task.name;
+    $scope.description = task.description;
 
-                $scope.uploadProgressBarColour = function() {
-                    if ($scope.uploadFailure)
-                        return "danger";
-                    if ($scope.uploadSuccess)
-                        return "success";
-                    return "info";
-                };
-                $scope.isFormVisible = true;
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.taskId = $stateParams.taskId;
+    $scope.task = {};
+    $scope.isFormVisible = true;
 
-                function success(response) {
-                    $state.go("solutionView", {
-                        'solutionId': response.data.id
-                    });
-                }
+    $scope.uploadProgressBarColour = function() {
+        if ($scope.uploadFailure)
+            return "danger";
+        if ($scope.uploadSuccess)
+            return "success";
+        return "info";
+    };
+    $scope.isFormVisible = true;
 
-                function failure() {
-                    $scope.isFormVisible = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = true;
-                    $scope.processing = false;
-                }
+    function success(response) {
+        $state.go("solutionView", {
+            'solutionId': response.data.id
+        });
+    }
 
-                function reset() {
-                    $scope.isFormVisible = true;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
-                $scope.reset = reset;
+    function failure() {
+        $scope.isFormVisible = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = true;
+        $scope.processing = false;
+    }
 
-                $scope.submitSolution = function(solution) {
-                    $scope.isFormVisible = false;
-                    try {
-                        var fd = new FormData();
+    function reset() {
+        $scope.isFormVisible = true;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
+    $scope.reset = reset;
 
-                        _.forEach(solution, function(value, key) {
-                            fd.append(key, value);
-                        });
+    $scope.submitSolution = function(solution) {
+        $scope.isFormVisible = false;
+        try {
+            var fd = new FormData();
 
-                        if (!!solution.solutionFile)
-                            fd.append("solutionFile", solution.solutionFile[0]);
-                        ValidationService.postToServer($scope, '/api/task/' + $stateParams.taskId + '/submitSolution', $scope.solutionSubmissionForm, fd, success, failure, reset);
-                    } catch (err) {
-                        reset();
-                    }
-                };
-
+            _.forEach(solution, function(value, key) {
+                fd.append(key, value);
             });
-        };
-    });
+
+            if (!!solution.solutionFile)
+                fd.append("solutionFile", solution.solutionFile[0]);
+            ValidationService.postToServer($scope, '/api/task/' + $stateParams.taskId + '/submitSolution', $scope.solutionSubmissionForm, fd, success, failure, reset);
+        } catch (err) {
+            reset();
+        }
+    };
+};

@@ -20,11 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state) {
+var _ = require("lodash");
+var Util = require("oolutil");
+module.exports = /*@NgInject*/ function($timeout, $q, $scope, $rootScope, $http,
+    $location, $stateParams, $state) {
 
 
-        };
-    });
+};

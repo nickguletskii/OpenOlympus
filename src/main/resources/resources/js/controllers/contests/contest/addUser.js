@@ -20,74 +20,73 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
-            $scope.$apply(function() {
-                $scope.getUserSuggestions = function(name) {
-                    return $http.get("/api/userCompletion", {
-                        params: {
-                            "term": name
-                        }
-                    }).then(function(response) {
-                        return response.data;
-                    });
-                };
 
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.userAdditionForm.forceValidation = true;
-                $scope.uploadProgressBarColour = function() {
-                    if ($scope.uploadFailure)
-                        return "danger";
-                    if ($scope.uploadSuccess)
-                        return "success";
-                    return "info";
-                };
-                $scope.isFormVisible = true;
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                function success(response) {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = true;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                    $scope.username = "";
-                    $translate('contest.addUser.lastAdded', {
-                        username: response.data.username
-                    }).then(function(d) {
-                        $scope.userAddedMessage = d;
-                    });
-                    $scope.userAdditionForm.username.$setUntouched();
-                    $scope.userAdditionForm.username.$setPristine();
-                }
+module.exports = function($timeout, $q, $scope, $rootScope, $http,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
+    $scope.getUserSuggestions = function(name) {
+        return $http.get("/api/userCompletion", {
+            params: {
+                "term": name
+            }
+        }).then(function(response) {
+            return response.data;
+        });
+    };
 
-                function failure() {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = true;
-                    $scope.processing = false;
-                }
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.uploadProgressBarColour = function() {
+        if ($scope.uploadFailure)
+            return "danger";
+        if ($scope.uploadSuccess)
+            return "success";
+        return "info";
+    };
+    $scope.isFormVisible = true;
 
-                function reset() {
-                    $scope.isSubmitting = false;
-                    $scope.uploadSuccess = false;
-                    $scope.uploadFailure = false;
-                    $scope.processing = false;
-                }
+    function success(response) {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = true;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+        $scope.username = "";
+        $translate('contest.addUser.lastAdded', {
+            username: response.data.username
+        }).then(function(d) {
+            $scope.userAddedMessage = d;
+        });
+        $scope.userAdditionForm.username.$setUntouched();
+        $scope.userAdditionForm.username.$setPristine();
+    }
 
-                $scope.addUser = function(user) {
-                    $scope.isSubmitting = true;
+    function failure() {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = true;
+        $scope.processing = false;
+    }
 
-                    try {
-                        var fd = new FormData();
-                        fd.append("username", user.username);
+    function reset() {
+        $scope.isSubmitting = false;
+        $scope.uploadSuccess = false;
+        $scope.uploadFailure = false;
+        $scope.processing = false;
+    }
 
-                        ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUser', $scope.userAdditionForm, fd, success, failure, reset);
-                    } catch (err) {
-                        reset();
-                    }
-                };
+    $scope.addUser = function(user) {
+        $scope.isSubmitting = true;
 
-            });
-        };
-    });
+        try {
+            var fd = new FormData();
+            fd.append("username", user.username);
+
+            ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUser', $scope.userAdditionForm, fd, success, failure, reset);
+        } catch (err) {
+            reset();
+        }
+    };
+};

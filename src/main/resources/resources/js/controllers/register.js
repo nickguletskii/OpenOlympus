@@ -20,68 +20,66 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
-            $scope.$apply(function() {
-                $http.get("/api/security/userStatus").success(function(response) {
-                    if (response.loggedIn) {
-                        $state.go("home");
-                    } else {
-                        $scope.logInFormVisible = true;
-                    }
-                });
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.userForm.forceValidation = true;
-                $scope.user = {};
-                $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
-                    if (_.isEmpty(recaptchaPublicKey)) {
-                        $scope.captchaDisabled = true;
-                        $scope.loaded = true;
-                        return;
-                    }
-                    googleGrecaptcha.then(function() {
-                        widgetId = grecaptcha.render(
-                            document.getElementById("no-captcha"), {
-                                "theme": "light",
-                                "sitekey": recaptchaPublicKey,
-                                "callback": function(r) {
-                                    $scope.$apply(function() {
-                                        $scope.user.recaptchaResponse = r;
-                                        $scope.captchaErrors = null;
-                                    });
-                                }
-                            }
-                        );
-                        $scope.resetCaptcha = function() {
-                            grecaptcha.reset(widgetId);
-                            $scope.user.recaptchaResponse = null;
-                        };
-                        $scope.loaded = true;
-                    });
-                });
 
-                $scope.register = function(user) {
-                    if (!($scope.eulaAccepted))
-                        return;
-                    $http({
-                        method: 'POST',
-                        url: '/api/user/register',
-                        data: user
-                    }).success(function(data) {
-                        if (data.status === "BINDING_ERROR") {
-                            ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
-                        } else if (data.status === "RECAPTCHA_ERROR") {
-                            $scope.captchaErrors = data.recaptchaErrorCodes;
-                        } else {
-                            $state.go("login", {
-                                showAdministratorApprovalRequiredMessage: true
-                            });
-                        }
-                    });
-                };
+var Util = require("oolutil");
+var _ = require("lodash");
 
-            });
-        };
+module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
+    $http.get("/api/security/userStatus").success(function(response) {
+        if (response.loggedIn) {
+            $state.go("home");
+        } else {
+            $scope.logInFormVisible = true;
+        }
     });
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.user = {};
+    $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
+        if (_.isEmpty(recaptchaPublicKey)) {
+            $scope.captchaDisabled = true;
+            $scope.loaded = true;
+            return;
+        }
+        googleGrecaptcha.then(function() {
+            widgetId = grecaptcha.render(
+                document.getElementById("no-captcha"), {
+                    "theme": "light",
+                    "sitekey": recaptchaPublicKey,
+                    "callback": function(r) {
+                        $scope.$apply(function() {
+                            $scope.user.recaptchaResponse = r;
+                            $scope.captchaErrors = null;
+                        });
+                    }
+                }
+            );
+            $scope.resetCaptcha = function() {
+                grecaptcha.reset(widgetId);
+                $scope.user.recaptchaResponse = null;
+            };
+            $scope.loaded = true;
+        });
+    });
+
+    $scope.register = function(user) {
+        if (!($scope.eulaAccepted))
+            return;
+        $http({
+            method: 'POST',
+            url: '/api/user/register',
+            data: user
+        }).success(function(data) {
+            if (data.status === "BINDING_ERROR") {
+                ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
+            } else if (data.status === "RECAPTCHA_ERROR") {
+                $scope.captchaErrors = data.recaptchaErrorCodes;
+            } else {
+                $state.go("login", {
+                    showAdministratorApprovalRequiredMessage: true
+                });
+            }
+        });
+    };
+};

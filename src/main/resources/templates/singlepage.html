@@ -29,9 +29,9 @@
 </head>
 
 <body ui-sref-opts="reload" ng-class="{fullScreen: fullScreen}">
-    <div ng-show="!hideResourcesLoading" class="loadingResourcesOverlay">
+    <div class="loadingResourcesOverlay">
         <div class="loadingResourcesOverlayMid text-center">
-            <div class="spinner-4em"></div>
+            <h1 class="bg-primary"><i class="fa fa-circle-o-notch fa-spin fa-5x"></i></h1>
             <h1 class="bg-primary">OpenOlympus</h1>
             <h3 class="bg-primary">Loading...</h3>
         </div>
@@ -46,7 +46,7 @@
     </div>
     <div class="container text-center" ng-if="showErrorModal" ng-cloak="">
         <div class="row">
-            <span class="glyphicon glyphicon-exclamation-sign text-danger" style="font-size: 20em"></span>
+            <span class="fa fa-exclamation-triangle text-danger" style="font-size: 20em"></span>
         </div>
         <div class="row">
             <h1>{{'error.title' | translate}}</h1>
@@ -54,7 +54,8 @@
             <button class="btn btn-danger" onClick="window.location.reload()">{{'error.reloadPage' | translate}}</button>
         </div>
     </div>
-
+    <script src="/resources/resources/bundled/js/vendor.bundle.js"></script>
+    <script src="/resources/resources/bundled/js/bundle.js"></script>
 </body>
 
 </html>

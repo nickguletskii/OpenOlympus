@@ -20,13 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams) {
+var Util = require("oolutil");
+var _ = require("lodash");
 
-            $scope.$apply(function() {
-                
-            });
-        };
-    });
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams) {
+
+};

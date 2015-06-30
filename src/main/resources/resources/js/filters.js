@@ -22,38 +22,39 @@
  */
 'use strict';
 
-define(['angular', 'services', 'lodash'], function(angular, services, _) {
+var angular = require("angular");
+var _ = require("lodash");
+require("services");
 
-    /* Filters */
+/* Filters */
 
-    angular.module('ool.filters', ['ool.services'])
-        .filter("asDate", function() {
-            return function(input) {
-                return new Date(input);
-            };
-        }).filter("minusOneNoValue", function() {
-            return function(input) {
-                if (input === -1)
-                    return "-";
-                return input;
-            };
-        }).filter("pairMap", function() {
-            return function(input, key, primary) {
-                var x = _.filter(input, function(pair) {
-                    return pair.first[primary] === key[primary];
-                });
+module.exports = angular.module('ool.filters', ['ool.services'])
+    .filter("asDate", function() {
+        return function(input) {
+            return new Date(input);
+        };
+    }).filter("minusOneNoValue", function() {
+        return function(input) {
+            if (input === -1)
+                return "-";
+            return input;
+        };
+    }).filter("pairMap", function() {
+        return function(input, key, primary) {
+            var x = _.filter(input, function(pair) {
+                return pair.first[primary] === key[primary];
+            });
 
-                return x[0].second;
-            };
-        }).filter("captchaErrorToOwnKey", function() {
-            return function(input) {
-                return "recaptcha." + input;
-            };
-        }).filter("toKB", function() {
-            return function(input) {
-                if (input === -1)
-                    return -1;
-                return Math.floor(input / 1024);
-            };
-        });
-});
+            return x[0].second;
+        };
+    }).filter("captchaErrorToOwnKey", function() {
+        return function(input) {
+            return "recaptcha." + input;
+        };
+    }).filter("toKB", function() {
+        return function(input) {
+            if (input === -1)
+                return -1;
+            return Math.floor(input / 1024);
+        };
+    });

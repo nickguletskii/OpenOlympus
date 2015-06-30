@@ -20,97 +20,100 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(
-    ["jquery", "bootstrap", "angular", "app", "oolutil", "angular-animate"],
-    function($, bootstrap, angular, app, Util) {
-        app
-            .run(function($rootScope,$timeout) {
-                $timeout(function() {
-                    $rootScope.hideResourcesLoading = true;
-                }, 1);
-            });
-        var ie = (function() {
-            var undef, v = 3,
-                div = document.createElement('div');
+var $ = require("jquery");
+var angular = require("angular");
+var app = require("app");
+var Util = require("oolutil");
+require("angular-animate");
+require("angular-ui-bootstrap");
 
-            while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', div
-                .getElementsByTagName('i')[0])
-            ;
-
-            return v > 4 ? v : undef;
-        }());
-
-        if (ie) {
-            window.navigate("/badbrowser");
-        }
-        angular
-            .module("template/pagination/pagination.html", [])
-            .run(
-                [
-                    "$templateCache",
-                    function($templateCache) {
-                        $templateCache
-                            .put(
-                                "template/pagination/pagination.html",
-                                "<div class=\"pagination-centered\"><ul class=\"pagination\">\n" + "  <li ng-repeat=\"page in pages\" ng-class=\"{arrow: $first || $last, current: page.active, unavailable: page.disabled}\"><a ui-sref-opts=\"reload\" ui-sref=\"{page: page.number}\">{{page.text}}</a></li>\n" + "</ul>\n" + "</div>");
-                    }
-                ]);
-
-        angular.module("template/pagination/pagination.html", []).run(["$templateCache", function($templateCache) {
-            $templateCache.put("template/pagination/pagination.html",
-                "<div class=\"pagination-centered hidden-print\">\n" +
-                "  <ul class=\"pagination pagination-md\">\n" +
-                "    <li ng-if=\"boundaryLinks\" ng-class=\"{disabled: noPrevious()}\"><a eat-click-if=\"noPrevious()\" ui-sref=\"{page: 1}\">{{getText('first')}}</a></li>\n" +
-                "    <li ng-if=\"directionLinks\" ng-class=\"{disabled: noPrevious()}\"><a eat-click-if=\"noPrevious()\" ui-sref=\"{page: page-1}\">{{getText('previous')}}</a></li>\n" +
-                "    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active}\"><a ui-sref=\"{page: page.number}\">{{page.text}}</a></li>\n" +
-                "    <li ng-if=\"directionLinks\" ng-class=\"{disabled: noNext()}\"><a eat-click-if=\"noNext()\" ui-sref=\"{page: page+1}\">{{getText('next')}}</a></li>\n" +
-                "    <li ng-if=\"boundaryLinks\" ng-class=\"{disabled: noNext()}\"><a eat-click-if=\"noNext()\" ui-sref=\"{page: totalPages}\">{{getText('last')}}</a></li>\n" +
-                "  </ul>\n" +
-                "</div>");
-        }]);
-
-        app.run(function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout, $state) {
-            $rootScope.stateParams = $stateParams;
-            $rootScope.$on('$stateChangeStart',
-                function(event, toState, toParams, fromState, fromParams) {
-                    console.log(toParams);
-                    $rootScope.stateParams = toParams;
-                });
-            $rootScope.security = AuthenticationProvider;
-            $rootScope.$on('$stateNotFound',
-                function(event, unfoundState, fromState, fromParams) {
-                    console.log("Couldn't find state: " + unfoundState);
-                });
-            $rootScope.$on('securityInfoChanged', function() {
-                $rootScope.security = AuthenticationProvider;
-            });
-            $rootScope.$on('$stateChangeStart',
-                function(event, toState, toParams, fromState, fromParams){
-                if($rootScope.showErrorModal) {
-                    event.preventDefault();
-                    $rootScope.showErrorModal = false;
-                    $state.go(toState, toParams, {reload: true});
-                }
-            });
-            $rootScope.$on('$stateChangeSuccess',
-                function(event, toState, toParams, fromState, fromParams) {
-                    $rootScope.stateConfig = toState;
-                });
-            $rootScope.$on('$stateChangeError',
-                function(event, toState, toParams, fromState, fromParams, error) {
-                    console.error(error);
-                    if (error.status == 403) {
-                        event.preventDefault();
-                        $location.path("/forbidden");
-                    } else
-                        $rootScope.showErrorModal = true;
-                });
-            $rootScope.toggleFullscreen = function(fullScreen) {
-                $rootScope.fullScreen = fullScreen;
-            };
-        });
-
-        angular.bootstrap(document, ['ool']);
-
-        return {};
+app
+    .run(function($rootScope, $timeout) {
+        $timeout(function() {
+            $rootScope.hideResourcesLoading = true;
+        }, 1);
     });
+var ie = (function() {
+    var undef, v = 3,
+        div = document.createElement('div');
+
+    while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', div
+        .getElementsByTagName('i')[0])
+    ;
+
+    return v > 4 ? v : undef;
+}());
+
+if (ie) {
+    window.navigate("/badbrowser");
+}
+angular
+    .module("template/pagination/pagination.html", [])
+    .run(
+        [
+            "$templateCache",
+            function($templateCache) {
+                $templateCache
+                    .put(
+                        "template/pagination/pagination.html",
+                        "<div class=\"pagination-centered\"><ul class=\"pagination\">\n" + "  <li ng-repeat=\"page in pages\" ng-class=\"{arrow: $first || $last, current: page.active, unavailable: page.disabled}\"><a ui-sref-opts=\"reload\" ui-sref=\"{page: page.number}\">{{page.text}}</a></li>\n" + "</ul>\n" + "</div>");
+            }
+        ]);
+
+angular.module("template/pagination/pagination.html", []).run(["$templateCache", function($templateCache) {
+    $templateCache.put("template/pagination/pagination.html",
+        "<div class=\"pagination-centered hidden-print\">\n" +
+        "  <ul class=\"pagination pagination-md\">\n" +
+        "    <li ng-if=\"boundaryLinks\" ng-class=\"{disabled: noPrevious()}\"><a eat-click-if=\"noPrevious()\" ui-sref=\"{page: 1}\">{{getText('first')}}</a></li>\n" +
+        "    <li ng-if=\"directionLinks\" ng-class=\"{disabled: noPrevious()}\"><a eat-click-if=\"noPrevious()\" ui-sref=\"{page: page-1}\">{{getText('previous')}}</a></li>\n" +
+        "    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active}\"><a ui-sref=\"{page: page.number}\">{{page.text}}</a></li>\n" +
+        "    <li ng-if=\"directionLinks\" ng-class=\"{disabled: noNext()}\"><a eat-click-if=\"noNext()\" ui-sref=\"{page: page+1}\">{{getText('next')}}</a></li>\n" +
+        "    <li ng-if=\"boundaryLinks\" ng-class=\"{disabled: noNext()}\"><a eat-click-if=\"noNext()\" ui-sref=\"{page: totalPages}\">{{getText('last')}}</a></li>\n" +
+        "  </ul>\n" +
+        "</div>");
+}]);
+
+app.run(function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout, $state) {
+    $rootScope.stateParams = $stateParams;
+    $rootScope.$on('$stateChangeStart',
+        function(event, toState, toParams, fromState, fromParams) {
+            console.log(toParams);
+            $rootScope.stateParams = toParams;
+        });
+    $rootScope.security = AuthenticationProvider;
+    $rootScope.$on('$stateNotFound',
+        function(event, unfoundState, fromState, fromParams) {
+            console.log("Couldn't find state: " + unfoundState);
+        });
+    $rootScope.$on('securityInfoChanged', function() {
+        $rootScope.security = AuthenticationProvider;
+    });
+    $rootScope.$on('$stateChangeStart',
+        function(event, toState, toParams, fromState, fromParams) {
+            if ($rootScope.showErrorModal) {
+                event.preventDefault();
+                $rootScope.showErrorModal = false;
+                $state.go(toState, toParams, {
+                    reload: true
+                });
+            }
+        });
+    $rootScope.$on('$stateChangeSuccess',
+        function(event, toState, toParams, fromState, fromParams) {
+            $rootScope.stateConfig = toState;
+        });
+    $rootScope.$on('$stateChangeError',
+        function(event, toState, toParams, fromState, fromParams, error) {
+            console.error(error);
+            if (error.status == 403) {
+                event.preventDefault();
+                $location.path("/forbidden");
+            } else
+                $rootScope.showErrorModal = true;
+        });
+    $rootScope.toggleFullscreen = function(fullScreen) {
+        $rootScope.fullScreen = fullScreen;
+    };
+});
+
+angular.bootstrap(document, ['ool']);

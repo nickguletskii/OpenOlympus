@@ -45,11 +45,11 @@
 		<tbody>
 			<tr ng-repeat="task in contest.tasks">
 				<td><a ui-sref="taskView({taskId: task.id, contestId: contestId})">{{task.name}}</a>
-					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="taskModificationView({taskId: task.id, contestId: contestId})">
+					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs fa fa-pencil" ui-sref="taskModificationView({taskId: task.id, contestId: contestId})">
 					</button>
-					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.rejudgeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs glyphicon glyphicon glyphicon-refresh " ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
+					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.task.rejudgeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs fa fa-refresh " ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
 					</button>
-					<button class="btn btn-danger btn-xs glyphicon glyphicon-remove pull-right" ng-really-click="removeTask(item)" item="task" ng-really-yes-button="{{'contest.task.remove.confirmationButton'|translate}}" ng-really-message="{{'contest.task.remove.confirmation' |translate}}">
+					<button class="btn btn-danger btn-xs fa fa-remove pull-right" ng-really-click="removeTask(item)" item="task" ng-really-yes-button="{{'contest.task.remove.confirmationButton'|translate}}" ng-really-message="{{'contest.task.remove.confirmation' |translate}}">
 					</button>
 				</td>
 			</tr>

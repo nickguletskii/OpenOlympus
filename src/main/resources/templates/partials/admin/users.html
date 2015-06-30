@@ -56,9 +56,9 @@
 				<td>{{user.firstNameMain}}</td>
 				<td>{{user.middleNameMain}}</td>
 				<td>{{user.lastNameMain}}
-					<button class="btn btn-danger btn-xs glyphicon glyphicon-remove pull-right" ng-really-click="deleteUser(item)" item="user" ng-really-yes-button="{{'admin.users.list.user.deleteConfirmationButton'|translate}}" ng-really-message="{{'admin.users.list.user.deleteConfirmation' |translate}}">
+					<button class="btn btn-danger btn-xs fa fa-remove pull-right" ng-really-click="deleteUser(item)" item="user" ng-really-yes-button="{{'admin.users.list.user.deleteConfirmationButton'|translate}}" ng-really-message="{{'admin.users.list.user.deleteConfirmation' |translate}}">
 					</button>
-					<button type="button" tooltip="{{ 'admin.users.list.user.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs glyphicon glyphicon-pencil" ui-sref="administrativePersonalInfoModificationView({userId: user.id})">
+					<button type="button" tooltip="{{ 'admin.users.list.user.editButton' | translate }}" class="hidden-print pull-right btn btn-primary btn-xs fa fa-pencil" ui-sref="administrativePersonalInfoModificationView({userId: user.id})">
 					</button>
 				</td>
 			</tr>

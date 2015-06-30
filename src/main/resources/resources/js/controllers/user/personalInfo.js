@@ -20,54 +20,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
-            $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService,
-            personalInfoPatchUrl, passwordPatchUrl, requireExistingPassword, UserService) {
-            $scope.$apply(function() {
-                $scope.serverErrorReporter = new ServersideFormErrorReporter();
-                $scope.userForm.forceValidation = true;
-                $scope.user = {};
-                $scope.password = {};
-                $scope.requireExistingPassword = requireExistingPassword;
-                $scope.$watch("userForm.$pristine", function(newValue, oldValue) {
-                    if (!newValue)
-                        $scope.updatedUser = false;
-                });
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                $scope.$watch("passwordForm.$pristine", function(newValue, oldValue) {
-                    if (!newValue)
-                        $scope.updatedPassword = false;
-                });
-
-                $http.get(personalInfoPatchUrl).success(function(user) {
-                    $scope.user = user;
-                    $scope.loaded = true;
-                });
-
-                $scope.patchUser = function(user) {
-                    UserService.patchUser(user, $stateParams.userId).then(function(data) {
-                        if (data.status === "BINDING_ERROR") {
-                            ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
-                        } else {
-                            $scope.updatedUser = true;
-                            $scope.userForm.$setPristine();
-                        }
-                    });
-                };
-
-                $scope.changePassword = function(passwordObj) {
-                    UserService.changePassword(passwordObj, $stateParams.userId).then(function(data) {
-                        if (data.status === "BINDING_ERROR") {
-                            ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
-                        } else {
-                            $scope.updatedPassword = true;
-                            $scope.passwordForm.$setPristine();
-                        }
-                    });
-                };
-
-            });
-        };
+module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService,
+    personalInfoPatchUrl, passwordPatchUrl, requireExistingPassword, UserService) {
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+    ;
+    $scope.user = {};
+    $scope.password = {};
+    $scope.requireExistingPassword = requireExistingPassword;
+    $scope.$watch("userForm.$pristine", function(newValue, oldValue) {
+        if (!newValue)
+            $scope.updatedUser = false;
     });
+
+    $scope.$watch("passwordForm.$pristine", function(newValue, oldValue) {
+        if (!newValue)
+            $scope.updatedPassword = false;
+    });
+
+    $http.get(personalInfoPatchUrl).success(function(user) {
+        $scope.user = user;
+        $scope.loaded = true;
+    });
+
+    $scope.patchUser = function(user) {
+        UserService.patchUser(user, $stateParams.userId).then(function(data) {
+            if (data.status === "BINDING_ERROR") {
+                ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
+            } else {
+                $scope.updatedUser = true;
+                $scope.userForm.$setPristine();
+            }
+        });
+    };
+
+    $scope.changePassword = function(passwordObj) {
+        UserService.changePassword(passwordObj, $stateParams.userId).then(function(data) {
+            if (data.status === "BINDING_ERROR") {
+                ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
+            } else {
+                $scope.updatedPassword = true;
+                $scope.passwordForm.$setPristine();
+            }
+        });
+    };
+};

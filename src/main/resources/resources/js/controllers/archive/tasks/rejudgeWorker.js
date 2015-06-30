@@ -20,16 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, $state) {
-            $scope.$apply(function() {
-                $http.post('/api/task/' + $stateParams.taskId + '/rejudgeTask').success(function(response) {
-                    $state.go("^.rejudgeTaskSuccess", {
-                        taskId: $stateParams.taskId
-                    });
-                });
-            });
-        };
+
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
+
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams, $state) {
+    $http.post('/api/task/' + $stateParams.taskId + '/rejudgeTask').success(function(response) {
+        $state.go("^.rejudgeTaskSuccess", {
+            taskId: $stateParams.taskId
+        });
     });
+};

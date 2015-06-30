@@ -20,31 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, users, userCount, ContestService) {
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-            $scope.$apply(function() {
-                var page = $stateParams.page;
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams, users, userCount, ContestService) {
+    var page = $stateParams.page;
 
-                function updateParticipants() {
-                    ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page).then(function(users) {
-                        $scope.users = users;
-                    });
-                    ContestService.countContestParticipants($stateParams.contestId).then(function(userCount) {
-                        $scope.userCount = userCount;
-                    });
-                }
+    function updateParticipants() {
+        ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page).then(function(users) {
+            $scope.users = users;
+        });
+        ContestService.countContestParticipants($stateParams.contestId).then(function(userCount) {
+            $scope.userCount = userCount;
+        });
+    }
 
-                $scope.removeUser = function(user) {
-                    ContestService.removeParticipant($stateParams.contestId, user.id).then(updateParticipants);
-                };
+    $scope.removeUser = function(user) {
+        ContestService.removeParticipant($stateParams.contestId, user.id).then(updateParticipants);
+    };
 
-                $scope.page = $stateParams.page;
+    $scope.page = $stateParams.page;
 
-                $scope.users = users;
-                $scope.userCount = userCount;
-            });
-        };
-    });
+    $scope.users = users;
+    $scope.userCount = userCount;
+};

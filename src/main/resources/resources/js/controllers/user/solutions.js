@@ -20,18 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, SolutionService, solutions, solutionCount) {
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-            $scope.$apply(function() {
-                var page = $stateParams.page;
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams, SolutionService, solutions, solutionCount) {
 
-                $scope.page = $stateParams.page;
+    var page = $stateParams.page;
 
-                $scope.solutions = solutions;
-                $scope.solutionCount = solutionCount;
-            });
-        };
-    });
+    $scope.page = $stateParams.page;
+
+    $scope.solutions = solutions;
+    $scope.solutionCount = solutionCount;
+};

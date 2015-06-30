@@ -22,6 +22,10 @@
  */
 'use strict';
 
+var angular = require("angular");
+var _ = require("lodash");
+require("services");
+
 var NARROW = 'col-md-6 col-md-offset-3';
 var WIDE = 'col-md-12 col-md-offset-0';
 
@@ -37,8 +41,7 @@ var stateList = [{
     "name": "taskView",
     "url": "/task/{taskId:[0-9]+}?contestId",
     "templateUrl": "/partials/task",
-    "controllerPath": "controllers/task",
-    "controller": "TaskViewController",
+    "controller": require("controllers/task"),
     "resolve": {
         "task": function(TaskService, $stateParams) {
             return TaskService.getTask($stateParams.taskId);
@@ -48,8 +51,7 @@ var stateList = [{
     "name": "taskModificationView",
     "url": "/task/{taskId:[0-9]+}/edit?contestId",
     "templateUrl": "/partials/task/edit",
-    "controllerPath": "controllers/task/edit",
-    "controller": "TaskModificationController",
+    "controller": require("controllers/task/edit"),
     "fluidContainer": true,
     "resolve": {
         "editTaskData": function(TaskService, $stateParams) {
@@ -60,10 +62,9 @@ var stateList = [{
     "name": "archiveTaskList",
     "url": "/archive/tasks?page?taskId",
     "templateUrl": "/partials/archive/tasks",
-    "controllerPath": "controllers/archive/tasks",
-    "controller": "ArchiveTaskListController",
+    "controller": require("controllers/archive/tasks"),
     "params": {
-        "page": 1,
+        "page": "1",
         "taskId": null
     },
     "resolve": {
@@ -78,11 +79,10 @@ var stateList = [{
     "name": "archiveRank",
     "url": "/archive/users?page",
     "templateUrl": "/partials/archive/users",
-    "controllerPath": "controllers/archive/users",
+    "controller": require("controllers/archive/users"),
 
-    "controller": "ArchiveRankController",
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "users": function(UserService, $stateParams) {
@@ -96,10 +96,9 @@ var stateList = [{
     "name": "contestList",
     "url": "/contests?page",
     "templateUrl": "/partials/contests",
-    "controllerPath": "controllers/contests",
-    "controller": "ContestListController",
+    "controller": require("controllers/contests"),
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "contests": function(ContestService, $stateParams) {
@@ -113,8 +112,7 @@ var stateList = [{
     "name": "contestView",
     "url": "/contest/{contestId:[0-9]+}?taskId",
     "templateUrl": "/partials/contests/contest",
-    "controllerPath": "controllers/contests/contest",
-    "controller": "ContestViewController",
+    "controller": require("controllers/contests/contest"),
     "params": {
         "taskId": null
     },
@@ -127,10 +125,9 @@ var stateList = [{
     "name": "contestParticipantsList",
     "url": "/contest/{contestId:[0-9]+}/participants?userId",
     "templateUrl": "/partials/contests/contest/participants",
-    "controllerPath": "controllers/contests/contest/participants",
-    "controller": "ContestParticipantsListController",
+    "controller": require("controllers/contests/contest/participants"),
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "users": function(ContestService, $stateParams) {
@@ -144,12 +141,11 @@ var stateList = [{
     "name": "contestResults",
     "url": "/contest/{contestId:[0-9]+}/results",
     "templateUrl": "/partials/contests/contest/results",
-    "controllerPath": "controllers/contests/contest/results",
+    "controller": require("controllers/contests/contest/results"),
     "customWidth": WIDE,
     "fluidContainer": true,
-    "controller": "ContestResultsController",
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "users": function(ContestService, $stateParams) {
@@ -163,10 +159,9 @@ var stateList = [{
     "name": "userSolutionList",
     "url": "/user/solutions?page",
     "templateUrl": "/partials/user/solutions",
-    "controllerPath": "controllers/user/solutions",
-    "controller": "UserSolutionListController",
+    "controller": require("controllers/user/solutions"),
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "solutions": function(SolutionService, $stateParams) {
@@ -180,10 +175,9 @@ var stateList = [{
     "name": "adminSolutionList",
     "url": "/admin/solutions?page",
     "templateUrl": "/partials/admin/solutions",
-    "controllerPath": "controllers/admin/solutions",
-    "controller": "AdminSolutionListController",
+    "controller": require("controllers/admin/solutions"),
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "solutions": function(SolutionService, $stateParams) {
@@ -197,8 +191,7 @@ var stateList = [{
     "name": "solutionView",
     "url": "/solution/{solutionId:[0-9]+}",
     "templateUrl": "/partials/solution",
-    "controllerPath": "controllers/solution",
-    "controller": "SolutionController",
+    "controller": require("controllers/solution"),
     "resolve": {
         "data": function(SolutionService, $stateParams) {
             return SolutionService.getVerdicts($stateParams.solutionId);
@@ -208,20 +201,17 @@ var stateList = [{
     "name": "createTask",
     "url": "/archive/tasks/add",
     "templateUrl": "/partials/archive/tasks/add",
-    "controllerPath": "controllers/archive/tasks/add",
-    "controller": "TaskCreationController"
+    "controller": require("controllers/archive/tasks/add")
 }, {
     "name": "createContest",
     "url": "/contests/add",
     "templateUrl": "/partials/contests/add",
-    "controllerPath": "controllers/contests/add",
-    "controller": "ContestCreationController"
+    "controller": require("controllers/contests/add")
 }, {
     "name": "editContest",
     "url": "/contest/{contestId:[0-9]+}/edit",
     "templateUrl": "/partials/contests/contest/edit",
-    "controllerPath": "controllers/contests/contest/edit",
-    "controller": "ContestModificationController",
+    "controller": require("controllers/contests/contest/edit"),
     "resolve": {
         "contest": function(ContestService, $stateParams) {
             return ContestService.getContestEditData($stateParams.contestId);
@@ -231,26 +221,23 @@ var stateList = [{
     "name": "login",
     "url": "/login?failure",
     "templateUrl": "/partials/login",
-    "controllerPath": "controllers/login",
-    "controller": "LoginController",
+    "controller": require("controllers/login"),
     "customWidth": NARROW,
     "params": {
-        "failure": false,
-        "showAdministratorApprovalRequiredMessage": false
+        "failure": "false",
+        "showAdministratorApprovalRequiredMessage": "false"
     }
 }, {
     "name": "register",
     "url": "/register",
     "templateUrl": "/partials/register",
-    "controllerPath": "controllers/register",
-    "controller": "RegistrationController",
+    "controller": require("controllers/register"),
     "customWidth": NARROW
 }, {
     "name": "personalInfoModificationView",
     "url": "/user/personalInfo",
     "templateUrl": "/partials/user/personalInfo",
-    "controllerPath": "controllers/user/personalInfo",
-    "controller": "PersonalInfoModificationController",
+    "controller": require("controllers/user/personalInfo"),
     "customWidth": NARROW,
     "resolve": {
         personalInfoPatchUrl: function() {
@@ -267,8 +254,7 @@ var stateList = [{
     "name": "administrativePersonalInfoModificationView",
     "url": "/admin/user/{userId:[0-9]+}/personalInfo",
     "templateUrl": "/partials/user/personalInfo",
-    "controllerPath": "controllers/user/personalInfo",
-    "controller": "AdministrativePersonalInfoModificationController",
+    "controller": require("controllers/user/personalInfo"),
     "customWidth": NARROW,
     "resolve": {
         personalInfoPatchUrl: function($stateParams) {
@@ -285,8 +271,7 @@ var stateList = [{
     "name": "home",
     "url": "/",
     "templateUrl": "/partials/home",
-    "controllerPath": "controllers/home",
-    "controller": "HomeController",
+    "controller": require("controllers/home"),
     "type": "requireController",
     "customWidth": NARROW
 }, {
@@ -294,10 +279,9 @@ var stateList = [{
     "url": "/admin/pendingUsers?page",
     "templateUrl": "/partials/admin/pendingUsers",
     "customWidth": WIDE,
-    "controllerPath": "controllers/admin/pendingUsers",
-    "controller": "PendingUsersController",
+    "controller": require("controllers/admin/pendingUsers"),
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "users": function(UserService, $stateParams) {
@@ -312,10 +296,9 @@ var stateList = [{
     "url": "/admin/users?page",
     "templateUrl": "/partials/admin/users",
     "customWidth": WIDE,
-    "controllerPath": "controllers/admin/users",
-    "controller": "AdministrativeUsersController",
+    "controller": require("controllers/admin/users"),
     "params": {
-        "page": 1
+        "page": "1"
     },
     "resolve": {
         "users": function(UserService, $stateParams) {
@@ -329,8 +312,7 @@ var stateList = [{
     "name": "administrationHub",
     "url": "/admin",
     "templateUrl": "/partials/admin",
-    "controllerPath": "controllers/admin",
-    "controller": "AdministrationHubController"
+    "controller": require("controllers/admin")
 }];
 
 var modalStateList = [{
@@ -342,8 +324,7 @@ var modalStateList = [{
     "parent": "archiveTaskList",
     "name": "archiveTaskList.rejudgeTaskWorking",
     "templateUrl": "/partials/archive/tasks/rejudgeTask/working",
-    "controllerPath": "controllers/archive/tasks/rejudgeWorker",
-    "controller": "TaskRejudgementWorkerController",
+    "controller": require("controllers/archive/tasks/rejudgeWorker"),
     "backdrop": true
 }, {
     "parent": "archiveTaskList",
@@ -359,76 +340,38 @@ var modalStateList = [{
     "parent": "contestView",
     "name": "contestView.rejudgeTaskWorking",
     "templateUrl": "/partials/archive/tasks/rejudgeTask/working",
-    "controllerPath": "controllers/archive/tasks/rejudgeWorker",
-    "controller": "TaskRejudgementWorkerController",
+    "controller": require("controllers/archive/tasks/rejudgeWorker"),
     "backdrop": true
 }, {
     "parent": "contestView",
     "name": "contestView.addUser",
     "templateUrl": "/partials/contests/contest/addUser",
-    "controllerPath": "controllers/contests/contest/addUser",
-    "controller": "ContestUserAdditionController",
+    "controller": require("controllers/contests/contest/addUser"),
     "backdrop": true
 }, {
     "parent": "contestView",
     "name": "contestView.addTask",
     "templateUrl": "/partials/contests/contest/addTask",
-    "controllerPath": "controllers/contests/contest/addTask",
-    "controller": "ContestTaskAdditionController",
+    "controller": require("controllers/contests/contest/addTask"),
     "backdrop": true
 }, {
     "parent": "contestParticipantsList",
     "name": "contestParticipantsList.addUserTime",
     "templateUrl": "/partials/contests/contest/addUserTime",
-    "controllerPath": "controllers/contests/contest/addUserTime",
-    "controller": "ContestUserTimeAdditionController",
+    "controller": require("controllers/contests/contest/addUserTime"),
     "backdrop": true
 }];
 
-var required = ['require', 'angular', 'lodash', 'services'];
-stateList.forEach(function(state) {
-    required.push(state.controllerPath);
-});
+var controllers = angular.module('ool.controllers', ['ool.services']);
 
+controllers.config( /*@ngInject*/ function($stateProvider, modalStateProvider) {
 
-define(required, function(require, angular, _) {
-
-    var getControllerInjector = function(controllerPath, resolve) {
-        if (!resolve)
-            resolve = [];
-        return _.union(['$scope', '$stateParams', '$injector'], resolve, [
-            function($scope, $stateParams, $injector) {
-                var args = arguments;
-                require([controllerPath], function(controller) {
-                    var routerArgs = _.assign({
-                        '$scope': $scope,
-                        '$stateParams': $stateParams,
-                    }, _.zipObject(resolve,
-                        _.takeRight(args, resolve.length)
-                    ));
-                    $injector.invoke(controller, this, routerArgs);
-                });
-            }
-        ]);
-    };
-
-    var controllers = angular.module('ool.controllers', ['ool.services']);
-
-    function processState(state) {
-        controllers.controller(state.controller, getControllerInjector(state.controllerPath, _.keys(state.resolve)));
-    }
-
-    _.each(stateList, processState);
-    _.each(modalStateList, processState);
-
-    controllers.config(function($stateProvider, modalStateProvider) {
-
-        _.each(stateList, function(state) {
-            $stateProvider.state(state);
-        });
-        _.each(modalStateList, function(state) {
-            modalStateProvider.state(state.name, state);
-        });
+    _.each(stateList, function(state) {
+        $stateProvider.state(state);
     });
-
+    _.each(modalStateList, function(state) {
+        modalStateProvider.state(state.name, state);
+    });
 });
+
+module.exports = controllers;

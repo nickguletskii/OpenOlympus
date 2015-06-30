@@ -20,44 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash', 'angular'],
-    function(Util, _, angular) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, SolutionService, data) {
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-            $scope.$apply(function() {
-                var DELAY_MIN = 100;
-                var DELAY_STEP = 100;
-                var DELAY_MAX = 1000;
-                var delay = DELAY_MIN;
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams, SolutionService, data) {
 
-                function setData(solution) {
-                    if (!Util.equalsWithoutAngular($scope.solution, solution)) {
-                        $scope.solution = solution;
-                        delay = DELAY_MIN;
-                    }
-                    return solution;
-                }
+    var DELAY_MIN = 100;
+    var DELAY_STEP = 100;
+    var DELAY_MAX = 1000;
+    var delay = DELAY_MIN;
 
-                function update(callback) {
-                    SolutionService.getVerdicts($stateParams.solutionId).then(setData).then(callback);
-                }
-                setData(data);
+    function setData(solution) {
+        if (!Util.equalsWithoutAngular($scope.solution, solution)) {
+            $scope.solution = solution;
+            delay = DELAY_MIN;
+        }
+        return solution;
+    }
 
-                var promise;
+    function update(callback) {
+        SolutionService.getVerdicts($stateParams.solutionId).then(setData).then(callback);
+    }
+    setData(data);
 
-                function poller() {
-                    delay = Math.min(delay + DELAY_STEP, DELAY_MAX);
-                    update(function() {
-                        promise = $timeout(poller, delay);
-                    });
-                }
-                promise = $timeout(poller, delay);
-                $scope.$on('$destroy', function() {
-                    $timeout.cancel(promise);
-                });
+    var promise;
 
-                // TODO: Websocket integration: server should push verdict updates.
-            });
-        };
+    function poller() {
+        delay = Math.min(delay + DELAY_STEP, DELAY_MAX);
+        update(function() {
+            promise = $timeout(poller, delay);
+        });
+    }
+    promise = $timeout(poller, delay);
+    $scope.$on('$destroy', function() {
+        $timeout.cancel(promise);
     });
+
+    // TODO: Websocket integration: server should push verdict updates.
+};

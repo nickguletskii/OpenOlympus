@@ -1,0 +1,1038 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.8.1-alpha" last-position="0,1019" last-zoom="0.9"
+	 default-owner="postgres">
+<database name="openolympus" encoding="UTF8" lc-collate="en_US" lc-ctype="en_US">
+	<role name="postgres"/>
+	<tablespace name="pg_default"/>
+</database>
+
+<schema name="public" protected="true" rect-visible="true" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<function name="get_contest_end"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamp"/>
+	</return-type>
+	<parameter name="contest_id">
+		<type name="integer"/>
+	</parameter>
+	<definition><![CDATA[ SELECT
+(contest.start_time + (contest.duration * INTERVAL '1 MILLISECOND') +
+(SELECT
+(COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
+FROM (
+SELECT COALESCE (sum(time_extension.duration), 0) as duration
+FROM time_extension
+WHERE time_extension.contest_id = contest.id
+GROUP BY time_extension.user_id ) AS extensions_per_user ) )
+FROM contest
+WHERE contest.id = contest_id]]></definition>
+</function>
+
+<function name="get_contest_end_for_user"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamp"/>
+	</return-type>
+	<parameter name="contest_id" in="true">
+		<type name="integer"/>
+	</parameter>
+	<parameter name="user_id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[SELECT
+(contest.start_time +
+(contest.duration * INTERVAL '1 MILLISECOND') +
+(SELECT (COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
+FROM ( SELECT COALESCE (sum(time_extension.duration), 0) as duration
+FROM time_extension
+WHERE time_extension.contest_id = contest.id
+AND time_extension.user_id = user_id
+GROUP BY time_extension.user_id ) AS extensions_per_user ) )
+FROM contest
+WHERE contest.id = contest_id ]]></definition>
+</function>
+
+<function name="get_contest_start"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamp"/>
+	</return-type>
+	<parameter name="contest_id">
+		<type name="integer"/>
+	</parameter>
+	<definition><![CDATA[ SELECT contest.start_time FROM contest WHERE contest.id = contest_id]]></definition>
+</function>
+
+<function name="get_contest_start_for_user"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamp"/>
+	</return-type>
+	<parameter name="contest_id">
+		<type name="integer"/>
+	</parameter>
+	<parameter name="user_id">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[ SELECT contest.start_time FROM contest WHERE contest.id = contest_id ]]></definition>
+</function>
+
+<function name="get_solution_author"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="bigint"/>
+	</return-type>
+	<parameter name="solution_id">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[ SELECT user_id FROM solution WHERE solution.id = solution_id]]></definition>
+</function>
+
+<function name="get_solution_time_added"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamp"/>
+	</return-type>
+	<parameter name="solution_id">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[ SELECT time_added FROM solution WHERE solution.id = solution_id ]]></definition>
+</function>
+
+<function name="maintain_contest_rank"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[ BEGIN IF (TG_OP = 'UPDATE') THEN PERFORM update_contest(NEW.id); END IF; RETURN NULL; END; ]]></definition>
+</function>
+
+<function name="maintain_contest_rank_with_task"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[ BEGIN IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_contest(NEW.contests_id); END IF; IF (TG_OP = 'DELETE') THEN PERFORM update_contest(OLD.contests_id); END IF; RETURN NULL; END; ]]></definition>
+</function>
+
+<function name="maintain_contest_rank_with_time_extensions"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[ BEGIN IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_user_in_contest(NEW.user_id, NEW.contest_id); END IF; IF (TG_OP = 'DELETE') THEN PERFORM update_user_in_contest(OLD.user_id, OLD.contest_id); END IF; RETURN NULL; END; ]]></definition>
+</function>
+
+<function name="maintain_solution_score"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[ BEGIN IF (TG_OP = 'DELETE') THEN PERFORM update_solution(OLD.solution_id); END IF; IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_solution(NEW.solution_id); END IF; RETURN NULL; END; ]]></definition>
+</function>
+
+<function name="update_contest"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="_param1">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[ UPDATE contest_participations SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id WHERE solutions.user_id=contest_participations.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id)) AND (SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participations.contest_id=$1 ]]></definition>
+</function>
+
+<function name="update_solution"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="_param1">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participations SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id WHERE solutions.user_id=contest_participations.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id)) AND (SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participations.user_id=get_solution_author($1) AND contest_participations.contest_id IN (SELECT contest_at_for_user(get_solution_time_added($1), get_solution_author($1))) ]]></definition>
+</function>
+
+<function name="update_user_in_contest"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="100"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="_param1">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="_param2">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participations SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id WHERE solutions.user_id=contest_participations.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id)) AND (SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participations.user_id = $1 AND contest_participations.contest_id = $2 ]]></definition>
+</function>
+
+<table name="contest_message">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="205.422" y="748.75"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+	<column name="question">
+		<type name="text" length="255"/>
+	</column>
+	<column name="response">
+		<type name="text" length="255"/>
+	</column>
+	<constraint name="contest_messages_pkey" type="pk-constr" table="public.contest_message">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="user_id" index="3"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="USER_fk" index="2"/>
+		<object name="contest_fk" index="1"/>
+	</customidxs>
+</table>
+
+<table name="contest_participation">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="133.469" y="1213.75"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="score">
+		<type name="numeric" length="19" precision="2"/>
+	</column>
+	<constraint name="contest_participation_pkey" type="pk-constr" table="public.contest_participation">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="contest_id" index="3"/>
+		<object name="user_id" index="2"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="USER_fk" index="2"/>
+		<object name="contest_fk" index="1"/>
+	</customidxs>
+</table>
+
+<table name="contest_question">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="166.25" y="964.25"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+	<column name="question">
+		<type name="text" length="255"/>
+	</column>
+	<column name="response">
+		<type name="text" length="255"/>
+	</column>
+	<constraint name="contest_question_pkey" type="pk-constr" table="public.contest_question">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="user_id" index="3"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="USER_fk" index="2"/>
+		<object name="contest_fk" index="1"/>
+	</customidxs>
+</table>
+
+<table name="persistent_logins">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="50" y="308.2"/>
+	<column name="username" not-null="true">
+		<type name="character varying" length="64"/>
+	</column>
+	<column name="series" not-null="true">
+		<type name="character varying" length="64"/>
+	</column>
+	<column name="token" not-null="true">
+		<type name="character varying" length="64"/>
+	</column>
+	<column name="last_used" not-null="true">
+		<type name="timestamp"/>
+	</column>
+	<constraint name="persistent_logins_pkey" type="pk-constr" table="public.persistent_logins">
+		<columns names="series" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="property">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="366.438" y="308.2"/>
+	<column name="id" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="property_key">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="property_value">
+		<type name="bytea"/>
+	</column>
+	<constraint name="property_pkey" type="pk-constr" table="public.property">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_4b6vatgj30955xsjr51yegxi9" type="uq-constr" table="public.property">
+		<columns names="property_value" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_8jytv8tu3pui7ram00b44tn4u" type="uq-constr" table="public.property">
+		<columns names="property_key" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="solution">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1354.3" y="422.533"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="file">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="maximum_score">
+		<type name="numeric" length="19" precision="2"/>
+	</column>
+	<column name="score">
+		<type name="numeric" length="19" precision="2"/>
+	</column>
+	<column name="tested" not-null="true">
+		<type name="boolean"/>
+	</column>
+	<column name="time_added">
+		<type name="timestamp"/>
+	</column>
+	<constraint name="solution_pkey" type="pk-constr" table="public.solution">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="task_id" index="7"/>
+		<object name="user_id" index="6"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="USER_fk" index="2"/>
+		<object name="task_fk" index="1"/>
+	</customidxs>
+</table>
+
+<table name="time_extension">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="174.417" y="1367.32"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="duration">
+		<type name="bigint"/>
+	</column>
+	<column name="reason">
+		<type name="text"/>
+	</column>
+	<constraint name="time_extension_pkey" type="pk-constr" table="public.time_extension">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="contest_id" index="4"/>
+		<object name="user_id" index="3"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="USER_fk" index="2"/>
+		<object name="contest_fk" index="1"/>
+	</customidxs>
+</table>
+
+<table name="contest">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="751.833" y="1378.75"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+	<column name="duration">
+		<type name="bigint"/>
+	</column>
+	<column name="name">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="show_full_tests_during_contest" not-null="true">
+		<type name="boolean"/>
+	</column>
+	<column name="start_time">
+		<type name="timestamp"/>
+	</column>
+	<constraint name="contest_pkey" type="pk-constr" table="public.contest">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="contest_name_unique" type="uq-constr" table="public.contest">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="task">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1353.58" y="1286.45"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+	<column name="description_file" not-null="true">
+		<type name="text" length="255"/>
+	</column>
+	<column name="name">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="task_location" not-null="true">
+		<type name="text" length="255"/>
+	</column>
+	<column name="created_date">
+		<type name="timestamp"/>
+	</column>
+	<constraint name="task_pkey" type="pk-constr" table="public.task">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="task_name_unique" type="uq-constr" table="public.task">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<sequence name="principal_sequence"
+	 start="1" increment="1"
+	 min-value="0" max-value="2147483647"
+	 cache="1" cycle="false">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
+
+<table name="USER">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="787.32" y="589.44"/>
+	<column name="id" not-null="true" sequence="public.principal_sequence">
+		<type name="bigint"/>
+	</column>
+	<column name="username">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="first_name_main">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="address_city">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="address_country">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="address_line1">
+		<type name="text" length="255"/>
+	</column>
+	<column name="address_line2">
+		<type name="text" length="255"/>
+	</column>
+	<column name="address_state">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="approval_email_sent" not-null="true">
+		<type name="boolean"/>
+	</column>
+	<column name="birth_date">
+		<type name="timestamp"/>
+	</column>
+	<column name="email_address">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="email_confirmation_token">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="enabled" not-null="true">
+		<type name="boolean"/>
+	</column>
+	<column name="first_name_localised">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="landline">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="last_name_localised">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="last_name_main">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="middle_name_localised">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="middle_name_main">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="mobile">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="password">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="school">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="teacher_first_name">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="teacher_last_name">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="teacher_middle_name">
+		<type name="character varying" length="255"/>
+	</column>
+	<column name="superuser" not-null="true" default-value="false">
+		<type name="boolean"/>
+	</column>
+	<column name="approved" not-null="true" default-value="false">
+		<type name="boolean"/>
+	</column>
+	<constraint name="users_pkey" type="pk-constr" table="public.&quot;USER&quot;">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_r43af9ap4edm43mmtq01oddj6" type="uq-constr" table="public.&quot;USER&quot;">
+		<columns names="username" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<relationship name="user_contest_participations" type="rel1n"
+	 src-col-pattern="user_id"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#a9e9ef"
+	 src-table="public.&quot;USER&quot;"
+	 dst-table="public.contest_participation"
+	 src-required="true" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="user_time_extensions" type="rel1n"
+	 src-col-pattern="user_id"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#230ee5"
+	 src-table="public.&quot;USER&quot;"
+	 dst-table="public.time_extension"
+	 src-required="true" dst-required="false"/>
+
+<relationship name="user_contest_messages" type="rel1n"
+	 src-col-pattern="user_id"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#eedb87"
+	 src-table="public.&quot;USER&quot;"
+	 dst-table="public.contest_message"
+	 src-required="true" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="user_solutions" type="rel1n"
+	 src-col-pattern="user_id"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#4afffe"
+	 src-table="public.&quot;USER&quot;"
+	 dst-table="public.solution"
+	 src-required="false" dst-required="false"
+	del-action="CASCADE"/>
+
+<index name="solution_by_user" table="public.solution"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="user_id"/>
+		</idxelement>
+</index>
+
+<index name="task_by_date_desc" table="public.task"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="created_date"/>
+		</idxelement>
+</index>
+
+<relationship name="user_questions" type="rel1n"
+	 src-col-pattern="user_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#a08e96"
+	 src-table="public.&quot;USER&quot;"
+	 dst-table="public.contest_question"
+	 src-required="true" dst-required="false"
+	del-action="CASCADE">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<usertype name="verdict_status_type" configuration="enumeration">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<enumeration values="waiting,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error,presentation_error,output_limit_exceeded,compile_error"/>
+</usertype>
+
+<table name="verdict">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="833.333" y="342.639"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="score">
+		<type name="numeric" length="19" precision="2"/>
+	</column>
+	<column name="maximum_score" not-null="true">
+		<type name="numeric" length="19" precision="2"/>
+	</column>
+	<column name="status" not-null="true">
+		<type name="public.verdict_status_type"/>
+	</column>
+	<column name="viewable_during_contest" not-null="true">
+		<type name="boolean"/>
+	</column>
+	<column name="path" not-null="true">
+		<type name="text"/>
+	</column>
+	<column name="cpu_time">
+		<type name="bigint"/>
+	</column>
+	<column name="real_time">
+		<type name="bigint"/>
+	</column>
+	<column name="memory_peak">
+		<type name="bigint"/>
+	</column>
+	<column name="additional_information">
+		<type name="text"/>
+	</column>
+	<constraint name="user_pk" type="pk-constr" table="public.verdict">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="solution_id" index="10"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="solution_fk" index="1"/>
+	</customidxs>
+</table>
+
+<relationship name="solution_verdicts" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#ee7172"
+	 src-table="public.solution"
+	 dst-table="public.verdict"
+	 src-required="false" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="contest_tasks" type="relnn"
+	 src-col-pattern="{sc}_{st}" dst-col-pattern="{sc}_{dt}"
+	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
+	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
+	 pk-col-pattern="id"
+	 custom-color="#bec171"
+	 src-table="public.contest"
+	 dst-table="public.task"
+	 src-required="false" dst-required="false"
+	 table-name="contest_tasks"/>
+
+<relationship name="contest_messages" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#9ec210"
+	 src-table="public.contest"
+	 dst-table="public.contest_message"
+	 src-required="true" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="contest_questions" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#25cdd2"
+	 src-table="public.contest"
+	 dst-table="public.contest_question"
+	 src-required="true" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="contest_participations" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#d75783"
+	 src-table="public.contest"
+	 dst-table="public.contest_participation"
+	 src-required="true" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="contest_time_extensions" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#362e7f"
+	 src-table="public.contest"
+	 dst-table="public.time_extension"
+	 src-required="true" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="task_solutions" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#49452e"
+	 src-table="public.task"
+	 dst-table="public.solution"
+	 src-required="true" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<table name="group">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="176.25" y="498.75"/>
+	<column name="id" not-null="true" sequence="public.principal_sequence">
+		<type name="bigint"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="text"/>
+	</column>
+	<constraint name="primary_key" type="pk-constr" table="public.group">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="group_name_unique" type="uq-constr" table="public.group">
+		<columns names="name" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<relationship name="group_users" type="relnn"
+	 src-col-pattern="{sc}_{st}" dst-col-pattern="{sc}_{dt}"
+	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
+	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
+	 pk-col-pattern="id"
+	 custom-color="#a5f397"
+	 src-table="public.group"
+	 dst-table="public.&quot;USER&quot;"
+	 src-required="false" dst-required="false"
+	 table-name="group_users"
+	del-action="CASCADE"/>
+
+<table name="resource">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1437.5" y="790"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="name" not-null="true">
+		<type name="text"/>
+	</column>
+	<column name="filename" not-null="true">
+		<type name="text"/>
+	</column>
+</table>
+
+<relationship name="user_uploads_resources" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#4cae12"
+	 src-table="public.&quot;USER&quot;"
+	 dst-table="public.resource"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="task_resources" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#e193f9"
+	 src-table="public.task"
+	 dst-table="public.resource"
+	 src-required="false" dst-required="false"/>
+
+<table name="task_permission">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="948.143" y="1128.25"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="type" not-null="true">
+		<type name="public.verdict_status_type"/>
+	</column>
+	<constraint name="task_permission_pk" type="pk-constr" table="public.task_permission">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="task_id" index="2"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="task_fk" index="1"/>
+	</customidxs>
+</table>
+
+<usertype name="acl_permission_type" configuration="enumeration">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<enumeration values="manage_acl,write,read,manage_participants,answer_questions,make_announcements"/>
+</usertype>
+
+<relationship name="task_permissions" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#865258"
+	 src-table="public.task"
+	 dst-table="public.task_permission"
+	 src-required="false" dst-required="false"/>
+
+<table name="task_permission_principal">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="899.048" y="1027.3"/>
+	<column name="principal_id">
+		<type name="integer"/>
+	</column>
+
+	<customidxs object-type="column">
+		<object name="task_permission_id" index="1"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="task_permission_fk" index="0"/>
+	</customidxs>
+</table>
+
+<usertype name="verdict_status_type_cp" configuration="enumeration">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<enumeration values="waiting,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error"/>
+</usertype>
+
+<table name="contest_permission">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="727.032" y="1272.7"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="type" not-null="true">
+		<type name="public.verdict_status_type_cp"/>
+	</column>
+	<constraint name="contest_permission_pk" type="pk-constr" table="public.contest_permission">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="contest_id" index="2"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="contest_fk" index="1"/>
+	</customidxs>
+</table>
+
+<relationship name="contest_permissions" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#71555a"
+	 src-table="public.contest"
+	 dst-table="public.contest_permission"
+	 src-required="false" dst-required="false"/>
+
+<usertype name="verdict_status_type_cp1" configuration="enumeration">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<enumeration values="waiting,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error"/>
+</usertype>
+
+<table name="contest_permission_principal">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="671.27" y="1167.3"/>
+	<column name="principal_id">
+		<type name="integer"/>
+	</column>
+
+	<customidxs object-type="column">
+		<object name="contest_permission_id" index="1"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="contest_permission_fk" index="0"/>
+	</customidxs>
+</table>
+
+<relationship name="contest_permission_principals" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#0db7b2"
+	 src-table="public.contest_permission"
+	 dst-table="public.contest_permission_principal"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+<relationship name="task_permission_principals" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#245479"
+	 src-table="public.task_permission"
+	 dst-table="public.task_permission_principal"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+</dbmodel>

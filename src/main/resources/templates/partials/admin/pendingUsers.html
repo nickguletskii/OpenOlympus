@@ -32,13 +32,13 @@
 	<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
 
 	<button type="button" class="btn btn-success btn-sm" ng-click="approveUsers()" ng-disabled="loading">
-		<span class="glyphicon glyphicon-ok"></span> {{'admin.unapprovedUsers.list.approve' | translate}}
+		<span class="fa fa-check"></span> {{'admin.unapprovedUsers.list.approve' | translate}}
 	</button>
 	<button type="button" class="btn btn-warning btn-sm" ng-click="retryApprovingFailedUsers()" ng-disabled="loading">
-		<span class="glyphicon glyphicon-repeat"></span> {{'admin.unapprovedUsers.list.retryApprovingFailedUsers' | translate}}
+		<span class="fa fa-repeat"></span> {{'admin.unapprovedUsers.list.retryApprovingFailedUsers' | translate}}
 	</button>
 	<button type="button" class="btn btn-danger btn-sm" ng-click="deleteUsersWithErrors()" ng-disabled="loading">
-		<span class="glyphicon glyphicon-trash"></span> {{'admin.unapprovedUsers.list.deleteUsersWithErrors' | translate}}
+		<span class="fa fa-trash"></span> {{'admin.unapprovedUsers.list.deleteUsersWithErrors' | translate}}
 	</button>
 	<div class="spinner" ng-if="loading"></div>
 	<table class="table table-striped table-bordered table-hover" id="userTable" ng-if="!loading">
@@ -55,7 +55,7 @@
 			<tr ng-repeat="user in users">
 				<td>
 					<button type="button" tooltip="{{user.error}}" class="btn btn-xs" ng-class="{'btn-default':!user.checked, 'btn-success':user.checked &amp;&amp; !user.error, 'btn-danger':!!user.error}" ng-click="user.checked=!user.checked">
-						<span class="glyphicon" ng-class="{'glyphicon-unchecked':!user.checked, 'glyphicon-check':user.checked}"></span>
+						<i class="fa" ng-class="{'fa-square-o':!user.checked, 'fa-check-square':user.checked}"></i>
 					</button>
 				</td>
 				<td>{{user.username}}</td>

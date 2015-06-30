@@ -30,7 +30,6 @@ define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) 
                         if (!ctrl) {
                             return;
                         }
-                        ctrl.forceValidation = true;
                         var self = this;
                         if (!_.has(self.existingErrorKeys, field))
                             self.existingErrorKeys[field] = [];

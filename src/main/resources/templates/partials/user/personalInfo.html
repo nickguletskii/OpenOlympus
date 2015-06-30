@@ -36,7 +36,7 @@
             <input label="user.password.form.labels.password" type="password" ng-model="password.password" ng-passwords-match-master="passwordConfirmation" ng-length="6,32" required="" oolinput=""></input>
             <input label="user.password.labels.passwordConfirmation" type="password" ng-model="password.passwordConfirmation" ng-model-options="{ updateOn: 'default passwordChanged' }" ng-passwords-match-slave="password" ng-length="6,32" required="" oolinput=""></input>
             <button type="submit" class="btn" ng-class="{'btn-success':updatedPassword}">
-                <span ng-if="updatedPassword" class="glyphicon glyphicon-ok"></span> {{'user.password.changeButton' | translate}}</button>
+                <span ng-if="updatedPassword" class="fa fa-check"></span> {{'user.password.changeButton' | translate}}</button>
         </form>
     </div>
     <div class="row">
@@ -67,7 +67,7 @@
             </div>
 
             <button type="submit" class="btn" ng-class="{'btn-success':updatedUser}">
-                <span ng-if="updatedUser" class="glyphicon glyphicon-ok"></span> {{'user.personalInfo.saveButton' | translate}}</button>
+                <span ng-if="updatedUser" class="fa fa-check"></span> {{'user.personalInfo.saveButton' | translate}}</button>
         </form>
     </div>
 </body>

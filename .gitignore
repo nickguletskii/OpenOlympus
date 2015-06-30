@@ -3,6 +3,9 @@ src/main/resources/spring.properties
 /tasks/
 /solutions/
 *.class
+/node_modules/
+/bower_components/
+/src/main/resources/resources/bundled/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

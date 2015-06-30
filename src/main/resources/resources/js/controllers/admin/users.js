@@ -20,30 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'lodash'],
-    function(Util, _) {
-        return function($timeout, $q, $scope, $rootScope, $http, $location,
-            $stateParams, UserService, users, userCount) {
 
-            $scope.$apply(function() {
-                var page = $stateParams.page;
+var Util = require("oolutil");
+var angular = require("angular");
+var _ = require("lodash");
 
-                $scope.page = $stateParams.page;
-                $scope.users = users;
-                $scope.userCount = userCount;
+module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+    $stateParams, UserService, users, userCount) {
 
-                $scope.deleteUser = function(user) {
-                    UserService.deleteUsers([user.id]).then(updateUsers);
-                };
+    var page = $stateParams.page;
 
-                function updateUsers() {
-                    UserService.getUsersPage(page).then(function(users) {
-                        $scope.users = users;
-                    });
-                    UserService.countUsers().then(function(count) {
-                        $scope.userCount = count;
-                    });
-                }
-            });
-        };
-    });
+    $scope.page = $stateParams.page;
+    $scope.users = users;
+    $scope.userCount = userCount;
+
+    $scope.deleteUser = function(user) {
+        UserService.deleteUsers([user.id]).then(updateUsers);
+    };
+
+    function updateUsers() {
+        UserService.getUsersPage(page).then(function(users) {
+            $scope.users = users;
+        });
+        UserService.countUsers().then(function(count) {
+            $scope.userCount = count;
+        });
+    }
+};
