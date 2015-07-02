@@ -5,8 +5,8 @@ var BowerWebpackPlugin = require("bower-webpack-plugin");
 var ChunkManifestPlugin = require('chunk-manifest-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-var resourceRoot = path.resolve(__dirname, "src/main/resources/resources");
-var generatedResourcesRoot = path.resolve(__dirname, "src/main/resources/resources/bundled");
+var resourceRoot = path.resolve(__dirname, "src/main/resources/public/resources");
+var generatedResourcesRoot = path.resolve(__dirname, "src/main/resources/public/resources/bundled");
 var nodeModulesRoot = path.resolve(__dirname, "node_modules");
 var bowerComponentsRoot = path.resolve(__dirname, "bower_components");
 
@@ -139,4 +139,6 @@ config.addVendor("angular", path.resolve(nodeModulesRoot, "angular/angular.js"))
 config.addVendor("angular-ui-bootstrap", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap.js"));
 config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap-tpls.js"));
 config.addVendor("angular-no-captcha", path.resolve(bowerComponentsRoot, "angular-no-captcha/src/angular-no-captcha.js"));
+config.addVendor("angular-form-for", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.js"));
+config.addVendor("angular-form-for-bootstrap", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.bootstrap-templates.js"));
 module.exports = config;

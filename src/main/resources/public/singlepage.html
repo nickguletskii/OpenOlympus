@@ -1,0 +1,155 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>OpenOlympus</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="stylesheet" href="/resources/bundled/bundle.css"></link>
+    <base href="/" />
+</head>
+
+<body ui-sref-opts="reload" ng-class="{fullScreen: fullScreen}">
+    <div ng-show="!hideResourcesLoading" class="loadingResourcesOverlay">
+        <div class="loadingResourcesOverlayMid text-center">
+            <h1 class="bg-primary"><i class="fa fa-cog fa-5x loadingResourcesOverlaySpinning"></i></h1>
+            <h1 class="bg-primary">OpenOlympus</h1>
+            <h3 class="bg-primary">Loading...</h3>
+        </div>
+    </div>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-if="!showErrorModal">
+        <div class="container-fluid" ng-cloak="">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" ng-init="navCollapsed=true" ng-click="navCollapsed=!navCollapsed">
+                    <!--  -->
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" translate="topbar.openolympus" href="/"></a>
+            </div>
+            <div class="collapse navbar-collapse" ng-class="!navCollapsed &amp;&amp; 'in'" ng-click="navCollapsed=true">
+                <ul class="nav navbar-nav">
+                    <li ng-if="!!runningContest">
+                        <a ui-sref="contestView({contestId: runningContest.id })" translate="topbar.navigation.currentContest" id="headerCurrentContestLink"></a>
+                    </li>
+                    <li>
+                        <a ui-sref="contestList" id="headerContestsLink">
+                            <span translate="topbar.navigation.contests"></span>
+                        </a>
+                    </li>
+                    <li class="dropdown" dropdown="">
+                        <a class="dropdown-toggle" dropdown-toggle="">
+                            <span translate="topbar.navigation.archive"></span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a ui-sref="archiveTaskList" translate="topbar.navigation.archive.tasks"></a>
+                            </li>
+                            <li>
+                                <a ui-sref="archiveRank" translate="topbar.navigation.archive.ranking"></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li ng-if="security.isUser()">
+                        <a href="/user/solutions" translate="user.solutions" id="headerSolutionsLink"></a>
+                    </li>
+                    <li ng-if="security.isAdmin()">
+                        <a ui-sref="administrationHub" translate="topbar.navigation.admin" id="headerAdminLink"></a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <!-- Right Nav Section -->
+                    <li class="dropdown" dropdown="">
+                        <a dropdown-toggle="">
+                            <span translate="header.languageMenu"></span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="language in availableLanguages">
+                                <a ng-click="changeLanguage(language)">{{ ('locale.language.' + language) | translate }}</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li ng-if="security.isLoggedIn() &amp;&amp; !security.isUser()">
+                        <button type="button" class="btn btn-warning navbar-btn" tooltip-placement="bottom" tooltip="{{'login.administratorApprovalRequired.body' | translate}}"><span class="fa fa-exclamation-triangle"></span></button>
+                    </li>
+                    <li ng-if="security.isLoggedIn()">
+                        <a ui-sref="personalInfoModificationView" id="headerUserInfoLink">{{security.getUsername()}}</a>
+                    </li>
+                    <li ng-if="security.isLoggedIn()">
+                        <a ng-click="security.logout()" translate="header.logout" id="headerLogoutLink"></a>
+                    </li>
+                    <li ng-if="!security.isLoggedIn()">
+                        <a ui-sref="login" translate="header.login"> </a>
+                    </li>
+                    <li ng-if="!security.isLoggedIn()">
+                        <a ui-sref="register" translate="header.register" id="headerRegisterLink"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'" ng-show="!showErrorModal" ng-cloak="">
+        <div class="row">
+            <div class="fadeTransition" ng-class="stateConfig.customWidth ? stateConfig.customWidth : 'col-md-10 col-md-offset-1'" ui-view=""></div>
+        </div>
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <hr />
+                    <div class="col-lg-6">
+                        <p>© 2013-2015 Nick Guletskii.</p>
+                        <p>
+                            <a href="mailto:nick@nickguletskii.com">nick@nickguletskii.com</a>
+                        </p>
+                    </div>
+                    <div class="col-lg-6">
+                        <p class="pull-right">
+                            <a ui-sref="eula" translate="footer.eula"></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <div class="container text-center" ng-if="showErrorModal" ng-cloak="">
+        <div class="row">
+            <span class="fa fa-exclamation-triangle text-danger" style="font-size: 20em"></span>
+        </div>
+        <div class="row">
+            <h1>{{'error.title' | translate}}</h1>
+            <p>{{'error.body' | translate}}</p>
+            <button class="btn btn-danger" onClick="window.location.reload()">{{'error.reloadPage' | translate}}</button>
+        </div>
+    </div>
+    <script src="/resources/bundled/js/vendor.bundle.js"></script>
+    <script src="/resources/bundled/js/bundle.js"></script>
+</body>
+
+</html>

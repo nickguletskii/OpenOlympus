@@ -13,6 +13,8 @@ require("angular-ui-codemirror");
 require("angular-no-captcha");
 require("angular-animate");
 require("angular-sanitize");
+require("angular-form-for");
+require("angular-form-for-bootstrap");
 
 var app = require("app");
 var filters = require("filters");
@@ -102,6 +104,7 @@ app.factory('$exceptionHandler', function($injector) {
         $timeout(function() {
             $rootScope.showErrorModal = true;
         }, 1);
+        console.error(exception);
         throw exception;
     };
 });

@@ -32,15 +32,15 @@ var WIDE = 'col-md-12 col-md-offset-0';
 var stateList = [{
     "name": "forbidden",
     "url": "/forbidden",
-    "templateUrl": "/partials/forbidden"
+    "templateUrl": "/partials/forbidden.html"
 }, {
     "name": "eula",
     "url": "/eula",
-    "templateUrl": "/partials/eula"
+    "templateUrl": "/partials/eula.html"
 }, {
     "name": "taskView",
     "url": "/task/{taskId:[0-9]+}?contestId",
-    "templateUrl": "/partials/task",
+    "templateUrl": "/partials/task.html",
     "controller": require("controllers/task"),
     "resolve": {
         "task": function(TaskService, $stateParams) {
@@ -50,7 +50,7 @@ var stateList = [{
 }, {
     "name": "taskModificationView",
     "url": "/task/{taskId:[0-9]+}/edit?contestId",
-    "templateUrl": "/partials/task/edit",
+    "templateUrl": "/partials/task/edit.html",
     "controller": require("controllers/task/edit"),
     "fluidContainer": true,
     "resolve": {
@@ -61,7 +61,7 @@ var stateList = [{
 }, {
     "name": "archiveTaskList",
     "url": "/archive/tasks?page?taskId",
-    "templateUrl": "/partials/archive/tasks",
+    "templateUrl": "/partials/archive/tasks.html",
     "controller": require("controllers/archive/tasks"),
     "params": {
         "page": "1",
@@ -78,7 +78,7 @@ var stateList = [{
 }, {
     "name": "archiveRank",
     "url": "/archive/users?page",
-    "templateUrl": "/partials/archive/users",
+    "templateUrl": "/partials/archive/users.html",
     "controller": require("controllers/archive/users"),
 
     "params": {
@@ -95,7 +95,7 @@ var stateList = [{
 }, {
     "name": "contestList",
     "url": "/contests?page",
-    "templateUrl": "/partials/contests",
+    "templateUrl": "/partials/contests.html",
     "controller": require("controllers/contests"),
     "params": {
         "page": "1"
@@ -111,7 +111,7 @@ var stateList = [{
 }, {
     "name": "contestView",
     "url": "/contest/{contestId:[0-9]+}?taskId",
-    "templateUrl": "/partials/contests/contest",
+    "templateUrl": "/partials/contests/contest.html",
     "controller": require("controllers/contests/contest"),
     "params": {
         "taskId": null
@@ -124,7 +124,7 @@ var stateList = [{
 }, {
     "name": "contestParticipantsList",
     "url": "/contest/{contestId:[0-9]+}/participants?userId",
-    "templateUrl": "/partials/contests/contest/participants",
+    "templateUrl": "/partials/contests/contest/participants.html",
     "controller": require("controllers/contests/contest/participants"),
     "params": {
         "page": "1"
@@ -140,7 +140,7 @@ var stateList = [{
 }, {
     "name": "contestResults",
     "url": "/contest/{contestId:[0-9]+}/results",
-    "templateUrl": "/partials/contests/contest/results",
+    "templateUrl": "/partials/contests/contest/results.html",
     "controller": require("controllers/contests/contest/results"),
     "customWidth": WIDE,
     "fluidContainer": true,
@@ -158,7 +158,7 @@ var stateList = [{
 }, {
     "name": "userSolutionList",
     "url": "/user/solutions?page",
-    "templateUrl": "/partials/user/solutions",
+    "templateUrl": "/partials/user/solutions.html",
     "controller": require("controllers/user/solutions"),
     "params": {
         "page": "1"
@@ -174,7 +174,7 @@ var stateList = [{
 }, {
     "name": "adminSolutionList",
     "url": "/admin/solutions?page",
-    "templateUrl": "/partials/admin/solutions",
+    "templateUrl": "/partials/admin/solutions.html",
     "controller": require("controllers/admin/solutions"),
     "params": {
         "page": "1"
@@ -190,7 +190,7 @@ var stateList = [{
 }, {
     "name": "solutionView",
     "url": "/solution/{solutionId:[0-9]+}",
-    "templateUrl": "/partials/solution",
+    "templateUrl": "/partials/solution.html",
     "controller": require("controllers/solution"),
     "resolve": {
         "data": function(SolutionService, $stateParams) {
@@ -200,17 +200,17 @@ var stateList = [{
 }, {
     "name": "createTask",
     "url": "/archive/tasks/add",
-    "templateUrl": "/partials/archive/tasks/add",
+    "templateUrl": "/partials/archive/tasks/add.html",
     "controller": require("controllers/archive/tasks/add")
 }, {
     "name": "createContest",
     "url": "/contests/add",
-    "templateUrl": "/partials/contests/add",
+    "templateUrl": "/partials/contests/add.html",
     "controller": require("controllers/contests/add")
 }, {
     "name": "editContest",
     "url": "/contest/{contestId:[0-9]+}/edit",
-    "templateUrl": "/partials/contests/contest/edit",
+    "templateUrl": "/partials/contests/contest/edit.html",
     "controller": require("controllers/contests/contest/edit"),
     "resolve": {
         "contest": function(ContestService, $stateParams) {
@@ -220,7 +220,7 @@ var stateList = [{
 }, {
     "name": "login",
     "url": "/login?failure",
-    "templateUrl": "/partials/login",
+    "templateUrl": "/partials/login.html",
     "controller": require("controllers/login"),
     "customWidth": NARROW,
     "params": {
@@ -230,13 +230,13 @@ var stateList = [{
 }, {
     "name": "register",
     "url": "/register",
-    "templateUrl": "/partials/register",
+    "templateUrl": "/partials/register.html",
     "controller": require("controllers/register"),
     "customWidth": NARROW
 }, {
     "name": "personalInfoModificationView",
     "url": "/user/personalInfo",
-    "templateUrl": "/partials/user/personalInfo",
+    "templateUrl": "/partials/user/personalInfo.html",
     "controller": require("controllers/user/personalInfo"),
     "customWidth": NARROW,
     "resolve": {
@@ -253,7 +253,7 @@ var stateList = [{
 }, {
     "name": "administrativePersonalInfoModificationView",
     "url": "/admin/user/{userId:[0-9]+}/personalInfo",
-    "templateUrl": "/partials/user/personalInfo",
+    "templateUrl": "/partials/user/personalInfo.html",
     "controller": require("controllers/user/personalInfo"),
     "customWidth": NARROW,
     "resolve": {
@@ -270,14 +270,14 @@ var stateList = [{
 }, {
     "name": "home",
     "url": "/",
-    "templateUrl": "/partials/home",
+    "templateUrl": "/partials/home.html",
     "controller": require("controllers/home"),
     "type": "requireController",
     "customWidth": NARROW
 }, {
     "name": "pendingUsersList",
     "url": "/admin/pendingUsers?page",
-    "templateUrl": "/partials/admin/pendingUsers",
+    "templateUrl": "/partials/admin/pendingUsers.html",
     "customWidth": WIDE,
     "controller": require("controllers/admin/pendingUsers"),
     "params": {
@@ -294,7 +294,7 @@ var stateList = [{
 }, {
     "name": "adminUsersList",
     "url": "/admin/users?page",
-    "templateUrl": "/partials/admin/users",
+    "templateUrl": "/partials/admin/users.html",
     "customWidth": WIDE,
     "controller": require("controllers/admin/users"),
     "params": {
@@ -311,53 +311,53 @@ var stateList = [{
 }, {
     "name": "administrationHub",
     "url": "/admin",
-    "templateUrl": "/partials/admin",
+    "templateUrl": "/partials/admin.html",
     "controller": require("controllers/admin")
 }];
 
 var modalStateList = [{
     "parent": "archiveTaskList",
     "name": "archiveTaskList.rejudgeTaskConfirmation",
-    "templateUrl": "/partials/archive/tasks/rejudgeTask/confirmation",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/confirmation.html",
     "backdrop": true
 }, {
     "parent": "archiveTaskList",
     "name": "archiveTaskList.rejudgeTaskWorking",
-    "templateUrl": "/partials/archive/tasks/rejudgeTask/working",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/working.html",
     "controller": require("controllers/archive/tasks/rejudgeWorker"),
     "backdrop": true
 }, {
     "parent": "archiveTaskList",
     "name": "archiveTaskList.rejudgeTaskSuccess",
-    "templateUrl": "/partials/archive/tasks/rejudgeTask/success",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/success.html",
     "backdrop": true
 }, {
     "parent": "contestView",
     "name": "contestView.rejudgeTaskConfirmation",
-    "templateUrl": "/partials/archive/tasks/rejudgeTask/confirmation",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/confirmation.html",
     "backdrop": true
 }, {
     "parent": "contestView",
     "name": "contestView.rejudgeTaskWorking",
-    "templateUrl": "/partials/archive/tasks/rejudgeTask/working",
+    "templateUrl": "/partials/archive/tasks/rejudgeTask/working.html",
     "controller": require("controllers/archive/tasks/rejudgeWorker"),
     "backdrop": true
 }, {
     "parent": "contestView",
     "name": "contestView.addUser",
-    "templateUrl": "/partials/contests/contest/addUser",
+    "templateUrl": "/partials/contests/contest/addUser.html",
     "controller": require("controllers/contests/contest/addUser"),
     "backdrop": true
 }, {
     "parent": "contestView",
     "name": "contestView.addTask",
-    "templateUrl": "/partials/contests/contest/addTask",
+    "templateUrl": "/partials/contests/contest/addTask.html",
     "controller": require("controllers/contests/contest/addTask"),
     "backdrop": true
 }, {
     "parent": "contestParticipantsList",
     "name": "contestParticipantsList.addUserTime",
-    "templateUrl": "/partials/contests/contest/addUserTime",
+    "templateUrl": "/partials/contests/contest/addUserTime.html",
     "controller": require("controllers/contests/contest/addUserTime"),
     "backdrop": true
 }];

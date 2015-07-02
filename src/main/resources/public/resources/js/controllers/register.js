@@ -27,14 +27,14 @@ var _ = require("lodash");
 module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
     $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
     $http.get("/api/security/userStatus").success(function(response) {
-        if (response.loggedIn) {
+        if (response) {
             $state.go("home");
         } else {
             $scope.logInFormVisible = true;
         }
     });
     $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    ;
+    
     $scope.user = {};
     $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
         if (_.isEmpty(recaptchaPublicKey)) {

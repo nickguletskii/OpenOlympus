@@ -30,12 +30,9 @@ import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 @Service
 public class EmailService {
@@ -55,28 +52,18 @@ public class EmailService {
 	@Value("${emailPassword}")
 	private String emailPassword;
 
-	@Autowired
-	private TemplateEngine templateEngine;
-
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
-	public void sendEmail(String emailAddress, String subject, String view,
-			String alternativeText, Map<String, Object> variables)
-			throws MessagingException, EmailException {
-		final Context ctx = new Context();
-		ctx.setVariables(variables);
-
+	public void sendEmail(String emailAddress, String subject, String view, String alternativeText,
+			Map<String, Object> variables) throws MessagingException, EmailException {
 		final HtmlEmail email = new HtmlEmail();
 		email.setHostName(this.emailHost);
 		email.setSmtpPort(this.emailHostPort);
-		email.setAuthenticator(new DefaultAuthenticator(this.emailLogin,
-				this.emailPassword));
+		email.setAuthenticator(new DefaultAuthenticator(this.emailLogin, this.emailPassword));
 		email.setSSL(true);
 		email.setFrom(this.emailLogin);
 		email.setSubject(subject);
 
-		final String htmlContent = this.templateEngine.process(view, ctx);
-
-		email.setHtmlMsg(htmlContent);
+		email.setHtmlMsg(null); // TODO: fix emails
 
 		email.setTextMsg(alternativeText);
 

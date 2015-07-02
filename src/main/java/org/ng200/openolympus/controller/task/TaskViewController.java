@@ -55,7 +55,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -88,9 +87,6 @@ public class TaskViewController {
 			this.name = name;
 		}
 	}
-
-	@Autowired
-	private ThymeleafViewResolver thymeleafViewResolver;
 
 	@Autowired
 	private UserService userService;

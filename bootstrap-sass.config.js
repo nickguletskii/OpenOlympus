@@ -1,6 +1,6 @@
 var path = require('path');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var resourceRoot = path.resolve(__dirname, "src/main/resources/resources");
+var resourceRoot = path.resolve(__dirname, "src/main/resources/public/resources");
 
 module.exports = {
     preBootstrapCustomizations: path.resolve(resourceRoot, "sass/_variables.scss"),

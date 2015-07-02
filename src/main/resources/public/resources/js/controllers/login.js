@@ -27,7 +27,7 @@ var _ = require("lodash");
 module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
     $location, $stateParams, $state, AuthenticationProvider, $translate) {
     AuthenticationProvider.update();
-    $scope.showAdministratorApprovalRequiredMessage = $stateParams.showAdministratorApprovalRequiredMessage;
+    $scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === 'true');
 
     $http.get("/api/security/userStatus").success(function(response) {
         if (response != null) {

@@ -27,7 +27,7 @@ var angular = require("angular");
 var app = angular.module('ool', ['pascalprecht.translate', 'ui.router',
     'ui.bootstrap', 'ool.filters', 'ool.controllers',
     'ool.services', 'ool.directives', 'angularFileUpload', 'ui.codemirror',
-    'noCAPTCHA', 'ngAnimate'
+    'noCAPTCHA', 'ngAnimate', 'formFor', 'formFor.bootstrapTemplates'
 ]);
 
 module.exports = app;

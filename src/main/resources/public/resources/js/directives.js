@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License
  * Copyright (c) 2014-2015 Nick Guletskii
  *
@@ -20,29 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.controller;
+'use strict';
 
-import javax.servlet.http.HttpServletRequest;
+var angular = require("angular");
+var services = require("services");
+var _ = require("lodash");
+var moment = require("moment");
+var textile = require("textile");
 
-import org.springframework.stereotype.Controller;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.HandlerMapping;
+/* Directives */
 
-@Controller
-public class PartialsController {
-	@RequestMapping("/partials/**")
-	String getMapping(final HttpServletRequest request) {
-		final String path = (String) request
-				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		final String bestMatchPattern = (String) request
-				.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-
-		final AntPathMatcher apm = new AntPathMatcher();
-		final String finalPath = apm.extractPathWithinPattern(bestMatchPattern,
-				path);
-
-		return "partials/" + finalPath + "::content";
-
-	}
-}
+angular.module('ool.directives', ['ool.services'])
+.directive('eatClickIf', require("directives/eat-click"))
+.directive('ngDateTime', require("directives/date-time"))
+.directive('datepickerLocaldate', require("directives/datepicker-localdate"))
+.directive('ngReallyClick', require("directives/really-click"))
+.directive("lang", require("directives/lang"))
+.directive('dynamic', require("directives/dynamic"));

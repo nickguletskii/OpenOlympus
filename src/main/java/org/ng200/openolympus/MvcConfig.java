@@ -24,6 +24,7 @@ package org.ng200.openolympus;
 
 import java.util.List;
 
+import org.hibernate.validator.internal.constraintvalidators.URLValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,35 +41,30 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@Import({
-	ThymeleafConfig.class
-})
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer properties() {
 		final PropertySourcesPlaceholderConfigurer propertySources = new PropertySourcesPlaceholderConfigurer();
 		final Resource[] resources = new ClassPathResource[] {
-			new ClassPathResource("openolympus.properties")
+																new ClassPathResource("openolympus.properties")
 		};
 		propertySources.setLocations(resources);
 		propertySources.setIgnoreUnresolvablePlaceholders(true);
 		return propertySources;
 	}
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(MvcConfig.class);
-
-	@Value("${customResourceLocation}")
-	String customResourceLocation;
+	private static final Logger logger = LoggerFactory.getLogger(MvcConfig.class);
 
 	Integer cachePeriod;
 
@@ -84,30 +80,13 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-		MvcConfig.logger.info("Custom resource location: {}",
-				this.customResourceLocation);
-
-		if (!StringUtils.isEmpty(this.customResourceLocation)) {
-			registry.addResourceHandler("/customResources/**")
-					.addResourceLocations(this.customResourceLocation);
-		}
-
-		registry.addResourceHandler("/resources/**")
-				.addResourceLocations("classpath:/")
+		registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/public/resources/")
 				.setCachePeriod(cachePeriod);
-
-		registry.addResourceHandler("/favicon.png")
-				.addResourceLocations("classpath:/")
+		registry.addResourceHandler("/partials/**").addResourceLocations("classpath:/public/partials/")
 				.setCachePeriod(cachePeriod);
-	}
-
-	@Override
-	public void addViewControllers(final ViewControllerRegistry registry) {
-		registry.addViewController("/home").setViewName("home");
-		registry.addViewController("/errors/404").setViewName("errors/404");
-
-		registry.addViewController("/**").setViewName("singlepage");
-		registry.setOrder(Ordered.LOWEST_PRECEDENCE);
+		registry.addResourceHandler("/singlepage.html").addResourceLocations("classpath:/public/singlepage.html")
+				.setCachePeriod(cachePeriod);
 	}
 
 	@Bean
@@ -130,9 +109,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Override
-	public void configureMessageConverters(
-			List<HttpMessageConverter<?>> converters) {
+	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		converters.add(jacksonMessageConverter);
 		super.configureMessageConverters(converters);
 	}
+
 }
