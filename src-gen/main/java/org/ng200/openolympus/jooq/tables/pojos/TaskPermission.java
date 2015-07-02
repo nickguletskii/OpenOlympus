@@ -10,8 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.ng200.openolympus.jooq.enums.VerdictStatusTypeCp;
-import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
+import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
 
 
 /**
@@ -26,31 +26,31 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "contest_permission", schema = "public")
-public class ContestPermission implements IContestPermission {
+@Table(name = "task_permission", schema = "public")
+public class TaskPermission implements ITaskPermission {
 
-	private static final long serialVersionUID = -1168409722;
+	private static final long serialVersionUID = -19862864;
 
-	private Long                id;
-	private VerdictStatusTypeCp type;
-	private Integer             contestId;
+	private Long               id;
+	private TaskPermissionType type;
+	private Integer            idTask;
 
-	public ContestPermission() {}
+	public TaskPermission() {}
 
-	public ContestPermission(ContestPermission value) {
+	public TaskPermission(TaskPermission value) {
 		this.id = value.id;
 		this.type = value.type;
-		this.contestId = value.contestId;
+		this.idTask = value.idTask;
 	}
 
-	public ContestPermission(
-		Long                id,
-		VerdictStatusTypeCp type,
-		Integer             contestId
+	public TaskPermission(
+		Long               id,
+		TaskPermissionType type,
+		Integer            idTask
 	) {
 		this.id = id;
 		this.type = type;
-		this.contestId = contestId;
+		this.idTask = idTask;
 	}
 
 	@Id
@@ -61,32 +61,32 @@ public class ContestPermission implements IContestPermission {
 	}
 
 	@Override
-	public ContestPermission setId(Long id) {
+	public TaskPermission setId(Long id) {
 		this.id = id;
 		return this;
 	}
 
 	@Column(name = "type", nullable = false)
 	@Override
-	public VerdictStatusTypeCp getType() {
+	public TaskPermissionType getType() {
 		return this.type;
 	}
 
 	@Override
-	public ContestPermission setType(VerdictStatusTypeCp type) {
+	public TaskPermission setType(TaskPermissionType type) {
 		this.type = type;
 		return this;
 	}
 
-	@Column(name = "contest_id", precision = 32)
+	@Column(name = "id_task", precision = 32)
 	@Override
-	public Integer getContestId() {
-		return this.contestId;
+	public Integer getIdTask() {
+		return this.idTask;
 	}
 
 	@Override
-	public ContestPermission setContestId(Integer contestId) {
-		this.contestId = contestId;
+	public TaskPermission setIdTask(Integer idTask) {
+		this.idTask = idTask;
 		return this;
 	}
 
@@ -98,17 +98,17 @@ public class ContestPermission implements IContestPermission {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void from(IContestPermission from) {
+	public void from(ITaskPermission from) {
 		setId(from.getId());
 		setType(from.getType());
-		setContestId(from.getContestId());
+		setIdTask(from.getIdTask());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <E extends IContestPermission> E into(E into) {
+	public <E extends ITaskPermission> E into(E into) {
 		into.from(this);
 		return into;
 	}

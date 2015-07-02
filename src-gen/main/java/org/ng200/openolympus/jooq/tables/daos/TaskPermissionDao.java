@@ -10,7 +10,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
-import org.ng200.openolympus.jooq.enums.VerdictStatusType;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.TaskPermission;
 import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 
@@ -67,15 +67,15 @@ public class TaskPermissionDao extends DAOImpl<TaskPermissionRecord, org.ng200.o
 	/**
 	 * Fetch records that have <code>type IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.TaskPermission> fetchByType(VerdictStatusType... values) {
+	public List<org.ng200.openolympus.jooq.tables.pojos.TaskPermission> fetchByType(TaskPermissionType... values) {
 		return fetch(TaskPermission.TASK_PERMISSION.TYPE, values);
 	}
 
 	/**
-	 * Fetch records that have <code>task_id IN (values)</code>
+	 * Fetch records that have <code>id_task IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.TaskPermission> fetchByTaskId(Integer... values) {
-		return fetch(TaskPermission.TASK_PERMISSION.TASK_ID, values);
+	public List<org.ng200.openolympus.jooq.tables.pojos.TaskPermission> fetchByIdTask(Integer... values) {
+		return fetch(TaskPermission.TASK_PERMISSION.ID_TASK, values);
 	}
 	public org.ng200.openolympus.jooq.tables.pojos.TaskPermission fetchOneById(String id) {
 		return fetchOneById(java.lang.Long.valueOf(id));

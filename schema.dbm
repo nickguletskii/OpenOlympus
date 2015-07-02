@@ -3,9 +3,9 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-alpha" last-position="0,1019" last-zoom="0.9"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="0,837" last-zoom="0.9"
 	 default-owner="postgres">
-<database name="openolympus" encoding="UTF8" lc-collate="en_US" lc-ctype="en_US">
+<database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
 	<tablespace name="pg_default"/>
 </database>
@@ -723,7 +723,7 @@ WHERE contest.id = contest_id ]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type"/>
+		<type name="public.verdict_status_type" precision="2"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -840,10 +840,10 @@ WHERE contest.id = contest_id ]]></definition>
 	<column name="name" not-null="true">
 		<type name="text"/>
 	</column>
-	<constraint name="primary_key" type="pk-constr" table="public.group">
+	<constraint name="primary_key" type="pk-constr" table="public.&quot;group&quot;">
 		<columns names="id" ref-type="src-columns"/>
 	</constraint>
-	<constraint name="group_name_unique" type="uq-constr" table="public.group">
+	<constraint name="group_name_unique" type="uq-constr" table="public.&quot;group&quot;">
 		<columns names="name" ref-type="src-columns"/>
 	</constraint>
 </table>
@@ -854,7 +854,7 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
 	 pk-col-pattern="id"
 	 custom-color="#a5f397"
-	 src-table="public.group"
+	 src-table="public.&quot;group&quot;"
 	 dst-table="public.&quot;USER&quot;"
 	 src-required="false" dst-required="false"
 	 table-name="group_users"
@@ -897,43 +897,17 @@ WHERE contest.id = contest_id ]]></definition>
 	 dst-table="public.resource"
 	 src-required="false" dst-required="false"/>
 
-<table name="task_permission">
+<usertype name="task_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="948.143" y="1128.25"/>
-	<column name="id" not-null="true">
-		<type name="bigserial"/>
-	</column>
-	<column name="type" not-null="true">
-		<type name="public.verdict_status_type"/>
-	</column>
-	<constraint name="task_permission_pk" type="pk-constr" table="public.task_permission">
-		<columns names="id" ref-type="src-columns"/>
-	</constraint>
-
-	<customidxs object-type="column">
-		<object name="task_id" index="2"/>
-	</customidxs>
-
-	<customidxs object-type="constraint">
-		<object name="task_fk" index="1"/>
-	</customidxs>
-</table>
+	<enumeration values="view,view_during_contest,modify"/>
+</usertype>
 
 <usertype name="acl_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
 	<enumeration values="manage_acl,write,read,manage_participants,answer_questions,make_announcements"/>
 </usertype>
-
-<relationship name="task_permissions" type="rel1n"
-	 src-col-pattern="{st}_{sc}"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#865258"
-	 src-table="public.task"
-	 dst-table="public.task_permission"
-	 src-required="false" dst-required="false"/>
 
 <table name="task_permission_principal">
 	<schema name="public"/>
@@ -952,10 +926,25 @@ WHERE contest.id = contest_id ]]></definition>
 	</customidxs>
 </table>
 
-<usertype name="verdict_status_type_cp" configuration="enumeration">
+<table name="task_permission">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="waiting,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error"/>
+	<position x="948.143" y="1128.25"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="type" not-null="true">
+		<type name="public.task_permission_type"/>
+	</column>
+	<constraint name="task_permission_pk" type="pk-constr" table="public.task_permission">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<usertype name="contest_permission_type" configuration="enumeration">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<enumeration values="edit,view_tasks_before_contest_started,delete,add_user,add_task,list_tasks,extend_time"/>
 </usertype>
 
 <table name="contest_permission">
@@ -966,35 +955,12 @@ WHERE contest.id = contest_id ]]></definition>
 		<type name="bigserial"/>
 	</column>
 	<column name="type" not-null="true">
-		<type name="public.verdict_status_type_cp"/>
+		<type name="public.contest_permission_type"/>
 	</column>
 	<constraint name="contest_permission_pk" type="pk-constr" table="public.contest_permission">
 		<columns names="id" ref-type="src-columns"/>
 	</constraint>
-
-	<customidxs object-type="column">
-		<object name="contest_id" index="2"/>
-	</customidxs>
-
-	<customidxs object-type="constraint">
-		<object name="contest_fk" index="1"/>
-	</customidxs>
 </table>
-
-<relationship name="contest_permissions" type="rel1n"
-	 src-col-pattern="{st}_{sc}"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#71555a"
-	 src-table="public.contest"
-	 dst-table="public.contest_permission"
-	 src-required="false" dst-required="false"/>
-
-<usertype name="verdict_status_type_cp1" configuration="enumeration">
-	<schema name="public"/>
-	<role name="postgres"/>
-	<enumeration values="waiting,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error"/>
-</usertype>
 
 <table name="contest_permission_principal">
 	<schema name="public"/>
@@ -1034,5 +1000,24 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-required="true" dst-required="false"
 	 identifier="true"
 />
+
+<relationship name="task_permissions" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#338dc6"
+	 src-table="public.task"
+	 dst-table="public.task_permission"
+	 src-required="false" dst-required="false"
+	del-action="CASCADE"/>
+
+<relationship name="contest_permissions" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#b39b27"
+	 src-table="public.contest"
+	 dst-table="public.contest_permission"
+	 src-required="false" dst-required="false"/>
 
 </dbmodel>

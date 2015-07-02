@@ -10,7 +10,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
-import org.ng200.openolympus.jooq.enums.VerdictStatusTypeCp;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.ContestPermission;
 import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 
@@ -67,15 +67,15 @@ public class ContestPermissionDao extends DAOImpl<ContestPermissionRecord, org.n
 	/**
 	 * Fetch records that have <code>type IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByType(VerdictStatusTypeCp... values) {
+	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByType(ContestPermissionType... values) {
 		return fetch(ContestPermission.CONTEST_PERMISSION.TYPE, values);
 	}
 
 	/**
-	 * Fetch records that have <code>contest_id IN (values)</code>
+	 * Fetch records that have <code>id_contest IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByContestId(Integer... values) {
-		return fetch(ContestPermission.CONTEST_PERMISSION.CONTEST_ID, values);
+	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByIdContest(Integer... values) {
+		return fetch(ContestPermission.CONTEST_PERMISSION.ID_CONTEST, values);
 	}
 	public org.ng200.openolympus.jooq.tables.pojos.ContestPermission fetchOneById(String id) {
 		return fetchOneById(java.lang.Long.valueOf(id));

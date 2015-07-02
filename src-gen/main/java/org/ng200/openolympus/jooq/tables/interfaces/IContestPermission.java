@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.ng200.openolympus.jooq.enums.VerdictStatusTypeCp;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 
 
 /**
@@ -45,24 +45,24 @@ public interface IContestPermission extends Serializable {
 	/**
 	 * Setter for <code>public.contest_permission.type</code>.
 	 */
-	public IContestPermission setType(VerdictStatusTypeCp value);
+	public IContestPermission setType(ContestPermissionType value);
 
 	/**
 	 * Getter for <code>public.contest_permission.type</code>.
 	 */
 	@Column(name = "type", nullable = false)
-	public VerdictStatusTypeCp getType();
+	public ContestPermissionType getType();
 
 	/**
-	 * Setter for <code>public.contest_permission.contest_id</code>.
+	 * Setter for <code>public.contest_permission.id_contest</code>.
 	 */
-	public IContestPermission setContestId(Integer value);
+	public IContestPermission setIdContest(Integer value);
 
 	/**
-	 * Getter for <code>public.contest_permission.contest_id</code>.
+	 * Getter for <code>public.contest_permission.id_contest</code>.
 	 */
-	@Column(name = "contest_id", precision = 32)
-	public Integer getContestId();
+	@Column(name = "id_contest", precision = 32)
+	public Integer getIdContest();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

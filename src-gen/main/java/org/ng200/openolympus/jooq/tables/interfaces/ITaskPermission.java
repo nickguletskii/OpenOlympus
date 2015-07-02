@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.ng200.openolympus.jooq.enums.VerdictStatusType;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 
 
 /**
@@ -45,24 +45,24 @@ public interface ITaskPermission extends Serializable {
 	/**
 	 * Setter for <code>public.task_permission.type</code>.
 	 */
-	public ITaskPermission setType(VerdictStatusType value);
+	public ITaskPermission setType(TaskPermissionType value);
 
 	/**
 	 * Getter for <code>public.task_permission.type</code>.
 	 */
 	@Column(name = "type", nullable = false)
-	public VerdictStatusType getType();
+	public TaskPermissionType getType();
 
 	/**
-	 * Setter for <code>public.task_permission.task_id</code>.
+	 * Setter for <code>public.task_permission.id_task</code>.
 	 */
-	public ITaskPermission setTaskId(Integer value);
+	public ITaskPermission setIdTask(Integer value);
 
 	/**
-	 * Getter for <code>public.task_permission.task_id</code>.
+	 * Getter for <code>public.task_permission.id_task</code>.
 	 */
-	@Column(name = "task_id", precision = 32)
-	public Integer getTaskId();
+	@Column(name = "id_task", precision = 32)
+	public Integer getIdTask();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

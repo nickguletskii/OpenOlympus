@@ -15,7 +15,7 @@ import org.jooq.Record1;
 import org.jooq.Record3;
 import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
-import org.ng200.openolympus.jooq.enums.VerdictStatusType;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.TaskPermission;
 import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
 
@@ -33,9 +33,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "task_permission", schema = "public")
-public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionRecord> implements Record3<Long, VerdictStatusType, Integer>, ITaskPermission {
+public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionRecord> implements Record3<Long, TaskPermissionType, Integer>, ITaskPermission {
 
-	private static final long serialVersionUID = -325732952;
+	private static final long serialVersionUID = -813696158;
 
 	/**
 	 * Setter for <code>public.task_permission.id</code>.
@@ -60,7 +60,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * Setter for <code>public.task_permission.type</code>.
 	 */
 	@Override
-	public TaskPermissionRecord setType(VerdictStatusType value) {
+	public TaskPermissionRecord setType(TaskPermissionType value) {
 		setValue(1, value);
 		return this;
 	}
@@ -70,25 +70,25 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Column(name = "type", nullable = false)
 	@Override
-	public VerdictStatusType getType() {
-		return (VerdictStatusType) getValue(1);
+	public TaskPermissionType getType() {
+		return (TaskPermissionType) getValue(1);
 	}
 
 	/**
-	 * Setter for <code>public.task_permission.task_id</code>.
+	 * Setter for <code>public.task_permission.id_task</code>.
 	 */
 	@Override
-	public TaskPermissionRecord setTaskId(Integer value) {
+	public TaskPermissionRecord setIdTask(Integer value) {
 		setValue(2, value);
 		return this;
 	}
 
 	/**
-	 * Getter for <code>public.task_permission.task_id</code>.
+	 * Getter for <code>public.task_permission.id_task</code>.
 	 */
-	@Column(name = "task_id", precision = 32)
+	@Column(name = "id_task", precision = 32)
 	@Override
-	public Integer getTaskId() {
+	public Integer getIdTask() {
 		return (Integer) getValue(2);
 	}
 
@@ -112,7 +112,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, VerdictStatusType, Integer> fieldsRow() {
+	public Row3<Long, TaskPermissionType, Integer> fieldsRow() {
 		return (Row3) super.fieldsRow();
 	}
 
@@ -120,7 +120,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, VerdictStatusType, Integer> valuesRow() {
+	public Row3<Long, TaskPermissionType, Integer> valuesRow() {
 		return (Row3) super.valuesRow();
 	}
 
@@ -136,7 +136,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Field<VerdictStatusType> field2() {
+	public Field<TaskPermissionType> field2() {
 		return TaskPermission.TASK_PERMISSION.TYPE;
 	}
 
@@ -145,7 +145,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Override
 	public Field<Integer> field3() {
-		return TaskPermission.TASK_PERMISSION.TASK_ID;
+		return TaskPermission.TASK_PERMISSION.ID_TASK;
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public VerdictStatusType value2() {
+	public TaskPermissionType value2() {
 		return getType();
 	}
 
@@ -169,7 +169,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Override
 	public Integer value3() {
-		return getTaskId();
+		return getIdTask();
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionRecord value2(VerdictStatusType value) {
+	public TaskPermissionRecord value2(TaskPermissionType value) {
 		setType(value);
 		return this;
 	}
@@ -195,7 +195,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Override
 	public TaskPermissionRecord value3(Integer value) {
-		setTaskId(value);
+		setIdTask(value);
 		return this;
 	}
 
@@ -203,7 +203,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionRecord values(Long value1, VerdictStatusType value2, Integer value3) {
+	public TaskPermissionRecord values(Long value1, TaskPermissionType value2, Integer value3) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
@@ -221,7 +221,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	public void from(ITaskPermission from) {
 		setId(from.getId());
 		setType(from.getType());
-		setTaskId(from.getTaskId());
+		setIdTask(from.getIdTask());
 	}
 
 	/**
@@ -247,11 +247,11 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	/**
 	 * Create a detached, initialised TaskPermissionRecord
 	 */
-	public TaskPermissionRecord(Long id, VerdictStatusType type, Integer taskId) {
+	public TaskPermissionRecord(Long id, TaskPermissionType type, Integer idTask) {
 		super(TaskPermission.TASK_PERMISSION);
 
 		setValue(0, id);
 		setValue(1, type);
-		setValue(2, taskId);
+		setValue(2, idTask);
 	}
 }
