@@ -29,9 +29,9 @@
 </head>
 
 <body ui-sref-opts="reload" ng-class="{fullScreen: fullScreen}">
-    <div class="loadingResourcesOverlay">
+    <div ng-show="!hideResourcesLoading" class="loadingResourcesOverlay">
         <div class="loadingResourcesOverlayMid text-center">
-            <h1 class="bg-primary"><i class="fa fa-circle-o-notch fa-spin fa-5x"></i></h1>
+            <h1 class="bg-primary"><i class="fa fa-cog fa-5x loadingResourcesOverlaySpinning"></i></h1>
             <h1 class="bg-primary">OpenOlympus</h1>
             <h3 class="bg-primary">Loading...</h3>
         </div>
