@@ -24,8 +24,9 @@
 var Util = require("oolutil");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
+module.exports = function($timeout, $q, $translate, $scope, $rootScope, $http,
     $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
+
     $http.get("/api/security/userStatus").success(function(response) {
         if (response) {
             $state.go("home");
@@ -34,52 +35,89 @@ module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecapt
         }
     });
     $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    
+
     $scope.user = {};
-    $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
-        if (_.isEmpty(recaptchaPublicKey)) {
-            $scope.captchaDisabled = true;
-            $scope.loaded = true;
-            return;
-        }
-        googleGrecaptcha.then(function() {
-            widgetId = grecaptcha.render(
-                document.getElementById("no-captcha"), {
-                    "theme": "light",
-                    "sitekey": recaptchaPublicKey,
-                    "callback": function(r) {
-                        $scope.$apply(function() {
-                            $scope.user.recaptchaResponse = r;
-                            $scope.captchaErrors = null;
-                        });
-                    }
+    $scope.validationRules = {
+        username: {
+            required: true,
+            pattern: /[a-zA-Z0-9_-]+/,
+            minlength: 4,
+            maxlength: 16
+        },
+        password: {
+            required: true
+        },
+        passwordConfirmation: {
+            required: true,
+            custom: function(value, model) {
+                var deferred = $q.defer();
+                if (value === model.password) {
+                    deferred.resolve();
+                } else {
+                    var key = 'register.form.validation.passwordsDontMatch';
+                    $translate([key]).then(function(message) {
+                        deferred.reject(message[key]);
+                    });
                 }
-            );
-            $scope.resetCaptcha = function() {
-                grecaptcha.reset(widgetId);
-                $scope.user.recaptchaResponse = null;
-            };
-            $scope.loaded = true;
-        });
-    });
+                return deferred.promise;
+            }
+        },
+        firstNameMain: {
+            required: true,
+            minlength: 1
+        },
+        middleNameMain: {
+            required: true,
+            minlength: 1
+        },
+        lastNameMain: {
+            required: true,
+            minlength: 1
+        },
+        landline: {
+            pattern: /^(\\+?[0-9]*)?$/
+        },
+        mobile: {
+            pattern: /^(\\+?[0-9]*)?$/
+        }
+    };
+
+    $scope.setRecaptchaWidgetId = function(widgetId) {
+        $scope.recaptchaWidgetId = widgetId;
+    };
 
     $scope.register = function(user) {
-        if (!($scope.eulaAccepted))
-            return;
+        var deferred = $q.defer();
         $http({
             method: 'POST',
             url: '/api/user/register',
             data: user
         }).success(function(data) {
             if (data.status === "BINDING_ERROR") {
-                ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
+                ValidationService.transformBindingResultsIntoFormForMap(data.fieldErrors).then(function(msg) {
+                    deferred.reject(
+                        msg
+                    );
+                })
             } else if (data.status === "RECAPTCHA_ERROR") {
-                $scope.captchaErrors = data.recaptchaErrorCodes;
+                $translate(data.recaptchaErrorCodes).then((translations) => {
+                    deferred.reject({
+                        recaptchaResponse: _.chain(data.recaptchaErrorCodes)
+                            .map(((key) => "register.form.recaptchaErrors." + translations[key]))
+                            .join("\n")
+                            .value()
+                    });
+                });
             } else {
+                deferred.resolve();
                 $state.go("login", {
                     showAdministratorApprovalRequiredMessage: true
                 });
+                return;
             }
+            $scope.$broadcast("formSubmissionRejected")
         });
+
+        return deferred.promise;
     };
 };

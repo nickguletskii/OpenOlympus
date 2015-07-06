@@ -20,43 +20,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) {
-    return function(app) {
-        app.factory('ServersideFormErrorReporter', function() {
-            return function(fieldMap) {
-                return {
-                    existingErrorKeys: {},
-                    report: function(ctrl, field, errors) {
-                        if (!ctrl) {
-                            return;
-                        }
-                        var self = this;
-                        if (!_.has(self.existingErrorKeys, field))
-                            self.existingErrorKeys[field] = [];
-                        var errorsToAdd = [];
-                        _.forEach(errors, function(error) {
-                            if (error.field === field || (!!fieldMap ? _.contains(fieldMap[error.field], field) : false)) {
-                                errorsToAdd.push(error);
-                            }
-                        });
-                        _.forEach(self.existingErrorKeys[field], function(errorKey) {
-                            if (_(errorsToAdd).map(function(error) {
-                                    return error.defaultMessage;
-                                }).contains(errorKey))
-                                return;
-                            ctrl.$setValidity(errorKey, true);
-                        });
 
-                        self.existingErrorKeys[field].length = 0;
-
-                        _.forEach(errorsToAdd, function(error) {
-                            ctrl.$setValidity(error.defaultMessage, false);
-                            self.existingErrorKeys[field].push(error.defaultMessage);
-                        });
-                        ctrl.$setDirty();
+var Util = require("oolutil");
+var _ = require("lodash");
+var angular = require("angular");
+var app = require("app");
+angular.module('ool.services').factory('ServersideFormErrorReporter', function() {
+    return function(fieldMap) {
+        return {
+            existingErrorKeys: {},
+            report: function(ctrl, field, errors) {
+                if (!ctrl) {
+                    return;
+                }
+                var self = this;
+                if (!_.has(self.existingErrorKeys, field))
+                    self.existingErrorKeys[field] = [];
+                var errorsToAdd = [];
+                _.forEach(errors, function(error) {
+                    if (error.field === field || (!!fieldMap ? _.contains(fieldMap[error.field], field) : false)) {
+                        errorsToAdd.push(error);
                     }
-                };
-            };
-        });
+                });
+                _.forEach(self.existingErrorKeys[field], function(errorKey) {
+                    if (_(errorsToAdd).map(function(error) {
+                            return error.defaultMessage;
+                        }).contains(errorKey))
+                        return;
+                    ctrl.$setValidity(errorKey, true);
+                });
+
+                self.existingErrorKeys[field].length = 0;
+
+                _.forEach(errorsToAdd, function(error) {
+                    ctrl.$setValidity(error.defaultMessage, false);
+                    self.existingErrorKeys[field].push(error.defaultMessage);
+                });
+                ctrl.$setDirty();
+            }
+        };
     };
 });

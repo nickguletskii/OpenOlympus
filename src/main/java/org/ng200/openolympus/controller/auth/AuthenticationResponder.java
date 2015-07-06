@@ -40,13 +40,13 @@ public class AuthenticationResponder {
 		generator.writeStartObject();
 		generator.writeStringField("auth", authMessage);
 		if (captchaErrorCodes != null && !captchaErrorCodes.isEmpty()) {
-			generator.writeArrayFieldStart("captchas");
+			generator.writeArrayFieldStart("recaptchaErrorCodes");
 			for (final String captchaErrorCode : captchaErrorCodes) {
 				generator.writeString(captchaErrorCode);
 			}
 			generator.writeEndArray();
 		} else {
-			generator.writeNullField("captchas");
+			generator.writeNullField("recaptchaErrorCodes");
 		}
 		generator.writeEndObject();
 		generator.close();

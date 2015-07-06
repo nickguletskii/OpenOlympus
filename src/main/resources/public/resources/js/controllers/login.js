@@ -24,66 +24,70 @@
 var Util = require("oolutil");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
+module.exports = function($timeout, $q, $scope, $rootScope, $http,
     $location, $stateParams, $state, AuthenticationProvider, $translate) {
     AuthenticationProvider.update();
     $scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === 'true');
 
-    $http.get("/api/security/userStatus").success(function(response) {
-        if (response != null) {
+    $http.get("/api/security/userStatus").success(function(data) {
+        if (data != null) {
             $state.go("home");
         } else {
             $scope.logInFormVisible = true;
         }
     });
 
-    $scope.resetCaptcha = function() {};
+    $scope.validationRules = {
+        username: {
+            required: true
+        },
+        password: {
+            required: true
+        }
+    };
+
     $scope.user = {};
 
-    $http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
-        if (_.isEmpty(recaptchaPublicKey)) {
-            $scope.captchaDisabled = true;
-            $scope.loaded = true;
-            return;
-        }
-        googleGrecaptcha.then(function() {
-            widgetId = grecaptcha.render(
-                document.getElementById("no-captcha"), {
-                    "theme": "light",
-                    "sitekey": recaptchaPublicKey,
-                    "callback": function(r) {
-                        $scope.$apply(function() {
-                            $scope.recaptchaResponse = r;
-                            $scope.captchaErrors = null;
-                        });
-                    }
-                }
-            );
-            $scope.resetCaptcha = function() {
-                grecaptcha.reset(widgetId);
-                $scope.recaptchaResponse = null;
-            };
-            $scope.loaded = true;
-        });
-    });
-
-    $scope.login = function() {
-
-        AuthenticationProvider.login($scope.user.username, $scope.user.password, $scope.recaptchaResponse)
-            .success(function(response) {
-                console.log(response);
-                if (response.auth === "succeded") {
-                    $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", true);
+    $scope.login = function(user) {
+        var deferred = $q.defer();
+        AuthenticationProvider.login(user.username, user.password, user.recaptchaResponse)
+            .success(function(data) {
+                if (data.auth === "succeded") {
+                    deferred.resolve();
                     AuthenticationProvider.update();
                     $state.go("home");
-                } else if (response.auth === "failed") {
-                    $scope.authError = true;
-                    $scope.loginForm.username.$setValidity("incorrectUsernameOrPassword", false);
+                    return;
+                } else if (data.auth === "failed") {
+                    var key = 'login.form.invalidUsernameOrPassword';
+                    $translate([key]).then(
+                        (translations) => {
+                            deferred.reject({
+                                "username": translations[key],
+                                "password": translations[key]
+                            })
+                        }
+                    );
+                    $scope.$broadcast("formSubmissionRejected")
+                    return;
                 }
-                if (response.captchas) {
-                    $scope.captchaErrors = response.captchas;
+                if (data.recaptchaErrorCodes) {
+                    $translate(data.recaptchaErrorCodes).then((translations) => {
+                        deferred.reject({
+                            recaptchaResponse: _.chain(data.recaptchaErrorCodes)
+                                .map(((key) => "login.form.recaptchaErrors." + translations[key]))
+                                .join("\n")
+                                .value()
+                        });
+                    });
+                    $scope.$broadcast("formSubmissionRejected");
+                    return;
                 }
+                throw {
+                    name: "UnknownLoginResultException"
+                    message: "Unknown login result",
+                    obj: data
+                };
             });
-        $scope.resetCaptcha();
+        return deferred.promise;
     };
 };

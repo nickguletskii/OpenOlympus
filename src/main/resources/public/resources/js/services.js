@@ -26,19 +26,14 @@ var angular = require("angular");
 var app = require("app");
 var _ = require("lodash");
 
-var services = [
-    require("services/authenticationProvider"),
-    require("services/serversideFormErrorReporter"),
-    require("services/validationService"),
-    require("services/modalState"),
-    require("services/userService"),
-    require("services/solutionService"),
-    require("services/taskService"),
-    require("services/contestService"),
-    require("services/timeService")
-];
-console.log(angular);
 var module = angular.module('ool.services', []);
-_.forEach(services, function(registrator) {
-    registrator(module);
-});
+
+require("services/authenticationProvider");
+require("services/serversideFormErrorReporter");
+require("services/validationService");
+require("services/modalState");
+require("services/userService");
+require("services/solutionService");
+require("services/taskService");
+require("services/contestService");
+require("services/timeService");

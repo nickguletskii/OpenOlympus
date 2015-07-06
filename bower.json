@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular-no-captcha": "~0.4.5"
+    "angular-recaptcha": "~2.2.4"
   },
   "devDependencies": {
     "SpinKit": "~1.0.1"

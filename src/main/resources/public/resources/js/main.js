@@ -10,7 +10,7 @@ require("angular-file-upload");
 require("angular-translate");
 require("angular-translate-loader-url");
 require("angular-ui-codemirror");
-require("angular-no-captcha");
+require("angular-recaptcha");
 require("angular-animate");
 require("angular-sanitize");
 require("angular-form-for");
@@ -24,24 +24,17 @@ var controllers = require("controllers");
 
 window.CodeMirror = codemirror;
 
-var dictionary = {
-    instantTranslationFunc: {},
-    getString: function(name, parameters, language) {
-        return dictionary.instantTranslationFunc("validation.errors." + name);
-    }
-};
-
 app.config(['$translateProvider', function($translateProvider) {
     $translateProvider.useSanitizeValueStrategy('escape');
     $translateProvider.useUrlLoader('/translation');
     $translateProvider.preferredLanguage('ru');
 }]);
 
-app.config(function($httpProvider, $locationProvider, $stateProvider) {
+app.config( /*@ngInject*/ function($httpProvider, $locationProvider, $stateProvider) {
 
     $locationProvider.html5Mode(true);
 
-    $httpProvider.interceptors.push(function($q, $rootScope, $location) {
+    $httpProvider.interceptors.push( /*@ngInject*/ function($q, $rootScope, $location) {
         return {
             'responseError': function(rejection) {
                 var status = rejection.status;
@@ -62,7 +55,7 @@ app.config(function($httpProvider, $locationProvider, $stateProvider) {
         };
     });
 
-    $httpProvider.interceptors.push(function($q, $rootScope, $location) {
+    $httpProvider.interceptors.push( /*@ngInject*/ function($q, $rootScope, $location) {
         return {
             'request': function(config) {
                 var isRestCall = config.url.indexOf('rest') === 0;
@@ -97,7 +90,7 @@ app.config(function($httpProvider, $locationProvider, $stateProvider) {
     });
 
 });
-app.factory('$exceptionHandler', function($injector) {
+app.factory('$exceptionHandler', /*@ngInject*/ function($injector) {
     return function(exception, cause) {
         var $rootScope = $injector.get("$rootScope");
         var $timeout = $injector.get("$timeout");
@@ -109,14 +102,12 @@ app.factory('$exceptionHandler', function($injector) {
     };
 });
 
-app.run(function($rootScope, $translate) {
-    $rootScope.$on('$translateChangeSuccess',
-        function(event, language) {
-            dictionary.instantTranslationFunc = $translate.instant;
-            $rootScope.currentLanguage = language.language;
-            moment.locale(language.language);
-        });
-    $rootScope.availableLanguages = ["en", "ru"]; // TODO: Make this dynamic
-    $rootScope.changeLanguage = $translate.use;
+app.run( /*@ngInject*/ function($rootScope, AuthenticationProvider) {
+    $rootScope.security = AuthenticationProvider;
+
+    $rootScope.$on('securityInfoChanged', function() {
+        $rootScope.security = AuthenticationProvider;
+    });
+
 });
 require("ui-setup");

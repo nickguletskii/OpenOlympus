@@ -22,16 +22,11 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-
-<head>
-</head>
-
-<body th:fragment="content">
-
-    <div class="spinner" ng-if="!loaded"></div>
-    <form name="loginForm" role="form" ng-show="!!loaded">
+<h1>{{ 'login.form.heading' | translate }}</h1>
+<spinner ng-show="!logInFormVisible" class="spinner-large">
+</spinner>
+<div ng-show="!!logInFormVisible">
+    <form name="loginForm" form-for="user" validation-rules="validationRules" submit-with="login(user)">
         <div class="panel panel-success" ng-if="showAdministratorApprovalRequiredMessage">
             <div class="panel-heading">
                 <h3 class="panel-title" translate="login.administratorApprovalRequired.title"></h3>
@@ -39,19 +34,9 @@
                 </div>
             </div>
         </div>
-
-        <input label="login.username" type="text" ng-model="user.username" required="" oolinput=""></input>
-        <input label="login.password" type="password" ng-model="user.password" required="" oolinput=""></input>
-
-        <div class="form-group" ng-if="!captchaDisabled">
-            <div id="no-captcha"></div>
-            <div class="error-list">
-                <span class="constraint-length help-block text-danger" ng-repeat="captchaError in captchaErrors">{{ captchaError | captchaErrorToOwnKey | translate}}</span>
-            </div>
-        </div>
-
-        <button type="submit" ng-click="login()" class="btn btn-default" translate="login.loginButton"></button>
+        <text-field label="{{ 'login.username' | translate }}" type="text" attribute="username"></text-field>
+        <text-field label="{{ 'login.password' | translate }}" type="password" attribute="password"></text-field>
+        <recaptcha label="{{ 'login.form.labels.captcha' | translate }}" attribute="recaptchaResponse"></recaptcha>
+        <submit-button label="{{ 'login.loginButton' | translate }}" button-class="btn btn-default"></submit-button>
     </form>
-</body>
-
-</html>
+</div>

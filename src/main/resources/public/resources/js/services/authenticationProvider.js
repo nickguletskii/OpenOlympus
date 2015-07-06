@@ -20,80 +20,83 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'angular', 'app', 'lodash'], function(Util, angular, app, _) {
-    return function(app) {
-        app.factory('AuthenticationProvider', function($rootScope, $http, $timeout, $state) {
-            var data  = null;
-            var poller = function() {
-                $http.get('/api/security/userStatus').then(function(r) {
-                    data = r.data;
-                    $rootScope.$broadcast('securityInfoChanged');
-                    $timeout(poller, 60000);
-                });
-            };
-            poller();
-
-            var transform = function(data) {
-                return $.param(data);
-            };
-
-            var update = function() {
-                $http.get('/api/security/userStatus').then(function(r) {
-                    data = r.data;
-                    $rootScope.$broadcast('securityInfoChanged');
-                });
-            };
-
-            return {
-                data: data,
-                isLoggedIn: function() {
-                    return !!data;
-                },
-                getUsername: function() {
-                    if (!data)
-                        return null;
-                    return data.username;
-                },
-                getUser: function() {
-                    return data;
-                },
-                isUser: function() {
-                    return !!data && data.approved;
-                },
-                isAdmin: function() {
-                    return !!data && data.superuser;
-                },
-                update: update,
-                login: function(username, password, recaptchaResponse) {
-                    return $http({
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                        },
-                        method: 'POST',
-                        url: '/login',
-                        transformRequest: transform,
-                        data: {
-                            'username': username,
-                            'password': password,
-                            'recaptchaResponse': recaptchaResponse
-                        }
-                    });
-                },
-                logout: function() {
-                    $http({
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                        },
-                        method: 'POST',
-                        url: '/logout',
-                        transformRequest: transform,
-                        data: {}
-                    }).then(function() {
-                        $state.go("home", {}, { reload: true });
-                        update();
-                    });
-                }
-            };
+var Util = require("oolutil");
+var _ = require("lodash");
+var angular = require("angular");
+var app = require("app");
+var $ = require("jquery");
+angular.module('ool.services').factory('AuthenticationProvider', function($rootScope, $http, $timeout, $state) {
+    var data = null;
+    var poller = function() {
+        $http.get('/api/security/userStatus').then(function(r) {
+            data = r.data;
+            $rootScope.$broadcast('securityInfoChanged');
+            $timeout(poller, 60000);
         });
+    };
+    poller();
+
+    var transform = function(data) {
+        return $.param(data);
+    };
+
+    var update = function() {
+        $http.get('/api/security/userStatus').then(function(r) {
+            data = r.data;
+            $rootScope.$broadcast('securityInfoChanged');
+        });
+    };
+
+    return {
+        data: data,
+        isLoggedIn: function() {
+            return !!data;
+        },
+        getUsername: function() {
+            if (!data)
+                return null;
+            return data.username;
+        },
+        getUser: function() {
+            return data;
+        },
+        isUser: function() {
+            return !!data && data.approved;
+        },
+        isAdmin: function() {
+            return !!data && data.superuser;
+        },
+        update: update,
+        login: function(username, password, recaptchaResponse) {
+            return $http({
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                method: 'POST',
+                url: '/login',
+                transformRequest: transform,
+                data: {
+                    'username': username,
+                    'password': password,
+                    'recaptchaResponse': recaptchaResponse
+                }
+            });
+        },
+        logout: function() {
+            $http({
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                method: 'POST',
+                url: '/logout',
+                transformRequest: transform,
+                data: {}
+            }).then(function() {
+                $state.go("home", {}, {
+                    reload: true
+                });
+                update();
+            });
+        }
     };
 });

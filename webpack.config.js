@@ -72,7 +72,7 @@ var config = {
         preLoaders: [],
         loaders: [{
             test: /angular.js$/,
-            loader: "expose?angular!exports?window.angular"
+            loader: "expose?angular!exports?window.angular!imports?$=jquery"
         }, {
             test: /\.js$/,
             exclude: /node_modules/,
@@ -141,4 +141,5 @@ config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "ang
 config.addVendor("angular-no-captcha", path.resolve(bowerComponentsRoot, "angular-no-captcha/src/angular-no-captcha.js"));
 config.addVendor("angular-form-for", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.js"));
 config.addVendor("angular-form-for-bootstrap", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.bootstrap-templates.js"));
+config.addVendor("angular-recaptcha", path.resolve(bowerComponentsRoot, "angular-recaptcha/release/angular-recaptcha.js"));
 module.exports = config;

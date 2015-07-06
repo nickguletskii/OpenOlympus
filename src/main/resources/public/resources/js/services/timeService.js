@@ -20,43 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-define(['oolutil', 'angular', 'app', 'lodash', 'moment'], function(Util, angular, app, _, moment) {
-    return function(app) {
-        app.factory('datetime', function($timeout, $http) {
+var Util = require("oolutil");
+var _ = require("lodash");
+var angular = require("angular");
+var app = require("app");
+angular.module('ool.services').factory('datetime', function($timeout, $http) {
 
-            function timeTo(referenceTime) {
-                var currentTime = moment().add(currentServerTimeOffset());
-                var from = moment(referenceTime);
-                var dur = moment.duration(from.diff(currentTime), "milliseconds");
-                return {
-                    days: dur.days(),
-                    hours: dur.hours(),
-                    minutes: dur.minutes(),
-                    seconds: dur.seconds()
-                };
-            }
+    function timeTo(referenceTime) {
+        var currentTime = moment().add(currentServerTimeOffset());
+        var from = moment(referenceTime);
+        var dur = moment.duration(from.diff(currentTime), "milliseconds");
+        return {
+            days: dur.days(),
+            hours: dur.hours(),
+            minutes: dur.minutes(),
+            seconds: dur.seconds()
+        };
+    }
 
-            function currentServerTime(referenceTime) {
-                return moment().add(currentServerTimeOffset());
-            }
+    function currentServerTime(referenceTime) {
+        return moment().add(currentServerTimeOffset());
+    }
 
-            var offset = 0;
+    var offset = 0;
 
-            $http.get("/api/time").success(
-                function(time) {
-                    offset = moment(time).diff(moment());
-                }
-            );
+    $http.get("/api/time").success(
+        function(time) {
+            offset = moment(time).diff(moment());
+        }
+    );
 
-            function currentServerTimeOffset() {
-                return offset;
-            }
+    function currentServerTimeOffset() {
+        return offset;
+    }
 
-            return {
-                timeTo: timeTo,
-                currentServerTime: currentServerTime,
-                currentServerTimeOffset: currentServerTimeOffset
-            };
-        });
+    return {
+        timeTo: timeTo,
+        currentServerTime: currentServerTime,
+        currentServerTimeOffset: currentServerTimeOffset
     };
 });

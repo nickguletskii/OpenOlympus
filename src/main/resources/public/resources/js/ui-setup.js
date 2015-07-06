@@ -24,6 +24,7 @@ var $ = require("jquery");
 var angular = require("angular");
 var app = require("app");
 var Util = require("oolutil");
+var moment = require("moment");
 require("angular-animate");
 require("angular-ui-bootstrap");
 
@@ -31,22 +32,9 @@ app
     .run(function($rootScope, $timeout) {
         $timeout(function() {
             $rootScope.hideResourcesLoading = true;
-        }, 1);
+        }, 0);
     });
-var ie = (function() {
-    var undef, v = 3,
-        div = document.createElement('div');
 
-    while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', div
-        .getElementsByTagName('i')[0])
-    ;
-
-    return v > 4 ? v : undef;
-}());
-
-if (ie) {
-    window.navigate("/badbrowser");
-}
 angular
     .module("template/pagination/pagination.html", [])
     .run(
@@ -56,7 +44,9 @@ angular
                 $templateCache
                     .put(
                         "template/pagination/pagination.html",
-                        "<div class=\"pagination-centered\"><ul class=\"pagination\">\n" + "  <li ng-repeat=\"page in pages\" ng-class=\"{arrow: $first || $last, current: page.active, unavailable: page.disabled}\"><a ui-sref-opts=\"reload\" ui-sref=\"{page: page.number}\">{{page.text}}</a></li>\n" + "</ul>\n" + "</div>");
+                        "<div class=\"pagination-centered\"><ul class=\"pagination\">\n" +
+                        "  <li ng-repeat=\"page in pages\" ng-class=\"{arrow: $first || $last, current: page.active, unavailable: page.disabled}\"><a ui-sref-opts=\"reload\" ui-sref=\"{page: page.number}\">{{page.text}}</a></li>\n" +
+                        "</ul>\n" + "</div>");
             }
         ]);
 
@@ -73,29 +63,38 @@ angular.module("template/pagination/pagination.html", []).run(["$templateCache",
         "</div>");
 }]);
 
-app.run(function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout, $state) {
+app.run( /*@ngInject*/ function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout, $state, $http, $translate, FormForConfiguration) {
+    // Make state parameters easily accessible
     $rootScope.stateParams = $stateParams;
-    $rootScope.$on('$stateChangeStart',
-        function(event, toState, toParams, fromState, fromParams) {
-            console.log(toParams);
-            $rootScope.stateParams = toParams;
+
+    // Make sure that locales are synchronised across libraries
+    $rootScope.$on('$translateChangeSuccess',
+        function(event, language) {
+            $rootScope.currentLanguage = language.language;
+            moment.locale(language.language);
         });
-    $rootScope.security = AuthenticationProvider;
+
+    $rootScope.availableLanguages = ["en", "ru"]; // TODO: Make this dynamic
+    $rootScope.changeLanguage = $translate.use; // Expose $translate.use to the language change menu
+
+
     $rootScope.$on('$stateNotFound',
         function(event, unfoundState, fromState, fromParams) {
-            console.log("Couldn't find state: " + unfoundState);
+            console.error("Couldn't find state: " + unfoundState);
         });
-    $rootScope.$on('securityInfoChanged', function() {
-        $rootScope.security = AuthenticationProvider;
-    });
     $rootScope.$on('$stateChangeStart',
         function(event, toState, toParams, fromState, fromParams) {
             if ($rootScope.showErrorModal) {
                 event.preventDefault();
-                $rootScope.showErrorModal = false;
+                console.log("Trying to recover from failure state by reloading!");
+                window.location.reload(true); // Refresh the page to prevent broken templates getting stuck in the page
                 $state.go(toState, toParams, {
-                    reload: true
+                    reload: true,
+                    notify: false,
+                    inherit: false
                 });
+            } else {
+                $rootScope.stateParams = toParams; // Make state parameters easily accessible
             }
         });
     $rootScope.$on('$stateChangeSuccess',
@@ -111,9 +110,37 @@ app.run(function($rootScope, $stateParams, AuthenticationProvider, $location, $t
             } else
                 $rootScope.showErrorModal = true;
         });
+
     $rootScope.toggleFullscreen = function(fullScreen) {
         $rootScope.fullScreen = fullScreen;
     };
+
+    $translate(["validation.failed.custom", "validation.failed.email", "validation.failed.integer",
+        "validation.failed.maxCollectionSize", "validation.failed.maximum", "validation.failed.maxLength",
+        "validation.failed.minimum", "validation.failed.minCollectionSize", "validation.failed.minLength",
+        "validation.failed.negative", "validation.failed.nonNegative", "validation.failed.numeric",
+        "validation.failed.pattern", "validation.failed.positive", "validation.failed.empty"
+    ]).then(function(translations) {
+        FormForConfiguration.setValidationFailedForCustomMessage(translations["validation.failed.custom"]);
+        FormForConfiguration.setValidationFailedForEmailTypeMessage(translations["validation.failed.email"]);
+        FormForConfiguration.setValidationFailedForIntegerTypeMessage(translations["validation.failed.integer"]);
+        FormForConfiguration.setValidationFailedForMaxCollectionSizeMessage(translations["validation.failed.maxCollectionSize"]);
+        FormForConfiguration.setValidationFailedForMaximumMessage(translations["validation.failed.maximum"]);
+        FormForConfiguration.setValidationFailedForMaxLengthMessage(translations["validation.failed.maxLength"]);
+        FormForConfiguration.setValidationFailedForMinimumMessage(translations["validation.failed.minimum"]);
+        FormForConfiguration.setValidationFailedForMinCollectionSizeMessage(translations["validation.failed.minCollectionSize"]);
+        FormForConfiguration.setValidationFailedForMinLengthMessage(translations["validation.failed.minLength"]);
+        FormForConfiguration.setValidationFailedForNegativeTypeMessage(translations["validation.failed.negative"]);
+        FormForConfiguration.setValidationFailedForNonNegativeTypeMessage(translations["validation.failed.nonNegative"]);
+        FormForConfiguration.setValidationFailedForNumericTypeMessage(translations["validation.failed.numeric"]);
+        FormForConfiguration.setValidationFailedForPatternMessage(translations["validation.failed.pattern"]);
+        FormForConfiguration.setValidationFailedForPositiveTypeMessage(translations["validation.failed.positive"]);
+        FormForConfiguration.setValidationFailedForRequiredMessage(translations["validation.failed.empty"]);
+    });
+
 });
+
+
+
 
 angular.bootstrap(document, ['ool']);

@@ -36,4 +36,8 @@ angular.module('ool.directives', ['ool.services'])
 .directive('datepickerLocaldate', require("directives/datepicker-localdate"))
 .directive('ngReallyClick', require("directives/really-click"))
 .directive("lang", require("directives/lang"))
-.directive('dynamic', require("directives/dynamic"));
+.directive('dynamic', require("directives/dynamic"))
+.directive('datepickerField', require("directives/datepicker"))
+.directive('recaptcha', require("directives/captcha"))
+.directive('spinner', require("directives/spinner"))
+;

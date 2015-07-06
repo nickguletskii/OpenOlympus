@@ -1,0 +1,9 @@
+<div class="form-group" ng-class="{disabled: disable || model.disabled, 'has-error': model.error}">
+    <field-label ng-if="label" input-uid="{{model.uid}}" iud="{{model.uid}}-label" label="{{label}}" help="{{help}}" required="{{model.required}}">
+    </field-label>
+    <field-error error="model.error" uid="{{model.uid}}-error">
+    </field-error>
+    <div class="center-block">
+        <datepicker datepicker-localdate="" ng-model="model.bindable" min-date="minDate" show-weeks="true" class="well well-sm"></datepicker>
+    </div>
+</div>
