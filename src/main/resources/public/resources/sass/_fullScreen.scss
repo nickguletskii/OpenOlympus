@@ -1,0 +1,34 @@
+
+.fullScreen {
+    height: calc(100% - 2em);
+    width: calc(100% - 2em);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100000 !important;
+    margin: 1em;
+}
+
+.fullScreenBody {
+    height: 100%;
+    padding-bottom: 2 em;
+}
+
+.fullScreenCodemirror {
+    height: 100%;
+    overflow: scroll;
+}
+
+.fullScreenCodemirror .CodeMirror {
+    border: 1px solid #eee;
+    height: 100% !important;
+}
+
+.fullScreenTextilePreview {
+    border: 1px solid #eee;
+    height: 100% !important;
+}
+
+.fullScreen {
+    overflow: hidden;
+}

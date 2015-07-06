@@ -1,0 +1,30 @@
+.loadingResourcesOverlay {
+    background-color: $brand-primary;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 200000 !important;
+    display: table;
+}
+
+.loadingResourcesOverlayMid {
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+}
+
+.loadingResourcesOverlayMid > .spinner-4em {
+    margin: auto;
+    background-color: white;
+    text-align: center !important;
+}
+
+.loadingResourcesOverlay.ng-hide {
+    @include animate('slideOutUp', 0.25s);
+}
+
+.loadingResourcesOverlaySpinning {
+    animation: fa-spin 5s infinite linear;
+}
