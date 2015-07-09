@@ -40,4 +40,5 @@ angular.module('ool.directives', ['ool.services'])
 .directive('datepickerField', require("directives/datepicker"))
 .directive('recaptcha', require("directives/captcha"))
 .directive('spinner', require("directives/spinner"))
+.directive('aclEditor', require("directives/acl"))
 ;
