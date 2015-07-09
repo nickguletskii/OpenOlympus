@@ -299,7 +299,13 @@
 											<table>
 												<expression>USER</expression>
 
-												<pojoImplements>org.ng200.openolympus.model.UserDetailsImpl</pojoImplements>
+												<pojoImplements>org.ng200.openolympus.model.UserDetailsImpl,
+													org.ng200.openolympus.model.OlympusPrincipal</pojoImplements>
+											</table>
+											<table>
+												<expression>group</expression>
+
+												<pojoImplements>org.ng200.openolympus.model.OlympusPrincipal</pojoImplements>
 											</table>
 											<table>
 												<expression>task</expression>
