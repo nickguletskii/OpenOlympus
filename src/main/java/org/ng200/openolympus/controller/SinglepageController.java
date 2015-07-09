@@ -17,6 +17,6 @@ public class SinglepageController {
 
 	@RequestMapping("/**")
 	public String singlepage() throws ResourceException {
-		return "singlepage.html";
+		return "/singlepage.html";
 	}
 }
