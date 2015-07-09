@@ -57,4 +57,18 @@ module.exports = angular.module('ool.filters', ['ool.services'])
                 return -1;
             return Math.floor(input / 1024);
         };
+    }).filter("renderFileList", function() {
+        return function(input) {
+            if (!input)
+                return;
+            let perFile = (file) => file.name;
+            if (!!input.length) {
+                return _.chain(input)
+                    .map(perFile)
+                    .map((name) => '"' + name + '"')
+                    .join(", ")
+                    .value();
+            }
+            return perFile(input);
+        };
     });

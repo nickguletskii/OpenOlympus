@@ -17,6 +17,7 @@ $fa-font-path: "node_modules/font-awesome/fonts/";
 @import "~_totals.scss";
 @import "~_transitions.scss";
 @import "~_acl.scss";
+@import "~_fileInput.scss";
 body {
     padding-top: $navbar-height * 1.5;
     padding-bottom: 20px;

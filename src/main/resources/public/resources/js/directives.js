@@ -41,4 +41,6 @@ angular.module('ool.directives', ['ool.services'])
 .directive('recaptcha', require("directives/captcha"))
 .directive('spinner', require("directives/spinner"))
 .directive('aclEditor', require("directives/acl"))
+.directive('fileInput', require("directives/file-input"))
+.directive('fileNgModel', require("directives/file-ng-model"))
 ;

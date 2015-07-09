@@ -1,0 +1,22 @@
+.input-file .input-group-addon {
+    border: 0px;
+    padding: 0px;
+}
+
+.input-file .input-group-addon .btn {
+    border-radius: 0 $border-radius-base $border-radius-base 0
+}
+
+.input-file .input-group-addon input {
+    cursor: pointer;
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    filter: alpha(opacity=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    opacity: 0;
+    background-color: transparent;
+    color: transparent;
+}
