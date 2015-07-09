@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.jooq.tables.interfaces.IUser;
+import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.model.UserDetailsImpl;
 
 
@@ -29,9 +30,9 @@ import org.ng200.openolympus.model.UserDetailsImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "USER", schema = "public")
-public class User implements UserDetailsImpl, IUser {
+public class User implements UserDetailsImpl, OlympusPrincipal, IUser {
 
-	private static final long serialVersionUID = -672864374;
+	private static final long serialVersionUID = -1542071437;
 
 	private Long      id;
 	private String    username;

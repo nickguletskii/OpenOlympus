@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.jooq.tables.interfaces.IGroup;
+import org.ng200.openolympus.model.OlympusPrincipal;
 
 
 /**
@@ -26,9 +27,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.IGroup;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "group", schema = "public")
-public class Group implements IGroup {
+public class Group implements OlympusPrincipal, IGroup {
 
-	private static final long serialVersionUID = 2061374109;
+	private static final long serialVersionUID = -326817714;
 
 	private Long   id;
 	private String name;

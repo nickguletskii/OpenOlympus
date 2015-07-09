@@ -31,13 +31,13 @@ public interface ITaskPermissionPrincipal extends Serializable {
 	/**
 	 * Setter for <code>public.task_permission_principal.principal_id</code>.
 	 */
-	public ITaskPermissionPrincipal setPrincipalId(Integer value);
+	public ITaskPermissionPrincipal setPrincipalId(Long value);
 
 	/**
 	 * Getter for <code>public.task_permission_principal.principal_id</code>.
 	 */
-	@Column(name = "principal_id", precision = 32)
-	public Integer getPrincipalId();
+	@Column(name = "principal_id", precision = 64)
+	public Long getPrincipalId();
 
 	/**
 	 * Setter for <code>public.task_permission_principal.task_permission_id</code>.

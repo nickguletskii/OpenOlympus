@@ -28,10 +28,10 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermissionPrincipal;
 @Table(name = "task_permission_principal", schema = "public")
 public class TaskPermissionPrincipal implements ITaskPermissionPrincipal {
 
-	private static final long serialVersionUID = -1980635745;
+	private static final long serialVersionUID = 289921096;
 
-	private Integer principalId;
-	private Long    taskPermissionId;
+	private Long principalId;
+	private Long taskPermissionId;
 
 	public TaskPermissionPrincipal() {}
 
@@ -41,21 +41,21 @@ public class TaskPermissionPrincipal implements ITaskPermissionPrincipal {
 	}
 
 	public TaskPermissionPrincipal(
-		Integer principalId,
-		Long    taskPermissionId
+		Long principalId,
+		Long taskPermissionId
 	) {
 		this.principalId = principalId;
 		this.taskPermissionId = taskPermissionId;
 	}
 
-	@Column(name = "principal_id", precision = 32)
+	@Column(name = "principal_id", precision = 64)
 	@Override
-	public Integer getPrincipalId() {
+	public Long getPrincipalId() {
 		return this.principalId;
 	}
 
 	@Override
-	public TaskPermissionPrincipal setPrincipalId(Integer principalId) {
+	public TaskPermissionPrincipal setPrincipalId(Long principalId) {
 		this.principalId = principalId;
 		return this;
 	}

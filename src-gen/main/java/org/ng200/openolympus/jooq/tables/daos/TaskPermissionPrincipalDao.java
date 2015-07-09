@@ -52,7 +52,7 @@ public class TaskPermissionPrincipalDao extends DAOImpl<TaskPermissionPrincipalR
 	/**
 	 * Fetch records that have <code>principal_id IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.TaskPermissionPrincipal> fetchByPrincipalId(Integer... values) {
+	public List<org.ng200.openolympus.jooq.tables.pojos.TaskPermissionPrincipal> fetchByPrincipalId(Long... values) {
 		return fetch(TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL.PRINCIPAL_ID, values);
 	}
 

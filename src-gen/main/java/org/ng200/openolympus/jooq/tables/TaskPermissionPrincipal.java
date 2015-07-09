@@ -33,7 +33,7 @@ import org.ng200.openolympus.jooq.tables.records.TaskPermissionPrincipalRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TaskPermissionPrincipal extends TableImpl<TaskPermissionPrincipalRecord> {
 
-	private static final long serialVersionUID = -78187637;
+	private static final long serialVersionUID = -897860470;
 
 	/**
 	 * The reference instance of <code>public.task_permission_principal</code>
@@ -51,7 +51,7 @@ public class TaskPermissionPrincipal extends TableImpl<TaskPermissionPrincipalRe
 	/**
 	 * The column <code>public.task_permission_principal.principal_id</code>.
 	 */
-	public final TableField<TaskPermissionPrincipalRecord, Integer> PRINCIPAL_ID = createField("principal_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<TaskPermissionPrincipalRecord, Long> PRINCIPAL_ID = createField("principal_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>public.task_permission_principal.task_permission_id</code>.

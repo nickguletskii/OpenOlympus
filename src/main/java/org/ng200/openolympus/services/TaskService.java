@@ -28,24 +28,23 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.Lock;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
 import org.ng200.openolympus.SecurityExpressionConstants;
-import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
+import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
-import org.ng200.openolympus.jooq.tables.records.ContestRecord;
 import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
-import org.ng200.openolympus.jooq.tables.records.TaskRecord;
+import org.ng200.openolympus.model.OlympusPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -92,8 +91,9 @@ public class TaskService extends GenericCreateUpdateRepository {
 	public List<Task> findTasksNewestFirst(final int pageNumber,
 			final int pageSize) {
 		return dslContext.selectFrom(Tables.TASK).groupBy(Tables.TASK.ID)
-				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
-				.offset((pageNumber - 1) * pageSize).fetchInto(Task.class);
+				.orderBy(Tables.TASK.CREATED_DATE.desc())
+				.limit(pageSize).offset((pageNumber - 1) * pageSize)
+				.fetchInto(Task.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -106,16 +106,17 @@ public class TaskService extends GenericCreateUpdateRepository {
 		if (this.securityService.isSuperuser(principal)) {
 			return this.findTasksNewestFirst(pageNumber, pageSize);
 		}
-		return dslContext
-				.select(Tables.TASK.fields())
+		return dslContext.select(Tables.TASK.fields())
 				.from(Tables.TASK_PERMISSION_PRINCIPAL)
 				.join(Tables.TASK_PERMISSION)
 				.on(Tables.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID
-						.eq(Tables.TASK_PERMISSION.ID)).join(Tables.TASK)
+						.eq(Tables.TASK_PERMISSION.ID))
+				.join(Tables.TASK)
 				.on(Tables.TASK_PERMISSION.ID_TASK.eq(Tables.TASK.ID))
 				.groupBy(Tables.TASK.CREATED_DATE)
 				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
-				.offset((pageNumber - 1) * pageSize).fetchInto(Task.class);
+				.offset((pageNumber - 1) * pageSize)
+				.fetchInto(Task.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -142,12 +143,11 @@ public class TaskService extends GenericCreateUpdateRepository {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public BigDecimal getScore(final Task task, final User user) {
-		return dslContext
-				.select(max(Tables.SOLUTION.SCORE))
+		return dslContext.select(max(Tables.SOLUTION.SCORE))
 				.from(Tables.SOLUTION)
-				.where(Tables.SOLUTION.TASK_ID.eq(task.getId()).and(
-						Tables.SOLUTION.USER_ID.eq(user.getId()))).fetchOne()
-				.value1();
+				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())
+						.and(Tables.SOLUTION.USER_ID.eq(user.getId())))
+				.fetchOne().value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -163,11 +163,11 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@Transactional
-	public void rejudgeTask(final Task task) throws ExecutionException,
-			IOException {
-		dslContext.delete(Tables.VERDICT).where(
-				Tables.VERDICT.SOLUTION_ID.in(dslContext
-						.select(Tables.SOLUTION.ID).from(Tables.SOLUTION)
+	public void rejudgeTask(final Task task)
+			throws ExecutionException, IOException {
+		dslContext.delete(Tables.VERDICT).where(Tables.VERDICT.SOLUTION_ID
+				.in(dslContext.select(Tables.SOLUTION.ID)
+						.from(Tables.SOLUTION)
 						.where(Tables.SOLUTION.TASK_ID.eq(task.getId()))));
 		Cursor<SolutionRecord> solutions = dslContext
 				.selectFrom(Tables.SOLUTION)
@@ -199,5 +199,32 @@ public class TaskService extends GenericCreateUpdateRepository {
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public Task updateTask(Task task) {
 		return update(task, Tables.TASK);
+	}
+
+	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
+			Task task) {
+		return getTaskPermissionsAndPrincipalData(task.getId());
+	}
+
+	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
+			int taskId) {
+		return dslContext.select(Tables.TASK_PERMISSION.TYPE,
+				Tables.TASK_PERMISSION_PRINCIPAL.PRINCIPAL_ID)
+				.from(Tables.TASK_PERMISSION)
+				.leftOuterJoin(Tables.TASK_PERMISSION_PRINCIPAL)
+				.on(Tables.TASK_PERMISSION.ID.eq(
+						Tables.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID))
+				.where(Tables.TASK_PERMISSION.ID_TASK.eq(taskId))
+				.fetchGroups(Tables.TASK_PERMISSION.TYPE,
+						(record) -> Optional.<OlympusPrincipal> ofNullable(
+								dslContext.selectFrom(Tables.GROUP)
+										.where(Tables.GROUP.ID
+												.eq(record.field2()))
+										.fetchOneInto(Group.class))
+								.orElse(
+										dslContext.selectFrom(Tables.USER)
+												.where(Tables.USER.ID
+														.eq(record.field2()))
+												.fetchOneInto(User.class)));
 	}
 }

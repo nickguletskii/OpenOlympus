@@ -32,15 +32,15 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermissionPrincipal;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "task_permission_principal", schema = "public")
-public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermissionPrincipalRecord> implements Record2<Integer, Long>, ITaskPermissionPrincipal {
+public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermissionPrincipalRecord> implements Record2<Long, Long>, ITaskPermissionPrincipal {
 
-	private static final long serialVersionUID = -13475018;
+	private static final long serialVersionUID = -2045632309;
 
 	/**
 	 * Setter for <code>public.task_permission_principal.principal_id</code>.
 	 */
 	@Override
-	public TaskPermissionPrincipalRecord setPrincipalId(Integer value) {
+	public TaskPermissionPrincipalRecord setPrincipalId(Long value) {
 		setValue(0, value);
 		return this;
 	}
@@ -48,10 +48,10 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	/**
 	 * Getter for <code>public.task_permission_principal.principal_id</code>.
 	 */
-	@Column(name = "principal_id", precision = 32)
+	@Column(name = "principal_id", precision = 64)
 	@Override
-	public Integer getPrincipalId() {
-		return (Integer) getValue(0);
+	public Long getPrincipalId() {
+		return (Long) getValue(0);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row2<Integer, Long> fieldsRow() {
+	public Row2<Long, Long> fieldsRow() {
 		return (Row2) super.fieldsRow();
 	}
 
@@ -101,7 +101,7 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row2<Integer, Long> valuesRow() {
+	public Row2<Long, Long> valuesRow() {
 		return (Row2) super.valuesRow();
 	}
 
@@ -109,7 +109,7 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Field<Integer> field1() {
+	public Field<Long> field1() {
 		return TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL.PRINCIPAL_ID;
 	}
 
@@ -125,7 +125,7 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Integer value1() {
+	public Long value1() {
 		return getPrincipalId();
 	}
 
@@ -141,7 +141,7 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionPrincipalRecord value1(Integer value) {
+	public TaskPermissionPrincipalRecord value1(Long value) {
 		setPrincipalId(value);
 		return this;
 	}
@@ -159,7 +159,7 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionPrincipalRecord values(Integer value1, Long value2) {
+	public TaskPermissionPrincipalRecord values(Long value1, Long value2) {
 		value1(value1);
 		value2(value2);
 		return this;
@@ -201,7 +201,7 @@ public class TaskPermissionPrincipalRecord extends UpdatableRecordImpl<TaskPermi
 	/**
 	 * Create a detached, initialised TaskPermissionPrincipalRecord
 	 */
-	public TaskPermissionPrincipalRecord(Integer principalId, Long taskPermissionId) {
+	public TaskPermissionPrincipalRecord(Long principalId, Long taskPermissionId) {
 		super(TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL);
 
 		setValue(0, principalId);
