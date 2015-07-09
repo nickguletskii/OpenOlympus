@@ -176,7 +176,7 @@ public class UserService {
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	public List<User> getUsersAlphabetically(final Integer pageNumber,
 			final int pageSize) {
-		return dslContext.select(Tables.USER.fields())
+		return dslContext.selectFrom(Tables.USER)
 				.groupBy(Tables.USER.ID)
 				.orderBy(Tables.USER.USERNAME).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(User.class);
