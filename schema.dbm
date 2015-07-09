@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="0,837" last-zoom="0.9"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="0,577" last-zoom="0.9"
 	 default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -833,7 +833,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="group">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="176.25" y="498.75"/>
+	<position x="322.917" y="497.639"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -914,7 +914,7 @@ WHERE contest.id = contest_id ]]></definition>
 	<role name="postgres"/>
 	<position x="899.048" y="1027.3"/>
 	<column name="principal_id">
-		<type name="integer"/>
+		<type name="bigint"/>
 	</column>
 
 	<customidxs object-type="column">
@@ -923,6 +923,7 @@ WHERE contest.id = contest_id ]]></definition>
 
 	<customidxs object-type="constraint">
 		<object name="task_permission_fk" index="0"/>
+		<object name="task_permission_principal_pk" index="1"/>
 	</customidxs>
 </table>
 
