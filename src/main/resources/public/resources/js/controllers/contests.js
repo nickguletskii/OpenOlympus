@@ -24,7 +24,7 @@
 var Util = require("oolutil");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
     $stateParams, contests, contestsCount) {
     var page = $stateParams.page;
 

@@ -24,7 +24,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('datetime', function($timeout, $http) {
+angular.module('ool.services').factory('datetime', /*@ngInject*/ function($timeout, $http) {
 
     function timeTo(referenceTime) {
         var currentTime = moment().add(currentServerTimeOffset());

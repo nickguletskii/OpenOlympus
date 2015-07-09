@@ -1,7 +1,7 @@
 var angular = require("angular");
 var app = require("app");
 
-module.exports = ['$parse', '$rootScope',
+module.exports = /*@ngInject*/
     function($parse, $rootScope) {
         return {
             // this ensure eatClickIf be compiled before ngClick
@@ -36,4 +36,3 @@ module.exports = ['$parse', '$rootScope',
             }
         }
     }
-]

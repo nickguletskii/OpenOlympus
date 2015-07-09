@@ -25,7 +25,7 @@ var Util = require("oolutil");
 var angular = require("angular");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
     $stateParams, $state) {
     $http.post('/api/task/' + $stateParams.taskId + '/rejudgeTask').success(function(response) {
         $state.go("^.rejudgeTaskSuccess", {

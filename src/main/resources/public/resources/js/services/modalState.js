@@ -24,7 +24,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').provider('modalState', function($stateProvider) {
+angular.module('ool.services').provider('modalState', /*@ngInject*/ function($stateProvider) {
     var provider = this;
     this.$get = function() {
         return provider;

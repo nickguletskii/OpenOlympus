@@ -24,7 +24,7 @@
 var Util = require("oolutil");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
     $location, $stateParams, $state, AuthenticationProvider, $translate) {
     AuthenticationProvider.update();
     $scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === 'true');
@@ -83,7 +83,7 @@ module.exports = function($timeout, $q, $scope, $rootScope, $http,
                     return;
                 }
                 throw {
-                    name: "UnknownLoginResultException"
+                    name: "UnknownLoginResultException",
                     message: "Unknown login result",
                     obj: data
                 };

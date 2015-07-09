@@ -1,7 +1,7 @@
 var angular = require("angular");
 var app = require("app");
 
-module.exports = /*@ngInject*/ ['$parse', function($parse) {
+module.exports = /*@ngInject*/ function($parse) {
     var directive = {
         restrict: 'A',
         require: ['ngModel'],
@@ -32,4 +32,4 @@ module.exports = /*@ngInject*/ ['$parse', function($parse) {
             return dt;
         });
     }
-}]
+}

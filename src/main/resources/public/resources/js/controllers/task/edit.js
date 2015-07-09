@@ -25,7 +25,7 @@ var angular = require("angular");
 var _ = require("lodash");
 var textile = require("textile");
 require("codemirror/mode/textile/textile");
-module.exports = function($timeout, $q, $scope, $rootScope, $http,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
     $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, editTaskData) {
     $scope.taskId = $stateParams.taskId;
 
@@ -44,7 +44,6 @@ module.exports = function($timeout, $q, $scope, $rootScope, $http,
     }, 1);
 
     $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    ;
     $scope.uploadProgressBarColour = function() {
         if ($scope.uploadFailure)
             return "danger";

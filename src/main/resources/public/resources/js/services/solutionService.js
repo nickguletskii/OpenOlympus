@@ -24,7 +24,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('SolutionService', function($http) {
+angular.module('ool.services').factory('SolutionService', /*@ngInject*/ function($http) {
     return {
         countUserSolutions: function() {
             return $http.get('api/user/solutionsCount').then(_.property("data"));

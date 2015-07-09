@@ -25,7 +25,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('ServersideFormErrorReporter', function() {
+angular.module('ool.services').factory('ServersideFormErrorReporter', /*@ngInject*/ function() {
     return function(fieldMap) {
         return {
             existingErrorKeys: {},

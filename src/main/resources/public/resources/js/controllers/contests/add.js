@@ -23,17 +23,17 @@
 var Util = require("oolutil");
 var angular = require("angular");
 var _ = require("lodash");
+var moment = require("moment");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http,
+module.exports = /*@ngInject*/function($timeout, $q, $scope, $rootScope, $http,
     $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
     $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    ;
     $scope.contest = {
         duration: 0,
         startTime: moment().format("YYYY-MM-DDTHH:mm:ss.SSSZ")
     };
 
-    $scope.open = function($event) {
+    $scope.open =function($event) {
         $event.preventDefault();
         $event.stopPropagation();
 

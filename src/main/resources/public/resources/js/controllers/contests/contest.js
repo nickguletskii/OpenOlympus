@@ -25,7 +25,7 @@ var angular = require("angular");
 var _ = require("lodash");
 var moment = require("moment");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
     $stateParams, contest, datetime, ContestService) {
     function updateTasks() {
         ContestService.getContestInfo($stateParams.contestId).then(function(contest) {

@@ -22,7 +22,7 @@
  */
 var _ = require("lodash");
 var Util = require("oolutil");
-module.exports = /*@NgInject*/ function($timeout, $q, $scope, $rootScope, $http,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
     $location, $stateParams, $state) {
 
 

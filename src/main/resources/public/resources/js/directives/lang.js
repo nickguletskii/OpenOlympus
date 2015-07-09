@@ -1,7 +1,7 @@
 var angular = require("angular");
 var app = require("app");
 
-module.exports = ['$compile', '$translate', '$rootScope', function($compile, $translate, $rootScope) {
+module.exports = /*@ngInject*/ function($compile, $translate, $rootScope) {
     return {
         restrict: "AE",
         link: function(scope, element, attrs, ctrl, transclude) {
@@ -18,4 +18,4 @@ module.exports = ['$compile', '$translate', '$rootScope', function($compile, $tr
             $rootScope.$watch("currentLanguage", changeTranslation);
         }
     };
-}]
+}

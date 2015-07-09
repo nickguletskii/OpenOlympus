@@ -24,7 +24,7 @@
 var Util = require("oolutil");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $translate, $scope, $rootScope, $http,
+module.exports = /*@ngInject*/ function($timeout, $q, $translate, $scope, $rootScope, $http,
     $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
 
     $http.get("/api/security/userStatus").success(function(response) {

@@ -25,7 +25,7 @@ var Util = require("oolutil");
 var angular = require("angular");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
     $stateParams, UserService, users, userCount) {
     var page = $stateParams.page;
 
@@ -76,7 +76,6 @@ module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
         }).value()).then(handleApprovalResponse);
     };
 
-
     $scope.retryApprovingFailedUsers = function() {
         $scope.loading = true;
         UserService.approveUsers(_($scope.users).filter(function(user) {
@@ -85,7 +84,6 @@ module.exports = function($timeout, $q, $scope, $rootScope, $http, $location,
             return user.id;
         }).value()).then(handleApprovalResponse);
     };
-
 
     $scope.deleteUsersWithErrors = function() {
         UserService.deleteUsers(_($scope.users).filter(function(user) {

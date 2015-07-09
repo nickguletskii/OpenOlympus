@@ -1,5 +1,6 @@
 var angular = require("angular");
 var app = require("app");
+var moment = require("moment");
 
 module.exports = /*@ngInject*/ function($q, $timeout) {
     return {

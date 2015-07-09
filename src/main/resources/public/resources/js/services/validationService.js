@@ -24,7 +24,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('ValidationService', function($injector, $q, $translate) {
+angular.module('ool.services').factory('ValidationService', /*@ngInject*/ function($injector, $q, $translate) {
     return {
         report: function(reporter, form, errors) {
             _.map(_.filter(form, function(element) {

@@ -24,13 +24,12 @@ var Util = require("oolutil");
 var angular = require("angular");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
     $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $sce, task, $compile) {
     $scope.name = task.name;
     $scope.description = task.description;
 
-    $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    ;
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();;
     $scope.taskId = $stateParams.taskId;
     $scope.task = {};
     $scope.isFormVisible = true;

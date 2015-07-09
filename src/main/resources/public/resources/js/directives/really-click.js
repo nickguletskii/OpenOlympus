@@ -1,46 +1,44 @@
 var angular = require("angular");
 var app = require("app");
 
-module.exports = ['$modal',
-    function($modal) {
+module.exports = /*@ngInject*/ function($modal) {
 
-        var ModalInstanceCtrl = function($scope, $modalInstance) {
-            $scope.ok = function() {
-                $modalInstance.close();
-            };
-
-            $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-            };
+    var ModalInstanceCtrl = function($scope, $modalInstance) {
+        $scope.ok = function() {
+            $modalInstance.close();
         };
 
-        return {
-            restrict: 'A',
-            scope: {
-                ngReallyClick: "&",
-                item: "="
-            },
-            link: function(scope, element, attrs) {
-                element.bind('click', function() {
-                    var message = attrs.ngReallyMessage;
+        $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+        };
+    };
 
-                    var modalHtml = '<div class="modal-body">' + message + '</div>';
-                    modalHtml += '<div class="modal-footer"><button class="btn btn-danger" ng-click="ok()">' + attrs.ngReallyYesButton + '</button><button class="btn btn-default" ng-click="cancel()">{{\'confirmationDialog.cancel\' | translate}}</button></div>';
+    return {
+        restrict: 'A',
+        scope: {
+            ngReallyClick: "&",
+            item: "="
+        },
+        link: function(scope, element, attrs) {
+            element.bind('click', function() {
+                var message = attrs.ngReallyMessage;
 
-                    var modalInstance = $modal.open({
-                        template: modalHtml,
-                        controller: ModalInstanceCtrl
-                    });
+                var modalHtml = '<div class="modal-body">' + message + '</div>';
+                modalHtml += '<div class="modal-footer"><button class="btn btn-danger" ng-click="ok()">' + attrs.ngReallyYesButton + '</button><button class="btn btn-default" ng-click="cancel()">{{\'confirmationDialog.cancel\' | translate}}</button></div>';
 
-                    modalInstance.result.then(function() {
-                        scope.ngReallyClick({
-                            item: scope.item
-                        });
-                    }, function() {});
-
+                var modalInstance = $modal.open({
+                    template: modalHtml,
+                    controller: ModalInstanceCtrl
                 });
 
-            }
-        };
-    }
-]
+                modalInstance.result.then(function() {
+                    scope.ngReallyClick({
+                        item: scope.item
+                    });
+                }, function() {});
+
+            });
+
+        }
+    };
+}

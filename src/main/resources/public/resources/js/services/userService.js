@@ -24,7 +24,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('UserService', function($http) {
+angular.module('ool.services').factory('UserService', /*@ngInject*/ function($http) {
     return {
         patchUser: function(user, userId) {
             var personalInfoPatchUrl = !userId ? "/api/user/personalInfo" : "/api/admin/user/" + userId + "/personalInfo";

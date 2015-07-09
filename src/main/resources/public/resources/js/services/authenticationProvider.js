@@ -25,7 +25,7 @@ var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
 var $ = require("jquery");
-angular.module('ool.services').factory('AuthenticationProvider', function($rootScope, $http, $timeout, $state) {
+angular.module('ool.services').factory('AuthenticationProvider', /*@ngInject*/ function($rootScope, $http, $timeout, $state) {
     var data = null;
     var poller = function() {
         $http.get('/api/security/userStatus').then(function(r) {

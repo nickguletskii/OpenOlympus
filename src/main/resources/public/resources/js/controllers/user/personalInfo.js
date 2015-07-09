@@ -24,11 +24,10 @@ var Util = require("oolutil");
 var angular = require("angular");
 var _ = require("lodash");
 
-module.exports = function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
+module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
     $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService,
     personalInfoPatchUrl, passwordPatchUrl, requireExistingPassword, UserService) {
-    $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    ;
+    $scope.serverErrorReporter = new ServersideFormErrorReporter();;
     $scope.user = {};
     $scope.password = {};
     $scope.requireExistingPassword = requireExistingPassword;

@@ -24,7 +24,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('ContestService', function($http) {
+angular.module('ool.services').factory('ContestService', /*@ngInject*/ function($http) {
     return {
         getContestsPage: function(page) {
             return $http.get('/api/contests', {

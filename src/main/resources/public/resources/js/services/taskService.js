@@ -24,7 +24,7 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('TaskService', function($http) {
+angular.module('ool.services').factory('TaskService', /*@ngInject*/ function($http) {
     return {
         getTask: function(taskId) {
             return $http.get("/api/task/" + taskId).then(_.property("data"));

@@ -1,6 +1,5 @@
 var path = require('path');
 var webpack = require('webpack');
-var ngAnnotatePlugin = require('ng-annotate-webpack-plugin');
 var BowerWebpackPlugin = require("bower-webpack-plugin");
 var ChunkManifestPlugin = require('chunk-manifest-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
@@ -75,8 +74,11 @@ var config = {
             loader: "expose?angular!exports?window.angular!imports?$=jquery"
         }, {
             test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'ng-annotate!babel',
+            exclude: [
+                /node_modules/,
+                /bower_components/
+            ],
+            loader: 'ng-annotate?add=true!babel',
             include: [
                 path.resolve(resourceRoot, "js/")
             ]
@@ -114,9 +116,6 @@ var config = {
         new webpack.ProvidePlugin({
             'angular': 'angular'
         }),
-        new ngAnnotatePlugin({
-            add: true
-        }),
         new webpack.optimize.CommonsChunkPlugin({
             chunkName: "vendor",
             filename: "js/vendor.bundle.js",
@@ -136,10 +135,13 @@ config.addVendor("jquery", path.resolve(nodeModulesRoot, "jquery/dist/jquery.min
 config.addVendor("moment", path.resolve(nodeModulesRoot, "moment/moment.js"));
 config.addVendor("moment-timezone", path.resolve(nodeModulesRoot, "moment-timezone/index.js"));
 config.addVendor("angular", path.resolve(nodeModulesRoot, "angular/angular.js"));
-config.addVendor("angular-ui-bootstrap", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap.js"));
-config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap-tpls.js"));
+config.addVendor("angular-animate", path.resolve(nodeModulesRoot, "angular-animate/angular-animate.min.js"));
+config.addVendor("angular-ui-bootstrap", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap.min.js"));
+config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap-tpls.min.js"));
+config.addVendor("angular-ui-router", path.resolve(nodeModulesRoot, "angular-ui-router/release/angular-ui-router.min.js"));
 config.addVendor("angular-no-captcha", path.resolve(bowerComponentsRoot, "angular-no-captcha/src/angular-no-captcha.js"));
 config.addVendor("angular-form-for", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.js"));
 config.addVendor("angular-form-for-bootstrap", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.bootstrap-templates.js"));
-config.addVendor("angular-recaptcha", path.resolve(bowerComponentsRoot, "angular-recaptcha/release/angular-recaptcha.js"));
+config.addVendor("angular-recaptcha", path.resolve(bowerComponentsRoot, "angular-recaptcha/release/angular-recaptcha.min.js"));
+config.addVendor("angular-translate", path.resolve(nodeModulesRoot, "angular-translate/dist/angular-translate.min.js"));
 module.exports = config;
