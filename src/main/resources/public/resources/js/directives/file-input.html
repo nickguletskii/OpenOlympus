@@ -8,7 +8,7 @@
             {{ model.bindable | renderFileList }}
         </div>
         <span class="input-group-addon">
-            <a class='btn' ng-class="{'btn-primary':!model.bindable, 'btn-success':!!model.bindable}" href='javascript:;'>
+            <a class='btn' ng-class="{'btn-primary':!model.bindable, 'btn-success':!!model.bindable, disabled: disable || model.disabled}" href='javascript:;'>
                 {{ 'controls.fileInput.browseButton' | translate }}
                 <input type="file" id="{{model.uid}}" name="{{attribute}}" class="form-control directive-main-element" ng-disabled="disable || model.disabled" tabindex="{{tabIndex}}" ng-model="model.bindable" ng-model-options="{updateOn:'fileSelectionChanged'}" form-for-debounce="{{debounce}}" ng-blur="onBlur()" file-ng-model ng-attr-multiple="{{multiple}}">
             </a>
