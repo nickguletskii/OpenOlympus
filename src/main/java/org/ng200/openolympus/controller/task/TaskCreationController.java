@@ -22,11 +22,9 @@
  */
 package org.ng200.openolympus.controller.task;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
@@ -36,6 +34,7 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
+import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.TaskCreationDto;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
@@ -52,7 +51,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import scala.annotation.meta.setter;
+import com.google.common.collect.ImmutableMap;
 
 @RestController
 public class TaskCreationController extends
@@ -69,51 +68,59 @@ public class TaskCreationController extends
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 	@ResponseBody
-	@Transactional
-	public Callable<BindingResponse> createTask(
+	public Callable<BindingResponse> createTaskAsync(
 			@Valid final TaskCreationDto taskCreationDto,
 			final BindingResult bindingResult) throws Throwable {
 		return () -> {
-			this.taskValidator.validate(taskCreationDto, bindingResult, null,
-					false);
-			if (bindingResult.hasErrors()) {
-				throw new BindException(bindingResult);
-			}
-			Task task = new Task().setName(taskCreationDto.getName())
-					.setCreatedDate(LocalDateTime.now());
-			final Path localDescriptionFile = this.storageService
-					.createTaskDescriptionFileStorage(task);
-			final Path judgeDir = this.storageService
-					.createTaskJudgeDirectory(task);
-
-			task = this.taskService.insertTask(task);
-
-			final Lock lock = task.writeLock();
-//			lock.lock();
-
-			try {
-				this.uploadDescription(task, taskCreationDto
-						.getDescriptionFile().getInputStream());
-				this.uploadJudgeFile(task, taskCreationDto);
-
-				task = this.taskService.updateTask(task);
-			} catch (final ArchiveException e) {
-				bindingResult.rejectValue("judgeFile", "",
-						"task.add.form.errors.judgeArchive.invalid");
-				throw new BindException(bindingResult);
-			} catch (final Exception e) {
-				try {
-					throw new GeneralNestedRuntimeException("", e);
-				} finally {
-					FileAccess.deleteDirectoryByWalking(judgeDir);
-					FileAccess.deleteDirectoryByWalking(localDescriptionFile);
-				}
-			} finally {
-				lock.unlock();
-			}
-
-			return BindingResponse.OK;
+			return createTask(taskCreationDto, bindingResult);
 		};
+	}
+
+	@Transactional
+	private BindingResponse createTask(final TaskCreationDto taskCreationDto,
+			final BindingResult bindingResult)
+					throws IOException, BindException {
+		this.taskValidator.validate(taskCreationDto, bindingResult, null,
+				false);
+		if (bindingResult.hasErrors()) {
+			throw new BindException(bindingResult);
+		}
+		Task task = new Task().setName(taskCreationDto.getName())
+				.setCreatedDate(LocalDateTime.now());
+		final Path localDescriptionFile = this.storageService
+				.createTaskDescriptionFileStorage(task);
+		final Path judgeDir = this.storageService
+				.createTaskJudgeDirectory(task);
+
+		task = this.taskService.insertTask(task);
+
+		final Lock lock = task.writeLock();
+		lock.lock();
+
+		try {
+			this.uploadDescription(task, taskCreationDto
+					.getDescriptionFile().getInputStream());
+			this.uploadJudgeFile(task, taskCreationDto);
+
+			task = this.taskService.updateTask(task);
+		} catch (final ArchiveException e) {
+			bindingResult.rejectValue("judgeFile", "",
+					"task.add.form.errors.judgeArchive.invalid");
+			throw new BindException(bindingResult);
+		} catch (final Exception e) {
+			try {
+				throw new GeneralNestedRuntimeException("", e);
+			} finally {
+				FileAccess.deleteDirectoryByWalking(judgeDir);
+				FileAccess.deleteDirectoryByWalking(localDescriptionFile);
+			}
+		} finally {
+			lock.unlock();
+		}
+
+		return new BindingResponse(Status.OK,
+				null, ImmutableMap.<String, Object> builder()
+						.put("taskId", task.getId()).build());
 	}
 
 }
