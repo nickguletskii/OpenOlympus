@@ -21,60 +21,21 @@
  * THE SOFTWARE.
  */
 
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
-
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload) {
-    $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    $scope.task = {};
-    $scope.uploadProgressBarColour = function() {
-        if ($scope.uploadFailure)
-            return "danger";
-        if ($scope.uploadSuccess)
-            return "success";
-        return "info";
-    };
-    $scope.isFormVisible = true;
-
-    function success() {
-        $scope.isFormVisible = false;
-        $scope.uploadSuccess = true;
-        $scope.uploadFailure = false;
-        $scope.processing = false;
-    }
-
-    function failure() {
-        $scope.isFormVisible = false;
-        $scope.uploadSuccess = false;
-        $scope.uploadFailure = true;
-        $scope.processing = false;
-    }
-
-    function reset() {
-        $scope.isFormVisible = true;
-        $scope.uploadSuccess = false;
-        $scope.uploadFailure = false;
-        $scope.processing = false;
-    }
-
-    $scope.createTask = function(task) {
-        $scope.isFormVisible = false;
-
-        try {
-            var fd = new FormData();
-
-            _.forEach(task, function(value, key) {
-                fd.append(key, value);
-            });
-            if (!!task.judgeFile)
-                fd.append("judgeFile", task.judgeFile[0]);
-            if (!!task.descriptionFile)
-                fd.append("descriptionFile", task.descriptionFile[0]);
-            ValidationService.postToServer($scope, '/api/task/create', $scope.taskCreationForm, fd, success, failure, reset);
-        } catch (err) {
-            reset();
-        }
-    };
+	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
+	$scope.task = {};
+	$scope.lastTaskId = null;
+	$scope.progress = {};
+	$scope.createTask = function(task) {
+		$scope.lastTaskId = null;
+		$scope.submitting = true;
+		$scope.uploadProgress = null;
+		return ValidationService.postToServer("/api/task/create", task, (progress) => $scope.progress = progress)
+			.then((response) => {
+				$scope.uploadProgress = null;
+				$scope.submitting = false;
+				$scope.task = {};
+				$scope.lastTaskId = response.data.taskId;
+			});
+	};
 };

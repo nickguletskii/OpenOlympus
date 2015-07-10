@@ -24,75 +24,96 @@ var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
 var app = require("app");
-angular.module('ool.services').factory('ValidationService', /*@ngInject*/ function($injector, $q, $translate) {
-    return {
-        report: function(reporter, form, errors) {
-            _.map(_.filter(form, function(element) {
-                return _.has(element, "$setValidity");
-            }), function(element) {
-                return element.$name;
-            }).forEach(function(field) {
-                reporter.report(form[field], field, errors);
-            });
-        },
-        transformBindingResultsIntoFormForMap: function(errors) {
-            var deferred = $q.defer();
 
-            var fieldMessageMap = _.chain(errors)
-                .groupBy('field')
-                .indexBy((group) => group[0].field)
-                .mapValues((group) =>
-                    _.chain(group).map(
-                        (validationResult) => validationResult.defaultMessage
-                    ).value())
-                .value();
+function ValidationException(message, data) {
+	this.message = message;
+	this.data = data;
+	this.name = "ValidationException";
+}
 
-            var shortKeyToLongKey = (x => "validation.failed." + x);
+angular.module("ool.services").factory("ValidationService", /*@ngInject*/ function($injector, $q, $translate) {
+	return {
+		report: function(reporter, form, errors) {
+			_.map(_.filter(form, function(element) {
+				return _.has(element, "$setValidity");
+			}), function(element) {
+				return element.$name;
+			}).forEach(function(field) {
+				reporter.report(form[field], field, errors);
+			});
+		},
+		transformBindingResultsIntoFormForMap: function(errors) {
+			var deferred = $q.defer();
 
-            var messages = _.chain(fieldMessageMap).values().flatten().map(shortKeyToLongKey).value();
-            $translate(messages).then(function(translations) {
-                deferred.resolve(
-                    _.chain(fieldMessageMap).mapValues(
-                        (group) =>
-                        _.chain(group)
-                        .map((message) => translations[shortKeyToLongKey(message)])
-                        .join("\n")
-                        .value()
-                    )
-                    .value()
-                );
-            });
-            return deferred.promise;
-        },
-        postToServer: function($scope, path, form, fd, success, failure, reset) {
-            $injector.invoke(function($rootScope, $upload, ValidationService) {
-                $upload.http({
-                    method: 'POST',
-                    url: path,
-                    headers: {
-                        'X-Auth-Token': $rootScope.authToken,
-                        'Content-Type': undefined
-                    },
-                    data: fd,
-                    transformRequest: angular.identity
-                }).progress(function(evt) {
-                    $scope.uploadProgress = Math.round(1000.0 * evt.loaded / evt.total) / 10.0;
-                    if (evt.loaded === evt.total) {
-                        $scope.processing = true;
-                    }
-                }).success(function(response) {
-                    if (response.status === "BINDING_ERROR") {
-                        ValidationService.report($scope.serverErrorReporter, form, response.fieldErrors);
-                        reset(response);
-                    } else if (response.status === "OK") {
-                        success(response);
-                    } else {
-                        failure(response);
-                    }
-                }).error(function(data) {
-                    reset();
-                });
-            });
-        },
-    };
+			var fieldMessageMap = _.chain(errors)
+				.groupBy("field")
+				.indexBy((group) => group[0].field)
+				.mapValues((group) =>
+					_.chain(group).map(
+						(validationResult) => validationResult.defaultMessage
+					).value())
+				.value();
+
+			var shortKeyToLongKey = x => "validation.failed." + x;
+
+			var messages = _.chain(fieldMessageMap).values().flatten().map(shortKeyToLongKey).value();
+			$translate(messages).then(function(translations) {
+				deferred.resolve(
+					_.chain(fieldMessageMap).mapValues(
+						(group) =>
+						_.chain(group)
+						.map((message) => translations[shortKeyToLongKey(message)])
+						.join("\n")
+						.value()
+					)
+					.value()
+				);
+			});
+			return deferred.promise;
+		},
+		postToServer: function(path, data, progressListener) {
+			var deferred = $q.defer();
+			var formData = new FormData();
+			_.forEach(data, (value, key) => {
+				if (value instanceof FileList) {
+					console.log(value.length);
+					if (value.length !== 1 && value.length !== 0) {
+						throw new Error("TODO: multiple file upload support");
+					}
+					formData.append(key, value[0]); // TODO: Multiple file upload support
+				} else {
+					formData.append(key, value);
+				}
+			});
+			$injector.invoke(function($rootScope, Upload, ValidationService) {
+				Upload.http({
+					method: "POST",
+					url: path,
+					headers: {
+						"X-Auth-Token": $rootScope.authToken,
+						"Content-Type": undefined
+					},
+					data: formData,
+					transformRequest: angular.identity
+				}).progress(function(evt) {
+					progressListener(evt);
+				}).success(function(response) {
+					if (response.status === "BINDING_ERROR") {
+						ValidationService.transformBindingResultsIntoFormForMap(response.fieldErrors).then(function(msg) {
+							deferred.reject(
+								msg
+							);
+						});
+					} else if (response.status === "OK") {
+						deferred.resolve(response);
+					} else {
+						throw new ValidationException("Validation failed unexpectedly due to an unknown response", data);
+					}
+				}).error(function(errorData) {
+					throw new ValidationException("Validation failed unexpectedly", errorData);
+				});
+			});
+			return deferred.promise;
+		}
+	};
 });

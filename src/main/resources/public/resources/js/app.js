@@ -26,7 +26,7 @@ var angular = require("angular");
 
 var app = angular.module('ool', ['pascalprecht.translate', 'ui.router',
     'ui.bootstrap', 'ool.filters', 'ool.controllers',
-    'ool.services', 'ool.directives', 'angularFileUpload', 'ui.codemirror',
+    'ool.services', 'ool.directives', 'ngFileUpload', 'ui.codemirror',
     'ngAnimate', 'formFor', 'formFor.bootstrapTemplates', 'vcRecaptcha'
 ]);
 

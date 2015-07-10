@@ -6,7 +6,6 @@ var _ = require("lodash");
 require("angular-ui-router");
 require("angular-ui-bootstrap");
 require("angular-ui-bootstrap-tpls");
-require("angular-file-upload");
 require("angular-translate");
 require("angular-translate-loader-url");
 require("angular-ui-codemirror");
@@ -15,6 +14,7 @@ require("angular-animate");
 require("angular-sanitize");
 require("angular-form-for");
 require("angular-form-for-bootstrap");
+require("ng-file-upload");
 
 var app = require("app");
 var filters = require("filters");
