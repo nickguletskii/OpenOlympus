@@ -159,7 +159,7 @@ public class RegistrationRestController {
 				.setTeacherMiddleName(userDto.getTeacherMiddleName()).setUsername(userDto.getUsername())
 				.setSuperuser(false).setApprovalEmailSent(false).setEnabled(true);
 
-		userService.saveUser(user);
+		userService.insertUser(user);
 
 		return new RegistrationResponse(Status.OK, null, null, null);
 	}

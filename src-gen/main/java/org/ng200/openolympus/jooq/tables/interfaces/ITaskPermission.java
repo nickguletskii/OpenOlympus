@@ -54,15 +54,15 @@ public interface ITaskPermission extends Serializable {
 	public TaskPermissionType getType();
 
 	/**
-	 * Setter for <code>public.task_permission.id_task</code>.
+	 * Setter for <code>public.task_permission.task_id</code>.
 	 */
-	public ITaskPermission setIdTask(Integer value);
+	public ITaskPermission setTaskId(Integer value);
 
 	/**
-	 * Getter for <code>public.task_permission.id_task</code>.
+	 * Getter for <code>public.task_permission.task_id</code>.
 	 */
-	@Column(name = "id_task", precision = 32)
-	public Integer getIdTask();
+	@Column(name = "task_id", precision = 32)
+	public Integer getTaskId();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

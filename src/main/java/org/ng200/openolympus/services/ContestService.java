@@ -250,7 +250,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 		final Table<Record> currentTasks = dslContext.select()
 				.from(Tables.CONTEST_TASKS)
-				.where(Tables.CONTEST_TASKS.ID_CONTEST.eq(contestF))
+				.where(Tables.CONTEST_TASKS.CONTEST_ID.eq(contestF))
 				.asTable("current_tasks");
 		final Table<?> solutionsTasks = DSL
 				.select(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID)
@@ -350,15 +350,15 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return dslContext
 				.selectFrom(Tables.TASK)
 				.where(Tables.TASK.ID.in(dslContext
-						.select(Tables.CONTEST_TASKS.ID_TASK)
+						.select(Tables.CONTEST_TASKS.TASK_ID)
 						.from(Tables.CONTEST_TASKS)
-						.where(Tables.CONTEST_TASKS.ID_CONTEST.eq(contest
+						.where(Tables.CONTEST_TASKS.CONTEST_ID.eq(contest
 								.getId())))).fetchInto(Task.class);
 	}
 
 	public void removeTaskFromContest(Task task, Contest contest) {
 		dslContext.delete(Tables.CONTEST_TASKS).where(
-				Tables.CONTEST_TASKS.ID_CONTEST.eq(contest.getId()));
+				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId()));
 	}
 
 	public void addContestTask(Contest contest, Task taskByName) {

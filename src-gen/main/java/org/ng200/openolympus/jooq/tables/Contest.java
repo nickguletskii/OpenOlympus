@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -36,7 +37,7 @@ import org.ng200.openolympus.util.DurationConverter;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Contest extends TableImpl<ContestRecord> {
 
-	private static final long serialVersionUID = 714456527;
+	private static final long serialVersionUID = -1934013745;
 
 	/**
 	 * The reference instance of <code>public.contest</code>
@@ -75,6 +76,11 @@ public class Contest extends TableImpl<ContestRecord> {
 	 * The column <code>public.contest.start_time</code>.
 	 */
 	public final TableField<ContestRecord, Timestamp> START_TIME = createField("start_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
+	 * The column <code>public.contest.owner</code>.
+	 */
+	public final TableField<ContestRecord, Long> OWNER = createField("owner", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * Create a <code>public.contest</code> table reference
@@ -120,6 +126,14 @@ public class Contest extends TableImpl<ContestRecord> {
 	@Override
 	public List<UniqueKey<ContestRecord>> getKeys() {
 		return Arrays.<UniqueKey<ContestRecord>>asList(Keys.CONTEST_PKEY, Keys.CONTEST_NAME_UNIQUE);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ForeignKey<ContestRecord, ?>> getReferences() {
+		return Arrays.<ForeignKey<ContestRecord, ?>>asList(Keys.CONTEST__PRINCIPAL_FK);
 	}
 
 	/**

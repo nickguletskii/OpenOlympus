@@ -31,13 +31,14 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContest;
 @Table(name = "contest", schema = "public")
 public class Contest implements IContest {
 
-	private static final long serialVersionUID = -34830586;
+	private static final long serialVersionUID = -541909947;
 
 	private Integer   id;
 	private Duration  duration;
 	private String    name;
 	private Boolean   showFullTestsDuringContest;
 	private Timestamp startTime;
+	private Long      owner;
 
 	public Contest() {}
 
@@ -47,6 +48,7 @@ public class Contest implements IContest {
 		this.name = value.name;
 		this.showFullTestsDuringContest = value.showFullTestsDuringContest;
 		this.startTime = value.startTime;
+		this.owner = value.owner;
 	}
 
 	public Contest(
@@ -54,13 +56,15 @@ public class Contest implements IContest {
 		Duration  duration,
 		String    name,
 		Boolean   showFullTestsDuringContest,
-		Timestamp startTime
+		Timestamp startTime,
+		Long      owner
 	) {
 		this.id = id;
 		this.duration = duration;
 		this.name = name;
 		this.showFullTestsDuringContest = showFullTestsDuringContest;
 		this.startTime = startTime;
+		this.owner = owner;
 	}
 
 	@Id
@@ -124,6 +128,18 @@ public class Contest implements IContest {
 		return this;
 	}
 
+	@Column(name = "owner", precision = 64)
+	@Override
+	public Long getOwner() {
+		return this.owner;
+	}
+
+	@Override
+	public Contest setOwner(Long owner) {
+		this.owner = owner;
+		return this;
+	}
+
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------
@@ -138,6 +154,7 @@ public class Contest implements IContest {
 		setName(from.getName());
 		setShowFullTestsDuringContest(from.getShowFullTestsDuringContest());
 		setStartTime(from.getStartTime());
+		setOwner(from.getOwner());
 	}
 
 	/**

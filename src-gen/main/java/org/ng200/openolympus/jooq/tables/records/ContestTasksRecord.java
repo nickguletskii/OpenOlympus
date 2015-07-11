@@ -31,45 +31,45 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestTasks;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest_tasks", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"id_contest", "id_task"})
+	@UniqueConstraint(columnNames = {"contest_id", "task_id"})
 })
 public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> implements Record2<Integer, Integer>, IContestTasks {
 
-	private static final long serialVersionUID = -900589033;
+	private static final long serialVersionUID = 1707659973;
 
 	/**
-	 * Setter for <code>public.contest_tasks.id_contest</code>.
+	 * Setter for <code>public.contest_tasks.contest_id</code>.
 	 */
 	@Override
-	public ContestTasksRecord setIdContest(Integer value) {
+	public ContestTasksRecord setContestId(Integer value) {
 		setValue(0, value);
 		return this;
 	}
 
 	/**
-	 * Getter for <code>public.contest_tasks.id_contest</code>.
+	 * Getter for <code>public.contest_tasks.contest_id</code>.
 	 */
-	@Column(name = "id_contest", nullable = false, precision = 32)
+	@Column(name = "contest_id", nullable = false, precision = 32)
 	@Override
-	public Integer getIdContest() {
+	public Integer getContestId() {
 		return (Integer) getValue(0);
 	}
 
 	/**
-	 * Setter for <code>public.contest_tasks.id_task</code>.
+	 * Setter for <code>public.contest_tasks.task_id</code>.
 	 */
 	@Override
-	public ContestTasksRecord setIdTask(Integer value) {
+	public ContestTasksRecord setTaskId(Integer value) {
 		setValue(1, value);
 		return this;
 	}
 
 	/**
-	 * Getter for <code>public.contest_tasks.id_task</code>.
+	 * Getter for <code>public.contest_tasks.task_id</code>.
 	 */
-	@Column(name = "id_task", nullable = false, precision = 32)
+	@Column(name = "task_id", nullable = false, precision = 32)
 	@Override
-	public Integer getIdTask() {
+	public Integer getTaskId() {
 		return (Integer) getValue(1);
 	}
 
@@ -110,7 +110,7 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	 */
 	@Override
 	public Field<Integer> field1() {
-		return ContestTasks.CONTEST_TASKS.ID_CONTEST;
+		return ContestTasks.CONTEST_TASKS.CONTEST_ID;
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	 */
 	@Override
 	public Field<Integer> field2() {
-		return ContestTasks.CONTEST_TASKS.ID_TASK;
+		return ContestTasks.CONTEST_TASKS.TASK_ID;
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	 */
 	@Override
 	public Integer value1() {
-		return getIdContest();
+		return getContestId();
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	 */
 	@Override
 	public Integer value2() {
-		return getIdTask();
+		return getTaskId();
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	 */
 	@Override
 	public ContestTasksRecord value1(Integer value) {
-		setIdContest(value);
+		setContestId(value);
 		return this;
 	}
 
@@ -151,7 +151,7 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	 */
 	@Override
 	public ContestTasksRecord value2(Integer value) {
-		setIdTask(value);
+		setTaskId(value);
 		return this;
 	}
 
@@ -174,8 +174,8 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	 */
 	@Override
 	public void from(IContestTasks from) {
-		setIdContest(from.getIdContest());
-		setIdTask(from.getIdTask());
+		setContestId(from.getContestId());
+		setTaskId(from.getTaskId());
 	}
 
 	/**
@@ -201,10 +201,10 @@ public class ContestTasksRecord extends UpdatableRecordImpl<ContestTasksRecord> 
 	/**
 	 * Create a detached, initialised ContestTasksRecord
 	 */
-	public ContestTasksRecord(Integer idContest, Integer idTask) {
+	public ContestTasksRecord(Integer contestId, Integer taskId) {
 		super(ContestTasks.CONTEST_TASKS);
 
-		setValue(0, idContest);
-		setValue(1, idTask);
+		setValue(0, contestId);
+		setValue(1, taskId);
 	}
 }

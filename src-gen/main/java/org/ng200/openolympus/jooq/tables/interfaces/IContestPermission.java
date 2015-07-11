@@ -54,15 +54,15 @@ public interface IContestPermission extends Serializable {
 	public ContestPermissionType getType();
 
 	/**
-	 * Setter for <code>public.contest_permission.id_contest</code>.
+	 * Setter for <code>public.contest_permission.contest_id</code>.
 	 */
-	public IContestPermission setIdContest(Integer value);
+	public IContestPermission setContestId(Integer value);
 
 	/**
-	 * Getter for <code>public.contest_permission.id_contest</code>.
+	 * Getter for <code>public.contest_permission.contest_id</code>.
 	 */
-	@Column(name = "id_contest", precision = 32)
-	public Integer getIdContest();
+	@Column(name = "contest_id", precision = 32)
+	public Integer getContestId();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

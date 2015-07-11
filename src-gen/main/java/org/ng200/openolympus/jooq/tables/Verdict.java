@@ -38,7 +38,7 @@ import org.ng200.openolympus.util.DurationConverter;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Verdict extends TableImpl<VerdictRecord> {
 
-	private static final long serialVersionUID = -962238502;
+	private static final long serialVersionUID = 792849548;
 
 	/**
 	 * The reference instance of <code>public.verdict</code>
@@ -143,7 +143,7 @@ public class Verdict extends TableImpl<VerdictRecord> {
 	 */
 	@Override
 	public UniqueKey<VerdictRecord> getPrimaryKey() {
-		return Keys.USER_PK;
+		return Keys.VERDICT_PK;
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class Verdict extends TableImpl<VerdictRecord> {
 	 */
 	@Override
 	public List<UniqueKey<VerdictRecord>> getKeys() {
-		return Arrays.<UniqueKey<VerdictRecord>>asList(Keys.USER_PK);
+		return Arrays.<UniqueKey<VerdictRecord>>asList(Keys.VERDICT_PK);
 	}
 
 	/**

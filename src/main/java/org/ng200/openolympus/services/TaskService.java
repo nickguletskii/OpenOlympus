@@ -112,7 +112,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.on(Tables.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID
 						.eq(Tables.TASK_PERMISSION.ID))
 				.join(Tables.TASK)
-				.on(Tables.TASK_PERMISSION.ID_TASK.eq(Tables.TASK.ID))
+				.on(Tables.TASK_PERMISSION.TASK_ID.eq(Tables.TASK.ID))
 				.groupBy(Tables.TASK.CREATED_DATE)
 				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
 				.offset((pageNumber - 1) * pageSize)
@@ -214,7 +214,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.leftOuterJoin(Tables.TASK_PERMISSION_PRINCIPAL)
 				.on(Tables.TASK_PERMISSION.ID.eq(
 						Tables.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID))
-				.where(Tables.TASK_PERMISSION.ID_TASK.eq(taskId))
+				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
 				.fetchGroups(Tables.TASK_PERMISSION.TYPE,
 						(record) -> Optional.<OlympusPrincipal> ofNullable(
 								dslContext.selectFrom(Tables.GROUP)

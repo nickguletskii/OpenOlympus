@@ -109,11 +109,11 @@ public class ApproveUserRegistrationController {
 									.put("link", link).put("user", user)
 									.build());
 			user.setApprovalEmailSent(true);
-			user = this.userService.saveUser(user);
+			user = this.userService.updateUser(user);
 		} else {
 			user.setApproved(true);
 			user.setEmailConfirmationToken(null);
-			this.userService.saveUser(user);
+			this.userService.updateUser(user);
 		}
 	}
 

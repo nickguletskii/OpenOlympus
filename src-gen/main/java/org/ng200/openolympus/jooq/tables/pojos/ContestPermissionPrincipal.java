@@ -7,8 +7,8 @@ package org.ng200.openolympus.jooq.tables.pojos;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.ng200.openolympus.jooq.tables.interfaces.IContestPermissionPrincipal;
 
@@ -25,43 +25,32 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermissionPrincipal;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "contest_permission_principal", schema = "public")
+@Table(name = "contest_permission_principal", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"contest_permission_id", "principal_id"})
+})
 public class ContestPermissionPrincipal implements IContestPermissionPrincipal {
 
-	private static final long serialVersionUID = -723070328;
+	private static final long serialVersionUID = 1547755360;
 
-	private Integer principalId;
-	private Long    contestPermissionId;
+	private Long contestPermissionId;
+	private Long principalId;
 
 	public ContestPermissionPrincipal() {}
 
 	public ContestPermissionPrincipal(ContestPermissionPrincipal value) {
-		this.principalId = value.principalId;
 		this.contestPermissionId = value.contestPermissionId;
+		this.principalId = value.principalId;
 	}
 
 	public ContestPermissionPrincipal(
-		Integer principalId,
-		Long    contestPermissionId
+		Long contestPermissionId,
+		Long principalId
 	) {
-		this.principalId = principalId;
 		this.contestPermissionId = contestPermissionId;
-	}
-
-	@Column(name = "principal_id", precision = 32)
-	@Override
-	public Integer getPrincipalId() {
-		return this.principalId;
-	}
-
-	@Override
-	public ContestPermissionPrincipal setPrincipalId(Integer principalId) {
 		this.principalId = principalId;
-		return this;
 	}
 
-	@Id
-	@Column(name = "contest_permission_id", unique = true, nullable = false, precision = 64)
+	@Column(name = "contest_permission_id", nullable = false, precision = 64)
 	@Override
 	public Long getContestPermissionId() {
 		return this.contestPermissionId;
@@ -70,6 +59,18 @@ public class ContestPermissionPrincipal implements IContestPermissionPrincipal {
 	@Override
 	public ContestPermissionPrincipal setContestPermissionId(Long contestPermissionId) {
 		this.contestPermissionId = contestPermissionId;
+		return this;
+	}
+
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	@Override
+	public Long getPrincipalId() {
+		return this.principalId;
+	}
+
+	@Override
+	public ContestPermissionPrincipal setPrincipalId(Long principalId) {
+		this.principalId = principalId;
 		return this;
 	}
 
@@ -82,8 +83,8 @@ public class ContestPermissionPrincipal implements IContestPermissionPrincipal {
 	 */
 	@Override
 	public void from(IContestPermissionPrincipal from) {
-		setPrincipalId(from.getPrincipalId());
 		setContestPermissionId(from.getContestPermissionId());
+		setPrincipalId(from.getPrincipalId());
 	}
 
 	/**

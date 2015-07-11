@@ -34,7 +34,7 @@ import org.ng200.openolympus.jooq.tables.records.UserRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User extends TableImpl<UserRecord> {
 
-	private static final long serialVersionUID = -10502993;
+	private static final long serialVersionUID = 1741550907;
 
 	/**
 	 * The reference instance of <code>public.USER</code>
@@ -219,7 +219,7 @@ public class User extends TableImpl<UserRecord> {
 	 */
 	@Override
 	public UniqueKey<UserRecord> getPrimaryKey() {
-		return Keys.USERS_PKEY;
+		return Keys.USER_PK;
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class User extends TableImpl<UserRecord> {
 	 */
 	@Override
 	public List<UniqueKey<UserRecord>> getKeys() {
-		return Arrays.<UniqueKey<UserRecord>>asList(Keys.USERS_PKEY, Keys.UK_R43AF9AP4EDM43MMTQ01ODDJ6);
+		return Arrays.<UniqueKey<UserRecord>>asList(Keys.USER_PK, Keys.UK_R43AF9AP4EDM43MMTQ01ODDJ6);
 	}
 
 	/**

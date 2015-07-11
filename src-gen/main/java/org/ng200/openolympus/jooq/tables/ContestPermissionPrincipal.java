@@ -33,7 +33,7 @@ import org.ng200.openolympus.jooq.tables.records.ContestPermissionPrincipalRecor
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ContestPermissionPrincipal extends TableImpl<ContestPermissionPrincipalRecord> {
 
-	private static final long serialVersionUID = 1546935218;
+	private static final long serialVersionUID = -1761259019;
 
 	/**
 	 * The reference instance of <code>public.contest_permission_principal</code>
@@ -49,14 +49,14 @@ public class ContestPermissionPrincipal extends TableImpl<ContestPermissionPrinc
 	}
 
 	/**
-	 * The column <code>public.contest_permission_principal.principal_id</code>.
-	 */
-	public final TableField<ContestPermissionPrincipalRecord, Integer> PRINCIPAL_ID = createField("principal_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
 	 * The column <code>public.contest_permission_principal.contest_permission_id</code>.
 	 */
 	public final TableField<ContestPermissionPrincipalRecord, Long> CONTEST_PERMISSION_ID = createField("contest_permission_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+	/**
+	 * The column <code>public.contest_permission_principal.principal_id</code>.
+	 */
+	public final TableField<ContestPermissionPrincipalRecord, Long> PRINCIPAL_ID = createField("principal_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * Create a <code>public.contest_permission_principal</code> table reference
@@ -101,7 +101,7 @@ public class ContestPermissionPrincipal extends TableImpl<ContestPermissionPrinc
 	 */
 	@Override
 	public List<ForeignKey<ContestPermissionPrincipalRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<ContestPermissionPrincipalRecord, ?>>asList(Keys.CONTEST_PERMISSION_PRINCIPAL__CONTEST_PERMISSION_FK);
+		return Arrays.<ForeignKey<ContestPermissionPrincipalRecord, ?>>asList(Keys.CONTEST_PERMISSION_PRINCIPAL__CONTEST_PERMISSION_FK, Keys.CONTEST_PERMISSION_PRINCIPAL__PRINCIPAL_FK);
 	}
 
 	/**

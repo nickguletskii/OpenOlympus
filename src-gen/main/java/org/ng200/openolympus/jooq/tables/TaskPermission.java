@@ -35,7 +35,7 @@ import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TaskPermission extends TableImpl<TaskPermissionRecord> {
 
-	private static final long serialVersionUID = 290166423;
+	private static final long serialVersionUID = -1391926781;
 
 	/**
 	 * The reference instance of <code>public.task_permission</code>
@@ -61,9 +61,9 @@ public class TaskPermission extends TableImpl<TaskPermissionRecord> {
 	public final TableField<TaskPermissionRecord, TaskPermissionType> TYPE = createField("type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(org.ng200.openolympus.jooq.enums.TaskPermissionType.class), this, "");
 
 	/**
-	 * The column <code>public.task_permission.id_task</code>.
+	 * The column <code>public.task_permission.task_id</code>.
 	 */
-	public final TableField<TaskPermissionRecord, Integer> ID_TASK = createField("id_task", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<TaskPermissionRecord, Integer> TASK_ID = createField("task_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>public.task_permission</code> table reference

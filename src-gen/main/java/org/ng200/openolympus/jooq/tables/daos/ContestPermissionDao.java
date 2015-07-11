@@ -72,10 +72,10 @@ public class ContestPermissionDao extends DAOImpl<ContestPermissionRecord, org.n
 	}
 
 	/**
-	 * Fetch records that have <code>id_contest IN (values)</code>
+	 * Fetch records that have <code>contest_id IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByIdContest(Integer... values) {
-		return fetch(ContestPermission.CONTEST_PERMISSION.ID_CONTEST, values);
+	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByContestId(Integer... values) {
+		return fetch(ContestPermission.CONTEST_PERMISSION.CONTEST_ID, values);
 	}
 	public org.ng200.openolympus.jooq.tables.pojos.ContestPermission fetchOneById(String id) {
 		return fetchOneById(java.lang.Long.valueOf(id));

@@ -35,7 +35,7 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
 @Table(name = "contest_permission", schema = "public")
 public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissionRecord> implements Record3<Long, ContestPermissionType, Integer>, IContestPermission {
 
-	private static final long serialVersionUID = 1272245471;
+	private static final long serialVersionUID = -1387965813;
 
 	/**
 	 * Setter for <code>public.contest_permission.id</code>.
@@ -75,20 +75,20 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	}
 
 	/**
-	 * Setter for <code>public.contest_permission.id_contest</code>.
+	 * Setter for <code>public.contest_permission.contest_id</code>.
 	 */
 	@Override
-	public ContestPermissionRecord setIdContest(Integer value) {
+	public ContestPermissionRecord setContestId(Integer value) {
 		setValue(2, value);
 		return this;
 	}
 
 	/**
-	 * Getter for <code>public.contest_permission.id_contest</code>.
+	 * Getter for <code>public.contest_permission.contest_id</code>.
 	 */
-	@Column(name = "id_contest", precision = 32)
+	@Column(name = "contest_id", precision = 32)
 	@Override
-	public Integer getIdContest() {
+	public Integer getContestId() {
 		return (Integer) getValue(2);
 	}
 
@@ -145,7 +145,7 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 */
 	@Override
 	public Field<Integer> field3() {
-		return ContestPermission.CONTEST_PERMISSION.ID_CONTEST;
+		return ContestPermission.CONTEST_PERMISSION.CONTEST_ID;
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 */
 	@Override
 	public Integer value3() {
-		return getIdContest();
+		return getContestId();
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 */
 	@Override
 	public ContestPermissionRecord value3(Integer value) {
-		setIdContest(value);
+		setContestId(value);
 		return this;
 	}
 
@@ -221,7 +221,7 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	public void from(IContestPermission from) {
 		setId(from.getId());
 		setType(from.getType());
-		setIdContest(from.getIdContest());
+		setContestId(from.getContestId());
 	}
 
 	/**
@@ -247,11 +247,11 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	/**
 	 * Create a detached, initialised ContestPermissionRecord
 	 */
-	public ContestPermissionRecord(Long id, ContestPermissionType type, Integer idContest) {
+	public ContestPermissionRecord(Long id, ContestPermissionType type, Integer contestId) {
 		super(ContestPermission.CONTEST_PERMISSION);
 
 		setValue(0, id);
 		setValue(1, type);
-		setValue(2, idContest);
+		setValue(2, contestId);
 	}
 }

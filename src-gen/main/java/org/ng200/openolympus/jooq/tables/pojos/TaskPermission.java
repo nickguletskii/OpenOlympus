@@ -29,28 +29,28 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
 @Table(name = "task_permission", schema = "public")
 public class TaskPermission implements ITaskPermission {
 
-	private static final long serialVersionUID = -19862864;
+	private static final long serialVersionUID = -1847224124;
 
 	private Long               id;
 	private TaskPermissionType type;
-	private Integer            idTask;
+	private Integer            taskId;
 
 	public TaskPermission() {}
 
 	public TaskPermission(TaskPermission value) {
 		this.id = value.id;
 		this.type = value.type;
-		this.idTask = value.idTask;
+		this.taskId = value.taskId;
 	}
 
 	public TaskPermission(
 		Long               id,
 		TaskPermissionType type,
-		Integer            idTask
+		Integer            taskId
 	) {
 		this.id = id;
 		this.type = type;
-		this.idTask = idTask;
+		this.taskId = taskId;
 	}
 
 	@Id
@@ -78,15 +78,15 @@ public class TaskPermission implements ITaskPermission {
 		return this;
 	}
 
-	@Column(name = "id_task", precision = 32)
+	@Column(name = "task_id", precision = 32)
 	@Override
-	public Integer getIdTask() {
-		return this.idTask;
+	public Integer getTaskId() {
+		return this.taskId;
 	}
 
 	@Override
-	public TaskPermission setIdTask(Integer idTask) {
-		this.idTask = idTask;
+	public TaskPermission setTaskId(Integer taskId) {
+		this.taskId = taskId;
 		return this;
 	}
 
@@ -101,7 +101,7 @@ public class TaskPermission implements ITaskPermission {
 	public void from(ITaskPermission from) {
 		setId(from.getId());
 		setType(from.getType());
-		setIdTask(from.getIdTask());
+		setTaskId(from.getTaskId());
 	}
 
 	/**

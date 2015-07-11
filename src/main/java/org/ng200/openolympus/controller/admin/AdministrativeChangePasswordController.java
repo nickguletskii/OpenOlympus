@@ -62,7 +62,7 @@ public class AdministrativeChangePasswordController {
 
 		user.setPassword(this.passwordEncoder.encode(passwordChangeDto
 				.getPassword()));
-		this.userService.saveUser(user);
+		this.userService.updateUser(user);
 		return BindingResponse.OK;
 	}
 

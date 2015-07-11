@@ -7,11 +7,10 @@ package org.ng200.openolympus.jooq.tables.records;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.jooq.Field;
-import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Row2;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -31,45 +30,46 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermissionPrincipal;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "contest_permission_principal", schema = "public")
-public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<ContestPermissionPrincipalRecord> implements Record2<Integer, Long>, IContestPermissionPrincipal {
+@Table(name = "contest_permission_principal", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"contest_permission_id", "principal_id"})
+})
+public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<ContestPermissionPrincipalRecord> implements Record2<Long, Long>, IContestPermissionPrincipal {
 
-	private static final long serialVersionUID = -925866219;
-
-	/**
-	 * Setter for <code>public.contest_permission_principal.principal_id</code>.
-	 */
-	@Override
-	public ContestPermissionPrincipalRecord setPrincipalId(Integer value) {
-		setValue(0, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.contest_permission_principal.principal_id</code>.
-	 */
-	@Column(name = "principal_id", precision = 32)
-	@Override
-	public Integer getPrincipalId() {
-		return (Integer) getValue(0);
-	}
+	private static final long serialVersionUID = -410927814;
 
 	/**
 	 * Setter for <code>public.contest_permission_principal.contest_permission_id</code>.
 	 */
 	@Override
 	public ContestPermissionPrincipalRecord setContestPermissionId(Long value) {
-		setValue(1, value);
+		setValue(0, value);
 		return this;
 	}
 
 	/**
 	 * Getter for <code>public.contest_permission_principal.contest_permission_id</code>.
 	 */
-	@Id
-	@Column(name = "contest_permission_id", unique = true, nullable = false, precision = 64)
+	@Column(name = "contest_permission_id", nullable = false, precision = 64)
 	@Override
 	public Long getContestPermissionId() {
+		return (Long) getValue(0);
+	}
+
+	/**
+	 * Setter for <code>public.contest_permission_principal.principal_id</code>.
+	 */
+	@Override
+	public ContestPermissionPrincipalRecord setPrincipalId(Long value) {
+		setValue(1, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.contest_permission_principal.principal_id</code>.
+	 */
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	@Override
+	public Long getPrincipalId() {
 		return (Long) getValue(1);
 	}
 
@@ -81,8 +81,8 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Record1<Long> key() {
-		return (Record1) super.key();
+	public Record2<Long, Long> key() {
+		return (Record2) super.key();
 	}
 
 	// -------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row2<Integer, Long> fieldsRow() {
+	public Row2<Long, Long> fieldsRow() {
 		return (Row2) super.fieldsRow();
 	}
 
@@ -101,7 +101,7 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row2<Integer, Long> valuesRow() {
+	public Row2<Long, Long> valuesRow() {
 		return (Row2) super.valuesRow();
 	}
 
@@ -109,15 +109,7 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Field<Integer> field1() {
-		return ContestPermissionPrincipal.CONTEST_PERMISSION_PRINCIPAL.PRINCIPAL_ID;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Field<Long> field2() {
+	public Field<Long> field1() {
 		return ContestPermissionPrincipal.CONTEST_PERMISSION_PRINCIPAL.CONTEST_PERMISSION_ID;
 	}
 
@@ -125,15 +117,15 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Integer value1() {
-		return getPrincipalId();
+	public Field<Long> field2() {
+		return ContestPermissionPrincipal.CONTEST_PERMISSION_PRINCIPAL.PRINCIPAL_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Long value2() {
+	public Long value1() {
 		return getContestPermissionId();
 	}
 
@@ -141,16 +133,15 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionPrincipalRecord value1(Integer value) {
-		setPrincipalId(value);
-		return this;
+	public Long value2() {
+		return getPrincipalId();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionPrincipalRecord value2(Long value) {
+	public ContestPermissionPrincipalRecord value1(Long value) {
 		setContestPermissionId(value);
 		return this;
 	}
@@ -159,7 +150,16 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionPrincipalRecord values(Integer value1, Long value2) {
+	public ContestPermissionPrincipalRecord value2(Long value) {
+		setPrincipalId(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ContestPermissionPrincipalRecord values(Long value1, Long value2) {
 		value1(value1);
 		value2(value2);
 		return this;
@@ -174,8 +174,8 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	 */
 	@Override
 	public void from(IContestPermissionPrincipal from) {
-		setPrincipalId(from.getPrincipalId());
 		setContestPermissionId(from.getContestPermissionId());
+		setPrincipalId(from.getPrincipalId());
 	}
 
 	/**
@@ -201,10 +201,10 @@ public class ContestPermissionPrincipalRecord extends UpdatableRecordImpl<Contes
 	/**
 	 * Create a detached, initialised ContestPermissionPrincipalRecord
 	 */
-	public ContestPermissionPrincipalRecord(Integer principalId, Long contestPermissionId) {
+	public ContestPermissionPrincipalRecord(Long contestPermissionId, Long principalId) {
 		super(ContestPermissionPrincipal.CONTEST_PERMISSION_PRINCIPAL);
 
-		setValue(0, principalId);
-		setValue(1, contestPermissionId);
+		setValue(0, contestPermissionId);
+		setValue(1, principalId);
 	}
 }

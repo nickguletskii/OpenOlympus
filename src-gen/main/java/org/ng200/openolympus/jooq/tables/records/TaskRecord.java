@@ -14,8 +14,8 @@ import javax.persistence.Table;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record5;
-import org.jooq.Row5;
+import org.jooq.Record6;
+import org.jooq.Row6;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.ng200.openolympus.jooq.tables.Task;
 import org.ng200.openolympus.jooq.tables.interfaces.ITask;
@@ -34,9 +34,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITask;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "task", schema = "public")
-public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Record5<Integer, String, String, String, LocalDateTime>, ITask {
+public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Record6<Integer, String, String, String, LocalDateTime, Long>, ITask {
 
-	private static final long serialVersionUID = -704882738;
+	private static final long serialVersionUID = -1784963666;
 
 	/**
 	 * Setter for <code>public.task.id</code>.
@@ -129,6 +129,24 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 		return (LocalDateTime) getValue(4);
 	}
 
+	/**
+	 * Setter for <code>public.task.owner_id</code>.
+	 */
+	@Override
+	public TaskRecord setOwnerId(Long value) {
+		setValue(5, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.task.owner_id</code>.
+	 */
+	@Column(name = "owner_id", precision = 64)
+	@Override
+	public Long getOwnerId() {
+		return (Long) getValue(5);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -142,23 +160,23 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 	}
 
 	// -------------------------------------------------------------------------
-	// Record5 type implementation
+	// Record6 type implementation
 	// -------------------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row5<Integer, String, String, String, LocalDateTime> fieldsRow() {
-		return (Row5) super.fieldsRow();
+	public Row6<Integer, String, String, String, LocalDateTime, Long> fieldsRow() {
+		return (Row6) super.fieldsRow();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row5<Integer, String, String, String, LocalDateTime> valuesRow() {
-		return (Row5) super.valuesRow();
+	public Row6<Integer, String, String, String, LocalDateTime, Long> valuesRow() {
+		return (Row6) super.valuesRow();
 	}
 
 	/**
@@ -205,6 +223,14 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Field<Long> field6() {
+		return Task.TASK.OWNER_ID;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Integer value1() {
 		return getId();
 	}
@@ -239,6 +265,14 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 	@Override
 	public LocalDateTime value5() {
 		return getCreatedDate();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Long value6() {
+		return getOwnerId();
 	}
 
 	/**
@@ -290,12 +324,22 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskRecord values(Integer value1, String value2, String value3, String value4, LocalDateTime value5) {
+	public TaskRecord value6(Long value) {
+		setOwnerId(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TaskRecord values(Integer value1, String value2, String value3, String value4, LocalDateTime value5, Long value6) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
 		value4(value4);
 		value5(value5);
+		value6(value6);
 		return this;
 	}
 
@@ -313,6 +357,7 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 		setName(from.getName());
 		setTaskLocation(from.getTaskLocation());
 		setCreatedDate(from.getCreatedDate());
+		setOwnerId(from.getOwnerId());
 	}
 
 	/**
@@ -338,7 +383,7 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 	/**
 	 * Create a detached, initialised TaskRecord
 	 */
-	public TaskRecord(Integer id, String descriptionFile, String name, String taskLocation, LocalDateTime createdDate) {
+	public TaskRecord(Integer id, String descriptionFile, String name, String taskLocation, LocalDateTime createdDate, Long ownerId) {
 		super(Task.TASK);
 
 		setValue(0, id);
@@ -346,5 +391,6 @@ public class TaskRecord extends UpdatableRecordImpl<TaskRecord> implements Recor
 		setValue(2, name);
 		setValue(3, taskLocation);
 		setValue(4, createdDate);
+		setValue(5, ownerId);
 	}
 }

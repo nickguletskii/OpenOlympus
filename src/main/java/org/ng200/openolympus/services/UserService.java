@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.ImmutableList;
 
 @Service
-public class UserService {
+public class UserService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private UserDao userDao;
@@ -102,15 +102,15 @@ public class UserService {
 				.from(Tables.USER)
 				.where(
 
-				Tables.USER.USERNAME.like(pattern)
-						.or(Tables.USER.FIRST_NAME_MAIN.like(pattern))
-						.or(Tables.USER.MIDDLE_NAME_MAIN.like(pattern))
-						.or(Tables.USER.LAST_NAME_MAIN.like(pattern))
-						.or(Tables.USER.FIRST_NAME_LOCALISED.like(pattern))
-						.or(Tables.USER.MIDDLE_NAME_LOCALISED.like(pattern))
-						.or(Tables.USER.LAST_NAME_LOCALISED.like(pattern))
+		Tables.USER.USERNAME.like(pattern)
+				.or(Tables.USER.FIRST_NAME_MAIN.like(pattern))
+				.or(Tables.USER.MIDDLE_NAME_MAIN.like(pattern))
+				.or(Tables.USER.LAST_NAME_MAIN.like(pattern))
+				.or(Tables.USER.FIRST_NAME_LOCALISED.like(pattern))
+				.or(Tables.USER.MIDDLE_NAME_LOCALISED.like(pattern))
+				.or(Tables.USER.LAST_NAME_LOCALISED.like(pattern))
 
-				).limit(30).fetchInto(User.class);
+		).limit(30).fetchInto(User.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
@@ -130,23 +130,26 @@ public class UserService {
 						Tables.SOLUTION.SCORE)
 				.orderBy(Tables.SOLUTION.USER_ID.asc(),
 						Tables.SOLUTION.TASK_ID.asc(),
-						Tables.SOLUTION.SCORE.desc()).asTable("users_tasks");
+						Tables.SOLUTION.SCORE.desc())
+				.asTable("users_tasks");
 
 		final Field<BigDecimal> user_score = DSL
 				.coalesce(DSL.sum(userTasks.field(Tables.SOLUTION.SCORE)),
-						DSL.field("0")).as("user_score");
+						DSL.field("0"))
+				.as("user_score");
 		List<Field<?>> fields = ImmutableList
 				.<Field<?>> builder()
 				.add(user_score)
 				.add(
 
-				DSL.rank()
-						.over(DSL.orderBy(DSL.coalesce(
-								DSL.sum(userTasks.field(Tables.SOLUTION.SCORE)),
-								DSL.field("0")))).as("rank"))
+		DSL.rank()
+				.over(DSL.orderBy(DSL.coalesce(
+						DSL.sum(userTasks.field(Tables.SOLUTION.SCORE)),
+						DSL.field("0"))))
+				.as("rank"))
 				.add(Tables.USER.fields())
 
-				.build();
+		.build();
 		return dslContext
 				.select(fields)
 				.from(Tables.USER)
@@ -182,11 +185,11 @@ public class UserService {
 				.offset(pageSize * (pageNumber - 1)).fetchInto(User.class);
 	}
 
-	public User saveUser(User user) {
-		UserRecord userRecord = dslContext.newRecord(Tables.USER);
-		userRecord.from(user);
-		userRecord.store();
-		userRecord.into(user);
-		return user;
+	public User insertUser(User user) {
+		return insert(user, Tables.USER);
+	}
+
+	public User updateUser(User user) {
+		return update(user, Tables.USER);
 	}
 }

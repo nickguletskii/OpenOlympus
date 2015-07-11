@@ -47,20 +47,20 @@ public class ContestTasksDao extends DAOImpl<ContestTasksRecord, org.ng200.openo
 	 */
 	@Override
 	protected Record2<Integer, Integer> getId(org.ng200.openolympus.jooq.tables.pojos.ContestTasks object) {
-		return compositeKeyRecord(object.getIdContest(), object.getIdTask());
+		return compositeKeyRecord(object.getContestId(), object.getTaskId());
 	}
 
 	/**
-	 * Fetch records that have <code>id_contest IN (values)</code>
+	 * Fetch records that have <code>contest_id IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.ContestTasks> fetchByIdContest(Integer... values) {
-		return fetch(ContestTasks.CONTEST_TASKS.ID_CONTEST, values);
+	public List<org.ng200.openolympus.jooq.tables.pojos.ContestTasks> fetchByContestId(Integer... values) {
+		return fetch(ContestTasks.CONTEST_TASKS.CONTEST_ID, values);
 	}
 
 	/**
-	 * Fetch records that have <code>id_task IN (values)</code>
+	 * Fetch records that have <code>task_id IN (values)</code>
 	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.ContestTasks> fetchByIdTask(Integer... values) {
-		return fetch(ContestTasks.CONTEST_TASKS.ID_TASK, values);
+	public List<org.ng200.openolympus.jooq.tables.pojos.ContestTasks> fetchByTaskId(Integer... values) {
+		return fetch(ContestTasks.CONTEST_TASKS.TASK_ID, values);
 	}
 }

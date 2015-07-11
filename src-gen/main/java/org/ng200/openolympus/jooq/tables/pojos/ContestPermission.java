@@ -29,28 +29,28 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
 @Table(name = "contest_permission", schema = "public")
 public class ContestPermission implements IContestPermission {
 
-	private static final long serialVersionUID = -1640189065;
+	private static final long serialVersionUID = -1613640367;
 
 	private Long                  id;
 	private ContestPermissionType type;
-	private Integer               idContest;
+	private Integer               contestId;
 
 	public ContestPermission() {}
 
 	public ContestPermission(ContestPermission value) {
 		this.id = value.id;
 		this.type = value.type;
-		this.idContest = value.idContest;
+		this.contestId = value.contestId;
 	}
 
 	public ContestPermission(
 		Long                  id,
 		ContestPermissionType type,
-		Integer               idContest
+		Integer               contestId
 	) {
 		this.id = id;
 		this.type = type;
-		this.idContest = idContest;
+		this.contestId = contestId;
 	}
 
 	@Id
@@ -78,15 +78,15 @@ public class ContestPermission implements IContestPermission {
 		return this;
 	}
 
-	@Column(name = "id_contest", precision = 32)
+	@Column(name = "contest_id", precision = 32)
 	@Override
-	public Integer getIdContest() {
-		return this.idContest;
+	public Integer getContestId() {
+		return this.contestId;
 	}
 
 	@Override
-	public ContestPermission setIdContest(Integer idContest) {
-		this.idContest = idContest;
+	public ContestPermission setContestId(Integer contestId) {
+		this.contestId = contestId;
 		return this;
 	}
 
@@ -101,7 +101,7 @@ public class ContestPermission implements IContestPermission {
 	public void from(IContestPermission from) {
 		setId(from.getId());
 		setType(from.getType());
-		setIdContest(from.getIdContest());
+		setContestId(from.getContestId());
 	}
 
 	/**

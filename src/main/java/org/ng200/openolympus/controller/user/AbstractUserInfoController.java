@@ -59,7 +59,7 @@ public class AbstractUserInfoController {
 		user.setMobile(userInfoDto.getMobile());
 		user.setSchool(userInfoDto.getSchool());
 		user.setBirthDate(new Timestamp(userInfoDto.getDateOfBirth().getTime()));
-		this.userService.saveUser(user);
+		this.userService.updateUser(user);
 	}
 
 	public void initialiseDTO(final UserInfoDto userInfoDto, final User user) {

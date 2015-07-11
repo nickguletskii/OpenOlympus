@@ -9,8 +9,8 @@ import java.io.Serializable;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 
 /**
@@ -25,19 +25,10 @@ import javax.persistence.Table;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "contest_permission_principal", schema = "public")
+@Table(name = "contest_permission_principal", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"contest_permission_id", "principal_id"})
+})
 public interface IContestPermissionPrincipal extends Serializable {
-
-	/**
-	 * Setter for <code>public.contest_permission_principal.principal_id</code>.
-	 */
-	public IContestPermissionPrincipal setPrincipalId(Integer value);
-
-	/**
-	 * Getter for <code>public.contest_permission_principal.principal_id</code>.
-	 */
-	@Column(name = "principal_id", precision = 32)
-	public Integer getPrincipalId();
 
 	/**
 	 * Setter for <code>public.contest_permission_principal.contest_permission_id</code>.
@@ -47,9 +38,19 @@ public interface IContestPermissionPrincipal extends Serializable {
 	/**
 	 * Getter for <code>public.contest_permission_principal.contest_permission_id</code>.
 	 */
-	@Id
-	@Column(name = "contest_permission_id", unique = true, nullable = false, precision = 64)
+	@Column(name = "contest_permission_id", nullable = false, precision = 64)
 	public Long getContestPermissionId();
+
+	/**
+	 * Setter for <code>public.contest_permission_principal.principal_id</code>.
+	 */
+	public IContestPermissionPrincipal setPrincipalId(Long value);
+
+	/**
+	 * Getter for <code>public.contest_permission_principal.principal_id</code>.
+	 */
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	public Long getPrincipalId();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

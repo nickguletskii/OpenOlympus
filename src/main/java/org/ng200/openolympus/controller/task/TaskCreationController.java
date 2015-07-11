@@ -24,11 +24,9 @@ package org.ng200.openolympus.controller.task;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
-
-import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.ng200.openolympus.FileAccess;
@@ -40,7 +38,10 @@ import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.TaskValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +49,6 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
@@ -57,36 +57,41 @@ import com.google.common.collect.ImmutableMap;
 public class TaskCreationController extends
 		TaskFilesystemManipulatingController {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(TaskCreationController.class);
 	@Autowired
 	private TaskValidator taskValidator;
 
 	@Autowired
 	private TaskService taskService;
+
 	@Autowired
 	private StorageService storageService;
 
+	@Autowired
+	private UserService userService;
+
 	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
-	@ResponseBody
-	public Callable<BindingResponse> createTaskAsync(
-			@Valid final TaskCreationDto taskCreationDto,
-			final BindingResult bindingResult) throws Throwable {
-		return () -> {
-			return createTask(taskCreationDto, bindingResult);
-		};
-	}
-
 	@Transactional
 	private BindingResponse createTask(final TaskCreationDto taskCreationDto,
-			final BindingResult bindingResult)
+			final BindingResult bindingResult, Principal principal)
 					throws IOException, BindException {
 		this.taskValidator.validate(taskCreationDto, bindingResult, null,
 				false);
+
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
+		Long ownerId = userService.getUserByUsername(principal.getName())
+				.getId();
+
+		logger.info("Owner id: {}", ownerId);
+
 		Task task = new Task().setName(taskCreationDto.getName())
-				.setCreatedDate(LocalDateTime.now());
+				.setCreatedDate(LocalDateTime.now())
+				.setOwnerId(ownerId);
+
 		final Path localDescriptionFile = this.storageService
 				.createTaskDescriptionFileStorage(task);
 		final Path judgeDir = this.storageService

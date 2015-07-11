@@ -86,6 +86,17 @@ public interface IContest extends Serializable {
 	@Column(name = "start_time")
 	public Timestamp getStartTime();
 
+	/**
+	 * Setter for <code>public.contest.owner</code>.
+	 */
+	public IContest setOwner(Long value);
+
+	/**
+	 * Getter for <code>public.contest.owner</code>.
+	 */
+	@Column(name = "owner", precision = 64)
+	public Long getOwner();
+
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------

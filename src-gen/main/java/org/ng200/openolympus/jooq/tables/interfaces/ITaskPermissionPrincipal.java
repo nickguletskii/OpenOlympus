@@ -9,8 +9,8 @@ import java.io.Serializable;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 
 /**
@@ -25,19 +25,10 @@ import javax.persistence.Table;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "task_permission_principal", schema = "public")
+@Table(name = "task_permission_principal", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"task_permission_id", "principal_id"})
+})
 public interface ITaskPermissionPrincipal extends Serializable {
-
-	/**
-	 * Setter for <code>public.task_permission_principal.principal_id</code>.
-	 */
-	public ITaskPermissionPrincipal setPrincipalId(Long value);
-
-	/**
-	 * Getter for <code>public.task_permission_principal.principal_id</code>.
-	 */
-	@Column(name = "principal_id", precision = 64)
-	public Long getPrincipalId();
 
 	/**
 	 * Setter for <code>public.task_permission_principal.task_permission_id</code>.
@@ -47,9 +38,19 @@ public interface ITaskPermissionPrincipal extends Serializable {
 	/**
 	 * Getter for <code>public.task_permission_principal.task_permission_id</code>.
 	 */
-	@Id
-	@Column(name = "task_permission_id", unique = true, nullable = false, precision = 64)
+	@Column(name = "task_permission_id", nullable = false, precision = 64)
 	public Long getTaskPermissionId();
+
+	/**
+	 * Setter for <code>public.task_permission_principal.principal_id</code>.
+	 */
+	public ITaskPermissionPrincipal setPrincipalId(Long value);
+
+	/**
+	 * Getter for <code>public.task_permission_principal.principal_id</code>.
+	 */
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	public Long getPrincipalId();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

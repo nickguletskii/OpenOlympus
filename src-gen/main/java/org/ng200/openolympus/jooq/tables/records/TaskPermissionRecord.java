@@ -35,7 +35,7 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
 @Table(name = "task_permission", schema = "public")
 public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionRecord> implements Record3<Long, TaskPermissionType, Integer>, ITaskPermission {
 
-	private static final long serialVersionUID = -813696158;
+	private static final long serialVersionUID = 832483594;
 
 	/**
 	 * Setter for <code>public.task_permission.id</code>.
@@ -75,20 +75,20 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	}
 
 	/**
-	 * Setter for <code>public.task_permission.id_task</code>.
+	 * Setter for <code>public.task_permission.task_id</code>.
 	 */
 	@Override
-	public TaskPermissionRecord setIdTask(Integer value) {
+	public TaskPermissionRecord setTaskId(Integer value) {
 		setValue(2, value);
 		return this;
 	}
 
 	/**
-	 * Getter for <code>public.task_permission.id_task</code>.
+	 * Getter for <code>public.task_permission.task_id</code>.
 	 */
-	@Column(name = "id_task", precision = 32)
+	@Column(name = "task_id", precision = 32)
 	@Override
-	public Integer getIdTask() {
+	public Integer getTaskId() {
 		return (Integer) getValue(2);
 	}
 
@@ -145,7 +145,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Override
 	public Field<Integer> field3() {
-		return TaskPermission.TASK_PERMISSION.ID_TASK;
+		return TaskPermission.TASK_PERMISSION.TASK_ID;
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Override
 	public Integer value3() {
-		return getIdTask();
+		return getTaskId();
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Override
 	public TaskPermissionRecord value3(Integer value) {
-		setIdTask(value);
+		setTaskId(value);
 		return this;
 	}
 
@@ -221,7 +221,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	public void from(ITaskPermission from) {
 		setId(from.getId());
 		setType(from.getType());
-		setIdTask(from.getIdTask());
+		setTaskId(from.getTaskId());
 	}
 
 	/**
@@ -247,11 +247,11 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	/**
 	 * Create a detached, initialised TaskPermissionRecord
 	 */
-	public TaskPermissionRecord(Long id, TaskPermissionType type, Integer idTask) {
+	public TaskPermissionRecord(Long id, TaskPermissionType type, Integer taskId) {
 		super(TaskPermission.TASK_PERMISSION);
 
 		setValue(0, id);
 		setValue(1, type);
-		setValue(2, idTask);
+		setValue(2, taskId);
 	}
 }

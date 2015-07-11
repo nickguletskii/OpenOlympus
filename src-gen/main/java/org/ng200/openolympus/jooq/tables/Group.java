@@ -33,7 +33,7 @@ import org.ng200.openolympus.jooq.tables.records.GroupRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Group extends TableImpl<GroupRecord> {
 
-	private static final long serialVersionUID = -1490552171;
+	private static final long serialVersionUID = 1254930255;
 
 	/**
 	 * The reference instance of <code>public.group</code>
@@ -93,7 +93,7 @@ public class Group extends TableImpl<GroupRecord> {
 	 */
 	@Override
 	public UniqueKey<GroupRecord> getPrimaryKey() {
-		return Keys.PRIMARY_KEY;
+		return Keys.GROUP_PK;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class Group extends TableImpl<GroupRecord> {
 	 */
 	@Override
 	public List<UniqueKey<GroupRecord>> getKeys() {
-		return Arrays.<UniqueKey<GroupRecord>>asList(Keys.PRIMARY_KEY, Keys.GROUP_NAME_UNIQUE);
+		return Arrays.<UniqueKey<GroupRecord>>asList(Keys.GROUP_PK, Keys.GROUP_NAME_UNIQUE);
 	}
 
 	/**

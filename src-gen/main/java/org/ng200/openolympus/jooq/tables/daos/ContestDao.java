@@ -99,6 +99,13 @@ public class ContestDao extends DAOImpl<ContestRecord, org.ng200.openolympus.joo
 	public List<org.ng200.openolympus.jooq.tables.pojos.Contest> fetchByStartTime(Timestamp... values) {
 		return fetch(Contest.CONTEST.START_TIME, values);
 	}
+
+	/**
+	 * Fetch records that have <code>owner IN (values)</code>
+	 */
+	public List<org.ng200.openolympus.jooq.tables.pojos.Contest> fetchByOwner(Long... values) {
+		return fetch(Contest.CONTEST.OWNER, values);
+	}
 	public org.ng200.openolympus.jooq.tables.pojos.Contest fetchOneById(String id) {
 		return fetchOneById(java.lang.Integer.valueOf(id));
 	}

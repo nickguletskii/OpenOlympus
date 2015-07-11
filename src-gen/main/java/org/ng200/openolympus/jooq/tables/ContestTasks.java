@@ -33,7 +33,7 @@ import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ContestTasks extends TableImpl<ContestTasksRecord> {
 
-	private static final long serialVersionUID = 1439519667;
+	private static final long serialVersionUID = -1063021951;
 
 	/**
 	 * The reference instance of <code>public.contest_tasks</code>
@@ -49,14 +49,14 @@ public class ContestTasks extends TableImpl<ContestTasksRecord> {
 	}
 
 	/**
-	 * The column <code>public.contest_tasks.id_contest</code>.
+	 * The column <code>public.contest_tasks.contest_id</code>.
 	 */
-	public final TableField<ContestTasksRecord, Integer> ID_CONTEST = createField("id_contest", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<ContestTasksRecord, Integer> CONTEST_ID = createField("contest_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.contest_tasks.id_task</code>.
+	 * The column <code>public.contest_tasks.task_id</code>.
 	 */
-	public final TableField<ContestTasksRecord, Integer> ID_TASK = createField("id_task", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<ContestTasksRecord, Integer> TASK_ID = createField("task_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * Create a <code>public.contest_tasks</code> table reference

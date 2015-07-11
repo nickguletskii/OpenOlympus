@@ -7,8 +7,8 @@ package org.ng200.openolympus.jooq.tables.pojos;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermissionPrincipal;
 
@@ -25,43 +25,32 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermissionPrincipal;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "task_permission_principal", schema = "public")
+@Table(name = "task_permission_principal", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"task_permission_id", "principal_id"})
+})
 public class TaskPermissionPrincipal implements ITaskPermissionPrincipal {
 
-	private static final long serialVersionUID = 289921096;
+	private static final long serialVersionUID = -959153356;
 
-	private Long principalId;
 	private Long taskPermissionId;
+	private Long principalId;
 
 	public TaskPermissionPrincipal() {}
 
 	public TaskPermissionPrincipal(TaskPermissionPrincipal value) {
-		this.principalId = value.principalId;
 		this.taskPermissionId = value.taskPermissionId;
+		this.principalId = value.principalId;
 	}
 
 	public TaskPermissionPrincipal(
-		Long principalId,
-		Long taskPermissionId
+		Long taskPermissionId,
+		Long principalId
 	) {
-		this.principalId = principalId;
 		this.taskPermissionId = taskPermissionId;
-	}
-
-	@Column(name = "principal_id", precision = 64)
-	@Override
-	public Long getPrincipalId() {
-		return this.principalId;
-	}
-
-	@Override
-	public TaskPermissionPrincipal setPrincipalId(Long principalId) {
 		this.principalId = principalId;
-		return this;
 	}
 
-	@Id
-	@Column(name = "task_permission_id", unique = true, nullable = false, precision = 64)
+	@Column(name = "task_permission_id", nullable = false, precision = 64)
 	@Override
 	public Long getTaskPermissionId() {
 		return this.taskPermissionId;
@@ -70,6 +59,18 @@ public class TaskPermissionPrincipal implements ITaskPermissionPrincipal {
 	@Override
 	public TaskPermissionPrincipal setTaskPermissionId(Long taskPermissionId) {
 		this.taskPermissionId = taskPermissionId;
+		return this;
+	}
+
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	@Override
+	public Long getPrincipalId() {
+		return this.principalId;
+	}
+
+	@Override
+	public TaskPermissionPrincipal setPrincipalId(Long principalId) {
+		this.principalId = principalId;
 		return this;
 	}
 
@@ -82,8 +83,8 @@ public class TaskPermissionPrincipal implements ITaskPermissionPrincipal {
 	 */
 	@Override
 	public void from(ITaskPermissionPrincipal from) {
-		setPrincipalId(from.getPrincipalId());
 		setTaskPermissionId(from.getTaskPermissionId());
+		setPrincipalId(from.getPrincipalId());
 	}
 
 	/**

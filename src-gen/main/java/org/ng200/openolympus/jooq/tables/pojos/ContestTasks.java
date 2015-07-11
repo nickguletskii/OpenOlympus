@@ -26,51 +26,51 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestTasks;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest_tasks", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"id_contest", "id_task"})
+	@UniqueConstraint(columnNames = {"contest_id", "task_id"})
 })
 public class ContestTasks implements IContestTasks {
 
-	private static final long serialVersionUID = 1367550037;
+	private static final long serialVersionUID = 1369986981;
 
-	private Integer idContest;
-	private Integer idTask;
+	private Integer contestId;
+	private Integer taskId;
 
 	public ContestTasks() {}
 
 	public ContestTasks(ContestTasks value) {
-		this.idContest = value.idContest;
-		this.idTask = value.idTask;
+		this.contestId = value.contestId;
+		this.taskId = value.taskId;
 	}
 
 	public ContestTasks(
-		Integer idContest,
-		Integer idTask
+		Integer contestId,
+		Integer taskId
 	) {
-		this.idContest = idContest;
-		this.idTask = idTask;
+		this.contestId = contestId;
+		this.taskId = taskId;
 	}
 
-	@Column(name = "id_contest", nullable = false, precision = 32)
+	@Column(name = "contest_id", nullable = false, precision = 32)
 	@Override
-	public Integer getIdContest() {
-		return this.idContest;
+	public Integer getContestId() {
+		return this.contestId;
 	}
 
 	@Override
-	public ContestTasks setIdContest(Integer idContest) {
-		this.idContest = idContest;
+	public ContestTasks setContestId(Integer contestId) {
+		this.contestId = contestId;
 		return this;
 	}
 
-	@Column(name = "id_task", nullable = false, precision = 32)
+	@Column(name = "task_id", nullable = false, precision = 32)
 	@Override
-	public Integer getIdTask() {
-		return this.idTask;
+	public Integer getTaskId() {
+		return this.taskId;
 	}
 
 	@Override
-	public ContestTasks setIdTask(Integer idTask) {
-		this.idTask = idTask;
+	public ContestTasks setTaskId(Integer taskId) {
+		this.taskId = taskId;
 		return this;
 	}
 
@@ -83,8 +83,8 @@ public class ContestTasks implements IContestTasks {
 	 */
 	@Override
 	public void from(IContestTasks from) {
-		setIdContest(from.getIdContest());
-		setIdTask(from.getIdTask());
+		setContestId(from.getContestId());
+		setTaskId(from.getTaskId());
 	}
 
 	/**

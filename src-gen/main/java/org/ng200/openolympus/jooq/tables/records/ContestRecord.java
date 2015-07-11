@@ -15,8 +15,8 @@ import javax.persistence.Table;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record5;
-import org.jooq.Row5;
+import org.jooq.Record6;
+import org.jooq.Row6;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.ng200.openolympus.jooq.tables.Contest;
 import org.ng200.openolympus.jooq.tables.interfaces.IContest;
@@ -35,9 +35,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContest;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest", schema = "public")
-public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements Record5<Integer, Duration, String, Boolean, Timestamp>, IContest {
+public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements Record6<Integer, Duration, String, Boolean, Timestamp, Long>, IContest {
 
-	private static final long serialVersionUID = 931719039;
+	private static final long serialVersionUID = 405312479;
 
 	/**
 	 * Setter for <code>public.contest.id</code>.
@@ -130,6 +130,24 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 		return (Timestamp) getValue(4);
 	}
 
+	/**
+	 * Setter for <code>public.contest.owner</code>.
+	 */
+	@Override
+	public ContestRecord setOwner(Long value) {
+		setValue(5, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.contest.owner</code>.
+	 */
+	@Column(name = "owner", precision = 64)
+	@Override
+	public Long getOwner() {
+		return (Long) getValue(5);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -143,23 +161,23 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 	}
 
 	// -------------------------------------------------------------------------
-	// Record5 type implementation
+	// Record6 type implementation
 	// -------------------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row5<Integer, Duration, String, Boolean, Timestamp> fieldsRow() {
-		return (Row5) super.fieldsRow();
+	public Row6<Integer, Duration, String, Boolean, Timestamp, Long> fieldsRow() {
+		return (Row6) super.fieldsRow();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row5<Integer, Duration, String, Boolean, Timestamp> valuesRow() {
-		return (Row5) super.valuesRow();
+	public Row6<Integer, Duration, String, Boolean, Timestamp, Long> valuesRow() {
+		return (Row6) super.valuesRow();
 	}
 
 	/**
@@ -206,6 +224,14 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Field<Long> field6() {
+		return Contest.CONTEST.OWNER;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Integer value1() {
 		return getId();
 	}
@@ -240,6 +266,14 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 	@Override
 	public Timestamp value5() {
 		return getStartTime();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Long value6() {
+		return getOwner();
 	}
 
 	/**
@@ -291,12 +325,22 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestRecord values(Integer value1, Duration value2, String value3, Boolean value4, Timestamp value5) {
+	public ContestRecord value6(Long value) {
+		setOwner(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ContestRecord values(Integer value1, Duration value2, String value3, Boolean value4, Timestamp value5, Long value6) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
 		value4(value4);
 		value5(value5);
+		value6(value6);
 		return this;
 	}
 
@@ -314,6 +358,7 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 		setName(from.getName());
 		setShowFullTestsDuringContest(from.getShowFullTestsDuringContest());
 		setStartTime(from.getStartTime());
+		setOwner(from.getOwner());
 	}
 
 	/**
@@ -339,7 +384,7 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 	/**
 	 * Create a detached, initialised ContestRecord
 	 */
-	public ContestRecord(Integer id, Duration duration, String name, Boolean showFullTestsDuringContest, Timestamp startTime) {
+	public ContestRecord(Integer id, Duration duration, String name, Boolean showFullTestsDuringContest, Timestamp startTime, Long owner) {
 		super(Contest.CONTEST);
 
 		setValue(0, id);
@@ -347,5 +392,6 @@ public class ContestRecord extends UpdatableRecordImpl<ContestRecord> implements
 		setValue(2, name);
 		setValue(3, showFullTestsDuringContest);
 		setValue(4, startTime);
+		setValue(5, owner);
 	}
 }

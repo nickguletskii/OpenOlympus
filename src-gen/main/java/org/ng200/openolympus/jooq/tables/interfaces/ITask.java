@@ -85,6 +85,17 @@ public interface ITask extends Serializable {
 	@Column(name = "created_date")
 	public LocalDateTime getCreatedDate();
 
+	/**
+	 * Setter for <code>public.task.owner_id</code>.
+	 */
+	public ITask setOwnerId(Long value);
+
+	/**
+	 * Getter for <code>public.task.owner_id</code>.
+	 */
+	@Column(name = "owner_id", precision = 64)
+	public Long getOwnerId();
+
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------

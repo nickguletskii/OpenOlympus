@@ -26,31 +26,31 @@ import javax.persistence.UniqueConstraint;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest_tasks", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"id_contest", "id_task"})
+	@UniqueConstraint(columnNames = {"contest_id", "task_id"})
 })
 public interface IContestTasks extends Serializable {
 
 	/**
-	 * Setter for <code>public.contest_tasks.id_contest</code>.
+	 * Setter for <code>public.contest_tasks.contest_id</code>.
 	 */
-	public IContestTasks setIdContest(Integer value);
+	public IContestTasks setContestId(Integer value);
 
 	/**
-	 * Getter for <code>public.contest_tasks.id_contest</code>.
+	 * Getter for <code>public.contest_tasks.contest_id</code>.
 	 */
-	@Column(name = "id_contest", nullable = false, precision = 32)
-	public Integer getIdContest();
+	@Column(name = "contest_id", nullable = false, precision = 32)
+	public Integer getContestId();
 
 	/**
-	 * Setter for <code>public.contest_tasks.id_task</code>.
+	 * Setter for <code>public.contest_tasks.task_id</code>.
 	 */
-	public IContestTasks setIdTask(Integer value);
+	public IContestTasks setTaskId(Integer value);
 
 	/**
-	 * Getter for <code>public.contest_tasks.id_task</code>.
+	 * Getter for <code>public.contest_tasks.task_id</code>.
 	 */
-	@Column(name = "id_task", nullable = false, precision = 32)
-	public Integer getIdTask();
+	@Column(name = "task_id", nullable = false, precision = 32)
+	public Integer getTaskId();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

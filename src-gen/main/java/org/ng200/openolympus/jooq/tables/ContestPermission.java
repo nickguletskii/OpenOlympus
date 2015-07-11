@@ -35,7 +35,7 @@ import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ContestPermission extends TableImpl<ContestPermissionRecord> {
 
-	private static final long serialVersionUID = 1678162323;
+	private static final long serialVersionUID = -756573283;
 
 	/**
 	 * The reference instance of <code>public.contest_permission</code>
@@ -61,9 +61,9 @@ public class ContestPermission extends TableImpl<ContestPermissionRecord> {
 	public final TableField<ContestPermissionRecord, ContestPermissionType> TYPE = createField("type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(org.ng200.openolympus.jooq.enums.ContestPermissionType.class), this, "");
 
 	/**
-	 * The column <code>public.contest_permission.id_contest</code>.
+	 * The column <code>public.contest_permission.contest_id</code>.
 	 */
-	public final TableField<ContestPermissionRecord, Integer> ID_CONTEST = createField("id_contest", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<ContestPermissionRecord, Integer> CONTEST_ID = createField("contest_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>public.contest_permission</code> table reference

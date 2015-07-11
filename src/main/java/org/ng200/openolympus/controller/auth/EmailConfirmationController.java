@@ -55,7 +55,7 @@ public class EmailConfirmationController {
 
 		user.setEmailConfirmationToken(null);
 		user.setApproved(true);
-		user = this.userService.saveUser(user);
+		user = this.userService.updateUser(user);
 
 		return "redirect:/login";
 	}

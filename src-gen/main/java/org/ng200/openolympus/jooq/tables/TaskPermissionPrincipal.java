@@ -33,7 +33,7 @@ import org.ng200.openolympus.jooq.tables.records.TaskPermissionPrincipalRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TaskPermissionPrincipal extends TableImpl<TaskPermissionPrincipalRecord> {
 
-	private static final long serialVersionUID = -897860470;
+	private static final long serialVersionUID = -1850379263;
 
 	/**
 	 * The reference instance of <code>public.task_permission_principal</code>
@@ -49,14 +49,14 @@ public class TaskPermissionPrincipal extends TableImpl<TaskPermissionPrincipalRe
 	}
 
 	/**
-	 * The column <code>public.task_permission_principal.principal_id</code>.
-	 */
-	public final TableField<TaskPermissionPrincipalRecord, Long> PRINCIPAL_ID = createField("principal_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-	/**
 	 * The column <code>public.task_permission_principal.task_permission_id</code>.
 	 */
 	public final TableField<TaskPermissionPrincipalRecord, Long> TASK_PERMISSION_ID = createField("task_permission_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+	/**
+	 * The column <code>public.task_permission_principal.principal_id</code>.
+	 */
+	public final TableField<TaskPermissionPrincipalRecord, Long> PRINCIPAL_ID = createField("principal_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * Create a <code>public.task_permission_principal</code> table reference
@@ -101,7 +101,7 @@ public class TaskPermissionPrincipal extends TableImpl<TaskPermissionPrincipalRe
 	 */
 	@Override
 	public List<ForeignKey<TaskPermissionPrincipalRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<TaskPermissionPrincipalRecord, ?>>asList(Keys.TASK_PERMISSION_PRINCIPAL__TASK_PERMISSION_FK);
+		return Arrays.<ForeignKey<TaskPermissionPrincipalRecord, ?>>asList(Keys.TASK_PERMISSION_PRINCIPAL__TASK_PERMISSION_FK, Keys.TASK_PERMISSION_PRINCIPAL__PRINCIPAL_FK);
 	}
 
 	/**
