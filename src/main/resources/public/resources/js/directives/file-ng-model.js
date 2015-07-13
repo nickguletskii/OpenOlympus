@@ -1,13 +1,11 @@
-var $ = require("jquery");
 var angular = require("angular");
-var app = require("app");
 
-module.exports = /*@ngInject*/ function() {
+angular.module("ool.directives").directive("fileNgModel", /*@ngInject*/ function() {
 	return {
 		require: "ngModel",
-		restrict: 'A',
+		restrict: "A",
 		link: function($scope, element, attrs, ngModel) {
-			element.bind('change', function(event) {
+			element.bind("change", function(event) {
 				var files = event.target.files;
 
 				ngModel.$setViewValue(files);
@@ -22,4 +20,4 @@ module.exports = /*@ngInject*/ function() {
 			});
 		}
 	};
-}
+});

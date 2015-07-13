@@ -20,27 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-'use strict';
+"use strict";
 
 var angular = require("angular");
-var services = require("services");
-var _ = require("lodash");
-var moment = require("moment");
-var textile = require("textile");
 
-/* Directives */
+angular.module("ool.directives", ["ool.services"]);
 
-angular.module('ool.directives', ['ool.services'])
-.directive('eatClickIf', require("directives/eat-click"))
-.directive('ngDateTime', require("directives/date-time"))
-.directive('datepickerLocaldate', require("directives/datepicker-localdate"))
-.directive('ngReallyClick', require("directives/really-click"))
-.directive("lang", require("directives/lang"))
-.directive('dynamic', require("directives/dynamic"))
-.directive('datepickerField', require("directives/datepicker"))
-.directive('recaptcha', require("directives/captcha"))
-.directive('spinner', require("directives/spinner"))
-.directive('aclEditor', require("directives/acl"))
-.directive('fileInput', require("directives/file-input"))
-.directive('fileNgModel', require("directives/file-ng-model"))
-;
+require("angular");
+require("directives/date-time");
+require("directives/datepicker-localdate");
+require("directives/really-click");
+require("directives/lang");
+require("directives/dynamic");
+require("directives/datepicker");
+require("directives/captcha");
+require("directives/simpleDirectives");
+require("directives/acl");
+require("directives/file-input");
+require("directives/file-ng-model");

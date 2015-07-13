@@ -1,7 +1,7 @@
 var $ = require("jquery");
 var angular = require("angular");
 
-module.exports = /*@ngInject*/ function(FieldHelper) {
+angular.module("ool.directives").directive("fileInput", /*@ngInject*/ function(FieldHelper) {
 	return {
 		restrict: "E",
 		require: "^formFor",
@@ -34,4 +34,4 @@ module.exports = /*@ngInject*/ function(FieldHelper) {
 			});
 		}
 	};
-};
+});

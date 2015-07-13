@@ -1,15 +1,13 @@
 var angular = require("angular");
-var app = require("app");
 var moment = require("moment");
-
-module.exports = /*@ngInject*/ function($q, $timeout) {
-    return {
-        require: 'ngModel',
-        restrict: 'A',
-        link: function(scope, elm, attrs, ctrl) {
-            ctrl.$validators.dateTime = function(modelValue, viewValue) {
-                return moment(viewValue, "YYYY-MM-DDTHH:mm:ss.SSSZ", true).isValid();
-            };
-        }
-    };
-}
+angular.module("ool.directives").directive("ngDateTime", /*@ngInject*/ function() {
+	return {
+		require: "ngModel",
+		restrict: "A",
+		link: function(scope, elm, attrs, ctrl) {
+			ctrl.$validators.dateTime = function(modelValue, viewValue) {
+				return moment(viewValue, "YYYY-MM-DDTHH:mm:ss.SSSZ", true).isValid();
+			};
+		}
+	};
+});

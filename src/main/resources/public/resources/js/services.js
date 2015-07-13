@@ -20,13 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-'use strict';
+"use strict";
 
 var angular = require("angular");
-var app = require("app");
-var _ = require("lodash");
 
-var module = angular.module('ool.services', []);
+angular.module("ool.services", []);
 
 require("services/authenticationProvider");
 require("services/serversideFormErrorReporter");
@@ -37,3 +35,4 @@ require("services/solutionService");
 require("services/taskService");
 require("services/contestService");
 require("services/timeService");
+require("services/aclService");
