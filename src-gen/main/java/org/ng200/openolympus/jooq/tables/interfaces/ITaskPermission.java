@@ -9,8 +9,8 @@ import java.io.Serializable;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 
@@ -27,31 +27,10 @@ import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "task_permission", schema = "public")
+@Table(name = "task_permission", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"task_id", "principal_id", "permission"})
+})
 public interface ITaskPermission extends Serializable {
-
-	/**
-	 * Setter for <code>public.task_permission.id</code>.
-	 */
-	public ITaskPermission setId(Long value);
-
-	/**
-	 * Getter for <code>public.task_permission.id</code>.
-	 */
-	@Id
-	@Column(name = "id", unique = true, nullable = false, precision = 64)
-	public Long getId();
-
-	/**
-	 * Setter for <code>public.task_permission.type</code>.
-	 */
-	public ITaskPermission setType(TaskPermissionType value);
-
-	/**
-	 * Getter for <code>public.task_permission.type</code>.
-	 */
-	@Column(name = "type", nullable = false)
-	public TaskPermissionType getType();
 
 	/**
 	 * Setter for <code>public.task_permission.task_id</code>.
@@ -61,8 +40,30 @@ public interface ITaskPermission extends Serializable {
 	/**
 	 * Getter for <code>public.task_permission.task_id</code>.
 	 */
-	@Column(name = "task_id", precision = 32)
+	@Column(name = "task_id", nullable = false, precision = 32)
 	public Integer getTaskId();
+
+	/**
+	 * Setter for <code>public.task_permission.principal_id</code>.
+	 */
+	public ITaskPermission setPrincipalId(Long value);
+
+	/**
+	 * Getter for <code>public.task_permission.principal_id</code>.
+	 */
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	public Long getPrincipalId();
+
+	/**
+	 * Setter for <code>public.task_permission.permission</code>.
+	 */
+	public ITaskPermission setPermission(TaskPermissionType value);
+
+	/**
+	 * Getter for <code>public.task_permission.permission</code>.
+	 */
+	@Column(name = "permission", nullable = false)
+	public TaskPermissionType getPermission();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

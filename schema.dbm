@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="171,551" last-zoom="1.2"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="87,587" last-zoom="1.1"
 	 default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -649,7 +649,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="group">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="779.999" y="939.445"/>
+	<position x="772.726" y="993.081"/>
 	<column name="id" not-null="true">
 		<type name="bigint"/>
 	</column>
@@ -900,7 +900,7 @@ WHERE contest.id = contest_id ]]></definition>
 <usertype name="task_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="view,view_during_contest,modify"/>
+	<enumeration values="view,view_during_contest,modify,manage_acl"/>
 </usertype>
 
 <usertype name="acl_permission_type" configuration="enumeration">
@@ -908,21 +908,6 @@ WHERE contest.id = contest_id ]]></definition>
 	<role name="postgres"/>
 	<enumeration values="manage_acl,write,read,manage_participants,answer_questions,make_announcements"/>
 </usertype>
-
-<table name="task_permission">
-	<schema name="public"/>
-	<role name="postgres"/>
-	<position x="1054.81" y="1161.59"/>
-	<column name="id" not-null="true">
-		<type name="bigserial"/>
-	</column>
-	<column name="type" not-null="true">
-		<type name="public.task_permission_type"/>
-	</column>
-	<constraint name="task_permission_pk" type="pk-constr" table="public.task_permission">
-		<columns names="id" ref-type="src-columns"/>
-	</constraint>
-</table>
 
 <usertype name="contest_permission_type" configuration="enumeration">
 	<schema name="public"/>
@@ -944,16 +929,6 @@ WHERE contest.id = contest_id ]]></definition>
 		<columns names="id" ref-type="src-columns"/>
 	</constraint>
 </table>
-
-<relationship name="task_permissions" type="rel1n"
-	 src-col-pattern="{st}_{sc}"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#338dc6"
-	 src-table="public.task"
-	 dst-table="public.task_permission"
-	 src-required="false" dst-required="false"
-	del-action="CASCADE"/>
 
 <relationship name="contest_permissions" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -983,26 +958,6 @@ WHERE contest.id = contest_id ]]></definition>
 	 dst-table="public.principal"
 	 src-required="false" dst-required="false"
 	 table-name="contest_permission_principal"/>
-
-<relationship name="task_permission_principal" type="relnn"
-	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
-	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
-	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
-	 pk-col-pattern="id"
-	 custom-color="#49a5ae"
-	 src-table="public.task_permission"
-	 dst-table="public.principal"
-	 src-required="false" dst-required="false"
-	 table-name="task_permission_principal"/>
-
-<relationship name="principal_tasks_owned" type="rel1n"
-	 src-col-pattern="owner_id"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#eea0b4"
-	 src-table="public.principal"
-	 dst-table="public.task"
-	 src-required="false" dst-required="false"/>
 
 <rule name="user_keep_principal_insert" event-type="ON INSERT" exec-type="ALSO"
  table="public.&quot;USER&quot;">
@@ -1052,6 +1007,42 @@ END;]]></definition>
 	 table="public.&quot;USER&quot;">
 		<function signature="public.keep_user_as_principal()"/>
 </trigger>
+
+<relationship name="task_permission" type="relnn"
+	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
+	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
+	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
+	 pk-col-pattern="id"
+	 custom-color="#d07b5e"
+	 src-table="public.task"
+	 dst-table="public.principal"
+	 src-required="false" dst-required="false"
+	 table-name="task_permission"
+	upd-action="NO ACTION"
+	del-action="NO ACTION">
+	<column name="permission" not-null="true">
+		<type name="public.task_permission_type" precision="0"/>
+	</column>
+	<special-pk-cols indexes="0"/>
+</relationship>
+
+<relationship name="group_users" type="relnn"
+	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
+	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
+	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
+	 pk-col-pattern="id"
+	 custom-color="#db5217"
+	 src-table="public.&quot;group&quot;"
+	 dst-table="public.&quot;USER&quot;"
+	 src-required="false" dst-required="false"
+	 table-name="group_users">
+	<label ref-type="src-label">
+		<position x="0" y="0"/>
+	</label>
+	<column name="can_add_others_to_group" not-null="true" default-value="false">
+		<type name="bool"/>
+	</column>
+</relationship>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

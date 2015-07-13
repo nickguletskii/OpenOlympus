@@ -98,13 +98,6 @@ public class TaskDao extends DAOImpl<TaskRecord, org.ng200.openolympus.jooq.tabl
 	public List<org.ng200.openolympus.jooq.tables.pojos.Task> fetchByCreatedDate(LocalDateTime... values) {
 		return fetch(Task.TASK.CREATED_DATE, values);
 	}
-
-	/**
-	 * Fetch records that have <code>owner_id IN (values)</code>
-	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.Task> fetchByOwnerId(Long... values) {
-		return fetch(Task.TASK.OWNER_ID, values);
-	}
 	public org.ng200.openolympus.jooq.tables.pojos.Task fetchOneById(String id) {
 		return fetchOneById(java.lang.Integer.valueOf(id));
 	}

@@ -11,7 +11,6 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -35,7 +34,7 @@ import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TaskPermission extends TableImpl<TaskPermissionRecord> {
 
-	private static final long serialVersionUID = -1391926781;
+	private static final long serialVersionUID = 1502014018;
 
 	/**
 	 * The reference instance of <code>public.task_permission</code>
@@ -51,19 +50,19 @@ public class TaskPermission extends TableImpl<TaskPermissionRecord> {
 	}
 
 	/**
-	 * The column <code>public.task_permission.id</code>.
-	 */
-	public final TableField<TaskPermissionRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaulted(true), this, "");
-
-	/**
-	 * The column <code>public.task_permission.type</code>.
-	 */
-	public final TableField<TaskPermissionRecord, TaskPermissionType> TYPE = createField("type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(org.ng200.openolympus.jooq.enums.TaskPermissionType.class), this, "");
-
-	/**
 	 * The column <code>public.task_permission.task_id</code>.
 	 */
-	public final TableField<TaskPermissionRecord, Integer> TASK_ID = createField("task_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<TaskPermissionRecord, Integer> TASK_ID = createField("task_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>public.task_permission.principal_id</code>.
+	 */
+	public final TableField<TaskPermissionRecord, Long> PRINCIPAL_ID = createField("principal_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+	/**
+	 * The column <code>public.task_permission.permission</code>.
+	 */
+	public final TableField<TaskPermissionRecord, TaskPermissionType> PERMISSION = createField("permission", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(org.ng200.openolympus.jooq.enums.TaskPermissionType.class), this, "");
 
 	/**
 	 * Create a <code>public.task_permission</code> table reference
@@ -91,14 +90,6 @@ public class TaskPermission extends TableImpl<TaskPermissionRecord> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Identity<TaskPermissionRecord, Long> getIdentity() {
-		return Keys.IDENTITY_TASK_PERMISSION;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public UniqueKey<TaskPermissionRecord> getPrimaryKey() {
 		return Keys.TASK_PERMISSION_PK;
 	}
@@ -116,7 +107,7 @@ public class TaskPermission extends TableImpl<TaskPermissionRecord> {
 	 */
 	@Override
 	public List<ForeignKey<TaskPermissionRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<TaskPermissionRecord, ?>>asList(Keys.TASK_PERMISSION__TASK_FK);
+		return Arrays.<ForeignKey<TaskPermissionRecord, ?>>asList(Keys.TASK_PERMISSION__TASK_FK, Keys.TASK_PERMISSION__PRINCIPAL_FK);
 	}
 
 	/**

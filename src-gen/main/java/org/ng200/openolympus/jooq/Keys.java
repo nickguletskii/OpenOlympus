@@ -18,6 +18,7 @@ import org.ng200.openolympus.jooq.tables.ContestPermissionPrincipal;
 import org.ng200.openolympus.jooq.tables.ContestQuestion;
 import org.ng200.openolympus.jooq.tables.ContestTasks;
 import org.ng200.openolympus.jooq.tables.Group;
+import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
 import org.ng200.openolympus.jooq.tables.Principal;
 import org.ng200.openolympus.jooq.tables.Property;
@@ -25,10 +26,8 @@ import org.ng200.openolympus.jooq.tables.Resource;
 import org.ng200.openolympus.jooq.tables.Solution;
 import org.ng200.openolympus.jooq.tables.Task;
 import org.ng200.openolympus.jooq.tables.TaskPermission;
-import org.ng200.openolympus.jooq.tables.TaskPermissionPrincipal;
 import org.ng200.openolympus.jooq.tables.TimeExtension;
 import org.ng200.openolympus.jooq.tables.User;
-import org.ng200.openolympus.jooq.tables.UserGroups;
 import org.ng200.openolympus.jooq.tables.Verdict;
 import org.ng200.openolympus.jooq.tables.records.ContestMessageRecord;
 import org.ng200.openolympus.jooq.tables.records.ContestParticipationRecord;
@@ -38,16 +37,15 @@ import org.ng200.openolympus.jooq.tables.records.ContestQuestionRecord;
 import org.ng200.openolympus.jooq.tables.records.ContestRecord;
 import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
 import org.ng200.openolympus.jooq.tables.records.GroupRecord;
+import org.ng200.openolympus.jooq.tables.records.GroupUsersRecord;
 import org.ng200.openolympus.jooq.tables.records.PersistentLoginsRecord;
 import org.ng200.openolympus.jooq.tables.records.PrincipalRecord;
 import org.ng200.openolympus.jooq.tables.records.PropertyRecord;
 import org.ng200.openolympus.jooq.tables.records.ResourceRecord;
 import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
-import org.ng200.openolympus.jooq.tables.records.TaskPermissionPrincipalRecord;
 import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 import org.ng200.openolympus.jooq.tables.records.TaskRecord;
 import org.ng200.openolympus.jooq.tables.records.TimeExtensionRecord;
-import org.ng200.openolympus.jooq.tables.records.UserGroupsRecord;
 import org.ng200.openolympus.jooq.tables.records.UserRecord;
 import org.ng200.openolympus.jooq.tables.records.VerdictRecord;
 
@@ -75,12 +73,10 @@ public class Keys {
 	public static final Identity<ContestParticipationRecord, Long> IDENTITY_CONTEST_PARTICIPATION = Identities0.IDENTITY_CONTEST_PARTICIPATION;
 	public static final Identity<ContestPermissionRecord, Long> IDENTITY_CONTEST_PERMISSION = Identities0.IDENTITY_CONTEST_PERMISSION;
 	public static final Identity<ContestQuestionRecord, Integer> IDENTITY_CONTEST_QUESTION = Identities0.IDENTITY_CONTEST_QUESTION;
-	public static final Identity<GroupRecord, Long> IDENTITY_GROUP = Identities0.IDENTITY_GROUP;
 	public static final Identity<PrincipalRecord, Long> IDENTITY_PRINCIPAL = Identities0.IDENTITY_PRINCIPAL;
 	public static final Identity<ResourceRecord, Long> IDENTITY_RESOURCE = Identities0.IDENTITY_RESOURCE;
 	public static final Identity<SolutionRecord, Long> IDENTITY_SOLUTION = Identities0.IDENTITY_SOLUTION;
 	public static final Identity<TaskRecord, Integer> IDENTITY_TASK = Identities0.IDENTITY_TASK;
-	public static final Identity<TaskPermissionRecord, Long> IDENTITY_TASK_PERMISSION = Identities0.IDENTITY_TASK_PERMISSION;
 	public static final Identity<TimeExtensionRecord, Long> IDENTITY_TIME_EXTENSION = Identities0.IDENTITY_TIME_EXTENSION;
 	public static final Identity<UserRecord, Long> IDENTITY_USER = Identities0.IDENTITY_USER;
 	public static final Identity<VerdictRecord, Long> IDENTITY_VERDICT = Identities0.IDENTITY_VERDICT;
@@ -99,6 +95,7 @@ public class Keys {
 	public static final UniqueKey<ContestTasksRecord> CONTEST_TASKS_PK = UniqueKeys0.CONTEST_TASKS_PK;
 	public static final UniqueKey<GroupRecord> GROUP_PK = UniqueKeys0.GROUP_PK;
 	public static final UniqueKey<GroupRecord> GROUP_NAME_UNIQUE = UniqueKeys0.GROUP_NAME_UNIQUE;
+	public static final UniqueKey<GroupUsersRecord> GROUP_USERS_PK = UniqueKeys0.GROUP_USERS_PK;
 	public static final UniqueKey<PersistentLoginsRecord> PERSISTENT_LOGINS_PKEY = UniqueKeys0.PERSISTENT_LOGINS_PKEY;
 	public static final UniqueKey<PrincipalRecord> PRINCIPAL_PK = UniqueKeys0.PRINCIPAL_PK;
 	public static final UniqueKey<PropertyRecord> PROPERTY_PKEY = UniqueKeys0.PROPERTY_PKEY;
@@ -108,11 +105,9 @@ public class Keys {
 	public static final UniqueKey<TaskRecord> TASK_PKEY = UniqueKeys0.TASK_PKEY;
 	public static final UniqueKey<TaskRecord> TASK_NAME_UNIQUE = UniqueKeys0.TASK_NAME_UNIQUE;
 	public static final UniqueKey<TaskPermissionRecord> TASK_PERMISSION_PK = UniqueKeys0.TASK_PERMISSION_PK;
-	public static final UniqueKey<TaskPermissionPrincipalRecord> TASK_PERMISSION_PRINCIPAL_PK = UniqueKeys0.TASK_PERMISSION_PRINCIPAL_PK;
 	public static final UniqueKey<TimeExtensionRecord> TIME_EXTENSION_PKEY = UniqueKeys0.TIME_EXTENSION_PKEY;
 	public static final UniqueKey<UserRecord> USER_PK = UniqueKeys0.USER_PK;
 	public static final UniqueKey<UserRecord> UK_R43AF9AP4EDM43MMTQ01ODDJ6 = UniqueKeys0.UK_R43AF9AP4EDM43MMTQ01ODDJ6;
-	public static final UniqueKey<UserGroupsRecord> USER_GROUPS_PK = UniqueKeys0.USER_GROUPS_PK;
 	public static final UniqueKey<VerdictRecord> VERDICT_PK = UniqueKeys0.VERDICT_PK;
 
 	// -------------------------------------------------------------------------
@@ -131,18 +126,18 @@ public class Keys {
 	public static final ForeignKey<ContestQuestionRecord, ContestRecord> CONTEST_QUESTION__CONTEST_FK = ForeignKeys0.CONTEST_QUESTION__CONTEST_FK;
 	public static final ForeignKey<ContestTasksRecord, ContestRecord> CONTEST_TASKS__CONTEST_FK = ForeignKeys0.CONTEST_TASKS__CONTEST_FK;
 	public static final ForeignKey<ContestTasksRecord, TaskRecord> CONTEST_TASKS__TASK_FK = ForeignKeys0.CONTEST_TASKS__TASK_FK;
+	public static final ForeignKey<GroupRecord, PrincipalRecord> GROUP__GROUP_PRINCIPAL_ID_MAPPING = ForeignKeys0.GROUP__GROUP_PRINCIPAL_ID_MAPPING;
+	public static final ForeignKey<GroupUsersRecord, GroupRecord> GROUP_USERS__GROUP_FK = ForeignKeys0.GROUP_USERS__GROUP_FK;
+	public static final ForeignKey<GroupUsersRecord, UserRecord> GROUP_USERS__USER_FK = ForeignKeys0.GROUP_USERS__USER_FK;
 	public static final ForeignKey<ResourceRecord, UserRecord> RESOURCE__USER_FK = ForeignKeys0.RESOURCE__USER_FK;
 	public static final ForeignKey<ResourceRecord, TaskRecord> RESOURCE__TASK_FK = ForeignKeys0.RESOURCE__TASK_FK;
 	public static final ForeignKey<SolutionRecord, UserRecord> SOLUTION__USER_FK = ForeignKeys0.SOLUTION__USER_FK;
 	public static final ForeignKey<SolutionRecord, TaskRecord> SOLUTION__TASK_FK = ForeignKeys0.SOLUTION__TASK_FK;
-	public static final ForeignKey<TaskRecord, UserRecord> TASK__USER_FK = ForeignKeys0.TASK__USER_FK;
 	public static final ForeignKey<TaskPermissionRecord, TaskRecord> TASK_PERMISSION__TASK_FK = ForeignKeys0.TASK_PERMISSION__TASK_FK;
-	public static final ForeignKey<TaskPermissionPrincipalRecord, TaskPermissionRecord> TASK_PERMISSION_PRINCIPAL__TASK_PERMISSION_FK = ForeignKeys0.TASK_PERMISSION_PRINCIPAL__TASK_PERMISSION_FK;
-	public static final ForeignKey<TaskPermissionPrincipalRecord, PrincipalRecord> TASK_PERMISSION_PRINCIPAL__PRINCIPAL_FK = ForeignKeys0.TASK_PERMISSION_PRINCIPAL__PRINCIPAL_FK;
+	public static final ForeignKey<TaskPermissionRecord, PrincipalRecord> TASK_PERMISSION__PRINCIPAL_FK = ForeignKeys0.TASK_PERMISSION__PRINCIPAL_FK;
 	public static final ForeignKey<TimeExtensionRecord, UserRecord> TIME_EXTENSION__USER_FK = ForeignKeys0.TIME_EXTENSION__USER_FK;
 	public static final ForeignKey<TimeExtensionRecord, ContestRecord> TIME_EXTENSION__CONTEST_FK = ForeignKeys0.TIME_EXTENSION__CONTEST_FK;
-	public static final ForeignKey<UserGroupsRecord, UserRecord> USER_GROUPS__USER_FK = ForeignKeys0.USER_GROUPS__USER_FK;
-	public static final ForeignKey<UserGroupsRecord, GroupRecord> USER_GROUPS__GROUP_FK = ForeignKeys0.USER_GROUPS__GROUP_FK;
+	public static final ForeignKey<UserRecord, PrincipalRecord> USER__USER_PRINCIPAL_ID_MAPPING = ForeignKeys0.USER__USER_PRINCIPAL_ID_MAPPING;
 	public static final ForeignKey<VerdictRecord, SolutionRecord> VERDICT__SOLUTION_FK = ForeignKeys0.VERDICT__SOLUTION_FK;
 
 	// -------------------------------------------------------------------------
@@ -155,12 +150,10 @@ public class Keys {
 		public static Identity<ContestParticipationRecord, Long> IDENTITY_CONTEST_PARTICIPATION = createIdentity(ContestParticipation.CONTEST_PARTICIPATION, ContestParticipation.CONTEST_PARTICIPATION.ID);
 		public static Identity<ContestPermissionRecord, Long> IDENTITY_CONTEST_PERMISSION = createIdentity(ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.ID);
 		public static Identity<ContestQuestionRecord, Integer> IDENTITY_CONTEST_QUESTION = createIdentity(ContestQuestion.CONTEST_QUESTION, ContestQuestion.CONTEST_QUESTION.ID);
-		public static Identity<GroupRecord, Long> IDENTITY_GROUP = createIdentity(Group.GROUP, Group.GROUP.ID);
 		public static Identity<PrincipalRecord, Long> IDENTITY_PRINCIPAL = createIdentity(Principal.PRINCIPAL, Principal.PRINCIPAL.ID);
 		public static Identity<ResourceRecord, Long> IDENTITY_RESOURCE = createIdentity(Resource.RESOURCE, Resource.RESOURCE.ID);
 		public static Identity<SolutionRecord, Long> IDENTITY_SOLUTION = createIdentity(Solution.SOLUTION, Solution.SOLUTION.ID);
 		public static Identity<TaskRecord, Integer> IDENTITY_TASK = createIdentity(Task.TASK, Task.TASK.ID);
-		public static Identity<TaskPermissionRecord, Long> IDENTITY_TASK_PERMISSION = createIdentity(TaskPermission.TASK_PERMISSION, TaskPermission.TASK_PERMISSION.ID);
 		public static Identity<TimeExtensionRecord, Long> IDENTITY_TIME_EXTENSION = createIdentity(TimeExtension.TIME_EXTENSION, TimeExtension.TIME_EXTENSION.ID);
 		public static Identity<UserRecord, Long> IDENTITY_USER = createIdentity(User.USER, User.USER.ID);
 		public static Identity<VerdictRecord, Long> IDENTITY_VERDICT = createIdentity(Verdict.VERDICT, Verdict.VERDICT.ID);
@@ -177,6 +170,7 @@ public class Keys {
 		public static final UniqueKey<ContestTasksRecord> CONTEST_TASKS_PK = createUniqueKey(ContestTasks.CONTEST_TASKS, ContestTasks.CONTEST_TASKS.CONTEST_ID, ContestTasks.CONTEST_TASKS.TASK_ID);
 		public static final UniqueKey<GroupRecord> GROUP_PK = createUniqueKey(Group.GROUP, Group.GROUP.ID);
 		public static final UniqueKey<GroupRecord> GROUP_NAME_UNIQUE = createUniqueKey(Group.GROUP, Group.GROUP.NAME);
+		public static final UniqueKey<GroupUsersRecord> GROUP_USERS_PK = createUniqueKey(GroupUsers.GROUP_USERS, GroupUsers.GROUP_USERS.GROUP_ID, GroupUsers.GROUP_USERS.USER_ID);
 		public static final UniqueKey<PersistentLoginsRecord> PERSISTENT_LOGINS_PKEY = createUniqueKey(PersistentLogins.PERSISTENT_LOGINS, PersistentLogins.PERSISTENT_LOGINS.SERIES);
 		public static final UniqueKey<PrincipalRecord> PRINCIPAL_PK = createUniqueKey(Principal.PRINCIPAL, Principal.PRINCIPAL.ID);
 		public static final UniqueKey<PropertyRecord> PROPERTY_PKEY = createUniqueKey(Property.PROPERTY, Property.PROPERTY.ID);
@@ -185,12 +179,10 @@ public class Keys {
 		public static final UniqueKey<SolutionRecord> SOLUTION_PKEY = createUniqueKey(Solution.SOLUTION, Solution.SOLUTION.ID);
 		public static final UniqueKey<TaskRecord> TASK_PKEY = createUniqueKey(Task.TASK, Task.TASK.ID);
 		public static final UniqueKey<TaskRecord> TASK_NAME_UNIQUE = createUniqueKey(Task.TASK, Task.TASK.NAME);
-		public static final UniqueKey<TaskPermissionRecord> TASK_PERMISSION_PK = createUniqueKey(TaskPermission.TASK_PERMISSION, TaskPermission.TASK_PERMISSION.ID);
-		public static final UniqueKey<TaskPermissionPrincipalRecord> TASK_PERMISSION_PRINCIPAL_PK = createUniqueKey(TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL, TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID, TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL.PRINCIPAL_ID);
+		public static final UniqueKey<TaskPermissionRecord> TASK_PERMISSION_PK = createUniqueKey(TaskPermission.TASK_PERMISSION, TaskPermission.TASK_PERMISSION.TASK_ID, TaskPermission.TASK_PERMISSION.PRINCIPAL_ID, TaskPermission.TASK_PERMISSION.PERMISSION);
 		public static final UniqueKey<TimeExtensionRecord> TIME_EXTENSION_PKEY = createUniqueKey(TimeExtension.TIME_EXTENSION, TimeExtension.TIME_EXTENSION.ID);
 		public static final UniqueKey<UserRecord> USER_PK = createUniqueKey(User.USER, User.USER.ID);
 		public static final UniqueKey<UserRecord> UK_R43AF9AP4EDM43MMTQ01ODDJ6 = createUniqueKey(User.USER, User.USER.USERNAME);
-		public static final UniqueKey<UserGroupsRecord> USER_GROUPS_PK = createUniqueKey(UserGroups.USER_GROUPS, UserGroups.USER_GROUPS.USER_ID, UserGroups.USER_GROUPS.GROUP_ID);
 		public static final UniqueKey<VerdictRecord> VERDICT_PK = createUniqueKey(Verdict.VERDICT, Verdict.VERDICT.ID);
 	}
 
@@ -207,18 +199,18 @@ public class Keys {
 		public static final ForeignKey<ContestQuestionRecord, ContestRecord> CONTEST_QUESTION__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestQuestion.CONTEST_QUESTION, ContestQuestion.CONTEST_QUESTION.CONTEST_ID);
 		public static final ForeignKey<ContestTasksRecord, ContestRecord> CONTEST_TASKS__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestTasks.CONTEST_TASKS, ContestTasks.CONTEST_TASKS.CONTEST_ID);
 		public static final ForeignKey<ContestTasksRecord, TaskRecord> CONTEST_TASKS__TASK_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.TASK_PKEY, ContestTasks.CONTEST_TASKS, ContestTasks.CONTEST_TASKS.TASK_ID);
+		public static final ForeignKey<GroupRecord, PrincipalRecord> GROUP__GROUP_PRINCIPAL_ID_MAPPING = createForeignKey(org.ng200.openolympus.jooq.Keys.PRINCIPAL_PK, Group.GROUP, Group.GROUP.ID);
+		public static final ForeignKey<GroupUsersRecord, GroupRecord> GROUP_USERS__GROUP_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.GROUP_PK, GroupUsers.GROUP_USERS, GroupUsers.GROUP_USERS.GROUP_ID);
+		public static final ForeignKey<GroupUsersRecord, UserRecord> GROUP_USERS__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, GroupUsers.GROUP_USERS, GroupUsers.GROUP_USERS.USER_ID);
 		public static final ForeignKey<ResourceRecord, UserRecord> RESOURCE__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, Resource.RESOURCE, Resource.RESOURCE.USER_ID);
 		public static final ForeignKey<ResourceRecord, TaskRecord> RESOURCE__TASK_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.TASK_PKEY, Resource.RESOURCE, Resource.RESOURCE.TASK_ID);
 		public static final ForeignKey<SolutionRecord, UserRecord> SOLUTION__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, Solution.SOLUTION, Solution.SOLUTION.USER_ID);
 		public static final ForeignKey<SolutionRecord, TaskRecord> SOLUTION__TASK_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.TASK_PKEY, Solution.SOLUTION, Solution.SOLUTION.TASK_ID);
-		public static final ForeignKey<TaskRecord, UserRecord> TASK__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, Task.TASK, Task.TASK.OWNER_ID);
 		public static final ForeignKey<TaskPermissionRecord, TaskRecord> TASK_PERMISSION__TASK_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.TASK_PKEY, TaskPermission.TASK_PERMISSION, TaskPermission.TASK_PERMISSION.TASK_ID);
-		public static final ForeignKey<TaskPermissionPrincipalRecord, TaskPermissionRecord> TASK_PERMISSION_PRINCIPAL__TASK_PERMISSION_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.TASK_PERMISSION_PK, TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL, TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID);
-		public static final ForeignKey<TaskPermissionPrincipalRecord, PrincipalRecord> TASK_PERMISSION_PRINCIPAL__PRINCIPAL_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.PRINCIPAL_PK, TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL, TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL.PRINCIPAL_ID);
+		public static final ForeignKey<TaskPermissionRecord, PrincipalRecord> TASK_PERMISSION__PRINCIPAL_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.PRINCIPAL_PK, TaskPermission.TASK_PERMISSION, TaskPermission.TASK_PERMISSION.PRINCIPAL_ID);
 		public static final ForeignKey<TimeExtensionRecord, UserRecord> TIME_EXTENSION__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, TimeExtension.TIME_EXTENSION, TimeExtension.TIME_EXTENSION.USER_ID);
 		public static final ForeignKey<TimeExtensionRecord, ContestRecord> TIME_EXTENSION__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, TimeExtension.TIME_EXTENSION, TimeExtension.TIME_EXTENSION.CONTEST_ID);
-		public static final ForeignKey<UserGroupsRecord, UserRecord> USER_GROUPS__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, UserGroups.USER_GROUPS, UserGroups.USER_GROUPS.USER_ID);
-		public static final ForeignKey<UserGroupsRecord, GroupRecord> USER_GROUPS__GROUP_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.GROUP_PK, UserGroups.USER_GROUPS, UserGroups.USER_GROUPS.GROUP_ID);
+		public static final ForeignKey<UserRecord, PrincipalRecord> USER__USER_PRINCIPAL_ID_MAPPING = createForeignKey(org.ng200.openolympus.jooq.Keys.PRINCIPAL_PK, User.USER, User.USER.ID);
 		public static final ForeignKey<VerdictRecord, SolutionRecord> VERDICT__SOLUTION_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.SOLUTION_PKEY, Verdict.VERDICT, Verdict.VERDICT.SOLUTION_ID);
 	}
 }

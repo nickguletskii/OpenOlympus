@@ -10,7 +10,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
-import org.jooq.Identity;
+import org.jooq.ForeignKey;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -33,7 +33,7 @@ import org.ng200.openolympus.jooq.tables.records.GroupRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Group extends TableImpl<GroupRecord> {
 
-	private static final long serialVersionUID = 1254930255;
+	private static final long serialVersionUID = 933141106;
 
 	/**
 	 * The reference instance of <code>public.group</code>
@@ -51,7 +51,7 @@ public class Group extends TableImpl<GroupRecord> {
 	/**
 	 * The column <code>public.group.id</code>.
 	 */
-	public final TableField<GroupRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaulted(true), this, "");
+	public final TableField<GroupRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>public.group.name</code>.
@@ -84,14 +84,6 @@ public class Group extends TableImpl<GroupRecord> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Identity<GroupRecord, Long> getIdentity() {
-		return Keys.IDENTITY_GROUP;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public UniqueKey<GroupRecord> getPrimaryKey() {
 		return Keys.GROUP_PK;
 	}
@@ -102,6 +94,14 @@ public class Group extends TableImpl<GroupRecord> {
 	@Override
 	public List<UniqueKey<GroupRecord>> getKeys() {
 		return Arrays.<UniqueKey<GroupRecord>>asList(Keys.GROUP_PK, Keys.GROUP_NAME_UNIQUE);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ForeignKey<GroupRecord, ?>> getReferences() {
+		return Arrays.<ForeignKey<GroupRecord, ?>>asList(Keys.GROUP__GROUP_PRINCIPAL_ID_MAPPING);
 	}
 
 	/**

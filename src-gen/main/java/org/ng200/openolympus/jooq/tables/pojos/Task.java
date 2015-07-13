@@ -31,14 +31,13 @@ import org.ng200.openolympus.model.LockableResourceImplWithIntegerId;
 @Table(name = "task", schema = "public")
 public class Task extends LockableResourceImplWithIntegerId implements ITask {
 
-	private static final long serialVersionUID = -882096916;
+	private static final long serialVersionUID = 1456338448;
 
 	private Integer       id;
 	private String        descriptionFile;
 	private String        name;
 	private String        taskLocation;
 	private LocalDateTime createdDate;
-	private Long          ownerId;
 
 	public Task() {}
 
@@ -48,7 +47,6 @@ public class Task extends LockableResourceImplWithIntegerId implements ITask {
 		this.name = value.name;
 		this.taskLocation = value.taskLocation;
 		this.createdDate = value.createdDate;
-		this.ownerId = value.ownerId;
 	}
 
 	public Task(
@@ -56,15 +54,13 @@ public class Task extends LockableResourceImplWithIntegerId implements ITask {
 		String        descriptionFile,
 		String        name,
 		String        taskLocation,
-		LocalDateTime createdDate,
-		Long          ownerId
+		LocalDateTime createdDate
 	) {
 		this.id = id;
 		this.descriptionFile = descriptionFile;
 		this.name = name;
 		this.taskLocation = taskLocation;
 		this.createdDate = createdDate;
-		this.ownerId = ownerId;
 	}
 
 	@Id
@@ -128,18 +124,6 @@ public class Task extends LockableResourceImplWithIntegerId implements ITask {
 		return this;
 	}
 
-	@Column(name = "owner_id", precision = 64)
-	@Override
-	public Long getOwnerId() {
-		return this.ownerId;
-	}
-
-	@Override
-	public Task setOwnerId(Long ownerId) {
-		this.ownerId = ownerId;
-		return this;
-	}
-
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------
@@ -154,7 +138,6 @@ public class Task extends LockableResourceImplWithIntegerId implements ITask {
 		setName(from.getName());
 		setTaskLocation(from.getTaskLocation());
 		setCreatedDate(from.getCreatedDate());
-		setOwnerId(from.getOwnerId());
 	}
 
 	/**

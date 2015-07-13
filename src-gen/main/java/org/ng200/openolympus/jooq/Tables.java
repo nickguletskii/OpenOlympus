@@ -14,6 +14,7 @@ import org.ng200.openolympus.jooq.tables.ContestPermissionPrincipal;
 import org.ng200.openolympus.jooq.tables.ContestQuestion;
 import org.ng200.openolympus.jooq.tables.ContestTasks;
 import org.ng200.openolympus.jooq.tables.Group;
+import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
 import org.ng200.openolympus.jooq.tables.Principal;
 import org.ng200.openolympus.jooq.tables.Property;
@@ -21,10 +22,8 @@ import org.ng200.openolympus.jooq.tables.Resource;
 import org.ng200.openolympus.jooq.tables.Solution;
 import org.ng200.openolympus.jooq.tables.Task;
 import org.ng200.openolympus.jooq.tables.TaskPermission;
-import org.ng200.openolympus.jooq.tables.TaskPermissionPrincipal;
 import org.ng200.openolympus.jooq.tables.TimeExtension;
 import org.ng200.openolympus.jooq.tables.User;
-import org.ng200.openolympus.jooq.tables.UserGroups;
 import org.ng200.openolympus.jooq.tables.Verdict;
 
 
@@ -82,6 +81,11 @@ public class Tables {
 	public static final Group GROUP = org.ng200.openolympus.jooq.tables.Group.GROUP;
 
 	/**
+	 * The table public.group_users
+	 */
+	public static final GroupUsers GROUP_USERS = org.ng200.openolympus.jooq.tables.GroupUsers.GROUP_USERS;
+
+	/**
 	 * The table public.persistent_logins
 	 */
 	public static final PersistentLogins PERSISTENT_LOGINS = org.ng200.openolympus.jooq.tables.PersistentLogins.PERSISTENT_LOGINS;
@@ -117,11 +121,6 @@ public class Tables {
 	public static final TaskPermission TASK_PERMISSION = org.ng200.openolympus.jooq.tables.TaskPermission.TASK_PERMISSION;
 
 	/**
-	 * The table public.task_permission_principal
-	 */
-	public static final TaskPermissionPrincipal TASK_PERMISSION_PRINCIPAL = org.ng200.openolympus.jooq.tables.TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL;
-
-	/**
 	 * The table public.time_extension
 	 */
 	public static final TimeExtension TIME_EXTENSION = org.ng200.openolympus.jooq.tables.TimeExtension.TIME_EXTENSION;
@@ -130,11 +129,6 @@ public class Tables {
 	 * The table public.USER
 	 */
 	public static final User USER = org.ng200.openolympus.jooq.tables.User.USER;
-
-	/**
-	 * The table public.user_groups
-	 */
-	public static final UserGroups USER_GROUPS = org.ng200.openolympus.jooq.tables.UserGroups.USER_GROUPS;
 
 	/**
 	 * The table public.verdict

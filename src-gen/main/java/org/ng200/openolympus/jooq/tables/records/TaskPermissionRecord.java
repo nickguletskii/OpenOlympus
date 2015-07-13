@@ -7,11 +7,10 @@ package org.ng200.openolympus.jooq.tables.records;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.jooq.Field;
-import org.jooq.Record1;
 import org.jooq.Record3;
 import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -32,64 +31,65 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "task_permission", schema = "public")
-public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionRecord> implements Record3<Long, TaskPermissionType, Integer>, ITaskPermission {
+@Table(name = "task_permission", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"task_id", "principal_id", "permission"})
+})
+public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionRecord> implements Record3<Integer, Long, TaskPermissionType>, ITaskPermission {
 
-	private static final long serialVersionUID = 832483594;
-
-	/**
-	 * Setter for <code>public.task_permission.id</code>.
-	 */
-	@Override
-	public TaskPermissionRecord setId(Long value) {
-		setValue(0, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.task_permission.id</code>.
-	 */
-	@Id
-	@Column(name = "id", unique = true, nullable = false, precision = 64)
-	@Override
-	public Long getId() {
-		return (Long) getValue(0);
-	}
-
-	/**
-	 * Setter for <code>public.task_permission.type</code>.
-	 */
-	@Override
-	public TaskPermissionRecord setType(TaskPermissionType value) {
-		setValue(1, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.task_permission.type</code>.
-	 */
-	@Column(name = "type", nullable = false)
-	@Override
-	public TaskPermissionType getType() {
-		return (TaskPermissionType) getValue(1);
-	}
+	private static final long serialVersionUID = -1454101402;
 
 	/**
 	 * Setter for <code>public.task_permission.task_id</code>.
 	 */
 	@Override
 	public TaskPermissionRecord setTaskId(Integer value) {
-		setValue(2, value);
+		setValue(0, value);
 		return this;
 	}
 
 	/**
 	 * Getter for <code>public.task_permission.task_id</code>.
 	 */
-	@Column(name = "task_id", precision = 32)
+	@Column(name = "task_id", nullable = false, precision = 32)
 	@Override
 	public Integer getTaskId() {
-		return (Integer) getValue(2);
+		return (Integer) getValue(0);
+	}
+
+	/**
+	 * Setter for <code>public.task_permission.principal_id</code>.
+	 */
+	@Override
+	public TaskPermissionRecord setPrincipalId(Long value) {
+		setValue(1, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.task_permission.principal_id</code>.
+	 */
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	@Override
+	public Long getPrincipalId() {
+		return (Long) getValue(1);
+	}
+
+	/**
+	 * Setter for <code>public.task_permission.permission</code>.
+	 */
+	@Override
+	public TaskPermissionRecord setPermission(TaskPermissionType value) {
+		setValue(2, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.task_permission.permission</code>.
+	 */
+	@Column(name = "permission", nullable = false)
+	@Override
+	public TaskPermissionType getPermission() {
+		return (TaskPermissionType) getValue(2);
 	}
 
 	// -------------------------------------------------------------------------
@@ -100,8 +100,8 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Record1<Long> key() {
-		return (Record1) super.key();
+	public Record3<Integer, Long, TaskPermissionType> key() {
+		return (Record3) super.key();
 	}
 
 	// -------------------------------------------------------------------------
@@ -112,7 +112,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, TaskPermissionType, Integer> fieldsRow() {
+	public Row3<Integer, Long, TaskPermissionType> fieldsRow() {
 		return (Row3) super.fieldsRow();
 	}
 
@@ -120,7 +120,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, TaskPermissionType, Integer> valuesRow() {
+	public Row3<Integer, Long, TaskPermissionType> valuesRow() {
 		return (Row3) super.valuesRow();
 	}
 
@@ -128,23 +128,7 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Field<Long> field1() {
-		return TaskPermission.TASK_PERMISSION.ID;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Field<TaskPermissionType> field2() {
-		return TaskPermission.TASK_PERMISSION.TYPE;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Field<Integer> field3() {
+	public Field<Integer> field1() {
 		return TaskPermission.TASK_PERMISSION.TASK_ID;
 	}
 
@@ -152,23 +136,23 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Long value1() {
-		return getId();
+	public Field<Long> field2() {
+		return TaskPermission.TASK_PERMISSION.PRINCIPAL_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionType value2() {
-		return getType();
+	public Field<TaskPermissionType> field3() {
+		return TaskPermission.TASK_PERMISSION.PERMISSION;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Integer value3() {
+	public Integer value1() {
 		return getTaskId();
 	}
 
@@ -176,25 +160,23 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionRecord value1(Long value) {
-		setId(value);
-		return this;
+	public Long value2() {
+		return getPrincipalId();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionRecord value2(TaskPermissionType value) {
-		setType(value);
-		return this;
+	public TaskPermissionType value3() {
+		return getPermission();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionRecord value3(Integer value) {
+	public TaskPermissionRecord value1(Integer value) {
 		setTaskId(value);
 		return this;
 	}
@@ -203,7 +185,25 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TaskPermissionRecord values(Long value1, TaskPermissionType value2, Integer value3) {
+	public TaskPermissionRecord value2(Long value) {
+		setPrincipalId(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TaskPermissionRecord value3(TaskPermissionType value) {
+		setPermission(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TaskPermissionRecord values(Integer value1, Long value2, TaskPermissionType value3) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
@@ -219,9 +219,9 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	 */
 	@Override
 	public void from(ITaskPermission from) {
-		setId(from.getId());
-		setType(from.getType());
 		setTaskId(from.getTaskId());
+		setPrincipalId(from.getPrincipalId());
+		setPermission(from.getPermission());
 	}
 
 	/**
@@ -247,11 +247,11 @@ public class TaskPermissionRecord extends UpdatableRecordImpl<TaskPermissionReco
 	/**
 	 * Create a detached, initialised TaskPermissionRecord
 	 */
-	public TaskPermissionRecord(Long id, TaskPermissionType type, Integer taskId) {
+	public TaskPermissionRecord(Integer taskId, Long principalId, TaskPermissionType permission) {
 		super(TaskPermission.TASK_PERMISSION);
 
-		setValue(0, id);
-		setValue(1, type);
-		setValue(2, taskId);
+		setValue(0, taskId);
+		setValue(1, principalId);
+		setValue(2, permission);
 	}
 }

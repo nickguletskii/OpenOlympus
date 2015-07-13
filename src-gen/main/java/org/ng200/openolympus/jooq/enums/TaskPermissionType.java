@@ -28,7 +28,9 @@ public enum TaskPermissionType implements EnumType {
 
 	view_during_contest("view_during_contest"),
 
-	modify("modify");
+	modify("modify"),
+
+	manage_acl("manage_acl");
 
 	private final String literal;
 

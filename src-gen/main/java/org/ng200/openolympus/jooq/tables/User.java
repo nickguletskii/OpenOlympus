@@ -11,6 +11,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -34,7 +35,7 @@ import org.ng200.openolympus.jooq.tables.records.UserRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User extends TableImpl<UserRecord> {
 
-	private static final long serialVersionUID = 1741550907;
+	private static final long serialVersionUID = 214823772;
 
 	/**
 	 * The reference instance of <code>public.USER</code>
@@ -228,6 +229,14 @@ public class User extends TableImpl<UserRecord> {
 	@Override
 	public List<UniqueKey<UserRecord>> getKeys() {
 		return Arrays.<UniqueKey<UserRecord>>asList(Keys.USER_PK, Keys.UK_R43AF9AP4EDM43MMTQ01ODDJ6);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ForeignKey<UserRecord, ?>> getReferences() {
+		return Arrays.<ForeignKey<UserRecord, ?>>asList(Keys.USER__USER_PRINCIPAL_ID_MAPPING);
 	}
 
 	/**

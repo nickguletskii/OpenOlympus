@@ -11,7 +11,6 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -36,7 +35,7 @@ import org.ng200.openolympus.util.DateTimeConverter;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Task extends TableImpl<TaskRecord> {
 
-	private static final long serialVersionUID = 432281703;
+	private static final long serialVersionUID = -2004804227;
 
 	/**
 	 * The reference instance of <code>public.task</code>
@@ -75,11 +74,6 @@ public class Task extends TableImpl<TaskRecord> {
 	 * The column <code>public.task.created_date</code>.
 	 */
 	public final TableField<TaskRecord, LocalDateTime> CREATED_DATE = createField("created_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new DateTimeConverter());
-
-	/**
-	 * The column <code>public.task.owner_id</code>.
-	 */
-	public final TableField<TaskRecord, Long> OWNER_ID = createField("owner_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * Create a <code>public.task</code> table reference
@@ -125,14 +119,6 @@ public class Task extends TableImpl<TaskRecord> {
 	@Override
 	public List<UniqueKey<TaskRecord>> getKeys() {
 		return Arrays.<UniqueKey<TaskRecord>>asList(Keys.TASK_PKEY, Keys.TASK_NAME_UNIQUE);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<ForeignKey<TaskRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<TaskRecord, ?>>asList(Keys.TASK__USER_FK);
 	}
 
 	/**

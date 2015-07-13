@@ -32,8 +32,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import org.jooq.Condition;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
@@ -44,6 +47,7 @@ import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
+import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -106,13 +110,25 @@ public class TaskService extends GenericCreateUpdateRepository {
 		if (this.securityService.isSuperuser(principal)) {
 			return this.findTasksNewestFirst(pageNumber, pageSize);
 		}
+		SelectConditionStep<Record1<Long>> userId = dslContext
+				.select(Tables.USER.ID)
+				.from(Tables.USER)
+				.where(Tables.USER.USERNAME
+						.eq(principal.getName()));
+		Condition taskPermissionAppliesToUser = Tables.TASK_PERMISSION.PRINCIPAL_ID
+				.in(
+						dslContext.select(Tables.GROUP_USERS.GROUP_ID)
+								.from(Tables.GROUP_USERS)
+								.where(Tables.GROUP_USERS.GROUP_ID.eq(userId)))
+				.or(Tables.TASK_PERMISSION.PRINCIPAL_ID.eq(userId));
 		return dslContext.select(Tables.TASK.fields())
-				.from(Tables.TASK_PERMISSION_PRINCIPAL)
+				.from(Tables.TASK)
 				.join(Tables.TASK_PERMISSION)
-				.on(Tables.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID
-						.eq(Tables.TASK_PERMISSION.ID))
-				.join(Tables.TASK)
-				.on(Tables.TASK_PERMISSION.TASK_ID.eq(Tables.TASK.ID))
+				.on(Tables.TASK_PERMISSION.TASK_ID
+						.eq(Tables.TASK.ID))
+				.where(taskPermissionAppliesToUser
+						.and(Tables.TASK_PERMISSION.PERMISSION
+								.eq(TaskPermissionType.view)))
 				.groupBy(Tables.TASK.CREATED_DATE)
 				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
 				.offset((pageNumber - 1) * pageSize)
@@ -208,23 +224,27 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
 			int taskId) {
-		return dslContext.select(Tables.TASK_PERMISSION.TYPE,
-				Tables.TASK_PERMISSION_PRINCIPAL.PRINCIPAL_ID)
+		return dslContext.select(Tables.TASK_PERMISSION.PERMISSION,
+				Tables.TASK_PERMISSION.PRINCIPAL_ID)
 				.from(Tables.TASK_PERMISSION)
-				.leftOuterJoin(Tables.TASK_PERMISSION_PRINCIPAL)
-				.on(Tables.TASK_PERMISSION.ID.eq(
-						Tables.TASK_PERMISSION_PRINCIPAL.TASK_PERMISSION_ID))
 				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
-				.fetchGroups(Tables.TASK_PERMISSION.TYPE,
+				.fetchGroups(Tables.TASK_PERMISSION.PERMISSION,
 						(record) -> Optional.<OlympusPrincipal> ofNullable(
 								dslContext.selectFrom(Tables.GROUP)
 										.where(Tables.GROUP.ID
-												.eq(record.field2()))
+												.eq(record.value2()))
 										.fetchOneInto(Group.class))
 								.orElse(
 										dslContext.selectFrom(Tables.USER)
 												.where(Tables.USER.ID
-														.eq(record.field2()))
+														.eq(record.value2()))
 												.fetchOneInto(User.class)));
+	}
+
+	public void createDefaultTaskACL(Task task, User owner) {
+		TaskPermissionRecord permissionRecord = new TaskPermissionRecord(
+				task.getId(), owner.getId(), TaskPermissionType.manage_acl);
+		permissionRecord.attach(dslContext.configuration());
+		permissionRecord.insert();
 	}
 }

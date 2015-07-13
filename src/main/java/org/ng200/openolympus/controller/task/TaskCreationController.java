@@ -36,6 +36,7 @@ import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.TaskCreationDto;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
@@ -83,14 +84,10 @@ public class TaskCreationController extends
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
-		Long ownerId = userService.getUserByUsername(principal.getName())
-				.getId();
-
-		logger.info("Owner id: {}", ownerId);
+		User owner = userService.getUserByUsername(principal.getName());
 
 		Task task = new Task().setName(taskCreationDto.getName())
-				.setCreatedDate(LocalDateTime.now())
-				.setOwnerId(ownerId);
+				.setCreatedDate(LocalDateTime.now());
 
 		final Path localDescriptionFile = this.storageService
 				.createTaskDescriptionFileStorage(task);
@@ -98,6 +95,7 @@ public class TaskCreationController extends
 				.createTaskJudgeDirectory(task);
 
 		task = this.taskService.insertTask(task);
+		this.taskService.createDefaultTaskACL(task, owner);
 
 		final Lock lock = task.writeLock();
 		lock.lock();

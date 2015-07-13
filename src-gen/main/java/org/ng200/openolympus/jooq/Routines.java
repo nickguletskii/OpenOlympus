@@ -16,6 +16,7 @@ import org.ng200.openolympus.jooq.routines.GetContestStart;
 import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
 import org.ng200.openolympus.jooq.routines.GetSolutionAuthor;
 import org.ng200.openolympus.jooq.routines.GetSolutionTimeAdded;
+import org.ng200.openolympus.jooq.routines.KeepUserAsPrincipal;
 import org.ng200.openolympus.jooq.routines.MaintainContestRank;
 import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTask;
 import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTimeExtensions;
@@ -226,6 +227,25 @@ public class Routines {
 	public static Field<Timestamp> getSolutionTimeAdded(Field<Long> solutionId) {
 		GetSolutionTimeAdded f = new GetSolutionTimeAdded();
 		f.setSolutionId(solutionId);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.keep_user_as_principal</code>
+	 */
+	public static Object keepUserAsPrincipal(Configuration configuration) {
+		KeepUserAsPrincipal f = new KeepUserAsPrincipal();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.keep_user_as_principal</code> as a field
+	 */
+	public static Field<Object> keepUserAsPrincipal() {
+		KeepUserAsPrincipal f = new KeepUserAsPrincipal();
 
 		return f.asField();
 	}

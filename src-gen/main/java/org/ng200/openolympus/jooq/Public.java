@@ -22,6 +22,7 @@ import org.ng200.openolympus.jooq.tables.ContestPermissionPrincipal;
 import org.ng200.openolympus.jooq.tables.ContestQuestion;
 import org.ng200.openolympus.jooq.tables.ContestTasks;
 import org.ng200.openolympus.jooq.tables.Group;
+import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
 import org.ng200.openolympus.jooq.tables.Principal;
 import org.ng200.openolympus.jooq.tables.Property;
@@ -29,10 +30,8 @@ import org.ng200.openolympus.jooq.tables.Resource;
 import org.ng200.openolympus.jooq.tables.Solution;
 import org.ng200.openolympus.jooq.tables.Task;
 import org.ng200.openolympus.jooq.tables.TaskPermission;
-import org.ng200.openolympus.jooq.tables.TaskPermissionPrincipal;
 import org.ng200.openolympus.jooq.tables.TimeExtension;
 import org.ng200.openolympus.jooq.tables.User;
-import org.ng200.openolympus.jooq.tables.UserGroups;
 import org.ng200.openolympus.jooq.tables.Verdict;
 
 
@@ -49,7 +48,7 @@ import org.ng200.openolympus.jooq.tables.Verdict;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = 434831030;
+	private static final long serialVersionUID = -823062637;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -81,7 +80,6 @@ public class Public extends SchemaImpl {
 			Sequences.RESOURCE_ID_SEQ,
 			Sequences.SOLUTION_ID_SEQ,
 			Sequences.TASK_ID_SEQ,
-			Sequences.TASK_PERMISSION_ID_SEQ,
 			Sequences.TIME_EXTENSION_ID_SEQ,
 			Sequences.VERDICT_ID_SEQ);
 	}
@@ -103,6 +101,7 @@ public class Public extends SchemaImpl {
 			ContestQuestion.CONTEST_QUESTION,
 			ContestTasks.CONTEST_TASKS,
 			Group.GROUP,
+			GroupUsers.GROUP_USERS,
 			PersistentLogins.PERSISTENT_LOGINS,
 			Principal.PRINCIPAL,
 			Property.PROPERTY,
@@ -110,10 +109,8 @@ public class Public extends SchemaImpl {
 			Solution.SOLUTION,
 			Task.TASK,
 			TaskPermission.TASK_PERMISSION,
-			TaskPermissionPrincipal.TASK_PERMISSION_PRINCIPAL,
 			TimeExtension.TIME_EXTENSION,
 			User.USER,
-			UserGroups.USER_GROUPS,
 			Verdict.VERDICT);
 	}
 }

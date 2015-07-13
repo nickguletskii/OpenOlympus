@@ -7,8 +7,8 @@ package org.ng200.openolympus.jooq.tables.pojos;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
@@ -26,59 +26,36 @@ import org.ng200.openolympus.jooq.tables.interfaces.ITaskPermission;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
-@Table(name = "task_permission", schema = "public")
+@Table(name = "task_permission", schema = "public", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"task_id", "principal_id", "permission"})
+})
 public class TaskPermission implements ITaskPermission {
 
-	private static final long serialVersionUID = -1847224124;
+	private static final long serialVersionUID = 75501085;
 
-	private Long               id;
-	private TaskPermissionType type;
 	private Integer            taskId;
+	private Long               principalId;
+	private TaskPermissionType permission;
 
 	public TaskPermission() {}
 
 	public TaskPermission(TaskPermission value) {
-		this.id = value.id;
-		this.type = value.type;
 		this.taskId = value.taskId;
+		this.principalId = value.principalId;
+		this.permission = value.permission;
 	}
 
 	public TaskPermission(
-		Long               id,
-		TaskPermissionType type,
-		Integer            taskId
+		Integer            taskId,
+		Long               principalId,
+		TaskPermissionType permission
 	) {
-		this.id = id;
-		this.type = type;
 		this.taskId = taskId;
+		this.principalId = principalId;
+		this.permission = permission;
 	}
 
-	@Id
-	@Column(name = "id", unique = true, nullable = false, precision = 64)
-	@Override
-	public Long getId() {
-		return this.id;
-	}
-
-	@Override
-	public TaskPermission setId(Long id) {
-		this.id = id;
-		return this;
-	}
-
-	@Column(name = "type", nullable = false)
-	@Override
-	public TaskPermissionType getType() {
-		return this.type;
-	}
-
-	@Override
-	public TaskPermission setType(TaskPermissionType type) {
-		this.type = type;
-		return this;
-	}
-
-	@Column(name = "task_id", precision = 32)
+	@Column(name = "task_id", nullable = false, precision = 32)
 	@Override
 	public Integer getTaskId() {
 		return this.taskId;
@@ -87,6 +64,30 @@ public class TaskPermission implements ITaskPermission {
 	@Override
 	public TaskPermission setTaskId(Integer taskId) {
 		this.taskId = taskId;
+		return this;
+	}
+
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	@Override
+	public Long getPrincipalId() {
+		return this.principalId;
+	}
+
+	@Override
+	public TaskPermission setPrincipalId(Long principalId) {
+		this.principalId = principalId;
+		return this;
+	}
+
+	@Column(name = "permission", nullable = false)
+	@Override
+	public TaskPermissionType getPermission() {
+		return this.permission;
+	}
+
+	@Override
+	public TaskPermission setPermission(TaskPermissionType permission) {
+		this.permission = permission;
 		return this;
 	}
 
@@ -99,9 +100,9 @@ public class TaskPermission implements ITaskPermission {
 	 */
 	@Override
 	public void from(ITaskPermission from) {
-		setId(from.getId());
-		setType(from.getType());
 		setTaskId(from.getTaskId());
+		setPrincipalId(from.getPrincipalId());
+		setPermission(from.getPermission());
 	}
 
 	/**

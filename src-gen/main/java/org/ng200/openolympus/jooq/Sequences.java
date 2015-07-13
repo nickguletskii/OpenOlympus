@@ -70,11 +70,6 @@ public class Sequences {
 	public static final Sequence<Long> TASK_ID_SEQ = new SequenceImpl<Long>("task_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>public.task_permission_id_seq</code>
-	 */
-	public static final Sequence<Long> TASK_PERMISSION_ID_SEQ = new SequenceImpl<Long>("task_permission_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
 	 * The sequence <code>public.time_extension_id_seq</code>
 	 */
 	public static final Sequence<Long> TIME_EXTENSION_ID_SEQ = new SequenceImpl<Long>("time_extension_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
