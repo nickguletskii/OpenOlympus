@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="87,587" last-zoom="1.1"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="0,362" last-zoom="0.8"
 	 default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -649,8 +649,8 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="group">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="772.726" y="993.081"/>
-	<column name="id" not-null="true">
+	<position x="773.635" y="993.99"/>
+	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
 	<column name="name" not-null="true">
@@ -1043,6 +1043,84 @@ END;]]></definition>
 		<type name="bool"/>
 	</column>
 </relationship>
+
+<function name="keep_user_as_member_of_groups"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+	IF (TG_OP = 'UPDATE' AND NEW.superuser = TRUE AND OLD.superuser = FALSE) THEN
+		INSERT INTO group_users(group_id, "USER_id",can_add_others_to_group) VALUES
+			((SELECT id FROM "group" WHERE name='#{superusers}'), NEW.id, FALSE);
+		RETURN NEW;
+	ELSIF (TG_OP = 'UPDATE' AND NEW.superuser = FALSE AND OLD.superuser = TRUE) THEN
+		DELETE FROM group_users
+			 WHERE group_users.USER_id =NEW.id
+			AND group_users.group_id=(SELECT id FROM "group" WHERE name='#{superusers}');
+		RETURN NEW;
+	ELSIF (TG_OP = 'INSERT') THEN
+		INSERT INTO group_users(
+			group_id, "USER_id", can_add_others_to_group)
+		VALUES ((SELECT id FROM "group" WHERE name='#{allUsers}'), NEW.id, FALSE);
+		IF(NEW.superuser=TRUE) THEN
+			INSERT INTO group_users(
+				group_id, "USER_id", can_add_others_to_group)
+			VALUES ((SELECT id FROM "group" WHERE name='#{superusers}'), NEW.id, FALSE);
+		END IF;
+		RETURN NEW;
+	END IF;
+END;]]></definition>
+</function>
+
+<function name="keep_group_as_principal"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+	IF (TG_OP = 'DELETE') THEN
+		DELETE FROM principal WHERE principal.id = OLD.id;
+		RETURN OLD;
+	ELSIF (TG_OP = 'UPDATE') THEN
+		UPDATE principal SET (id) = (NEW.id) WHERE principal.id=OLD.id;
+		RETURN NEW;
+	ELSIF (TG_OP = 'INSERT') THEN
+		INSERT INTO principal(id) VALUES (NEW.id);
+		RETURN NEW;
+	END IF;
+END;]]></definition>
+</function>
+
+<trigger name="keep_group_as_principal_trigger" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="true" del-event="true" upd-event="true" trunc-event="false"
+	 table="public.&quot;group&quot;">
+		<function signature="public.keep_group_as_principal()"/>
+</trigger>
+
+<trigger name="keep_user_as_member_of_groups_trigger" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.&quot;USER&quot;">
+		<function signature="public.keep_user_as_member_of_groups()"/>
+</trigger>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

@@ -35,15 +35,18 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.ng200.openolympus.cerberus.util.Lists;
+import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.daos.ContestDao;
 import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
 import org.ng200.openolympus.jooq.tables.daos.ContestTasksDao;
 import org.ng200.openolympus.jooq.tables.daos.GroupDao;
+import org.ng200.openolympus.jooq.tables.daos.GroupUsersDao;
 import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
 import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
 import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
+import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
 import org.ng200.openolympus.services.StorageService;
@@ -91,7 +94,8 @@ public class Application {
 	}
 
 	public static void setupContext(
-			final ApplicationContext webApplicationContext) throws SQLException {
+			final ApplicationContext webApplicationContext)
+					throws SQLException {
 		final UserService userService = webApplicationContext
 				.getBean(UserService.class);
 
@@ -130,16 +134,41 @@ public class Application {
 	@Bean
 	public UserDao userDao() {
 		UserDao userDao = new UserDao(dslContext().configuration());
-		if (userDao.fetchOneByUsername("admin") == null) {
-			logger.info("The administrative account doesn't exist. Creating...");
-			userDao.insert(new User().setUsername("admin")
-					.setPassword(passwordEncoder().encode("admin"))
-					.setSuperuser(true).setEnabled(true).setApproved(true)
-					.setApprovalEmailSent(false));
+		GroupDao groupDao = new GroupDao(dslContext().configuration());
+
+		if (groupDao
+				.fetchOneByName(NameConstants.ALL_USERS_GROUP_NAME) == null) {
+			logger.info("The group of all users doesn't exist. Creating...");
+			groupDao.insert(
+					new Group().setName(NameConstants.ALL_USERS_GROUP_NAME));
 		}
-		if (userDao.fetchOneByUsername("system") == null) {
+
+		if (groupDao.fetchOneByName(
+				NameConstants.SUPERUSERS_GROUP_NAME) == null) {
+			logger.info("The group of all users doesn't exist. Creating...");
+			groupDao.insert(new Group()
+					.setName(NameConstants.SUPERUSERS_GROUP_NAME));
+		}
+
+		if (userDao.fetchOneByUsername(
+				NameConstants.SYSTEM_ACCOUNT_NAME) == null) {
 			logger.info("The system account doesn't exist. Creating...");
-			userDao.insert(new User().setUsername("system").setPassword(null)
+			userDao.insert(
+					new User().setUsername(NameConstants.SYSTEM_ACCOUNT_NAME)
+							.setPassword(null)
+							.setSuperuser(true).setEnabled(true)
+							.setApproved(true)
+							.setApprovalEmailSent(false));
+		}
+
+		if (userDao.fetchOneByUsername(
+				NameConstants.ADMINISTRATOR_ACCOUNT_NAME) == null) {
+			logger.info(
+					"The administrative account doesn't exist. Creating...");
+			userDao.insert(new User()
+					.setUsername(NameConstants.ADMINISTRATOR_ACCOUNT_NAME)
+					.setPassword(passwordEncoder()
+							.encode(NameConstants.ADMINISTRATOR_ACCOUNT_NAME))
 					.setSuperuser(true).setEnabled(true).setApproved(true)
 					.setApprovalEmailSent(false));
 		}
@@ -180,6 +209,11 @@ public class Application {
 	@Bean
 	public PropertyDao propertyDao() {
 		return new PropertyDao(dslContext().configuration());
+	}
+
+	@Bean
+	public GroupUsersDao groupUsersDao() {
+		return new GroupUsersDao(dslContext().configuration());
 	}
 
 	@Bean

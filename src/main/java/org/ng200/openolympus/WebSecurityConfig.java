@@ -168,7 +168,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.authorizeRequests()
 		.antMatchers(HttpMethod.GET, WebSecurityConfig.permittedGet).permitAll().and()
 		.authorizeRequests()
-		.antMatchers(WebSecurityConfig.administrativeAny).hasAuthority(Authorities.ADMINISTRATOR.getAuthority()).and()
+		.antMatchers(WebSecurityConfig.administrativeAny).hasAuthority(Authorities.SUPERUSER.getAuthority()).and()
 		.addFilterBefore(this.reCaptchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter
 				.class)
 				.httpBasic();

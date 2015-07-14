@@ -1,56 +1,71 @@
-<div class="panel panel-warning" ng-repeat="(name, permission) in permissions">
+<div class="panel panel-warning" ng-repeat=" permission in permissions">
     <div class="panel-heading">
-        <h3 class="panel-title">{{ localisationNamespace + '.permission.' + name | translate }}</h3>
+        <h3 class="panel-title">{{ localisationNamespace + '.heading' | translate }}</h3>
     </div>
     <div class="panel-body">
-    </div>
-    <div class="panel panel-warning">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th style="width: 10%"><i class="fa fa-users fa-fw"></i> {{ localisationNamespace + '.header.group.id' | translate }} </th>
-                    <th>{{ localisationNamespace + '.header.group.name' | translate }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="principal in permission.principals | filter: {type:'Group'}">
-                    <td>{{principal.id}}</td>
-                    <td>{{principal.name}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <hr />
-        <form name="addGroupForm" form-for="permission.group" validation-rules="groupValidationRules" submit-with="addGroup(permission.group)" class="form-inline">
-            <type-ahead-field label="" attribute="id" class="fill-parent" options="groupOptions"></type-ahead-field>
-            <submit-button button-class="btn btn-default fa fa-plus"></submit-button>
-        </form>
-    </div>
-    <div class="panel panel-warning">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th style="width: 10%"><i class="fa fa-user fa-fw"></i> {{ localisationNamespace + '.header.user.id' | translate }}
-                    </th>
-                    <th>{{ localisationNamespace + '.header.user.username' | translate }}</th>
-                    <th>{{ localisationNamespace + '.header.user.firstName' | translate }}</th>
-                    <th>{{ localisationNamespace + '.header.user.middleName' | translate }}</th>
-                    <th>{{ localisationNamespace + '.header.user.lastName' | translate }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="principal in permission.principals | filter: {type:'User'}">
-                    <td>{{principal.id}}</td>
-                    <td>{{principal.username}}</td>
-                    <td>{{principal.firstNameMain}}</td>
-                    <td>{{principal.middleNameMain}}</td>
-                    <td>{{principal.lastNameMain}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <hr />
-        <form name="addUserForm" form-for="permission.user" validation-rules="userValidationRules" submit-with="addUser(permission.user)" class="form-inline">
-            <type-ahead-field label="" attribute="id" class="fill-parent" options="userOptions"></type-ahead-field>
-            <submit-button button-class="btn btn-default fa fa-plus"></submit-button>
-        </form>
+        <div class="panel panel-primary" ng-repeat=" permission in permissions">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ localisationNamespace + '.permission.' + permission.permission | translate }}</h3>
+            </div>
+            <div class="panel-body">
+            </div>
+            <div class="panel panel-primary">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%"><i class="fa fa-users fa-fw"></i> {{ localisationNamespace + '.header.group.id' | translate }} </th>
+                            <th>{{ localisationNamespace + '.header.group.name' | translate }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="principal in permission.principals | filter: {type:'Group'} track by principal.id">
+                            <td>{{principal.id}}</td>
+                            <td>{{principal.name|groupName}}</td>
+                            <td class="text-right table-button-column">
+                                <button type="button" class="btn btn-danger btn-xs" ng-click="removePrincipal(permission, principal.id)"><i class="fa fa-times-circle fa-fw"></i>{{ (localisationNamespace + '.body.removeButton') | translate }}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr />
+                <form name="addGroupForm" form-for="permission.group" validation-rules="groupValidationRules" submit-with="addGroup(permission, permission.group)">
+                    <acl-type-ahead label="" attribute="group" class="fill-parent" option-getter="groupOptionProvider" typeahead-template="directives/aclEditor/typeaheadGroupItem.html" button-text="{{(localisationNamespace + '.body.addGroupButton') | translate}}"></acl-type-ahead>
+                </form>
+            </div>
+            <div class="panel panel-primary">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%"><i class="fa fa-user fa-fw"></i> {{ (localisationNamespace + '.header.user.id') | translate }}
+                            </th>
+                            <th>{{ (localisationNamespace + '.header.user.username') | translate }}</th>
+                            <th>{{ (localisationNamespace + '.header.user.firstNameMain') | translate }}</th>
+                            <th>{{ (localisationNamespace + '.header.user.middleNameMain') | translate }}</th>
+                            <th>{{ (localisationNamespace + '.header.user.lastNameMain') | translate }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="user in permission.principals | filter: {type:'User'}  track by user.id ">
+                            <td>
+                                {{user.id}}
+                            </td>
+                            <td>{{user.username}}</td>
+                            <td>{{user.firstNameMain}}</td>
+                            <td>{{user.middleNameMain}}</td>
+                            <td>{{user.lastNameMain}}</td>
+                            <td class="text-right table-button-column">
+                                <button type="button" class="btn btn-danger btn-xs" ng-click="removePrincipal(permission, user.id)"><i class="fa fa-times-circle fa-fw"></i>{{ (localisationNamespace + '.body.removeButton') | translate }}</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr />
+                <form name="addUserForm" form-for="permission.user" validation-rules="userValidationRules" submit-with="addUser(permission, permission.user)">
+                    <acl-type-ahead label="" attribute="user" class="fill-parent" option-getter="userOptionProvider" typeahead-template="directives/aclEditor/typeaheadUserItem.html" button-text="{{(localisationNamespace + '.body.addUserButton') | translate}}"></acl-type-ahead>
+                </form>
+            </div>
+        </div>
     </div>
 </div>

@@ -98,7 +98,7 @@ public class TestingService {
 		private static final long serialVersionUID = -5336945477077794036L;
 
 		public SystemAuthenticationToken() {
-			super(Lists.from(Authorities.ADMINISTRATOR, Authorities.USER));
+			super(Lists.from(Authorities.SUPERUSER, Authorities.USER));
 			this.setAuthenticated(true);
 		}
 

@@ -1,20 +1,16 @@
 var angular = require("angular");
-var _ = require("lodash");
 
 var module = angular.module("ool.directives");
 
-var directives = [{
-	name: "spinner",
-	template: "directives/spinner.html"
-}];
-
-_.forEach(directives, (directive) =>
-	module.directive(directive.name, /*@ngInject*/ function() {
+function defineSimpleDirective(name, template) {
+	module.directive(name, /*@ngInject*/ function() {
 		return {
 			restrict: "E",
-			template: require("ng-cache!" + directive.template),
+			template: template,
 			scope: {},
 			link: () => {}
 		};
-	})
-);
+	});
+}
+
+defineSimpleDirective("spinner", require("ng-cache!directives/spinner.html"));

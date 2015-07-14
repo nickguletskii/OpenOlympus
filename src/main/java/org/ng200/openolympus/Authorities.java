@@ -19,7 +19,7 @@ public class Authorities {
 	}
 
 	public static GrantedAuthority USER = new Authority("USER");
-	public static GrantedAuthority ADMINISTRATOR = new Authority(
-			"ADMINISTRATOR");
+	public static GrantedAuthority SUPERUSER = new Authority(
+			"SUPERUSER");
 
 }

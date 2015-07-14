@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-'use strict';
+"use strict";
 
 var angular = require("angular");
 var _ = require("lodash");
@@ -28,47 +28,52 @@ require("services");
 
 /* Filters */
 
-module.exports = angular.module('ool.filters', ['ool.services'])
-    .filter("asDate", function() {
-        return function(input) {
-            return new Date(input);
-        };
-    }).filter("minusOneNoValue", function() {
-        return function(input) {
-            if (input === -1)
-                return "-";
-            return input;
-        };
-    }).filter("pairMap", function() {
-        return function(input, key, primary) {
-            var x = _.filter(input, function(pair) {
-                return pair.first[primary] === key[primary];
-            });
+module.exports = angular.module("ool.filters", ["ool.services"])
+	.filter("asDate", function() {
+		return function(input) {
+			return new Date(input);
+		};
+	}).filter("minusOneNoValue", function() {
+		return function(input) {
+			if (input === -1) {
+				return "-";
+			}
+			return input;
+		};
+	}).filter("pairMap", function() {
+		return function(input, key, primary) {
+			var x = _.filter(input, function(pair) {
+				return pair.first[primary] === key[primary];
+			});
 
-            return x[0].second;
-        };
-    }).filter("captchaErrorToOwnKey", function() {
-        return function(input) {
-            return "recaptcha." + input;
-        };
-    }).filter("toKB", function() {
-        return function(input) {
-            if (input === -1)
-                return -1;
-            return Math.floor(input / 1024);
-        };
-    }).filter("renderFileList", function() {
-        return function(input) {
-            if (!input)
-                return;
-            let perFile = (file) => file.name;
-            if (!!input.length) {
-                return _.chain(input)
-                    .map(perFile)
-                    .map((name) => '"' + name + '"')
-                    .join(", ")
-                    .value();
-            }
-            return perFile(input);
-        };
-    });
+			return x[0].second;
+		};
+	}).filter("captchaErrorToOwnKey", function() {
+		return function(input) {
+			return "recaptcha." + input;
+		};
+	}).filter("toKB", function() {
+		return function(input) {
+			if (input === -1) {
+				return -1;
+			}
+			return Math.floor(input / 1024);
+		};
+	}).filter("renderFileList", function() {
+		return function(input) {
+			if (!input) {
+				return null;
+			}
+			let perFile = (file) => file.name;
+			if (input.length) {
+				return _.chain(input)
+					.map(perFile)
+					.map((name) => "\"" + name + "\"")
+					.join(", ")
+					.value();
+			}
+			return perFile(input);
+		};
+	});
+
+require("filters/group-name");

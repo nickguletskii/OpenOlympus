@@ -1,5 +1,6 @@
 require("font-awesome-webpack");
 
+var $ = require("jquery");
 var codemirror = require("codemirror");
 var moment = require("moment");
 var _ = require("lodash");

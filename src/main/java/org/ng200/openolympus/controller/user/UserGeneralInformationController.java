@@ -22,45 +22,51 @@
  */
 package org.ng200.openolympus.controller.user;
 
-import java.security.Principal;
+import java.util.List;
 
-import javax.validation.Valid;
-
-import org.ng200.openolympus.controller.BindingResponse;
-import org.ng200.openolympus.dto.UserInfoDto;
+import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityExpressionConstants;
+import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @RestController
-public class UserInfoController extends AbstractUserInfoController {
+public class UserGeneralInformationController {
 
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.PATCH)
-	public BindingResponse changePersonInfo(
-			@Valid @RequestBody final UserInfoDto userInfoDto,
-			final BindingResult bindingResult, final Principal principal)
-			throws BindException {
-		if (bindingResult.hasErrors()) {
-			throw new BindException(bindingResult);
-		}
-		super.copyDtoIntoDatabase(userInfoDto, bindingResult,
-				this.userService.getUserByUsername(principal.getName()));
-		return BindingResponse.OK;
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@JsonView(UnprivilegedView.class)
+	@RequestMapping(method = RequestMethod.GET, value = "/api/userCompletion")
+	public @ResponseBody List<User> searchUsers(
+			@RequestParam(value = "term", defaultValue = "") final String name) {
+		Assertions.resourceExists(name);
+
+		return this.userService.findAFewUsersWithNameContaining(name);
 	}
 
-	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.GET)
-	public UserInfoDto showUserDetailsForm(final Principal principal) {
-		final UserInfoDto userInfoDto = new UserInfoDto();
-		super.initialiseDTO(userInfoDto,
-				this.userService.getUserByUsername(principal.getName()));
-		return userInfoDto;
+	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@JsonView(UnprivilegedView.class)
+	@RequestMapping(method = RequestMethod.GET, value = "/api/user")
+	public @ResponseBody User getUser(
+			@RequestParam(value = "id", required = false) final Long id,
+			@RequestParam(value = "username", required = false) final String name)
+					throws MissingServletRequestParameterException {
+		if (name != null)
+			return this.userService.getUserByUsername(name);
+		if (id == null)
+			throw new MissingServletRequestParameterException("id", "long");
+		return this.userService.getUserById(id);
 	}
 }

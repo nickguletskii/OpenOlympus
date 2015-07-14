@@ -23,7 +23,7 @@ public interface UserDetailsImpl extends IUser, UserDetails {
 		if (getApproved())
 			builder.add(Authorities.USER);
 		if (getSuperuser())
-			builder.add(Authorities.ADMINISTRATOR);
+			builder.add(Authorities.SUPERUSER);
 		return builder.build();
 	}
 
