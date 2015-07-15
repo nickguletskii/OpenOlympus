@@ -6,7 +6,7 @@ module.exports = {
     preBootstrapCustomizations: path.resolve(resourceRoot, "sass/_variables.scss"),
 
     mainSass: path.resolve(resourceRoot, "sass/_main.scss"),
-    verbose: true,
+    verbose: false,
     debug: false,
 
     styleLoader: ExtractTextPlugin.extract('css?sourceMap!sass?sourceMap'),
