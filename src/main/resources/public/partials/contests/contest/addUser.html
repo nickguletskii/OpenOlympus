@@ -22,46 +22,35 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<script type="text/ng-template" id="typeaheadTemplate.html">
+	<a>
+		<span bind-html-unsafe="match.label | typeaheadHighlight:query"></span> (
+		<span bind-html-unsafe="match.model.firstNameMain | typeaheadHighlight:query"></span>
+		<span bind-html-unsafe="match.model.middleNameMain"></span>
+		<span bind-html-unsafe="match.model.lastNameMain | typeaheadHighlight:query"></span>)
+	</a>
+</script>
+<div class="modal-header">
+	<button type="button" class="close" ng-click="$dismiss('cancel')">
+		<span>&times;</span>
+	</button>
+	<h4 class="modal-title"> {{'contest.addUser.title' | translate}}</h4>
+</div>
+<div class="modal-body">
+	<form name="userAdditionForm" role="form" novalidate="" ng-submit="addUser(username)">
+		<input label="{{ 'contest.addUser.username' | translate }}" type="text" ng-model="username" placeholder="{{ 'contest.addUser.placeholder' | translate }}" typeahead="user as user.username for user in getUserSuggestions($viewValue)" typeahead-loading="typeaheadLoading" typeahead-template-url="typeaheadTemplate.html" class="form-control" oolinput="">
+		<div class="form-group">
+			<button type="submit" class="btn btn-default">
+				<span class="fa fa-refresh" ng-show="isSubmitting"></span> {{'contest.addUser.addUserButton' | translate}}
+			</button>
+			<p class="text-success" ng-show="!!userAddedMessage">
+				<span class="fa fa-check" aria-hidden="true"></span>
+				{{ userAddedMessage }}
+			</p>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" ng-click="$dismiss('close')">{{'contest.addUser.closeButton' | translate}}</button>
+</div>
 
-<head>
-</head>
-
-<body th:fragment="content">
-	<script type="text/ng-template" id="typeaheadTemplate.html">
-		<a>
-			<span bind-html-unsafe="match.label | typeaheadHighlight:query"></span> (
-			<span bind-html-unsafe="match.model.firstNameMain | typeaheadHighlight:query"></span> 
-			<span bind-html-unsafe="match.model.middleNameMain"></span> 
-			<span bind-html-unsafe="match.model.lastNameMain | typeaheadHighlight:query"></span>)
-		</a>
-	</script>
-	<div class="modal-header">
-		<button type="button" class="close" ng-click="$dismiss('cancel')">
-			<span>&times;</span>
-		</button>
-		<h4 class="modal-title"> {{'contest.addUser.title' | translate}}</h4>
-	</div>
-	<div class="modal-body">
-		<form name="userAdditionForm" role="form" novalidate="" ng-submit="addUser(username)">
-			<input label="{{ 'contest.addUser.username' | translate }}" type="text" ng-model="username" placeholder="{{ 'contest.addUser.placeholder' | translate }}" typeahead="user as user.username for user in getUserSuggestions($viewValue)" typeahead-loading="typeaheadLoading" typeahead-template-url="typeaheadTemplate.html" class="form-control" oolinput=""></input>
-
-			<div class="form-group">
-				<button type="submit" class="btn btn-default">
-					<span class="fa fa-refresh" ng-show="isSubmitting"></span> {{'contest.addUser.addUserButton' | translate}}
-				</button>
-				<p class="text-success" ng-show="!!userAddedMessage">
-					<span class="fa fa-check" aria-hidden="true"></span>
-					{{ userAddedMessage }}
-				</p>
-			</div>
-		</form>
-
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-default" ng-click="$dismiss('close')">{{'contest.addUser.closeButton' | translate}}</button>
-	</div>
-</body>
-
-</html>

@@ -22,26 +22,16 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<div class="modal-header">
+	<button type="button" class="close" ng-click="$dismiss('close')">
+		<span>&times;</span>
+	</button>
+	<h4 class="modal-title"> {{'task.rejudge.successTitle' | translate}}</h4>
+</div>
+<div class="modal-body">
+	<p>{{'task.rejudge.success' | translate}}</p>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-success" ng-click="$dismiss('close')">{{'task.rejudge.closeButton' | translate}}</button>
+</div>
 
-<head>
-</head>
-
-<body th:fragment="content">
-
-	<div class="modal-header">
-		<button type="button" class="close" ng-click="$dismiss('close')">
-			<span>&times;</span>
-		</button>
-		<h4 class="modal-title"> {{'task.rejudge.successTitle' | translate}}</h4>
-	</div>
-	<div class="modal-body">
-		<p>{{'task.rejudge.success' | translate}}</p>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-success" ng-click="$dismiss('close')">{{'task.rejudge.closeButton' | translate}}</button>
-	</div>
-</body>
-
-</html>

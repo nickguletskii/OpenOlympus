@@ -22,35 +22,23 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<div class="modal-header">
+	<button type="button" class="close" ng-click="$dismiss('cancel')">
+		<span>&times;</span>
+	</button>
+	<h4 class="modal-title"> {{'contest.addUserTime.title' | translate}}</h4>
+</div>
+<div class="modal-body">
+	<form name="userTimeAdditionForm" role="form" novalidate="" ng-submit="addUserTime(time)">
+		<input label="{{ 'contest.addUserTime.time' | translate }}" type="number" ng-model="time" class="form-control" oolinput="">
+		<div class="form-group">
+			<button type="submit" class="btn btn-success" ng-disabled="isSubmitting">
+				<span class="fa fa-refresh" ng-show="isSubmitting"></span> {{'contest.addUserTime.addUserTimeButton' | translate}}
+			</button>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" ng-click="$dismiss('close')">{{'contest.addUserTime.closeButton' | translate}}</button>
+</div>
 
-<head>
-</head>
-
-<body th:fragment="content">
-
-	<div class="modal-header">
-		<button type="button" class="close" ng-click="$dismiss('cancel')">
-			<span>&times;</span>
-		</button>
-		<h4 class="modal-title"> {{'contest.addUserTime.title' | translate}}</h4>
-	</div>
-	<div class="modal-body">
-		<form name="userTimeAdditionForm" role="form" novalidate="" ng-submit="addUserTime(time)">
-			<input label="{{ 'contest.addUserTime.time' | translate }}" type="number" ng-model="time" class="form-control" oolinput=""></input>
-
-			<div class="form-group">
-				<button type="submit" class="btn btn-success" ng-disabled="isSubmitting">
-					<span class="fa fa-refresh" ng-show="isSubmitting"></span> {{'contest.addUserTime.addUserTimeButton' | translate}}
-				</button>
-			</div>
-		</form>
-
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-default" ng-click="$dismiss('close')">{{'contest.addUserTime.closeButton' | translate}}</button>
-	</div>
-</body>
-
-</html>

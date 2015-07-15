@@ -22,27 +22,17 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<div class="modal-header">
+	<button type="button" class="close" ng-click="$dismiss('cancel')">
+		<span>&times;</span>
+	</button>
+	<h4 class="modal-title"> {{'task.rejudge.confirmationTitle' | translate}}</h4>
+</div>
+<div class="modal-body">
+	<p>{{'task.rejudge.confirmation' | translate}}</p>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" ng-click="$dismiss('cancel')">{{'task.rejudge.cancelButton' | translate}}</button>
+	<button type="button" class="btn btn-danger" ui-sref="^.rejudgeTaskWorking({taskId: stateParams.taskId})">{{'task.rejudge.confirmButton' | translate}}</button>
+</div>
 
-<head>
-</head>
-
-<body th:fragment="content">
-
-	<div class="modal-header">
-		<button type="button" class="close" ng-click="$dismiss('cancel')">
-			<span>&times;</span>
-		</button>
-		<h4 class="modal-title"> {{'task.rejudge.confirmationTitle' | translate}}</h4>
-	</div>
-	<div class="modal-body">
-		<p>{{'task.rejudge.confirmation' | translate}}</p>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-default" ng-click="$dismiss('cancel')">{{'task.rejudge.cancelButton' | translate}}</button>
-        <button type="button" class="btn btn-danger" ui-sref="^.rejudgeTaskWorking({taskId: stateParams.taskId})">{{'task.rejudge.confirmButton' | translate}}</button>
-	</div>
-</body>
-
-</html>

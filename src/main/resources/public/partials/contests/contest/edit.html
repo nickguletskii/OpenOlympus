@@ -22,44 +22,28 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<form name="contestModificationForm" role="form" novalidate="" ng-submit="modifyContest(contest)" ng-show="isFormVisible">
+	<input label="contest.modificationForm.labels.name" type="text" ng-model="contest.name" required="" oolinput="">
+	<input label="contest.modificationForm.labels.startTime" type="datetime" ng-model="contest.startTime" required="" oolinput="" ng-date-time="">
+	<input label="contest.modificationForm.labels.duration" type="number" ng-model="contest.duration" min="1" ng-min="1" required="" oolinput="">
+	<div class="checkbox">
+		<label>
+			<input type="checkbox" ng-model="contest.showFullTestsDuringContest"> {{'contest.creationForm.labels.showFullTestsDuringContest'|translate}}
+		</label>
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-default">{{'contest.modificationForm.labels.modifyButton' | translate}}</button>
+	</div>
+</form>
+<form ng-show="!isFormVisible">
+	<div class="form-group">
+		<label>{{'contest.modificationForm.labels.uploading' | translate}}</label>
+		<progressbar value="uploadProgress" type="{{ uploadProgressBarColour() }}" class="progress-striped" ng-class="{'active': uploading }"><b>{{uploadProgress}}%</b>
+		</progressbar>
+		<label ng-if="processing">{{'contest.modificationForm.labels.processing' | translate}}</label>
+		<button class="btn btn-danger" ng-if="uploadFailure" ng-click="reset()">{{'contest.modificationForm.labels.back' | translate}}</button>
+		<button class="btn btn-success" ng-if="uploadSuccess" ng-click="reset()">{{'contest.modificationForm.labels.again' | translate}}</button>
+		<button class="btn btn-success" ng-if="uploadSuccess" ui-sref="contestView({contestId: stateParams.contestId})">{{'contest.modificationForm.labels.toContest' | translate}}</button>
+	</div>
+</form>
 
-<head>
-</head>
-
-<body th:fragment="content">
-    <form name="contestModificationForm" role="form" novalidate="" ng-submit="modifyContest(contest)" ng-show="isFormVisible">
-        <input label="contest.modificationForm.labels.name" type="text" ng-model="contest.name" required="" oolinput=""></input>
-        
-        <input label="contest.modificationForm.labels.startTime" type="datetime" ng-model="contest.startTime" required="" oolinput="" ng-date-time=""></input>
-
-        <input label="contest.modificationForm.labels.duration" type="number" ng-model="contest.duration" min="1" ng-min="1" required="" oolinput=""></input>
-
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" ng-model="contest.showFullTestsDuringContest"></input>
-
-                {{'contest.creationForm.labels.showFullTestsDuringContest'|translate}}
-            </label>
-        </div>
-        
-        <div class="form-group">
-            <button type="submit" class="btn btn-default">{{'contest.modificationForm.labels.modifyButton' | translate}}</button>
-        </div>
-    </form>
-    <form ng-show="!isFormVisible">
-        <div class="form-group">
-            <label>{{'contest.modificationForm.labels.uploading' | translate}}</label>
-            <progressbar value="uploadProgress" type="{{ uploadProgressBarColour() }}" class="progress-striped" ng-class="{'active': uploading }"><b>{{uploadProgress}}%</b>
-            </progressbar>
-            <label ng-if="processing">{{'contest.modificationForm.labels.processing' | translate}}</label>
-            <button class="btn btn-danger" ng-if="uploadFailure" ng-click="reset()">{{'contest.modificationForm.labels.back' | translate}}</button>
-            <button class="btn btn-success" ng-if="uploadSuccess" ng-click="reset()">{{'contest.modificationForm.labels.again' | translate}}</button>
-            <button class="btn btn-success" ng-if="uploadSuccess" ui-sref="contestView({contestId: stateParams.contestId})">{{'contest.modificationForm.labels.toContest' | translate}}</button>
-        </div>
-    </form>
-
-</body>
-
-</html>

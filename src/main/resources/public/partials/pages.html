@@ -22,24 +22,16 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
->
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
 <head>
 </head>
 
 <body th:fragment="content">
 	<div class="pagination-centered">
-		<pagination
-			total-items="{{totalItems}}"
-			page="{{page}}"
-			on-select-page="switchPage(page)"
-			max-size="{{maxSize}}"
-			boundary-links="true"
-		></pagination>
+		<pagination total-items="{{totalItems}}" page="{{page}}" on-select-page="switchPage(page)" max-size="{{maxSize}}" boundary-links="true"></pagination>
 	</div>
 </body>
+
 </html>
+

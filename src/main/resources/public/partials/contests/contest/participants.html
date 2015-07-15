@@ -22,39 +22,29 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<table class="table table-striped table-bordered table-hover" id="userTable">
+	<thead>
+		<tr>
+			<th>{{'contest.participants.username' | translate}}</th>
+			<th>{{'contest.participants.firstNameMain' | translate}}</th>
+			<th>{{'contest.participants.middleNameMain' | translate}}</th>
+			<th>{{'contest.participants.lastNameMain' | translate}}</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="user in users">
+			<td>{{user.username}}</td>
+			<td>{{user.firstNameMain}}</td>
+			<td>{{user.middleNameMain}}</td>
+			<td>{{user.lastNameMain}}</td>
+			<td>
+				<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.participants.addUserTimeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs fa-clock-o " ui-sref=".addUserTime({userId: user.id})"> </button>
+				<button class="btn btn-danger btn-xs fa fa-remove pull-right" ng-really-click="removeUser(item)" item="user" ng-really-yes-button="{{'contest.participants.remove.confirmationButton'|translate}}" ng-really-message="{{'contest.participants.remove.confirmation' |translate}}">
+				</button>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<pagination total-items="userCount" ng-model="page" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" direction-links="true" boundary-links="true"></pagination>
 
-<head>
-</head>
-
-<body th:fragment="content">
-	<table class="table table-striped table-bordered table-hover" id="userTable">
-		<thead>
-			<tr>
-				<th>{{'contest.participants.username' | translate}}</th>
-				<th>{{'contest.participants.firstNameMain' | translate}}</th>
-				<th>{{'contest.participants.middleNameMain' | translate}}</th>
-				<th>{{'contest.participants.lastNameMain' | translate}}</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat="user in users">
-				<td>{{user.username}}</td>
-				<td>{{user.firstNameMain}}</td>
-				<td>{{user.middleNameMain}}</td>
-				<td>{{user.lastNameMain}}</td>
-				<td>
-					<button type="button" ng-if="security.isAdmin()" tooltip="{{ 'contest.participants.addUserTimeButton' | translate }}" class=" hidden-print pull-right btn btn-warning btn-xs fa-clock-o " ui-sref=".addUserTime({userId: user.id})"> </button>
-					<button class="btn btn-danger btn-xs fa fa-remove pull-right" ng-really-click="removeUser(item)" item="user" ng-really-yes-button="{{'contest.participants.remove.confirmationButton'|translate}}" ng-really-message="{{'contest.participants.remove.confirmation' |translate}}">
-					</button>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<pagination total-items="userCount" ng-model="page" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" direction-links="true" boundary-links="true"></pagination>
-
-</body>
-
-</html>

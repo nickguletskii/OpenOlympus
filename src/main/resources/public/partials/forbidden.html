@@ -22,22 +22,14 @@
     THE SOFTWARE.
 
 -->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<!DOCTYPE HTML>
+<div class="text-center">
+	<div class="row">
+		<span class="fa fa-lock text-danger" style="font-size: 20em" />
+	</div>
+	<div class="row&&">
+		<h1>{{'error.forbidden.title' | translate}}</h1>
+		<p>{{'error.forbidden.body' | translate}}</p>
+	</div>
+</div>
 
-<head>
-</head>
-
-<body th:fragment="content">
-    <div class="text-center">
-        <div class="row">
-            <span class="fa fa-lock text-danger" style="font-size: 20em"></span>
-        </div>
-        <div class="row">
-            <h1>{{'error.forbidden.title' | translate}}</h1>
-            <p>{{'error.forbidden.body' | translate}}</p>
-        </div>
-    </div>
-</body>
-
-</html>
