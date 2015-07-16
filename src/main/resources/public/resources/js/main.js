@@ -49,28 +49,6 @@ angular.module("ool")
 
 		$httpProvider.interceptors.push( /*@ngInject*/ function($q, $rootScope, $location) {
 			return {
-				"responseError": function(rejection) {
-					var status = rejection.status;
-					var config = rejection.config;
-					if (!config) {
-						return $q.reject(rejection);
-					}
-					var method = config.method;
-					var url = config.url;
-
-					if (status === 401) {
-						$location.path("/login");
-					} else {
-						throw new Error(method + " on " + url + " failed with status " + status);
-					}
-
-					return $q.reject(rejection);
-				}
-			};
-		});
-
-		$httpProvider.interceptors.push( /*@ngInject*/ function($q, $rootScope, $location) {
-			return {
 				"request": function(config) {
 					if (angular.isDefined($rootScope.authToken)) {
 						config.headers["X-Auth-Token"] = $rootScope.authToken;
@@ -90,10 +68,18 @@ angular.module("ool")
 						$rootScope.showErrorModal = true;
 						return $q.reject(response);
 					}
+					var status = response.status;
+					var config = response.config;
+					var method = config.method;
+					var url = config.url;
 
-					if (response.status === 403) {
+					if (status === 403) {
 						$location.path("/forbidden");
 						return $q.reject(response);
+					} else if (response.status === 401) {
+						$location.path("/login");
+					} else {
+						throw new Error(method + " on " + url + " failed with status " + status);
 					}
 
 					return $q.reject(response);
