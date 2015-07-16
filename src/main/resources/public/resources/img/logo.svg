@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <clipPath id="circleClip">
+                <circle r="0.45" cx="0.5" cy="0.5"></circle>
+            </clipPath>
+        </defs>
+        <g transform="scale(600,-600) translate(0, -1)" clip-path="url(#circleClip)">
+            <rect x="0" y="0" width="1" height="1" fill="#097d9e"></rect>
+            <polygon points="0.1,0,0.7,0.6,1.15,0" fill="#06a77d"></polygon>
+            <polygon points="-0.1,0,0.4,0.5,0.775,0" stroke="#097d9e" stroke-width="0.005"></polygon>
+            <polygon points="-0.1,0,0.4,0.5,0.775,0" fill="#06a77d"></polygon>
+        </g>
+    </svg>

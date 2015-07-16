@@ -398,6 +398,8 @@
 						<exclude>node_modules/**</exclude>
 						<exclude>bower_components/**</exclude>
 						<exclude>src/main/resources/public/resources/bundled/**</exclude>
+						<exclude>src/main/resources/public/resources/sass/_bootswatch.scss</exclude>
+						<exclude>src/main/resources/public/resources/sass/_bootswatchVariables.scss</exclude>
 						<exclude>**/.directory</exclude>
 						<exclude>missingLocalisation.txt</exclude>
 					</excludes>

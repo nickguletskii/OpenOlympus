@@ -74,3 +74,8 @@ body {
     white-space: nowrap;
     width: 1%;
 }
+
+.navbar-brand > img {
+	display: inline-block;
+	max-height: $navbar-height - 2 * $navbar-padding-vertical;
+}

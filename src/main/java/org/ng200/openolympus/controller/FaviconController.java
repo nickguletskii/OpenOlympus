@@ -20,10 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@import "~_bootswatchVariables.scss";
-$icon-font-path: "../fonts/";
-$brand-primary: #2B474F;
-$brand-success: #06A77D;
-$brand-info: #097D9E;
-$brand-warning: #FF9E16;
-$brand-danger: #E02D1D;
+package org.ng200.openolympus.controller;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class FaviconController {
+	private ClassPathResource ico = new ClassPathResource("public/favicon.ico");
+	private ClassPathResource png = new ClassPathResource("public/favicon.png");
+
+	@RequestMapping(value = "/**/favicon.ico", method = RequestMethod.GET)
+	@ResponseBody
+	public Resource faviconIco() {
+		return ico;
+	}
+
+	@RequestMapping(value = "/**/favicon.png", method = RequestMethod.GET)
+	@ResponseBody
+	public Resource faviconPng() {
+		return png;
+	}
+}
