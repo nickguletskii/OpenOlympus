@@ -26,7 +26,7 @@ var angular = require("angular");
 var _ = require("lodash");
 
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, $translate) {
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, Upload, $translate) {
     $scope.getTaskSuggestions = function(name) {
         return $http.get("/api/taskCompletion", {
             params: {
