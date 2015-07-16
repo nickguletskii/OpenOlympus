@@ -96,7 +96,7 @@ public class SolutionStatusController {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SolutionStatusController.class);
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + '(' + "#solution.user"

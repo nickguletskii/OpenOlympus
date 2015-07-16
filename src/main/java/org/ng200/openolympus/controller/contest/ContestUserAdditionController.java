@@ -56,7 +56,7 @@ public class ContestUserAdditionController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addUser")
 	public BindingResponse addUser(
 			@PathVariable(value = "contest") final Contest contest,

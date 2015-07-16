@@ -52,7 +52,7 @@ public class EmailService {
 	@Value("${emailPassword}")
 	private String emailPassword;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void sendEmail(String emailAddress, String subject, String view, String alternativeText,
 			Map<String, Object> variables) throws MessagingException, EmailException {
 		final HtmlEmail email = new HtmlEmail();

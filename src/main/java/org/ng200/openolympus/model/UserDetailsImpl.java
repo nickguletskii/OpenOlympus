@@ -25,15 +25,19 @@ package org.ng200.openolympus.model;
 import java.util.Collection;
 
 import org.ng200.openolympus.Authorities;
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.annotations.SecurityClearance;
 import org.ng200.openolympus.jooq.tables.interfaces.IUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 
+@JsonFilter("default")
 public interface UserDetailsImpl extends IUser, UserDetails {
 
 	static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);
@@ -68,4 +72,7 @@ public interface UserDetailsImpl extends IUser, UserDetails {
 	public default boolean isEnabled() {
 		return getEnabled();
 	}
+
+	@SecurityClearance(SecurityClearanceType.INTERNAL)
+	public String getPassword();
 }

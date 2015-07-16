@@ -80,7 +80,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 	@Autowired
 	private DSLContext dslContext;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void addContestParticipant(final Contest contest, final User user) {
 		contestParticipationDao.insert(new ContestParticipation(null, null,
 				user.getId(), contest.getId()));
@@ -91,20 +91,20 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return contestDao.count();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@Transactional
 	public void deleteContest(Contest contest) {
 		contestDao.delete(contest);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void extendTimeForUser(final Contest contest, final User user,
 			final Duration time) {
 		timeExtensionDao.insert(new TimeExtension(null, time, null, user
 				.getId(), contest.getId()));
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Contest getContestByName(final String name) {
 		return contestDao.fetchOneByName(name);
 	}
@@ -118,7 +118,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return procedure.getReturnValue().toInstant();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<UserRanking> getContestResults(Contest contest) {
 		return getContestResultsQuery(contest).fetchInto(UserRanking.class);
 	}
@@ -138,7 +138,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 						.getId()));
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -184,7 +184,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 				).fetchOneInto(Contest.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber,
 			int pageSize) {
 		return dslContext
@@ -202,7 +202,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 				Date.from(Instant.now()));
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -233,7 +233,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return !contest.getStartTime().toInstant().isAfter(Instant.now());
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -326,12 +326,12 @@ public class ContestService extends GenericCreateUpdateRepository {
 								true).otherwise(false)).fetchOne().value1();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Contest insertContest(Contest contest) {
 		return insert(contest, Tables.CONTEST);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Contest updateContest(Contest contest) {
 		return update(contest, Tables.CONTEST);
 	}

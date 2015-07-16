@@ -43,14 +43,14 @@ public class PendingUserListRestController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/pendingUsersCount", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public long getUsers() {
 		return this.userService.countUnapprovedUsers();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/pendingUsers", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> getUsers(@RequestParam("page") Integer page) {

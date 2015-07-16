@@ -46,7 +46,7 @@ public class TaskFilesystemManipulatingController {
 	@Autowired
 	private StorageService storageService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	private void extractZipFile(final InputStream zipFile,
 			final Path destination) throws Exception {
 		try (ArchiveInputStream input = new ArchiveStreamFactory()
@@ -65,13 +65,13 @@ public class TaskFilesystemManipulatingController {
 		}
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	protected void uploadDescription(final Task task, InputStream inputStream)
 			throws ExecuteException, IOException {
 		this.storageService.writeTaskDescription(task, inputStream);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	protected void uploadJudgeFile(final Task task, final UploadableTask taskDto)
 			throws IOException, Exception {
 		final Path judgeFile = this.storageService.getTaskJudgeFile(task);

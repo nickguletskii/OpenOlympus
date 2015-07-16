@@ -20,17 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus;
+package org.ng200.openolympus.config;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
+import org.ng200.openolympus.Authorities;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationFailureHandler;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationSuccessHandler;
 import org.ng200.openolympus.controller.auth.RecaptchaAuthenticationFilter;
 import org.ng200.openolympus.services.UserSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -45,6 +46,7 @@ import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -59,58 +61,59 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private UserSecurityService userSecurityService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	@Value("${persistentTokenKey}")
-	private String persistentTokenKey;
+
 	@Autowired
-	private PersistentTokenRepository persistentTokenRepository;
+	private PersistentTokenConfiguration persistentTokenConfiguration;
+	@Autowired
+	private DataSource dataSource;
 
 	private static String[] permittedAny = {
-			"/",
-			"/translation",
-			"/resources/**",
-			"/api/user/register/",
-			"/errors/**"
+												"/",
+												"/translation",
+												"/resources/**",
+												"/api/user/register/",
+												"/errors/**"
 	};
 
 	private static String[] authorisedAny = {
-			"/api/archive/rank",
-			"/api/archive/rankCount",
-			"/api/archive/tasks",
-			"/api/archive/taskCount",
-			"/api/contests",
-			"/api/contestsCount",
-			"/api/contest/*",
-			"/api/contest/*/results",
-			"/api/verdict",
-			"/api/user/solutions",
-			"/api/user/solutionsCount",
-			"/api/user/solutionsCount",
-			"/api/task/*",
-			"/api/task/*/name"
+												"/api/archive/rank",
+												"/api/archive/rankCount",
+												"/api/archive/tasks",
+												"/api/archive/taskCount",
+												"/api/contests",
+												"/api/contestsCount",
+												"/api/contest/*",
+												"/api/contest/*/results",
+												"/api/verdict",
+												"/api/user/solutions",
+												"/api/user/solutionsCount",
+												"/api/user/solutionsCount",
+												"/api/task/*",
+												"/api/task/*/name"
 	};
 
 	private static String[] authorisedPost = {
-			"/user/**",
-			"/api/task/*/submitSolution"
+												"/user/**",
+												"/api/task/*/submitSolution"
 	};
 	private static String[] authorisedGet = {};
 	private static String[] permittedGet = {};
 	private static String[] administrativeAny = {
-			"/api/admin/**",
-			"/api/task/create",
-			"/api/taskSourcecode",
-			"/api/task/*/edit",
-			"/api/task/*/rejudgeTask",
-			"/api/contests/create",
-			"/api/contest/*/edit",
-			"/api/contest/*/participants",
-			"/api/contest/*/remove",
-			"/api/contest/*/completeResults",
-			"/api/contest/*/addTask",
-			"/api/contest/*/addUser",
-			"/api/contest/*/addUserTime",
-			"/api/contest/*/removeTask/*",
-			"/api/taskSourcecode"
+													"/api/admin/**",
+													"/api/task/create",
+													"/api/taskSourcecode",
+													"/api/task/*/edit",
+													"/api/task/*/rejudgeTask",
+													"/api/contests/create",
+													"/api/contest/*/edit",
+													"/api/contest/*/participants",
+													"/api/contest/*/remove",
+													"/api/contest/*/completeResults",
+													"/api/contest/*/addTask",
+													"/api/contest/*/addUser",
+													"/api/contest/*/addUserTime",
+													"/api/contest/*/removeTask/*",
+													"/api/taskSourcecode"
 	};
 
 	@Bean
@@ -132,45 +135,54 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
-		//@formatter:off
+
 		http
-		.csrf().disable()
-		.headers()
-		.xssProtection().disable()
-		.and()
-		.exceptionHandling().accessDeniedHandler(new AccessDeniedHandlerImpl())
-		.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
-		.and()
-		.formLogin()
-		.loginPage("/login")
-		.failureHandler(this.authenticationFailureHandler())
-		.successHandler(this.authenticationSuccessHandler())
-		.loginProcessingUrl("/login")
-		.usernameParameter("username")
-		.passwordParameter("password")
-		.permitAll().and()
-		.logout()
-		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-		.logoutSuccessUrl("/")
-		.permitAll().and()
-		.rememberMe()
-		.rememberMeServices(this.rememberMeServices())
-		.tokenRepository(persistentTokenRepository)
-		.key(this.persistentTokenKey).tokenValiditySeconds(60*60*24*14).userDetailsService(this.userSecurityService).and().authenticationProvider(this.rememberMeAuthenticationProvider())
-		.authorizeRequests()
-		.antMatchers(WebSecurityConfig.permittedAny).permitAll().and()
-		.authorizeRequests()
-		.antMatchers(WebSecurityConfig.authorisedAny).hasAuthority(Authorities.USER.getAuthority()).and()
-		.authorizeRequests()
-		.antMatchers(HttpMethod.POST, WebSecurityConfig.authorisedPost).hasAuthority(Authorities.USER.getAuthority()).and()
-		.authorizeRequests()
-		.antMatchers(HttpMethod.GET, WebSecurityConfig.authorisedGet).hasAuthority(Authorities.USER.getAuthority()).and()
-		.authorizeRequests()
-		.antMatchers(HttpMethod.GET, WebSecurityConfig.permittedGet).permitAll().and()
-		.authorizeRequests()
-		.antMatchers(WebSecurityConfig.administrativeAny).hasAuthority(Authorities.SUPERUSER.getAuthority()).and()
-		.addFilterBefore(this.reCaptchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter
-				.class)
+				.csrf().disable()
+				.headers()
+				.xssProtection().disable()
+				.and()
+				.exceptionHandling()
+				.accessDeniedHandler(new AccessDeniedHandlerImpl())
+				.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+				.and()
+				.formLogin()
+				.loginPage("/login")
+				.failureHandler(this.authenticationFailureHandler())
+				.successHandler(this.authenticationSuccessHandler())
+				.loginProcessingUrl("/login")
+				.usernameParameter("username")
+				.passwordParameter("password")
+				.permitAll().and()
+				.logout()
+				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+				.logoutSuccessUrl("/")
+				.permitAll().and()
+				.rememberMe()
+				.rememberMeServices(this.rememberMeServices())
+				.tokenRepository(persistentTokenRepository())
+				.key(this.persistentTokenConfiguration.getPersistentTokenKey())
+				.tokenValiditySeconds(60 * 60 * 24 * 14)
+				.userDetailsService(this.userSecurityService).and()
+				.authenticationProvider(this.rememberMeAuthenticationProvider())
+				.authorizeRequests()
+				.antMatchers(WebSecurityConfig.permittedAny).permitAll().and()
+				.authorizeRequests()
+				.antMatchers(WebSecurityConfig.authorisedAny)
+				.hasAuthority(Authorities.USER.getAuthority()).and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, WebSecurityConfig.authorisedPost)
+				.hasAuthority(Authorities.USER.getAuthority()).and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.GET, WebSecurityConfig.authorisedGet)
+				.hasAuthority(Authorities.USER.getAuthority()).and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.GET, WebSecurityConfig.permittedGet)
+				.permitAll().and()
+				.authorizeRequests()
+				.antMatchers(WebSecurityConfig.administrativeAny)
+				.hasAuthority(Authorities.SUPERUSER.getAuthority()).and()
+				.addFilterBefore(this.reCaptchaAuthenticationFilter(),
+						UsernamePasswordAuthenticationFilter.class)
 				.httpBasic();
 		//@formatter:on
 	}
@@ -183,18 +195,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
 		final RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider(
-				this.persistentTokenKey);
+				this.persistentTokenConfiguration.getPersistentTokenKey());
 		return rememberMeAuthenticationProvider;
 	}
 
 	@Bean
 	public RememberMeServices rememberMeServices() {
 		final PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-				this.persistentTokenKey, this.userSecurityService,
-				this.persistentTokenRepository) {
+				this.persistentTokenConfiguration.getPersistentTokenKey(),
+				this.userSecurityService,
+				this.persistentTokenRepository()) {
 
 			@Override
-			protected String extractRememberMeCookie(HttpServletRequest request) {
+			protected String extractRememberMeCookie(
+					HttpServletRequest request) {
 				if (request.getHeader("X-Auth-Token") != null) {
 					return request.getHeader("X-Auth-Token");
 				}
@@ -219,5 +233,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.setCookieName(WebSecurityConfig.REMEMBERME_COOKIE_NAME);
 		rememberMeServices.setAlwaysRemember(true);
 		return rememberMeServices;
+	}
+
+	@Bean
+	public PersistentTokenRepository persistentTokenRepository() {
+		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl() {
+
+			@Override
+			protected void initDao() {
+				getJdbcTemplate()
+						.execute(
+								"create table if not exists persistent_logins (username varchar(64) not null, series varchar(64) primary key, "
+										+ "token varchar(64) not null, last_used timestamp not null)");
+			}
+
+		};
+		db.setDataSource(dataSource);
+		return db;
 	}
 }

@@ -21,57 +21,31 @@
  * THE SOFTWARE.
  */
 var _ = require("lodash");
-
-String.prototype.endsWith = function(suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
-
-String.prototype.format = function() {
-    var args = arguments;
-    return this.replace(/{(\d+)}/g, function(match, number) {
-        return typeof args[number] != 'undefined' ? args[number] : match;
-    });
-};
+var angular = require("angular");
 
 var removeAngularElements = function(obj) {
-    if ((typeof obj) !== "object")
-        return obj;
-    return _.mapValues(_.pick(obj, function(name) {
-        if (typeof name == "string")
-            return name.substring(0, 1) == "$";
-        return true;
-    }), removeAngularElements);
+	if (!angular.isObject(obj)) {
+		return obj;
+	}
+	return _.mapValues(_.pick(obj, function(name) {
+		if (angular.isString(name)) {
+			return name.substring(0, 1) === "$";
+		}
+		return true;
+	}), removeAngularElements);
 };
 
 module.exports = {
-    getURLParameters: function() {
-        var result = {},
-            tmp = [];
-        location.search.substr(1).split("&").forEach(function(item) {
-            tmp = item.split("=");
-            result[tmp[0]] = decodeURIComponent(tmp[1]);
-        });
-        return result;
-    },
-    mergeObjects: function(obj1, obj2) {
-        var obj3 = {};
-        for (var attrname in obj1) {
-            obj3[attrname] = obj1[attrname];
-        }
-        for (var attrname in obj2) {
-            obj3[attrname] = obj2[attrname];
-        }
-        return obj3;
-    },
-    emptyToNull: function(obj) {
-        return _.mapValues(obj, function(value) {
-            if (value === "")
-                return null;
-            return value;
-        });
-    },
-    removeAngularElements: removeAngularElements,
-    equalsWithoutAngular: function(obj1, obj2) {
-        return _.isEqual(removeAngularElements(obj1), removeAngularElements(obj2));
-    }
+	emptyToNull: function(obj) {
+		return _.mapValues(obj, function(value) {
+			if (value === "") {
+				return null;
+			}
+			return value;
+		});
+	},
+	removeAngularElements: removeAngularElements,
+	equalsWithoutAngular: function(obj1, obj2) {
+		return _.isEqual(removeAngularElements(obj1), removeAngularElements(obj2));
+	}
 };

@@ -25,9 +25,6 @@ package org.ng200.openolympus;
 import java.io.IOException;
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -44,15 +41,12 @@ public class DurationJacksonModule extends SimpleModule {
 	 */
 	private static final long serialVersionUID = 5894603418971898080L;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DurationJacksonModule.class);
-
 	public DurationJacksonModule() {
 		addSerializer(new JsonSerializer<Duration>() {
 			@Override
 			public void serialize(Duration duration, JsonGenerator gen,
 					SerializerProvider serializerProvider) throws IOException,
-					JsonProcessingException {
+							JsonProcessingException {
 				gen.writeNumber(duration.toMillis());
 			}
 
@@ -65,7 +59,7 @@ public class DurationJacksonModule extends SimpleModule {
 			@Override
 			public Duration deserialize(JsonParser jp,
 					DeserializationContext ctxt) throws IOException,
-					JsonProcessingException {
+							JsonProcessingException {
 				long l = jp.getValueAsLong();
 				return Duration.ofMillis(l);
 			}

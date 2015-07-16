@@ -23,19 +23,13 @@
 package org.ng200.openolympus.controller.auth;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 public class AuthenticationInformationController {
@@ -43,7 +37,6 @@ public class AuthenticationInformationController {
 	@Autowired
 	private UserService userService;
 
-	@JsonView(UnprivilegedView.class)
 	@RequestMapping(value = "/api/security/userStatus", method = RequestMethod.GET)
 	public User userStatus(Principal principal) {
 		if (principal == null) {

@@ -20,7 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
 	$scope.task = {};

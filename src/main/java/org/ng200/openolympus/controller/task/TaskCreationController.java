@@ -23,29 +23,19 @@
 package org.ng200.openolympus.controller.task;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.concurrent.locks.Lock;
 
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.TaskCreationDto;
-import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.TaskValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,11 +45,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.ImmutableMap;
 
 @RestController
-public class TaskCreationController extends
-		TaskFilesystemManipulatingController {
+public class TaskCreationController {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(TaskCreationController.class);
 	@Autowired
 	private TaskValidator taskValidator;
 
@@ -67,14 +54,10 @@ public class TaskCreationController extends
 	private TaskService taskService;
 
 	@Autowired
-	private StorageService storageService;
-
-	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
-	@Transactional
 	private BindingResponse createTask(final TaskCreationDto taskCreationDto,
 			final BindingResult bindingResult, Principal principal)
 					throws IOException, BindException {
@@ -86,40 +69,8 @@ public class TaskCreationController extends
 		}
 		User owner = userService.getUserByUsername(principal.getName());
 
-		Task task = new Task().setName(taskCreationDto.getName())
-				.setCreatedDate(LocalDateTime.now());
-
-		final Path localDescriptionFile = this.storageService
-				.createTaskDescriptionFileStorage(task);
-		final Path judgeDir = this.storageService
-				.createTaskJudgeDirectory(task);
-
-		task = this.taskService.insertTask(task);
-		this.taskService.createDefaultTaskACL(task, owner);
-
-		final Lock lock = task.writeLock();
-		lock.lock();
-
-		try {
-			this.uploadDescription(task, taskCreationDto
-					.getDescriptionFile().getInputStream());
-			this.uploadJudgeFile(task, taskCreationDto);
-
-			task = this.taskService.updateTask(task);
-		} catch (final ArchiveException e) {
-			bindingResult.rejectValue("judgeFile", "",
-					"task.add.form.errors.judgeArchive.invalid");
-			throw new BindException(bindingResult);
-		} catch (final Exception e) {
-			try {
-				throw new GeneralNestedRuntimeException("", e);
-			} finally {
-				FileAccess.deleteDirectoryByWalking(judgeDir);
-				FileAccess.deleteDirectoryByWalking(localDescriptionFile);
-			}
-		} finally {
-			lock.unlock();
-		}
+		Task task = taskService.uploadTask(taskCreationDto, bindingResult,
+				owner);
 
 		return new BindingResponse(Status.OK,
 				null, ImmutableMap.<String, Object> builder()

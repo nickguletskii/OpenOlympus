@@ -66,7 +66,7 @@ public class StorageService implements Serializable {
 		return dir;
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Path createTaskDescriptionFileStorage(Task task) throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final String idString = System.currentTimeMillis() + "_"
@@ -79,7 +79,7 @@ public class StorageService implements Serializable {
 		return file;
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Path createTaskJudgeDirectory(Task task) throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault().getPath(this.storagePath,
@@ -133,7 +133,7 @@ public class StorageService implements Serializable {
 				.toString());
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void writeTaskDescription(Task task, InputStream inputStream)
 			throws ExecuteException, IOException {
 		final Path source = FileSystems.getDefault().getPath(this.storagePath,

@@ -24,20 +24,36 @@ package org.ng200.openolympus.services;
 
 import static org.jooq.impl.DSL.max;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.Lock;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.exec.ExecuteException;
 import org.jooq.Condition;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
+import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
+import org.ng200.openolympus.dto.TaskCreationDto;
+import org.ng200.openolympus.dto.UploadableTask;
+import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
@@ -54,6 +70,8 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 
 @Service
 public class TaskService extends GenericCreateUpdateRepository {
@@ -75,7 +93,10 @@ public class TaskService extends GenericCreateUpdateRepository {
 	@Autowired
 	private DSLContext dslContext;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@Autowired
+	private StorageService storageService;
+
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -84,14 +105,14 @@ public class TaskService extends GenericCreateUpdateRepository {
 		return taskDao.count();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Task> findAFewTasksWithNameContaining(final String name) {
 		return dslContext.selectFrom(Tables.TASK)
 				.where(Tables.TASK.NAME.like(name))
 				.limit(LIMIT_TASKS_WITH_NAME_CONTAINING).fetchInto(Task.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Task> findTasksNewestFirst(final int pageNumber,
 			final int pageSize) {
 		return dslContext.selectFrom(Tables.TASK).groupBy(Tables.TASK.ID)
@@ -100,7 +121,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.fetchInto(Task.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -135,7 +156,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.fetchInto(Task.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -149,7 +170,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.value1();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -166,18 +187,18 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.fetchOne().value1();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
-	@PostAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PostAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + " #returnObject.published")
 	public Task getTaskByName(final String taskName) {
 		return taskDao.fetchOneByName(taskName);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@Transactional
 	public void rejudgeTask(final Task task)
 			throws ExecutionException, IOException {
@@ -194,7 +215,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 		}
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Task insertTask(Task task) {
 		return insert(task, Tables.TASK);
 	}
@@ -212,7 +233,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 		return taskDao.findById(id);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Task updateTask(Task task) {
 		return update(task, Tables.TASK);
 	}
@@ -246,5 +267,85 @@ public class TaskService extends GenericCreateUpdateRepository {
 				task.getId(), owner.getId(), TaskPermissionType.manage_acl);
 		permissionRecord.attach(dslContext.configuration());
 		permissionRecord.insert();
+	}
+
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
+	private void extractZipFile(final InputStream zipFile,
+			final Path destination) throws Exception {
+		try (ArchiveInputStream input = new ArchiveStreamFactory()
+				.createArchiveInputStream(new BufferedInputStream(zipFile))) {
+			ArchiveEntry entry;
+			while ((entry = input.getNextEntry()) != null) {
+				final Path dest = destination.resolve(entry.getName());
+				if (entry.isDirectory()) {
+					FileAccess.createDirectories(dest);
+				} else {
+					FileAccess.createDirectories(dest.getParent());
+					FileAccess.createFile(dest);
+					Files.copy(input, dest,
+							StandardCopyOption.REPLACE_EXISTING);
+				}
+			}
+		}
+	}
+
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
+	protected void uploadDescription(final Task task, InputStream inputStream)
+			throws ExecuteException, IOException {
+		this.storageService.writeTaskDescription(task, inputStream);
+	}
+
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
+	protected void uploadJudgeFile(final Task task,
+			final UploadableTask taskDto)
+					throws IOException, Exception {
+		final Path judgeFile = this.storageService.getTaskJudgeFile(task);
+		if (FileAccess.exists(judgeFile)) {
+			FileAccess.deleteDirectoryByWalking(judgeFile);
+		}
+		FileAccess.createDirectories(judgeFile);
+
+		this.extractZipFile(taskDto.getJudgeFile().getInputStream(), judgeFile);
+	}
+
+	@Transactional
+	public Task uploadTask(final TaskCreationDto taskCreationDto,
+			final BindingResult bindingResult, User owner)
+					throws IOException, BindException {
+		Task task = new Task().setName(taskCreationDto.getName())
+				.setCreatedDate(LocalDateTime.now());
+
+		final Path localDescriptionFile = this.storageService
+				.createTaskDescriptionFileStorage(task);
+		final Path judgeDir = this.storageService
+				.createTaskJudgeDirectory(task);
+
+		task = this.insertTask(task);
+		this.createDefaultTaskACL(task, owner);
+		
+		final Lock lock = task.writeLock();
+		lock.lock();
+
+		try {
+			this.uploadDescription(task, taskCreationDto
+					.getDescriptionFile().getInputStream());
+			this.uploadJudgeFile(task, taskCreationDto);
+
+			task = this.updateTask(task);
+		} catch (final ArchiveException e) {
+			bindingResult.rejectValue("judgeFile", "",
+					"task.add.form.errors.judgeArchive.invalid");
+			throw new BindException(bindingResult);
+		} catch (final Exception e) {
+			try {
+				throw new GeneralNestedRuntimeException("", e);
+			} finally {
+				FileAccess.deleteDirectoryByWalking(judgeDir);
+				FileAccess.deleteDirectoryByWalking(localDescriptionFile);
+			}
+		} finally {
+			lock.unlock();
+		}
+		return task;
 	}
 }

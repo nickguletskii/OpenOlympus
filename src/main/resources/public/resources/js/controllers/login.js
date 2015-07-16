@@ -21,73 +21,72 @@
  * THE SOFTWARE.
  */
 
-var Util = require("oolutil");
 var _ = require("lodash");
 
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-    $location, $stateParams, $state, AuthenticationProvider, $translate) {
-    AuthenticationProvider.update();
-    $scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === 'true');
+	$location, $stateParams, $state, AuthenticationProvider, $translate) {
+	AuthenticationProvider.update();
+	$scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === "true");
 
-    $http.get("/api/security/userStatus").success(function(data) {
-        if (data != null) {
-            $state.go("home");
-        } else {
-            $scope.logInFormVisible = true;
-        }
-    });
+	$http.get("/api/security/userStatus").success(function(data) {
+		if (data) {
+			$state.go("home");
+		} else {
+			$scope.logInFormVisible = true;
+		}
+	});
 
-    $scope.validationRules = {
-        username: {
-            required: true
-        },
-        password: {
-            required: true
-        }
-    };
+	$scope.validationRules = {
+		username: {
+			required: true
+		},
+		password: {
+			required: true
+		}
+	};
 
-    $scope.user = {};
+	$scope.user = {};
 
-    $scope.login = function(user) {
-        var deferred = $q.defer();
-        AuthenticationProvider.login(user.username, user.password, user.recaptchaResponse)
-            .success(function(data) {
-                if (data.auth === "succeded") {
-                    deferred.resolve();
-                    AuthenticationProvider.update();
-                    $state.go("home");
-                    return;
-                } else if (data.auth === "failed") {
-                    var key = 'login.form.invalidUsernameOrPassword';
-                    $translate([key]).then(
-                        (translations) => {
-                            deferred.reject({
-                                "username": translations[key],
-                                "password": translations[key]
-                            })
-                        }
-                    );
-                    $scope.$broadcast("formSubmissionRejected")
-                    return;
-                }
-                if (data.recaptchaErrorCodes) {
-                    $translate(data.recaptchaErrorCodes).then((translations) => {
-                        deferred.reject({
-                            recaptchaResponse: _.chain(data.recaptchaErrorCodes)
-                                .map(((key) => "login.form.recaptchaErrors." + translations[key]))
-                                .join("\n")
-                                .value()
-                        });
-                    });
-                    $scope.$broadcast("formSubmissionRejected");
-                    return;
-                }
-                throw {
-                    name: "UnknownLoginResultException",
-                    message: "Unknown login result",
-                    obj: data
-                };
-            });
-        return deferred.promise;
-    };
+	$scope.login = function(user) {
+		var deferred = $q.defer();
+		AuthenticationProvider.login(user.username, user.password, user.recaptchaResponse)
+			.success(function(data) {
+				if (data.auth === "succeded") {
+					deferred.resolve();
+					AuthenticationProvider.update();
+					$state.go("home");
+					return;
+				} else if (data.auth === "failed") {
+					let key = "login.form.invalidUsernameOrPassword";
+					$translate([key]).then(
+						(translations) => {
+							deferred.reject({
+								"username": translations[key],
+								"password": translations[key]
+							});
+						}
+					);
+					$scope.$broadcast("formSubmissionRejected");
+					return;
+				}
+				if (data.recaptchaErrorCodes) {
+					$translate(data.recaptchaErrorCodes).then((translations) => {
+						deferred.reject({
+							recaptchaResponse: _.chain(data.recaptchaErrorCodes)
+								.map(((key) => "login.form.recaptchaErrors." + translations[key]))
+								.join("\n")
+								.value()
+						});
+					});
+					$scope.$broadcast("formSubmissionRejected");
+					return;
+				}
+				throw {
+					name: "UnknownLoginResultException",
+					message: "Unknown login result",
+					obj: data
+				};
+			});
+		return deferred.promise;
+	};
 };

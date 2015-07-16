@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdministrativeUserInfoController extends
 		AbstractUserInfoController {
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.PATCH)
 	public BindingResponse changePersonInfo(final Model model,
 			@Valid @RequestBody final UserInfoDto userInfoDto,
@@ -54,7 +54,7 @@ public class AdministrativeUserInfoController extends
 		return BindingResponse.OK;
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(
 			@PathVariable(value = "user") final User user) {

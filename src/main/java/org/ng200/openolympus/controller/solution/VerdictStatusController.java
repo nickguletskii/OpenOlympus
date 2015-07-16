@@ -166,7 +166,7 @@ public class VerdictStatusController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR
 			+ '('
 			+ SecurityExpressionConstants.IS_USER

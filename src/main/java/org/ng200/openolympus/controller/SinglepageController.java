@@ -8,8 +8,8 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
  * The above copyright notice and this permission notice shall be included in
+ *
  * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -22,23 +22,32 @@
  */
 package org.ng200.openolympus.controller;
 
-import org.opensaml.util.resource.ClasspathResource;
 import org.opensaml.util.resource.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.WebRequest;
 
+@Order(Ordered.LOWEST_PRECEDENCE - 10)
 @Controller
 public class SinglepageController {
 
-	private static final Logger logger = LoggerFactory.getLogger(SinglepageController.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(SinglepageController.class);
 
-	@RequestMapping("/**")
-	public String singlepage() throws ResourceException {
-		return "/singlepage.html";
+	@RequestMapping(value = "/**", produces = MediaType.TEXT_HTML_VALUE)
+	@ResponseBody
+	public Resource singlepage(WebRequest requst) throws ResourceException {
+		logger.debug("Singlepage controller called for URI: {}",
+				requst.getDescription(false));
+		return new ClassPathResource("public/index.html");
 	}
+
 }

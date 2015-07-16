@@ -43,7 +43,7 @@ public class ArchiveUserRankListRestController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -54,7 +54,7 @@ public class ArchiveUserRankListRestController {
 		return this.userService.countUsers();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND

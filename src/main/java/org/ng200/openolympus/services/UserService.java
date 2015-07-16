@@ -66,14 +66,14 @@ public class UserService extends GenericCreateUpdateRepository {
 
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public long countUnapprovedUsers() {
 		// TODO: Check
 		return dslContext.selectCount().from(Tables.USER)
 				.where(Tables.USER.APPROVED.eq(false)).execute();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -82,18 +82,18 @@ public class UserService extends GenericCreateUpdateRepository {
 		return userDao.count();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void deleteUser(final User user) {
 		userDao.delete(user);
 
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void deleteUsers(List<User> users) {
 		userDao.delete(users);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> findAFewUsersWithNameContaining(final String name) {
 		// TODO: use something better for searching...
 		String pattern = "%" + name + "%";
@@ -113,7 +113,7 @@ public class UserService extends GenericCreateUpdateRepository {
 		).limit(30).fetchInto(User.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -159,7 +159,7 @@ public class UserService extends GenericCreateUpdateRepository {
 				.offset(pageSize * (page - 1)).fetchInto(UserRanking.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> getPendingUsers(int pageNumber, int pageSize) {
 		return dslContext.selectFrom(Tables.USER)
 				.where(Tables.USER.APPROVAL_EMAIL_SENT.eq(false))
@@ -167,7 +167,7 @@ public class UserService extends GenericCreateUpdateRepository {
 				.fetchInto(User.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public User getUserById(final Long id) {
 		return userDao.findById(id);
 	}
@@ -176,7 +176,7 @@ public class UserService extends GenericCreateUpdateRepository {
 		return userDao.fetchOneByUsername(username);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> getUsersAlphabetically(final Integer pageNumber,
 			final int pageSize) {
 		return dslContext.selectFrom(Tables.USER)

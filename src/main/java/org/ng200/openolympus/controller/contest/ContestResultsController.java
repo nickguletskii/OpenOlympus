@@ -118,7 +118,7 @@ public class ContestResultsController {
 	@Autowired
 	private TaskService taskService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -134,7 +134,7 @@ public class ContestResultsController {
 		return this.contestService.hasContestTestingFinished(contest);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<ContestUserRankingDto> showCompleteResultsPage(
@@ -147,7 +147,7 @@ public class ContestResultsController {
 				.collect(Collectors.toList());
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND

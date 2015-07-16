@@ -31,44 +31,19 @@ var generatedResourcesRoot = path.resolve(__dirname, "src/main/resources/public/
 var nodeModulesRoot = path.resolve(__dirname, "node_modules");
 var bowerComponentsRoot = path.resolve(__dirname, "bower_components");
 
-var goog = {
-	string: {}
-};
-/* Fragment from Google Closure library !*/
-
-// Copyright 2006 The Closure Library Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-goog.string.regExpEscape = function(s) {
-	return String(s).replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, "\\$1").
-	replace(/\x08/g, "\\x08");
-};
-
-/* End fragment from Google Closure library !*/
-
 var config = {
-	addVendor: function(name, path) {
-		this.resolve.alias[name] = path;
+	addVendor: function(name, p) {
+		this.resolve.alias[name] = p;
 	},
 	context: resourceRoot,
 	entry: [
 		"main.js",
-		'bootstrap-sass!' + path.resolve(__dirname, "bootstrap-sass.config.js"),
+		"bootstrap-sass!" + path.resolve(__dirname, "bootstrap-sass.config.js"),
 		"font-awesome-webpack!" + path.resolve(__dirname, "font-awesome.config.js")
 	],
 	output: {
 		path: path.resolve(generatedResourcesRoot),
-		filename: 'js/bundle.js'
+		filename: "js/bundle.js"
 	},
 	cache: true,
 	devtool: "eval",
@@ -96,26 +71,26 @@ var config = {
 			loader: "expose?angular!exports?window.angular"
 		}, {
 			test: /node_modules\/jquery\/.*\.js$/,
-			loader: 'expose?jQuery'
+			loader: "expose?jQuery"
 		}, {
 			test: /\.js$/,
 			exclude: [
 				/node_modules/,
 				/bower_components/
 			],
-			loader: 'ng-annotate?add=true!babel',
+			loader: "ng-annotate?add=true!babel?cacheDirectory&optional=runtime&comments=false",
 			include: [
 				path.resolve(resourceRoot, "js/")
 			]
 		}, {
 			test: /\.sass$/,
-			loader: ExtractTextPlugin.extract('css?sourceMap!sass?sourceMap')
+			loader: ExtractTextPlugin.extract("css?sourceMap!sass?indentedSyntax")
 		}, {
 			test: /\.scss$/,
-			loader: ExtractTextPlugin.extract('css?sourceMap!sass?sourceMap')
+			loader: ExtractTextPlugin.extract("css?sourceMap!sass")
 		}, {
 			test: /\.less$/,
-			loader: ExtractTextPlugin.extract('css?sourceMap!less?sourceMap')
+			loader: ExtractTextPlugin.extract("css?sourceMap!less")
 		}, {
 			test: /\.css$/,
 			loader: ExtractTextPlugin.extract("css?sourceMap"),
@@ -164,12 +139,11 @@ var config = {
 config.addVendor("jquery", path.resolve(nodeModulesRoot, "jquery/dist/jquery.min.js"));
 config.addVendor("moment", path.resolve(nodeModulesRoot, "moment/moment.js"));
 config.addVendor("moment-timezone", path.resolve(nodeModulesRoot, "moment-timezone/index.js"));
-config.addVendor("angular", path.resolve(nodeModulesRoot, "angular/angular.js"));
+config.addVendor("angular", path.resolve(nodeModulesRoot, "angular/angular.min.js"));
 config.addVendor("angular-animate", path.resolve(nodeModulesRoot, "angular-animate/angular-animate.min.js"));
-config.addVendor("angular-ui-bootstrap", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap.js"));
-config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap-tpls.js"));
+config.addVendor("angular-ui-bootstrap", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap.min.js"));
+config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap-tpls.min.js"));
 config.addVendor("angular-ui-router", path.resolve(nodeModulesRoot, "angular-ui-router/release/angular-ui-router.min.js"));
-config.addVendor("angular-no-captcha", path.resolve(bowerComponentsRoot, "angular-no-captcha/src/angular-no-captcha.js"));
 config.addVendor("angular-form-for", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.js"));
 config.addVendor("angular-form-for-bootstrap", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.bootstrap-templates.js"));
 config.addVendor("angular-recaptcha", path.resolve(bowerComponentsRoot, "angular-recaptcha/release/angular-recaptcha.min.js"));

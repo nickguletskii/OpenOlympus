@@ -20,73 +20,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus;
+package org.ng200.openolympus.config;
 
-import java.util.List;
-
-import org.hibernate.validator.internal.constraintvalidators.URLValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.Ordered;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.StringUtils;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-public class MvcConfig extends WebMvcConfigurerAdapter {
-
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer properties() {
-		final PropertySourcesPlaceholderConfigurer propertySources = new PropertySourcesPlaceholderConfigurer();
-		final Resource[] resources = new ClassPathResource[] {
-																new ClassPathResource("openolympus.properties")
-		};
-		propertySources.setLocations(resources);
-		propertySources.setIgnoreUnresolvablePlaceholders(true);
-		return propertySources;
-	}
-
-	private static final Logger logger = LoggerFactory.getLogger(MvcConfig.class);
-
-	Integer cachePeriod;
-
-	@Value("${cachePeriod:}")
-	public void setCachePeriod(String cachePeriod) {
-		if (StringUtils.isEmpty(cachePeriod))
-			return;
-		this.cachePeriod = Integer.valueOf(cachePeriod);
-	}
-
-	@Autowired
-	private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+public class MvcConfig extends WebMvcAutoConfigurationAdapter {
 
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
 		registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
-		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/public/resources/")
-				.setCachePeriod(cachePeriod);
-		registry.addResourceHandler("/partials/**").addResourceLocations("classpath:/public/partials/")
-				.setCachePeriod(cachePeriod);
-		registry.addResourceHandler("/singlepage.html").addResourceLocations("classpath:/public/singlepage.html")
-				.setCachePeriod(cachePeriod);
+		registry.addResourceHandler("/resources/**")
+				.addResourceLocations("classpath:/public/resources/");
+		registry.addResourceHandler("/partials/**")
+				.addResourceLocations("classpath:/public/partials/");
+		registry.addResourceHandler("/singlepage.html")
+				.addResourceLocations("classpath:/public/singlepage.html");
 	}
 
 	@Bean
@@ -106,12 +68,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		r.setDefaultErrorView("error");
 		r.setExceptionAttribute("exception");
 		return r;
-	}
-
-	@Override
-	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		converters.add(jacksonMessageConverter);
-		super.configureMessageConverters(converters);
 	}
 
 }

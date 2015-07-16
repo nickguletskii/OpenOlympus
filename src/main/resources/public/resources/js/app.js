@@ -20,14 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-'use strict';
+"use strict";
 
 var angular = require("angular");
 
-var app = angular.module('ool', ['pascalprecht.translate', 'ui.router',
-    'ui.bootstrap', 'ool.filters', 'ool.controllers',
-    'ool.services', 'ool.directives', 'ngFileUpload', 'ui.codemirror',
-    'ngAnimate', 'formFor', 'formFor.bootstrapTemplates', 'vcRecaptcha'
-]);
+require("filters");
+require("services");
+require("directives");
+require("controllers");
 
-module.exports = app;
+angular.module("ool", ["pascalprecht.translate", "ui.router",
+	"ui.bootstrap", "ool.filters", "ool.controllers",
+	"ool.services", "ool.directives", "ngFileUpload", "ui.codemirror",
+	"ngAnimate", "formFor", "formFor.bootstrapTemplates", "vcRecaptcha"
+]);

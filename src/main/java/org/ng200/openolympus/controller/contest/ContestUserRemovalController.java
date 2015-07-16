@@ -42,7 +42,7 @@ public class ContestUserRemovalController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/removeUser", method = RequestMethod.DELETE)
 	public void removeTask(
 			@PathVariable(value = "contest") final Contest contest,

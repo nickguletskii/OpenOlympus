@@ -49,7 +49,7 @@ public class ContestParticipantsController {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
 	@JsonView(PriviligedView.class)
 	public List<User> showParticipantsPage(

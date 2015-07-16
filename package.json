@@ -54,6 +54,7 @@
     "angular-ui-bootstrap": "^0.12.1",
     "angular-ui-codemirror": "^0.3.0",
     "angular-ui-router": "^0.2.15",
+    "babel-runtime": "^5.7.0",
     "codemirror": "^5.4.0",
     "font-awesome": "^4.3.0",
     "font-awesome-webpack": "0.0.3",

@@ -60,7 +60,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 	@Autowired
 	private ContestService contestService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -71,7 +71,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.value1();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -87,14 +87,14 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.value1();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public int getNumberOfPendingVerdicts() {
 		return dslContext.selectCount().from(Tables.VERDICT)
 				.where(Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting))
 				.fetchOne().value1();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + "#solution.user"
@@ -108,7 +108,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.fetchOne().value1();
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Solution> getPage(final int pageNumber, final int pageSize) {
 		return dslContext.selectCount().from(Tables.SOLUTION)
 				.groupBy(Tables.SOLUTION.ID)
@@ -116,7 +116,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -135,7 +135,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND
@@ -151,7 +151,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Stream<Verdict> getPendingVerdicts() {
 		return StreamSupport.stream(
 				dslContext
@@ -161,7 +161,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				false).map(record -> record.into(Verdict.class));
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public long getSolutionCount() {
 		return solutionDao.count();
 	}
@@ -172,7 +172,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + "#solution.user"
@@ -186,7 +186,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + '(' + "#solution.user"
@@ -201,7 +201,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 		return getVerdictsVisibleDuringContest(solution);
 	}
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + "#solution.user"

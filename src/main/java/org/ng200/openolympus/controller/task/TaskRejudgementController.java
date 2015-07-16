@@ -45,7 +45,7 @@ public class TaskRejudgementController {
 	@Autowired
 	private TaskService taskService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void rejudgeTask(@PathVariable(value = "task") final Task task,

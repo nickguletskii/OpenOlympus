@@ -54,7 +54,7 @@ public class ContestUserTimeAdditionController {
 	@Autowired
 	private UserService userService;
 
-	@PreAuthorize(SecurityExpressionConstants.IS_ADMIN)
+	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/addUserTime", method = RequestMethod.POST)
 	public BindingResponse addUserTime(final Model model,
 			@PathVariable(value = "contest") final Contest contest,

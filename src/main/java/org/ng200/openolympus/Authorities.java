@@ -26,11 +26,18 @@ import org.springframework.security.core.GrantedAuthority;
 
 public class Authorities {
 
-	protected static class Authority implements GrantedAuthority {
+	public static class OlympusAuthority implements GrantedAuthority {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6009653253064200656L;
 		private final String authority;
+		private SecurityClearanceType clearanceType;
 
-		public Authority(String authority) {
+		public OlympusAuthority(String authority,
+				SecurityClearanceType clearanceType) {
 			this.authority = authority;
+			this.clearanceType = clearanceType;
 		}
 
 		@Override
@@ -38,10 +45,17 @@ public class Authorities {
 			return authority;
 		}
 
+		public SecurityClearanceType getClearanceType() {
+			return clearanceType;
+		}
+
 	}
 
-	public static GrantedAuthority USER = new Authority("USER");
-	public static GrantedAuthority SUPERUSER = new Authority(
-			"SUPERUSER");
+	public static GrantedAuthority USER = new OlympusAuthority("USER",
+			SecurityClearanceType.APPROVED_USER);
+	public static GrantedAuthority ADMINISTRATOR = new OlympusAuthority(
+			"ADMINISTRATOR", SecurityClearanceType.ADMINISTRATIVE_USER);
+	public static GrantedAuthority SUPERUSER = new OlympusAuthority(
+			"SUPERUSER", SecurityClearanceType.SUPERUSER);
 
 }

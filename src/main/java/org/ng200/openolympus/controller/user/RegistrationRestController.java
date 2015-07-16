@@ -38,7 +38,6 @@ import org.ng200.openolympus.services.CaptchaService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.UserDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
@@ -68,7 +67,8 @@ public class RegistrationRestController {
 		private List<FieldError> fieldErrors;
 		private List<ObjectError> globalErrors;
 
-		public RegistrationResponse(Status status, List<String> recaptchaErrorCodes, List<FieldError> fieldErrors,
+		public RegistrationResponse(Status status,
+				List<String> recaptchaErrorCodes, List<FieldError> fieldErrors,
 				List<ObjectError> globalErrors) {
 			this.status = status;
 			this.recaptchaErrorCodes = recaptchaErrorCodes;
@@ -110,9 +110,6 @@ public class RegistrationRestController {
 
 	}
 
-	@Value("${remoteAddress}")
-	private String remoteAddress;
-
 	@Autowired
 	private UserDtoValidator userDtoValidator;
 	@Autowired
@@ -129,35 +126,51 @@ public class RegistrationRestController {
 						BindException.class
 	})
 	public RegistrationResponse handleBindException(BindException exception) {
-		return new RegistrationResponse(Status.BINDING_ERROR, null, exception.getBindingResult().getFieldErrors(),
+		return new RegistrationResponse(Status.BINDING_ERROR, null,
+				exception.getBindingResult().getFieldErrors(),
 				exception.getBindingResult().getGlobalErrors());
 	}
 
 	@RequestMapping(value = "/api/user/register", method = RequestMethod.POST)
-	public RegistrationResponse registerUser(@RequestBody @Valid final UserDto userDto,
+	public RegistrationResponse registerUser(
+			@RequestBody @Valid final UserDto userDto,
 			final BindingResult bindingResult)
-					throws BindException, URISyntaxException, ClientProtocolException, IOException {
-		final List<String> recaptchaErrorCodes = this.captchaService.checkCaptcha(userDto.getRecaptchaResponse());
+					throws BindException, URISyntaxException,
+					ClientProtocolException, IOException {
+		final List<String> recaptchaErrorCodes = this.captchaService
+				.checkCaptcha(userDto.getRecaptchaResponse());
 		if (recaptchaErrorCodes != null && !recaptchaErrorCodes.isEmpty()) {
-			return new RegistrationResponse(Status.RECAPTCHA_ERROR, recaptchaErrorCodes, null, null);
+			return new RegistrationResponse(Status.RECAPTCHA_ERROR,
+					recaptchaErrorCodes, null, null);
 		}
 
 		this.validate(userDto, bindingResult);
 
-		User user = new User().setAddressCity(userDto.getAddressCity()).setAddressCountry(userDto.getAddressCountry())
-				.setAddressLine1(userDto.getAddressLine1()).setAddressLine2(userDto.getAddressLine2())
+		User user = new User().setAddressCity(userDto.getAddressCity())
+				.setAddressCountry(userDto.getAddressCountry())
+				.setAddressLine1(userDto.getAddressLine1())
+				.setAddressLine2(userDto.getAddressLine2())
 				.setAddressState(userDto.getAddressState())
-				.setBirthDate(Optional.ofNullable(userDto.getDateOfBirth()).map(x -> x.toInstant()).map(Timestamp::from)
+				.setBirthDate(Optional.ofNullable(userDto.getDateOfBirth())
+						.map(x -> x.toInstant()).map(Timestamp::from)
 						.orElse(null))
-				.setEmailAddress(userDto.getEmailAddress()).setFirstNameLocalised(userDto.getFirstNameLocalised())
-				.setFirstNameMain(userDto.getFirstNameMain()).setLandline(userDto.getLandline())
-				.setLastNameLocalised(userDto.getLastNameLocalised()).setLastNameMain(userDto.getLastNameMain())
+				.setEmailAddress(userDto.getEmailAddress())
+				.setFirstNameLocalised(userDto.getFirstNameLocalised())
+				.setFirstNameMain(userDto.getFirstNameMain())
+				.setLandline(userDto.getLandline())
+				.setLastNameLocalised(userDto.getLastNameLocalised())
+				.setLastNameMain(userDto.getLastNameMain())
 				.setMiddleNameLocalised(userDto.getMiddleNameLocalised())
-				.setMiddleNameMain(userDto.getMiddleNameLocalised()).setMobile(userDto.getMobile())
-				.setPassword(passwordEncoder.encode(userDto.getPassword())).setSchool(userDto.getSchool())
-				.setTeacherFirstName(userDto.getTeacherFirstName()).setTeacherLastName(userDto.getTeacherLastName())
-				.setTeacherMiddleName(userDto.getTeacherMiddleName()).setUsername(userDto.getUsername())
-				.setSuperuser(false).setApprovalEmailSent(false).setEnabled(true);
+				.setMiddleNameMain(userDto.getMiddleNameLocalised())
+				.setMobile(userDto.getMobile())
+				.setPassword(passwordEncoder.encode(userDto.getPassword()))
+				.setSchool(userDto.getSchool())
+				.setTeacherFirstName(userDto.getTeacherFirstName())
+				.setTeacherLastName(userDto.getTeacherLastName())
+				.setTeacherMiddleName(userDto.getTeacherMiddleName())
+				.setUsername(userDto.getUsername())
+				.setSuperuser(false).setApprovalEmailSent(false)
+				.setEnabled(true);
 
 		userService.insertUser(user);
 
@@ -165,8 +178,10 @@ public class RegistrationRestController {
 	}
 
 	@RequestMapping(value = "/api/user/register/validate", method = RequestMethod.POST)
-	private RegistrationResponse validate(@RequestBody @Valid final UserDto userDto, final BindingResult bindingResult)
-			throws BindException {
+	private RegistrationResponse validate(
+			@RequestBody @Valid final UserDto userDto,
+			final BindingResult bindingResult)
+					throws BindException {
 
 		this.userDtoValidator.validate(userDto, bindingResult);
 		if (bindingResult.hasErrors()) {

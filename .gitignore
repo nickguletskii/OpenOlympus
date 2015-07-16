@@ -1,4 +1,5 @@
 missingLocalisation.txt
+secret.properties
 src/main/resources/spring.properties
 /tasks/
 /solutions/

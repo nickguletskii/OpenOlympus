@@ -33,8 +33,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.ng200.openolympus.RecaptchaResponse;
-import org.springframework.beans.factory.annotation.Value;
+import org.ng200.openolympus.config.RecaptchaConfiguration;
+import org.ng200.openolympus.recaptcha.RecaptchaResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -47,22 +48,20 @@ public class CaptchaService {
 
 	private final CloseableHttpClient httpclient = HttpClients.createDefault();
 
-	@Value("${enableCaptcha}")
-	private boolean captchaEnabled;
-
-	@Value("${recaptchaPrivateKey}")
-	private String recaptchaPrivateKey;
+	@Autowired
+	private RecaptchaConfiguration recaptchaConfiguration;
 
 	public List<String> checkCaptcha(final String recaptchaResponse)
 			throws URISyntaxException, IOException, JsonParseException,
 			JsonMappingException, ClientProtocolException {
-		if (!this.captchaEnabled) {
+		if (!this.recaptchaConfiguration.isRecaptchaEnabled()) {
 			return null;
 		}
 
 		final URI uri = new URIBuilder().setScheme("https")
 				.setHost("www.google.com").setPath("/recaptcha/api/siteverify")
-				.setParameter("secret", this.recaptchaPrivateKey)
+				.setParameter("secret",
+						this.recaptchaConfiguration.getRecaptchaPrivateKey())
 				.setParameter("response", recaptchaResponse).build();
 
 		final HttpGet httpget = new HttpGet(uri);

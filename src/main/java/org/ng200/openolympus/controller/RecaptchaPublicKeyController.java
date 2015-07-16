@@ -22,21 +22,22 @@
  */
 package org.ng200.openolympus.controller;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.ng200.openolympus.config.RecaptchaConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RecaptchaPublicKeyController {
-	@Value("${recaptchaPublicKey:null}")
-	private String recaptchaPublicKey;
 
-	@Value("${enableCaptcha:false}")
-	private boolean recaptchaEnabled;
+	@Autowired
+	private RecaptchaConfiguration recaptchaConfiguration;
 
 	@RequestMapping(value = "/api/recaptchaPublicKey", method = RequestMethod.GET)
 	public String getKey() {
-		return recaptchaEnabled ? recaptchaPublicKey : null;
+		return recaptchaConfiguration.isRecaptchaEnabled()
+				? recaptchaConfiguration.getRecaptchaPublicKey()
+				: null;
 	}
 }
