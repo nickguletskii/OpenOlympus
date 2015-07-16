@@ -27,7 +27,7 @@ var _ = require("lodash");
 var moment = require("moment-timezone");
 
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, $upload, contest) {
+    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, Upload, contest) {
     $scope.serverErrorReporter = new ServersideFormErrorReporter();
     $scope.contest = {};
 
