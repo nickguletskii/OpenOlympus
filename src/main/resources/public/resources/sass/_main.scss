@@ -80,3 +80,7 @@ body {
 	display: inline-block;
 	max-height: $navbar-height - 2 * $navbar-padding-vertical;
 }
+
+.collapsing {
+	transition-duration: 0.15s !important;
+}
