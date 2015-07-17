@@ -51,7 +51,7 @@ public class ContestParticipantsController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
-	@JsonView(PriviligedView.class)
+	
 	public List<User> showParticipantsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,

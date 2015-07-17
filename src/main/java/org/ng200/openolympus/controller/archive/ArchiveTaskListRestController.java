@@ -59,12 +59,10 @@ public class ArchiveTaskListRestController {
 			this.maxScore = maxScore;
 		}
 
-		@JsonView(UnprivilegedView.class)
 		public BigDecimal getMaxScore() {
 			return this.maxScore;
 		}
 
-		@JsonView(UnprivilegedView.class)
 		public BigDecimal getScore() {
 			return this.score;
 		}
@@ -93,7 +91,7 @@ public class ArchiveTaskListRestController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/tasksCount", method = RequestMethod.GET)
-	@JsonView(UnprivilegedView.class)
+
 	public Long countUsers() {
 		return this.taskService.countTasks();
 	}
@@ -104,7 +102,7 @@ public class ArchiveTaskListRestController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
-	@JsonView(UnprivilegedView.class)
+
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,
 			Principal principal) {
 

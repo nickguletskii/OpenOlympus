@@ -60,35 +60,26 @@ public class SolutionDto implements Serializable {
 		this.submissionTime = solution.getTimeAdded();
 	}
 
-	@JsonView(SolutionDto.SolutionDTOView.class)
 	public long getId() {
 		return this.id;
 	}
 
-	@JsonView(SolutionDto.SolutionDTOView.class)
 	public BigDecimal getMaximumScore() {
 		return this.maximumScore;
 	}
 
-	@JsonView(SolutionDto.SolutionDTOView.class)
 	public BigDecimal getScore() {
 		return this.score;
 	}
 
-	@JsonView(SolutionDto.SolutionDTOView.class)
 	public Date getSubmissionTime() {
 		return this.submissionTime;
 	}
 
-	@JsonView({
-			SolutionDto.SolutionDTOView.class,
-			UnprivilegedView.class
-	})
 	public Task getTask() {
 		return this.task;
 	}
 
-	@JsonView(SolutionDto.SolutionDTOView.class)
 	public long getUserId() {
 		return this.userId;
 	}

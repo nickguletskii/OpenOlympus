@@ -112,7 +112,7 @@ public class ContestViewController {
 			+ ')')
 	@Cacheable(value = "contests", key = "#contest.id", unless = "#result == null")
 	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
-	@JsonView(UnprivilegedView.class)
+	
 	public ContestDTO showContestHub(
 			@PathVariable(value = "contest") final Contest contest,
 			final Principal principal) {

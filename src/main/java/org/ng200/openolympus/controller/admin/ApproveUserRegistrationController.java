@@ -63,7 +63,7 @@ public class ApproveUserRegistrationController {
 			Beans.copy(user, this);
 		}
 
-		@JsonView(PriviligedView.class)
+		
 		public String getStatusMessage() {
 			return this.statusMessage;
 		}
@@ -119,7 +119,7 @@ public class ApproveUserRegistrationController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
-	@JsonView(PriviligedView.class)
+	
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
 				.filter(user -> !user.getApprovalEmailSent()).map(u -> {

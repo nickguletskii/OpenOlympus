@@ -45,14 +45,14 @@ public class AdminUserListRestController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/usersCount", method = RequestMethod.GET)
-	@JsonView(PriviligedView.class)
+	
 	public long countUsers() {
 		return this.userService.countUsers();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/users", method = RequestMethod.GET)
-	@JsonView(PriviligedView.class)
+	
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUsersAlphabetically(page,
 				AdminUserListRestController.PAGE_SIZE);

@@ -47,7 +47,7 @@ public class GroupGeneralInformationController {
 	private GroupService groupService;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
-	@JsonView(UnprivilegedView.class)
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupCompletion")
 	public @ResponseBody List<Group> searchGroups(
 			@RequestParam(value = "term", defaultValue = "") final String name) {
@@ -57,7 +57,7 @@ public class GroupGeneralInformationController {
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
-	@JsonView(UnprivilegedView.class)
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/api/group")
 	public @ResponseBody Group getGroup(
 			@RequestParam(value = "id", required = false) final Long id,

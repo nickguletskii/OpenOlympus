@@ -98,7 +98,7 @@ public class SolutionListController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
-	@JsonView(SolutionDto.SolutionDTOView.class)
+	
 	public List<SolutionDto> showUserSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
 			final Model model, final Principal principal) {

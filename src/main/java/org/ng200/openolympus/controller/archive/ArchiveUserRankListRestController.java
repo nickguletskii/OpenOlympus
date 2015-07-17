@@ -49,7 +49,7 @@ public class ArchiveUserRankListRestController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/rankCount", method = RequestMethod.GET)
-	@JsonView(UnprivilegedView.class)
+	
 	public Long countUsers() {
 		return this.userService.countUsers();
 	}
@@ -60,7 +60,7 @@ public class ArchiveUserRankListRestController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/rank", method = RequestMethod.GET)
-	@JsonView(UnprivilegedView.class)
+	
 	public List<UserRanking> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getArchiveRankPage(page,
 				ArchiveUserRankListRestController.PAGE_SIZE);

@@ -78,13 +78,13 @@ public class Pair<F, S> implements Serializable {
 	}
 
 	@JsonProperty("first")
-	@JsonView(UnprivilegedView.class)
+	
 	public F getFirst() {
 		return this.first;
 	}
 
 	@JsonProperty("second")
-	@JsonView(UnprivilegedView.class)
+	
 	public S getSecond() {
 		return this.second;
 	}

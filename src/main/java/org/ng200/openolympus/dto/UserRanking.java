@@ -76,12 +76,12 @@ public class UserRanking extends User {
 		Beans.copy(user, this);
 	}
 
-	@JsonView(UnprivilegedView.class)
+	
 	public BigInteger getRank() {
 		return this.rank;
 	}
 
-	@JsonView(UnprivilegedView.class)
+	
 	public BigDecimal getScore() {
 		return this.score;
 	}

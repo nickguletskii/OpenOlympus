@@ -69,7 +69,7 @@ public class ContestResultsController {
 			// TODO: fix contest ranking DTO
 		}
 
-		@JsonView(UnprivilegedView.class)
+		
 		public List<Pair<Task, BigDecimal>> getTaskScores() {
 			return this.taskScores;
 		}
@@ -136,7 +136,7 @@ public class ContestResultsController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
-	@JsonView(PriviligedView.class)
+	
 	public List<ContestUserRankingDto> showCompleteResultsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			final Model model, final Principal principal) {
@@ -155,7 +155,7 @@ public class ContestResultsController {
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/contest/{contest}/results", method = RequestMethod.GET)
-	@JsonView(UnprivilegedView.class)
+	
 	public List<ContestUserRankingDto> showResultsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
