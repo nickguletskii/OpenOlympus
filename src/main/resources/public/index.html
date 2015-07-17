@@ -29,7 +29,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>OpenOlympus</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="stylesheet" href="/resources/bundled/bundle.css"></link>
+    <link rel="stylesheet" href="/resources/bundled/bundle.css">
     <base href="/" />
 </head>
 
@@ -117,7 +117,7 @@
     </nav>
     <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'" ng-show="!showErrorModal" ng-cloak="">
         <div class="row">
-            <div class="fadeTransition" ng-class="stateConfig.customWidth ? stateConfig.customWidth : 'col-md-10 col-md-offset-1'" ui-view=""></div>
+            <div ng-class="stateConfig.customWidth ? stateConfig.customWidth : 'col-md-10 col-md-offset-1'" ui-view=""></div>
         </div>
         <footer>
             <div class="row">
@@ -145,7 +145,7 @@
         <div class="row">
             <h1>{{'error.title' | translate}}</h1>
             <p>{{'error.body' | translate}}</p>
-            <button class="btn btn-danger" onClick="window.location.reload()">{{'error.reloadPage' | translate}}</button>
+            <button class="btn btn-danger" on-click="window.location.reload()">{{'error.reloadPage' | translate}}</button>
         </div>
     </div>
     <script src="/resources/bundled/js/vendor.bundle.js"></script>
