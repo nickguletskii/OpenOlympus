@@ -20,29 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 .input-file .input-group-addon {
-    border: 0px;
-    padding: 0px;
+	border: 0px;
+	padding: 0px;
 }
 
 .input-file .input-group-addon .btn {
-    border-radius: 0 $border-radius-base $border-radius-base 0
+	border-radius: 0 $border-radius-base $border-radius-base 0
 }
 
 .input-file .input-group-addon input {
-    cursor: pointer;
-    position: absolute;
-    width: 100%;
-    z-index: 2;
-    top: 0;
-    right: 0;
-    filter: alpha(opacity=0);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    opacity: 0;
-    background-color: transparent;
-    color: transparent;
+	cursor: pointer;
+	position: absolute;
+	width: 100%;
+	z-index: 2;
+	top: 0;
+	right: 0;
+	filter: alpha(opacity=0);
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	opacity: 0;
+	background-color: transparent;
+	color: transparent;
 }
 
 .disabled .input-file .form-control {
-    background-color: $input-bg-disabled;
+	background-color: $input-bg-disabled;
 }

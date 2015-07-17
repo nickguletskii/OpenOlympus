@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 $fa-font-path: "node_modules/font-awesome/fonts/";
 @import "~_bootswatch.scss";
 @import "~animate.scss/vendor/assets/stylesheets/animate.scss";
@@ -41,13 +42,13 @@ $fa-font-path: "node_modules/font-awesome/fonts/";
 @import "~_acl.scss";
 @import "~_fileInput.scss";
 body {
-    padding-top: $navbar-height * 1.5;
-    padding-bottom: 20px;
-    overflow-x: hidden;
+	padding-top: $navbar-height * 1.5;
+	padding-bottom: 20px;
+	overflow-x: hidden;
 }
 
 .pagination-centered {
-    text-align: center;
+	text-align: center;
 }
 
 [ng\:cloak],
@@ -56,23 +57,23 @@ body {
 [x-ng-cloak],
 .ng-cloak,
 .x-ng-cloak {
-    display: none !important;
-    opacity: 0
+	display: none !important;
+	opacity: 0
 }
 
 .miniCodemirror .CodeMirror {
-    border: 1px solid #eee;
-    height: 40em !important;
+	border: 1px solid #eee;
+	height: 40em !important;
 }
 
 .tooltip {
-    max-width: 213px;
-    width: 213px;
+	max-width: 213px;
+	width: 213px;
 }
 
 .table-button-column {
-    white-space: nowrap;
-    width: 1%;
+	white-space: nowrap;
+	width: 1%;
 }
 
 .navbar-brand > img {

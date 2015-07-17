@@ -23,18 +23,18 @@
 
 .fadeTransition.ng-enter,
 .fadeTransition.ng-leave {
-    -webkit-animation-duration: 0.2s;
-    animation-duration: 0.2s;
+	-webkit-animation-duration: 0.2s;
+	animation-duration: 0.2s;
 }
 
 .fadeTransition.ng-enter {
-    -webkit-animation-name: fadeInLeft;
-    animation-name: fadeInLeft;
+	-webkit-animation-name: fadeInLeft;
+	animation-name: fadeInLeft;
 }
 
 .fadeTransition.ng-leave {
-    -webkit-animation-name: fadeOutRight;
-    animation-name: fadeOutRight;
-    display: inline-block;
-    position: absolute;
+	-webkit-animation-name: fadeOutRight;
+	animation-name: fadeOutRight;
+	display: inline-block;
+	position: absolute;
 }

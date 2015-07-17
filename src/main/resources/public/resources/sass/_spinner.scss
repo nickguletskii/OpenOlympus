@@ -20,22 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 .spinner-container {
-    width: 100%;
-    z-index: 200000 !important;
-    display: table;
-    text-align: center;
+	width: 100%;
+	z-index: 200000 !important;
+	display: table;
+	text-align: center;
 }
 
 .spinner:before {
-    content: $fa-var-cog;
+	content: $fa-var-cog;
 }
 
 .spinner {
-    animation: fa-spin 5s infinite linear;
-    @include fa-icon();
+	animation: fa-spin 5s infinite linear;
+	@include fa-icon();
 }
 
 .spinner-large {
-    font-size: 10em !important;
+	font-size: 10em !important;
 }
