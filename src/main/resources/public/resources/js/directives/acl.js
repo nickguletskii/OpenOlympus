@@ -43,12 +43,32 @@ angular.module("ool.directives")
 		}
 
 		function link($scope, $element, $attributes) {
+			function updateStatus() {
+				$scope.changesCommitted =
+					_.isEqual(
+						ACLService.cannonicalPermissionForm($scope.permissions),
+						$scope.origPermissions
+					);
+			}
+
 			$scope.refresh = () =>
-				ACLService.getACL($attributes.aclGetter).success((permissions) =>
+				ACLService.getACL($attributes.aclGetter).success((permissions) => {
 					$scope.permissions = _.map(permissions, perm => _.assign(perm, {
 						user: {}, // Form data object for adding users
 						group: {} // Form data object for adding groups
-					})));
+					}));
+					$scope.origPermissions = ACLService.cannonicalPermissionForm(_.cloneDeep($scope.permissions));
+					updateStatus();
+				});
+
+			$scope.commit = () => {
+				$scope.committing = true;
+				ACLService.setACL($attributes.aclSetter, $scope.permissions).success(() => {
+					$scope.refresh();
+					$scope.committing = false;
+				});
+			};
+
 
 			$scope.refresh();
 
@@ -115,6 +135,8 @@ angular.module("ool.directives")
 				}
 
 				permission.principals.push(userForm.user);
+				updateStatus();
+
 				return $q.when(null);
 			};
 
@@ -136,11 +158,14 @@ angular.module("ool.directives")
 				}
 
 				permission.principals.push(groupForm.group);
+				updateStatus();
+
 				return $q.when(null);
 			};
 
 			$scope.removePrincipal = function(permission, toRemove) {
 				permission.principals.splice(_.findIndex(permission.principals, (principal) => principal.id === toRemove), 1);
+				updateStatus();
 			};
 
 

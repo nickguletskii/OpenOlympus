@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -65,6 +66,9 @@ import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
 import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 import org.ng200.openolympus.model.OlympusPrincipal;
+import org.ng200.openolympus.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -322,7 +326,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 		task = this.insertTask(task);
 		this.createDefaultTaskACL(task, owner);
-		
+
 		final Lock lock = task.writeLock();
 		lock.lock();
 
@@ -347,5 +351,23 @@ public class TaskService extends GenericCreateUpdateRepository {
 			lock.unlock();
 		}
 		return task;
+	}
+
+	@Transactional
+	public void setTaskPermissionsAndPrincipals(int taskId,
+			Map<TaskPermissionType, List<Long>> map) {
+		dslContext.delete(Tables.TASK_PERMISSION)
+				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId)).execute();
+		dslContext.batchInsert(
+				map.entrySet().stream().flatMap(e -> e.getValue().stream()
+						.map(id -> new Pair<>(e.getKey(), id)))
+						.map(p -> {
+							TaskPermissionRecord record = new TaskPermissionRecord(
+									taskId,
+									p.getSecond(), p.getFirst());
+							record.attach(dslContext.configuration());
+							return record;
+						}).collect(Collectors.toList()))
+				.execute();
 	}
 }

@@ -21,8 +21,18 @@
  * THE SOFTWARE.
  */
 var angular = require("angular");
+var _ = require("lodash");
 angular.module("ool.services")
 	.service("ACLService", /*@ngInject*/ function($http) {
+		this.cannonicalPermissionForm = (permissions) => {
+			var data = {};
+			_.forEach(permissions, (p) => {
+				data[p.permission] = _(p.principals).sortBy("id").map("id").values();
+			});
+			return data;
+		};
 		this.getACL = (url) => $http.get(url, {});
-		this.setACL = (url) => $http.put(url, {});
+		this.setACL = (url, permissions) => {
+			return $http.put(url, this.cannonicalPermissionForm(permissions));
+		};
 	});

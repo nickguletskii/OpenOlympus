@@ -25,7 +25,7 @@
 <button type="button" ng-if="security.isAdmin()" th:attr="tooltip= #{task.editButton}" class="hidden-print btn btn-primary fa fa-pencil" ui-sref="taskModificationView({taskId: taskId})">
 </button>
 <h2>{{name}}</h2>
-<acl-editor acl-getter="/api/task/{{taskId}}/acl" localisation-namespace="task.permissions"></acl-editor>
+<acl-editor acl-getter="/api/task/{{taskId}}/acl" acl-setter="/api/task/{{taskId}}/acl" localisation-namespace="task.permissions"></acl-editor>
 <div dynamic="description"></div>
 <div class="panel panel-primary">
 	<div class="panel-heading">
