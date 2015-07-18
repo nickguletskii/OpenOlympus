@@ -63,7 +63,6 @@ public class ApproveUserRegistrationController {
 			Beans.copy(user, this);
 		}
 
-		
 		public String getStatusMessage() {
 			return this.statusMessage;
 		}
@@ -73,8 +72,8 @@ public class ApproveUserRegistrationController {
 		}
 	}
 
-	@Value(value = "${emailConfirmationEnabled:true}")
-	private boolean emailConfirmationEnabled;
+	private boolean emailConfirmationEnabled = false;// TODO: reimplement email
+														// confirmation
 
 	@Autowired
 	private EmailService emailService;
@@ -94,20 +93,7 @@ public class ApproveUserRegistrationController {
 					.queryParam("token", user.getEmailConfirmationToken())
 					.build().encode().toUriString();
 
-			this.emailService
-					.sendEmail(
-							user.getEmailAddress(),
-							"Welcome to OpenOlympus!",
-							"emailConfirmationEmail",
-							new StringBuilder()
-									.append("Welcome to OpenOlympus! Please click the following link to complete your registration: ") // TODO:
-									// Localise
-									// this
-									// message
-									.append(link).toString(),
-							ImmutableMap.<String, Object> builder()
-									.put("link", link).put("user", user)
-									.build());
+			// TODO: reimplement email confirmation
 			user.setApprovalEmailSent(true);
 			user = this.userService.updateUser(user);
 		} else {
@@ -119,7 +105,7 @@ public class ApproveUserRegistrationController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
-	
+
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
 				.filter(user -> !user.getApprovalEmailSent()).map(u -> {

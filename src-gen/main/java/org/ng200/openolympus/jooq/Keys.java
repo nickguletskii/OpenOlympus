@@ -95,6 +95,7 @@ public class Keys {
 	public static final Identity<ContestParticipationRecord, Long> IDENTITY_CONTEST_PARTICIPATION = Identities0.IDENTITY_CONTEST_PARTICIPATION;
 	public static final Identity<ContestPermissionRecord, Long> IDENTITY_CONTEST_PERMISSION = Identities0.IDENTITY_CONTEST_PERMISSION;
 	public static final Identity<ContestQuestionRecord, Integer> IDENTITY_CONTEST_QUESTION = Identities0.IDENTITY_CONTEST_QUESTION;
+	public static final Identity<GroupRecord, Long> IDENTITY_GROUP = Identities0.IDENTITY_GROUP;
 	public static final Identity<PrincipalRecord, Long> IDENTITY_PRINCIPAL = Identities0.IDENTITY_PRINCIPAL;
 	public static final Identity<ResourceRecord, Long> IDENTITY_RESOURCE = Identities0.IDENTITY_RESOURCE;
 	public static final Identity<SolutionRecord, Long> IDENTITY_SOLUTION = Identities0.IDENTITY_SOLUTION;
@@ -172,6 +173,7 @@ public class Keys {
 		public static Identity<ContestParticipationRecord, Long> IDENTITY_CONTEST_PARTICIPATION = createIdentity(ContestParticipation.CONTEST_PARTICIPATION, ContestParticipation.CONTEST_PARTICIPATION.ID);
 		public static Identity<ContestPermissionRecord, Long> IDENTITY_CONTEST_PERMISSION = createIdentity(ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.ID);
 		public static Identity<ContestQuestionRecord, Integer> IDENTITY_CONTEST_QUESTION = createIdentity(ContestQuestion.CONTEST_QUESTION, ContestQuestion.CONTEST_QUESTION.ID);
+		public static Identity<GroupRecord, Long> IDENTITY_GROUP = createIdentity(Group.GROUP, Group.GROUP.ID);
 		public static Identity<PrincipalRecord, Long> IDENTITY_PRINCIPAL = createIdentity(Principal.PRINCIPAL, Principal.PRINCIPAL.ID);
 		public static Identity<ResourceRecord, Long> IDENTITY_RESOURCE = createIdentity(Resource.RESOURCE, Resource.RESOURCE.ID);
 		public static Identity<SolutionRecord, Long> IDENTITY_SOLUTION = createIdentity(Solution.SOLUTION, Solution.SOLUTION.ID);

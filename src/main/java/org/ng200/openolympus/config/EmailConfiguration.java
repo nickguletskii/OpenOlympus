@@ -20,13 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.services;
+package org.ng200.openolympus.config;
 
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Service
-public class EmailService {
+@Component
+@Configuration
+public class EmailConfiguration {
 
-	// TODO: reimplement email
-	// confirmation
 }

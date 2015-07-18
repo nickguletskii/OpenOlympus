@@ -20,13 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.services;
+package org.ng200.openolympus.security;
 
-import org.springframework.stereotype.Service;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 
-@Service
-public class EmailService {
-
-	// TODO: reimplement email
-	// confirmation
+public interface SecurityClearanceUnlessPredicate {
+	public boolean objectMatches(User user, Object obj);
 }

@@ -41,6 +41,10 @@ import com.fasterxml.jackson.databind.ser.PropertyFilter;
 @Component
 @Configuration
 public class JacksonConfiguration {
+	@Bean
+	public SecurityClearanceJacksonFilter securityClearanceJacksonFilter() {
+		return new SecurityClearanceJacksonFilter();
+	}
 
 	@Bean
 	public Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder() {
@@ -53,12 +57,12 @@ public class JacksonConfiguration {
 					@Override
 					public PropertyFilter findPropertyFilter(Object filterId,
 							Object valueToFilter) {
-						return new SecurityClearanceJacksonFilter();
+						return securityClearanceJacksonFilter();
 					}
 
 					@Override
 					public BeanPropertyFilter findFilter(Object filterId) {
-						return new SecurityClearanceJacksonFilter();
+						return securityClearanceJacksonFilter();
 					}
 				})
 				.annotationIntrospector(new JacksonAnnotationIntrospector());

@@ -25,8 +25,6 @@ package org.ng200.openolympus.model;
 import java.util.Collection;
 
 import org.ng200.openolympus.Authorities;
-import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.annotations.SecurityClearance;
 import org.ng200.openolympus.jooq.tables.interfaces.IUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +71,4 @@ public interface UserDetailsImpl extends IUser, UserDetails {
 		return getEnabled();
 	}
 
-	@SecurityClearance(SecurityClearanceType.INTERNAL)
-	public String getPassword();
 }

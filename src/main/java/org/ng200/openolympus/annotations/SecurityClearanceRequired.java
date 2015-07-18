@@ -20,13 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.services;
+package org.ng200.openolympus.annotations;
 
-import org.springframework.stereotype.Service;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Service
-public class EmailService {
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.security.PrincipalMatchesUser;
 
-	// TODO: reimplement email
-	// confirmation
+@Retention(RetentionPolicy.RUNTIME)
+@Target(value = {
+					ElementType.METHOD,
+					ElementType.FIELD,
+					ElementType.PACKAGE,
+					ElementType.TYPE,
+					ElementType.TYPE_USE
+})
+public @interface SecurityClearanceRequired {
+	SecurityClearanceType value() default SecurityClearanceType.ANNONYMOUS;
+
+	Class<PrincipalMatchesUser>[] unless() default {};
 }

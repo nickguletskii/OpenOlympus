@@ -33,6 +33,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -55,7 +56,7 @@ import org.ng200.openolympus.jooq.tables.records.GroupRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Group extends TableImpl<GroupRecord> {
 
-	private static final long serialVersionUID = 933141106;
+	private static final long serialVersionUID = -991262986;
 
 	/**
 	 * The reference instance of <code>public.group</code>
@@ -73,7 +74,7 @@ public class Group extends TableImpl<GroupRecord> {
 	/**
 	 * The column <code>public.group.id</code>.
 	 */
-	public final TableField<GroupRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<GroupRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * The column <code>public.group.name</code>.
@@ -100,6 +101,14 @@ public class Group extends TableImpl<GroupRecord> {
 
 	private Group(String alias, Table<GroupRecord> aliased, Field<?>[] parameters) {
 		super(alias, Public.PUBLIC, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Identity<GroupRecord, Long> getIdentity() {
+		return Keys.IDENTITY_GROUP;
 	}
 
 	/**

@@ -34,6 +34,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.FileAccess;
+import org.ng200.openolympus.config.StorageConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,8 +46,7 @@ public final class OpenOlympusMessageSource extends
 	private static final Logger logger = LoggerFactory
 			.getLogger(OpenOlympusMessageSource.class);
 
-	@Value("${storagePath}")
-	private String storagePath;
+	private StorageConfiguration storageConfig;
 	private long lastModified;
 
 	@Override
@@ -76,7 +76,8 @@ public final class OpenOlympusMessageSource extends
 				return;
 			}
 			final Path file = FileSystems.getDefault().getPath(
-					this.storagePath, "missingLocalisation.txt");
+					this.storageConfig.getStoragePath(),
+					"missingLocalisation.txt");
 			if (!FileAccess.exists(file)) {
 				FileAccess.createDirectories(file.getParent());
 				FileAccess.createFile(file);
@@ -93,7 +94,8 @@ public final class OpenOlympusMessageSource extends
 	}
 
 	@Override
-	protected MessageFormat resolveCode(final String code, final Locale locale) {
+	protected MessageFormat resolveCode(final String code,
+			final Locale locale) {
 		final MessageFormat format = super.resolveCode(code, locale);
 		;
 		if (format == null) {

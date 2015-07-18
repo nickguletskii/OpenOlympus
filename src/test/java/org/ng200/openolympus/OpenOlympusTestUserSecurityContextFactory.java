@@ -20,23 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.annotations;
+package org.ng200.openolympus;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
-import org.ng200.openolympus.SecurityClearanceType;
+public class OpenOlympusTestUserSecurityContextFactory
+		implements WithSecurityContextFactory<WithOpenOlympusMockUser> {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(value = {
-					ElementType.METHOD,
-					ElementType.FIELD,
-					ElementType.PACKAGE,
-					ElementType.TYPE,
-					ElementType.TYPE_USE
-})
-public @interface SecurityClearance {
-	SecurityClearanceType value() default SecurityClearanceType.ANNONYMOUS;
+	@Override
+	public SecurityContext createSecurityContext(
+			WithOpenOlympusMockUser annotation) {
+		SecurityContext context = SecurityContextHolder
+				.createEmptyContext();
+		User principal = new User().setUsername(annotation.username())
+				.setApproved(annotation.approved())
+				.setSuperuser(annotation.superuser());
+		Authentication auth = new UsernamePasswordAuthenticationToken(
+				principal, "password", principal.getAuthorities());
+		context.setAuthentication(auth);
+		return context;
+	}
+
 }

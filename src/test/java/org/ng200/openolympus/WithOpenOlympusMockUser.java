@@ -20,13 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.services;
+package org.ng200.openolympus;
 
-import org.springframework.stereotype.Service;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-@Service
-public class EmailService {
+import org.springframework.security.test.context.support.WithSecurityContext;
 
-	// TODO: reimplement email
-	// confirmation
+@Retention(RetentionPolicy.RUNTIME)
+@WithSecurityContext(factory = OpenOlympusTestUserSecurityContextFactory.class)
+public @interface WithOpenOlympusMockUser {
+	public String username();
+
+	public boolean approved();
+
+	public boolean superuser();
 }

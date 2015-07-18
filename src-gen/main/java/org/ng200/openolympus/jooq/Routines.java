@@ -38,6 +38,8 @@ import org.ng200.openolympus.jooq.routines.GetContestStart;
 import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
 import org.ng200.openolympus.jooq.routines.GetSolutionAuthor;
 import org.ng200.openolympus.jooq.routines.GetSolutionTimeAdded;
+import org.ng200.openolympus.jooq.routines.KeepGroupAsPrincipal;
+import org.ng200.openolympus.jooq.routines.KeepUserAsMemberOfGroups;
 import org.ng200.openolympus.jooq.routines.KeepUserAsPrincipal;
 import org.ng200.openolympus.jooq.routines.MaintainContestRank;
 import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTask;
@@ -249,6 +251,44 @@ public class Routines {
 	public static Field<Timestamp> getSolutionTimeAdded(Field<Long> solutionId) {
 		GetSolutionTimeAdded f = new GetSolutionTimeAdded();
 		f.setSolutionId(solutionId);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.keep_group_as_principal</code>
+	 */
+	public static Object keepGroupAsPrincipal(Configuration configuration) {
+		KeepGroupAsPrincipal f = new KeepGroupAsPrincipal();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.keep_group_as_principal</code> as a field
+	 */
+	public static Field<Object> keepGroupAsPrincipal() {
+		KeepGroupAsPrincipal f = new KeepGroupAsPrincipal();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.keep_user_as_member_of_groups</code>
+	 */
+	public static Object keepUserAsMemberOfGroups(Configuration configuration) {
+		KeepUserAsMemberOfGroups f = new KeepUserAsMemberOfGroups();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.keep_user_as_member_of_groups</code> as a field
+	 */
+	public static Field<Object> keepUserAsMemberOfGroups() {
+		KeepUserAsMemberOfGroups f = new KeepUserAsMemberOfGroups();
 
 		return f.asField();
 	}

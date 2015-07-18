@@ -35,10 +35,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.jooq.tables.interfaces.IUser;
+import org.ng200.openolympus.model.IUserSecurityDescription;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.model.UserDetailsImpl;
-
-import com.fasterxml.jackson.annotation.JsonFilter;
 
 
 /**
@@ -54,9 +53,9 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "USER", schema = "public")
-public class User implements UserDetailsImpl, OlympusPrincipal, IUser {
+public class User implements UserDetailsImpl, OlympusPrincipal, IUserSecurityDescription, IUser {
 
-	private static final long serialVersionUID = -1542071437;
+	private static final long serialVersionUID = -191439500;
 
 	private Long      id;
 	private String    username;

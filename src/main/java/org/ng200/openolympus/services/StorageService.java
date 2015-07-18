@@ -36,10 +36,10 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.IOUtils;
 import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
+import org.ng200.openolympus.config.StorageConfiguration;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +51,8 @@ public class StorageService implements Serializable {
 	 */
 	private static final long serialVersionUID = -9146834121227344818L;
 
-	@Value("${storagePath}")
-	private String storagePath;
+	@Autowired
+	private StorageConfiguration storageConfig;
 
 	@Autowired
 	private transient TaskDescriptionProvider taskDescriptionProvider;
@@ -60,7 +60,7 @@ public class StorageService implements Serializable {
 	public Path createSolutionDirectory() throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault()
-				.getPath(this.storagePath, "solutions",
+				.getPath(this.storageConfig.getStoragePath(), "solutions",
 						uuid.toString() + "_" + System.currentTimeMillis());
 		FileAccess.createDirectories(dir);
 		return dir;
@@ -71,7 +71,8 @@ public class StorageService implements Serializable {
 		final UUID uuid = UUID.randomUUID();
 		final String idString = System.currentTimeMillis() + "_"
 				+ uuid.toString();
-		final Path file = FileSystems.getDefault().getPath(this.storagePath,
+		final Path file = FileSystems.getDefault().getPath(
+				this.storageConfig.getStoragePath(),
 				"tasks", "descriptions", idString);
 		FileAccess.createDirectories(file);
 		FileAccess.createFile(file.resolve("source"));
@@ -82,7 +83,8 @@ public class StorageService implements Serializable {
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Path createTaskJudgeDirectory(Task task) throws IOException {
 		final UUID uuid = UUID.randomUUID();
-		final Path dir = FileSystems.getDefault().getPath(this.storagePath,
+		final Path dir = FileSystems.getDefault().getPath(
+				this.storageConfig.getStoragePath(),
 				"tasks", "judges", uuid.toString());
 		FileAccess.createDirectories(dir);
 		task.setTaskLocation(uuid.toString());
@@ -90,17 +92,18 @@ public class StorageService implements Serializable {
 	}
 
 	public Path getSolutionFile(final Solution solution) {
-		return FileSystems.getDefault().getPath(this.storagePath, "solutions",
+		return FileSystems.getDefault().getPath(
+				this.storageConfig.getStoragePath(), "solutions",
 				solution.getFile());
 	}
 
 	public String getStoragePath() {
-		return this.storagePath;
+		return this.storageConfig.getStoragePath();
 	}
 
 	public String getTaskDescription(final Task task) throws IOException {
 		final Path compiled = FileSystems.getDefault().getPath(
-				this.storagePath, "tasks", "descriptions",
+				this.storageConfig.getStoragePath(), "tasks", "descriptions",
 				task.getDescriptionFile(), "compiled");
 
 		if (!FileAccess.exists(compiled)) {
@@ -112,14 +115,16 @@ public class StorageService implements Serializable {
 	}
 
 	public String getTaskDescriptionSourcecode(Task task) throws IOException {
-		final Path source = FileSystems.getDefault().getPath(this.storagePath,
+		final Path source = FileSystems.getDefault().getPath(
+				this.storageConfig.getStoragePath(),
 				"tasks", "descriptions", task.getDescriptionFile(), "source");
 		return new String(FileAccess.readAllBytes(source),
 				Charset.forName("UTF8"));
 	}
 
 	public Path getTaskJudgeFile(final Task task) {
-		return FileSystems.getDefault().getPath(this.storagePath, "tasks",
+		return FileSystems.getDefault().getPath(
+				this.storageConfig.getStoragePath(), "tasks",
 				"judges", task.getTaskLocation());
 	}
 
@@ -129,14 +134,16 @@ public class StorageService implements Serializable {
 
 	public void setSolutionFile(final Solution solution, final Path file) {
 		solution.setFile(FileSystems.getDefault()
-				.getPath(this.storagePath, "solutions").relativize(file)
+				.getPath(this.storageConfig.getStoragePath(), "solutions")
+				.relativize(file)
 				.toString());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void writeTaskDescription(Task task, InputStream inputStream)
 			throws ExecuteException, IOException {
-		final Path source = FileSystems.getDefault().getPath(this.storagePath,
+		final Path source = FileSystems.getDefault().getPath(
+				this.storageConfig.getStoragePath(),
 				"tasks", "descriptions", task.getDescriptionFile(), "source");
 
 		try (OutputStream outputStream = Files.newOutputStream(source)) {
@@ -144,7 +151,7 @@ public class StorageService implements Serializable {
 		}
 
 		final Path compiled = FileSystems.getDefault().getPath(
-				this.storagePath, "tasks", "descriptions",
+				this.storageConfig.getStoragePath(), "tasks", "descriptions",
 				task.getDescriptionFile(), "compiled");
 		this.taskDescriptionProvider.transform(source, compiled);
 	}

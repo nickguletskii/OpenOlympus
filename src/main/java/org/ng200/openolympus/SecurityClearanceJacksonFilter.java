@@ -22,11 +22,16 @@
  */
 package org.ng200.openolympus;
 
-import org.ng200.openolympus.annotations.SecurityClearance;
+import java.util.stream.Collectors;
+
+import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.PropertyName;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -36,31 +41,75 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SecurityClearanceJacksonFilter.class);
 
-	@Override
-	protected boolean include(BeanPropertyWriter writer) {
-		logger.info("Should I include {}?", writer.getFullName().toString());
-		SecurityClearance requestedClearance = writer
-				.findAnnotation(SecurityClearance.class);
+	protected boolean include(Object object, BeanPropertyWriter writer) {
+		SecurityClearanceRequired requestedClearance = writer
+				.findAnnotation(SecurityClearanceRequired.class);
+		logger.debug("Voting on object: {}, property: {}, clearance: {}",
+				object,
+				writer.getFullName(),
+				requestedClearance);
+
 		if (requestedClearance == null || requestedClearance
-				.value() == SecurityClearanceType.ANNONYMOUS)
+				.value() == SecurityClearanceType.ANNONYMOUS) {
+			logger.debug(
+					"Voted 'accept'  on object: {}, property: {}, clearance: {} because annonymous access is allowed",
+					object, writer.getFullName(), writer.getFullName(),
+					requestedClearance);
 			return true;
-		return include(requestedClearance);
+		}
+		return include(object, requestedClearance, writer.getFullName());
 	}
 
-	@Override
-	protected boolean include(PropertyWriter writer) {
-		logger.info("Should I include {}?", writer.getFullName().toString());
-		SecurityClearance requestedClearance = writer
-				.findAnnotation(SecurityClearance.class);
+	protected boolean include(Object object, PropertyWriter writer) {
+
+		SecurityClearanceRequired requestedClearance = writer
+				.findAnnotation(SecurityClearanceRequired.class);
+		logger.debug("Voting on object: {}, property: {}, clearance: {}",
+				object,
+				writer.getFullName(),
+				requestedClearance);
+
 		if (requestedClearance == null || requestedClearance
-				.value() == SecurityClearanceType.ANNONYMOUS)
+				.value() == SecurityClearanceType.ANNONYMOUS) {
+			logger.debug(
+					"Voted 'accept' on object: {}, property: {}, clearance: {} because annonymous access is allowed",
+					object, writer.getFullName(), requestedClearance);
 			return true;
-		return include(requestedClearance);
+		}
+		return include(object, requestedClearance, writer.getFullName());
 	}
 
-	private boolean include(SecurityClearance requestedClearance) {
-		logger.info("Requested clearance: {}", requestedClearance.value());
-		return SecurityContextHolder.getContext().getAuthentication()
+	private boolean include(Object object,
+			SecurityClearanceRequired requestedClearance,
+			PropertyName propertyName) {
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			logger.debug(
+					"Voted 'deny' on object: {}, property: {}, clearance: {} because there is no security context",
+					object, propertyName, requestedClearance);
+			return false;
+		}
+		if (SecurityContextHolder.getContext().getAuthentication() != null
+				&& requestedClearance
+						.value() == SecurityClearanceType.LOGGED_IN) {
+			logger.debug(
+					"Voted 'accept' on object: {}, clearance {} because any logged in user has access to this information",
+					object, propertyName, requestedClearance);
+
+			return true;
+		}
+		logger.debug("Olympus authorities: {}",
+				SecurityContextHolder.getContext().getAuthentication()
+						.getAuthorities());
+		logger.debug("Olympus authority clearances: {}",
+				SecurityContextHolder.getContext().getAuthentication()
+						.getAuthorities()
+						.stream()
+						.filter((
+								authority) -> authority instanceof Authorities.OlympusAuthority)
+						.map(authority -> ((Authorities.OlympusAuthority) authority)
+								.getClearanceType())
+						.collect(Collectors.toList()));
+		boolean flag = SecurityContextHolder.getContext().getAuthentication()
 				.getAuthorities()
 				.stream()
 				.anyMatch(
@@ -69,6 +118,43 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 								((Authorities.OlympusAuthority) authority)
 										.getClearanceType() == requestedClearance
 												.value());
+
+		logger.debug(
+				"Voted {} on object: {}, property: {}, clearance: {} because of user's authorities",
+				flag,
+				object, propertyName, requestedClearance);
+		return flag;
+	}
+
+	@Override
+	public void serializeAsField(Object bean, JsonGenerator jgen,
+			SerializerProvider provider, BeanPropertyWriter writer)
+					throws Exception {
+		if (include(bean, writer)) {
+			writer.serializeAsField(bean, jgen, provider);
+		} else if (!jgen.canOmitFields()) { // since 2.3
+			writer.serializeAsOmittedField(bean, jgen, provider);
+		}
+	}
+
+	@Override
+	public void serializeAsField(Object pojo, JsonGenerator jgen,
+			SerializerProvider provider, PropertyWriter writer)
+					throws Exception {
+		if (include(pojo, writer)) {
+			writer.serializeAsField(pojo, jgen, provider);
+		} else if (!jgen.canOmitFields()) { // since 2.3
+			writer.serializeAsOmittedField(pojo, jgen, provider);
+		}
+	}
+
+	@Override
+	public void serializeAsElement(Object elementValue, JsonGenerator jgen,
+			SerializerProvider provider, PropertyWriter writer)
+					throws Exception {
+		if (includeElement(elementValue)) {
+			writer.serializeAsElement(elementValue, jgen, provider);
+		}
 	}
 
 }
