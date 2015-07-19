@@ -28,7 +28,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.security.PrincipalMatchesUser;
+import org.ng200.openolympus.security.SecurityClearanceUnlessPredicate;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {
@@ -41,5 +41,5 @@ import org.ng200.openolympus.security.PrincipalMatchesUser;
 public @interface SecurityClearanceRequired {
 	SecurityClearanceType value() default SecurityClearanceType.ANNONYMOUS;
 
-	Class<PrincipalMatchesUser>[] unless() default {};
+	Class<? extends SecurityClearanceUnlessPredicate>[]unless() default {};
 }

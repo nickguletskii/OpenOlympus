@@ -31,10 +31,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.config.JacksonConfiguration;
+import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityClearanceUnlessPredicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
@@ -53,6 +56,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 							"file:secret.properties"
 }, ignoreResourceNotFound = true)
 public class SecurityClearanceTests {
+	private static final Logger logger = LoggerFactory
+			.getLogger(SecurityClearanceTests.class);
+
 	@JsonFilter("simple-strict-security")
 	public static class AnnotatedObject {
 		private String annonymousField = "annonymousFieldValue";
@@ -88,6 +94,29 @@ public class SecurityClearanceTests {
 			this.roleField = roleField;
 		}
 
+		private String unlessField = "unlessFieldValue";
+
+		@SecurityClearanceRequired(value = SecurityClearanceType.SUPERUSER, unless = TestSecurityClearanceUnlessPredicate.class)
+		public String getUnlessField() {
+			return unlessField;
+		}
+
+		public void setUnlessField(String unlessField) {
+			this.unlessField = unlessField;
+		}
+
+	}
+
+	public static class TestSecurityClearanceUnlessPredicate
+			implements SecurityClearanceUnlessPredicate {
+
+		@Override
+		public boolean objectMatches(User user, Object obj) {
+			if (user == null)
+				return false;
+			return user.getUsername().equals("testPredicate");
+		}
+
 	}
 
 	@Autowired
@@ -118,10 +147,20 @@ public class SecurityClearanceTests {
 				bout.toString(),
 				CoreMatchers.not(
 						CoreMatchers.containsString("loggedInFieldValue")));
+
+		assertThat(
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers.not(CoreMatchers.containsString("unlessField")));
+		assertThat(
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers
+						.not(CoreMatchers.containsString("unlessFieldValue")));
 	}
 
 	@Test
-	@WithMockUser(username = "test", roles = {})
+	@WithOpenOlympusMockUser(username = "test", approved = false, superuser = false)
 	public void checkLoggedIn() throws Exception {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		JsonFactory factory = new JsonFactory();
@@ -149,12 +188,23 @@ public class SecurityClearanceTests {
 		assertThat(
 				"Output shouldn't contain fields that are visible to users with role: ",
 				bout.toString(),
-				CoreMatchers.containsString("roleField"));
+				CoreMatchers
+						.not(CoreMatchers.containsString("roleField")));
 		assertThat(
 				"Output shouldn't contain fields that are visible to users with role: ",
 				bout.toString(),
 				CoreMatchers
 						.not(CoreMatchers.containsString("roleFieldValue")));
+
+		assertThat(
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers.not(CoreMatchers.containsString("unlessField")));
+		assertThat(
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers
+						.not(CoreMatchers.containsString("unlessFieldValue")));
 	}
 
 	@Test
@@ -191,5 +241,60 @@ public class SecurityClearanceTests {
 				"Output should contain fields that are visible to users with role: ",
 				bout.toString(),
 				CoreMatchers.containsString("roleFieldValue"));
+
+		assertThat(
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers.not(CoreMatchers.containsString("unlessField")));
+		assertThat(
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers
+						.not(CoreMatchers.containsString("unlessFieldValue")));
+	}
+
+	@Test
+	@WithOpenOlympusMockUser(username = "testPredicate", approved = true, superuser = false)
+	public void checkUnless() throws Exception {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		JsonFactory factory = new JsonFactory();
+		JsonGenerator generator = factory.createGenerator(bout);
+		jacksonObjectMapper.writeValue(generator, new AnnotatedObject());
+
+		assertThat(
+				"Output should contain fields that are visible to annonymous users: ",
+				bout.toString(),
+				CoreMatchers.containsString("annonymousField"));
+		assertThat(
+				"Output should contain fields that are visible to annonymous users: ",
+				bout.toString(),
+				CoreMatchers.containsString("annonymousFieldValue"));
+
+		assertThat(
+				"Output should contain fields that are visible to logged in users: ",
+				bout.toString(),
+				CoreMatchers.containsString("loggedInField"));
+		assertThat(
+				"Output should contain fields that are visible to logged in users: ",
+				bout.toString(),
+				CoreMatchers.containsString("loggedInFieldValue"));
+
+		assertThat(
+				"Output should contain fields that are visible to users with role: ",
+				bout.toString(),
+				CoreMatchers.containsString("roleField"));
+		assertThat(
+				"Output should contain fields that are visible to users with role: ",
+				bout.toString(),
+				CoreMatchers.containsString("unlessFieldValue"));
+
+		assertThat(
+				"Output should contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers.containsString("unlessField"));
+		assertThat(
+				"Output should contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(),
+				CoreMatchers.containsString("unlessFieldValue"));
 	}
 }
