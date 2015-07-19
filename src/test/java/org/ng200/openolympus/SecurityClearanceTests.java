@@ -61,15 +61,15 @@ public class SecurityClearanceTests {
 
 	@JsonFilter("simple-strict-security")
 	public static class AnnotatedObject {
-		private String annonymousField = "annonymousFieldValue";
+		private String anonymousField = "anonymousFieldValue";
 
-		@SecurityClearanceRequired(value = SecurityClearanceType.ANNONYMOUS)
-		public String getAnnonymousField() {
-			return annonymousField;
+		@SecurityClearanceRequired(value = SecurityClearanceType.ANONYMOUS)
+		public String getanonymousField() {
+			return anonymousField;
 		}
 
-		public void setAnnonymousField(String annonymousField) {
-			this.annonymousField = annonymousField;
+		public void setanonymousField(String anonymousField) {
+			this.anonymousField = anonymousField;
 		}
 
 		private String loggedInField = "loggedInFieldValue";
@@ -123,20 +123,20 @@ public class SecurityClearanceTests {
 	private ObjectMapper jacksonObjectMapper;
 
 	@Test
-	public void checkAnnonymous() throws Exception {
+	public void checkanonymous() throws Exception {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		JsonFactory factory = new JsonFactory();
 		JsonGenerator generator = factory.createGenerator(bout);
 		jacksonObjectMapper.writeValue(generator, new AnnotatedObject());
 
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousField"));
+				CoreMatchers.containsString("anonymousField"));
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousFieldValue"));
+				CoreMatchers.containsString("anonymousFieldValue"));
 
 		assertThat(
 				"Output should not contain fields that are visible to logged in users: ",
@@ -168,13 +168,13 @@ public class SecurityClearanceTests {
 		jacksonObjectMapper.writeValue(generator, new AnnotatedObject());
 
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousField"));
+				CoreMatchers.containsString("anonymousField"));
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousFieldValue"));
+				CoreMatchers.containsString("anonymousFieldValue"));
 
 		assertThat(
 				"Output should contain fields that are visible to logged in users: ",
@@ -216,13 +216,13 @@ public class SecurityClearanceTests {
 		jacksonObjectMapper.writeValue(generator, new AnnotatedObject());
 
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousField"));
+				CoreMatchers.containsString("anonymousField"));
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousFieldValue"));
+				CoreMatchers.containsString("anonymousFieldValue"));
 
 		assertThat(
 				"Output should contain fields that are visible to logged in users: ",
@@ -262,13 +262,13 @@ public class SecurityClearanceTests {
 		jacksonObjectMapper.writeValue(generator, new AnnotatedObject());
 
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousField"));
+				CoreMatchers.containsString("anonymousField"));
 		assertThat(
-				"Output should contain fields that are visible to annonymous users: ",
+				"Output should contain fields that are visible to anonymous users: ",
 				bout.toString(),
-				CoreMatchers.containsString("annonymousFieldValue"));
+				CoreMatchers.containsString("anonymousFieldValue"));
 
 		assertThat(
 				"Output should contain fields that are visible to logged in users: ",

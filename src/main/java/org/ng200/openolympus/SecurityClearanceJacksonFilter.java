@@ -105,9 +105,9 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 			return true;
 		}
 		if (requestedClearance == null || requestedClearance
-				.value() == SecurityClearanceType.ANNONYMOUS) {
+				.value() == SecurityClearanceType.ANONYMOUS) {
 			SecurityClearanceJacksonFilter.logger.debug(
-					"Voted 'accept'  on object: {}, property: {}, clearance: {} because annonymous access is allowed",
+					"Voted 'accept'  on object: {}, property: {}, clearance: {} because anonymous access is allowed",
 					object, propertyName,
 					requestedClearance);
 			return true;

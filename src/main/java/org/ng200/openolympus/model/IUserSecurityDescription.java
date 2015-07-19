@@ -30,7 +30,7 @@ import org.ng200.openolympus.security.PrincipalMatchesUser;
 
 public interface IUserSecurityDescription {
 
-	@SecurityClearanceRequired(SecurityClearanceType.ANNONYMOUS)
+	@SecurityClearanceRequired(SecurityClearanceType.ANONYMOUS)
 	public Long getId();
 
 	@SecurityClearanceRequired(SecurityClearanceType.LOGGED_IN)

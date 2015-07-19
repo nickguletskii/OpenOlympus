@@ -39,7 +39,7 @@ import org.ng200.openolympus.security.SecurityClearanceUnlessPredicate;
 					ElementType.TYPE_USE
 })
 public @interface SecurityClearanceRequired {
-	SecurityClearanceType value() default SecurityClearanceType.ANNONYMOUS;
+	SecurityClearanceType value() default SecurityClearanceType.ANONYMOUS;
 
 	Class<? extends SecurityClearanceUnlessPredicate>[]unless() default {};
 }
