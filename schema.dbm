@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="0,362" last-zoom="0.8"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="113,990" last-zoom="1"
 	 default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -656,6 +656,9 @@ WHERE contest.id = contest_id ]]></definition>
 	<column name="name" not-null="true">
 		<type name="text"/>
 	</column>
+	<column name="hidden" not-null="true" default-value="false">
+		<type name="boolean"/>
+	</column>
 	<constraint name="group_pk" type="pk-constr" table="public.&quot;group&quot;">
 		<columns names="id" ref-type="src-columns"/>
 	</constraint>
@@ -912,52 +915,8 @@ WHERE contest.id = contest_id ]]></definition>
 <usertype name="contest_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="edit,view_tasks_before_contest_started,delete,add_user,add_task,list_tasks,extend_time"/>
+	<enumeration values="edit,view_tasks_before_contest_started,delete,add_user,add_task,list_tasks,extend_time,know_about,manage_acl"/>
 </usertype>
-
-<table name="contest_permission">
-	<schema name="public"/>
-	<role name="postgres"/>
-	<position x="751.476" y="1220.47"/>
-	<column name="id" not-null="true">
-		<type name="bigserial"/>
-	</column>
-	<column name="type" not-null="true">
-		<type name="public.contest_permission_type"/>
-	</column>
-	<constraint name="contest_permission_pk" type="pk-constr" table="public.contest_permission">
-		<columns names="id" ref-type="src-columns"/>
-	</constraint>
-</table>
-
-<relationship name="contest_permissions" type="rel1n"
-	 src-col-pattern="{st}_{sc}"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#b39b27"
-	 src-table="public.contest"
-	 dst-table="public.contest_permission"
-	 src-required="false" dst-required="false"/>
-
-<relationship name="principal_contests_owned" type="rel1n"
-	 src-col-pattern="owner"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#58b083"
-	 src-table="public.principal"
-	 dst-table="public.contest"
-	 src-required="false" dst-required="false"/>
-
-<relationship name="contest_permission_principal" type="relnn"
-	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
-	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
-	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
-	 pk-col-pattern="id"
-	 custom-color="#2bd6b7"
-	 src-table="public.contest_permission"
-	 dst-table="public.principal"
-	 src-required="false" dst-required="false"
-	 table-name="contest_permission_principal"/>
 
 <rule name="user_keep_principal_insert" event-type="ON INSERT" exec-type="ALSO"
  table="public.&quot;USER&quot;">
@@ -1121,6 +1080,118 @@ END;]]></definition>
 	 table="public.&quot;USER&quot;">
 		<function signature="public.keep_user_as_member_of_groups()"/>
 </trigger>
+
+<relationship name="contest_permission" type="relnn"
+	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
+	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
+	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
+	 pk-col-pattern="id"
+	 custom-color="#bec391"
+	 src-table="public.contest"
+	 dst-table="public.principal"
+	 src-required="false" dst-required="false"
+	 table-name="contest_permission">
+	<column name="permission" not-null="true">
+		<type name="public.contest_permission_type" precision="0"/>
+	</column>
+</relationship>
+
+<function name="has_contest_permission"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="boolean"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<parameter name="principal_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="permission_p" in="true">
+		<type name="public.contest_permission_type" precision="0"/>
+	</parameter>
+	<definition><![CDATA[BEGIN 
+	IF EXISTS (SELECT 1 FROM contest_permission WHERE
+		permission_applies_to_principal(principal_id_p, contest_permission.principal_id) AND
+		contest_permission.contest_id=contest_id_p AND
+		contest_permission.permission=permission_p
+		) THEN
+		RETURN TRUE;
+	END IF;
+	RETURN FALSE;
+END;]]></definition>
+</function>
+
+<function name="has_task_permission"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="boolean"/>
+	</return-type>
+	<parameter name="task_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<parameter name="principal_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="permission_p" in="true">
+		<type name="public.task_permission_type" precision="0"/>
+	</parameter>
+	<definition><![CDATA[BEGIN 
+	IF EXISTS (SELECT 1 FROM task_permission WHERE
+		permission_applies_to_principal(principal_id_p, task_permission.principal_id) AND
+		task_permission.task_id=task_id_p AND
+		task_permission.permission=permission_p
+		) THEN
+		RETURN TRUE;
+	END IF;
+	RETURN FALSE;
+END;]]></definition>
+</function>
+
+<function name="permission_applies_to_principal"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="boolean"/>
+	</return-type>
+	<parameter name="principal_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="permission_principal_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[BEGIN
+	RETURN permission_principal_id_p = principal_id_p OR
+	permission_principal_id_p IN (SELECT group_id FROM group_users
+			WHERE group_users."USER_id"=principal_id_p);
+END;]]></definition>
+</function>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

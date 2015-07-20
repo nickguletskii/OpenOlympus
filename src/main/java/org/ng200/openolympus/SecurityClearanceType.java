@@ -23,5 +23,44 @@
 package org.ng200.openolympus;
 
 public enum SecurityClearanceType {
-	ANONYMOUS, APPROVED_USER, ADMINISTRATIVE_USER, SUPERUSER, INTERNAL, LOGGED_IN
+	/**
+	 * This security clearance type is granted to everyone, including users who
+	 * are not logged in.
+	 */
+	ANONYMOUS, /**
+				 * This security clearance type is granted to users who were
+				 * approved by the administrators.
+				 */
+	APPROVED_USER, /**
+					 * This security clearance type is granted to users who can
+					 * view and modify user details.
+					 */
+	ADMINISTRATIVE_USER, /**
+							 * This security clearance type is granted to users
+							 * who can create contests.
+							 */
+	CONTEST_ORGANIZER, /**
+						 * This security clearance type is granted to users who
+						 * can create contests.
+						 */
+	TASK_SUPERVISOR, /**
+						 * This security clearance type is granted to users who
+						 * can create tasks.
+						 */
+	SUPERUSER, /**
+				 * This security clearance type is only granted to accounts used
+				 * by the internal OpenOlympus services.
+				 */
+	INTERNAL, /**
+				 * This security clearance type requires the user to be logged
+				 * in, i.e. not anonymous.
+				 */
+	LOGGED_IN, /**
+				 * Clearance should rarely, if ever, be denied to superusers.
+				 * However, in some cases this may prove to be more readable,
+				 * e.g. when there is no authorisation and the predicate
+				 * requests superuser access.
+				 */
+	DENIED
+
 }

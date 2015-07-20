@@ -43,6 +43,7 @@ import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.routines.GetContestEnd;
 import org.ng200.openolympus.jooq.routines.GetContestEndForUser;
 import org.ng200.openolympus.jooq.tables.daos.ContestDao;
@@ -110,7 +111,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
-	public Instant getContestEndIncludingAllTimeExtensions(final Contest contest) {
+	public Instant getContestEndIncludingAllTimeExtensions(
+			final Contest contest) {
 		GetContestEnd procedure = new GetContestEnd();
 		procedure.setContestId(contest.getId());
 		procedure.attach(dslContext.configuration());
@@ -132,7 +134,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 						DSL.rank()
 								.over(DSL.orderBy(DSL.coalesce(
 										Tables.CONTEST_PARTICIPATION.SCORE,
-										DSL.field("0")).desc())).as("rank"))
+										DSL.field("0")).desc()))
+								.as("rank"))
 				.from(Tables.CONTEST_PARTICIPATION)
 				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
 						.getId()));
@@ -163,25 +166,25 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.selectFrom(Tables.CONTEST)
 				.where(
 
-				Routines.getContestStart(Tables.CONTEST.ID)
-						.between(Timestamp.from(startDate.toInstant()))
-						.and(Timestamp.from(endDate.toInstant()))
+		Routines.getContestStart(Tables.CONTEST.ID)
+				.between(Timestamp.from(startDate.toInstant()))
+				.and(Timestamp.from(endDate.toInstant()))
 
-						.or(Routines.getContestEnd(Tables.CONTEST.ID)
-								.between(Timestamp.from(startDate.toInstant()))
-								.and(Timestamp.from(endDate.toInstant())))
+		.or(Routines.getContestEnd(Tables.CONTEST.ID)
+				.between(Timestamp.from(startDate.toInstant()))
+				.and(Timestamp.from(endDate.toInstant())))
 
-						.or(DSL.val(Timestamp.from(startDate.toInstant()))
-								.between(
-										Routines.getContestStart(Tables.CONTEST.ID))
-								.and(Routines.getContestEnd(Tables.CONTEST.ID)))
+		.or(DSL.val(Timestamp.from(startDate.toInstant()))
+				.between(
+						Routines.getContestStart(Tables.CONTEST.ID))
+				.and(Routines.getContestEnd(Tables.CONTEST.ID)))
 
-						.or(DSL.val(Timestamp.from(endDate.toInstant()))
-								.between(
-										Routines.getContestStart(Tables.CONTEST.ID))
-								.and(Routines.getContestEnd(Tables.CONTEST.ID)))
+		.or(DSL.val(Timestamp.from(endDate.toInstant()))
+				.between(
+						Routines.getContestStart(Tables.CONTEST.ID))
+				.and(Routines.getContestEnd(Tables.CONTEST.ID)))
 
-				).fetchOneInto(Contest.class);
+		).fetchOneInto(Contest.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
@@ -193,7 +196,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.leftOuterJoin(Tables.USER)
 				.on(Tables.CONTEST_PARTICIPATION.USER_ID.eq(Tables.USER.ID))
 				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
-						.getId())).limit(pageSize)
+						.getId()))
+				.limit(pageSize)
 				.offset((pageNumber - 1) * pageSize).fetchInto(User.class);
 	}
 
@@ -280,7 +284,10 @@ public class ContestService extends GenericCreateUpdateRepository {
 						.decode()
 						.when(DSL.exists(dslContext.select(
 								userTasks.field(Tables.SOLUTION.USER_ID)).from(
-								userTasks)), false).otherwise(true)).fetchOne()
+										userTasks)),
+								false)
+						.otherwise(true))
+				.fetchOne()
 				.value1();
 	}
 
@@ -305,13 +312,15 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
-	public boolean isContestOverIncludingAllTimeExtensions(final Contest contest) {
+	public boolean isContestOverIncludingAllTimeExtensions(
+			final Contest contest) {
 		return this.getContestEndIncludingAllTimeExtensions(contest).isBefore(
 				Instant.now());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
-	public boolean isUserParticipatingIn(final User user, final Contest contest) {
+	public boolean isUserParticipatingIn(final User user,
+			final Contest contest) {
 		return dslContext
 				.select(DSL
 						.decode()
@@ -323,7 +332,9 @@ public class ContestService extends GenericCreateUpdateRepository {
 												.eq(contest.getId())
 												.and(Tables.CONTEST_PARTICIPATION.USER_ID
 														.eq(user.getId())))),
-								true).otherwise(false)).fetchOne().value1();
+								true)
+						.otherwise(false))
+				.fetchOne().value1();
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
@@ -353,7 +364,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 						.select(Tables.CONTEST_TASKS.TASK_ID)
 						.from(Tables.CONTEST_TASKS)
 						.where(Tables.CONTEST_TASKS.CONTEST_ID.eq(contest
-								.getId())))).fetchInto(Task.class);
+								.getId()))))
+				.fetchInto(Task.class);
 	}
 
 	public void removeTaskFromContest(Task task, Contest contest) {
@@ -365,6 +377,16 @@ public class ContestService extends GenericCreateUpdateRepository {
 		dslContext.insertInto(Tables.CONTEST_TASKS)
 				.values(new ContestTasks(contest.getId(), taskByName.getId()))
 				.execute();
+	}
+
+	public boolean userKnowsAboutContest(User user, Contest contest,
+			ContestPermissionType knowAbout) {
+		return Routines.hasContestPermission(dslContext.configuration(),
+				contest.getId(), user.getId(), ContestPermissionType.know_about)
+				.booleanValue()
+				|| Routines.hasContestPermission(dslContext.configuration(),
+						contest.getId(), user.getId(),
+						ContestPermissionType.manage_acl).booleanValue();
 	}
 
 }

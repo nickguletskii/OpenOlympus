@@ -22,8 +22,17 @@
  */
 package org.ng200.openolympus.security;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 
-public interface SecurityClearanceUnlessPredicate {
-	public boolean objectMatches(User user, Object obj);
+/**
+ * @author Nick Guletskii
+ * 
+ *         While a SecurityClearancePredicate is not a true predicate, it's
+ *         still a predicate in the sense that when composed with common
+ *         security logic, it becomes a proper predicate.
+ */
+public interface SecurityClearancePredicate {
+	public SecurityClearanceType getRequiredClearanceForObject(User user,
+			Object obj);
 }

@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.config.JacksonConfiguration;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.security.SecurityClearanceUnlessPredicate;
+import org.ng200.openolympus.security.SecurityClearancePredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +63,7 @@ public class SecurityClearanceTests {
 	public static class AnnotatedObject {
 		private String anonymousField = "anonymousFieldValue";
 
-		@SecurityClearanceRequired(value = SecurityClearanceType.ANONYMOUS)
+		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.ANONYMOUS)
 		public String getanonymousField() {
 			return anonymousField;
 		}
@@ -74,7 +74,7 @@ public class SecurityClearanceTests {
 
 		private String loggedInField = "loggedInFieldValue";
 
-		@SecurityClearanceRequired(value = SecurityClearanceType.LOGGED_IN)
+		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.LOGGED_IN)
 		public String getLoggedInField() {
 			return loggedInField;
 		}
@@ -85,7 +85,7 @@ public class SecurityClearanceTests {
 
 		private String roleField = "roleFieldValue";
 
-		@SecurityClearanceRequired(value = SecurityClearanceType.APPROVED_USER)
+		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER)
 		public String getRoleField() {
 			return roleField;
 		}
@@ -94,27 +94,30 @@ public class SecurityClearanceTests {
 			this.roleField = roleField;
 		}
 
-		private String unlessField = "unlessFieldValue";
+		private String predicateField = "predicateFieldValue";
 
-		@SecurityClearanceRequired(value = SecurityClearanceType.SUPERUSER, unless = TestSecurityClearanceUnlessPredicate.class)
-		public String getUnlessField() {
-			return unlessField;
+		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = TestSecurityClearancepredicatePredicate.class)
+		public String getPredicateField() {
+			return predicateField;
 		}
 
-		public void setUnlessField(String unlessField) {
-			this.unlessField = unlessField;
+		public void setpredicateField(String predicateField) {
+			this.predicateField = predicateField;
 		}
 
 	}
 
-	public static class TestSecurityClearanceUnlessPredicate
-			implements SecurityClearanceUnlessPredicate {
+	public static class TestSecurityClearancepredicatePredicate
+			implements SecurityClearancePredicate {
 
 		@Override
-		public boolean objectMatches(User user, Object obj) {
+		public SecurityClearanceType getRequiredClearanceForObject(User user,
+				Object obj) {
 			if (user == null)
-				return false;
-			return user.getUsername().equals("testPredicate");
+				return SecurityClearanceType.DENIED;
+			return user.getUsername().equals("testPredicate")
+					? SecurityClearanceType.SUPERUSER
+					: SecurityClearanceType.APPROVED_USER;
 		}
 
 	}
@@ -123,7 +126,7 @@ public class SecurityClearanceTests {
 	private ObjectMapper jacksonObjectMapper;
 
 	@Test
-	public void checkanonymous() throws Exception {
+	public void checkAnonymous() throws Exception {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		JsonFactory factory = new JsonFactory();
 		JsonGenerator generator = factory.createGenerator(bout);
@@ -151,12 +154,14 @@ public class SecurityClearanceTests {
 		assertThat(
 				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
 				bout.toString(),
-				CoreMatchers.not(CoreMatchers.containsString("unlessField")));
+				CoreMatchers
+						.not(CoreMatchers.containsString("predicateField")));
 		assertThat(
 				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
 				bout.toString(),
 				CoreMatchers
-						.not(CoreMatchers.containsString("unlessFieldValue")));
+						.not(CoreMatchers
+								.containsString("predicateFieldValue")));
 	}
 
 	@Test
@@ -199,12 +204,14 @@ public class SecurityClearanceTests {
 		assertThat(
 				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
 				bout.toString(),
-				CoreMatchers.not(CoreMatchers.containsString("unlessField")));
+				CoreMatchers
+						.not(CoreMatchers.containsString("predicateField")));
 		assertThat(
 				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
 				bout.toString(),
 				CoreMatchers
-						.not(CoreMatchers.containsString("unlessFieldValue")));
+						.not(CoreMatchers
+								.containsString("predicateFieldValue")));
 	}
 
 	@Test
@@ -243,19 +250,17 @@ public class SecurityClearanceTests {
 				CoreMatchers.containsString("roleFieldValue"));
 
 		assertThat(
-				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
-				bout.toString(),
-				CoreMatchers.not(CoreMatchers.containsString("unlessField")));
+				"Output should contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(), CoreMatchers.containsString("predicateField"));
 		assertThat(
-				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
-				bout.toString(),
-				CoreMatchers
-						.not(CoreMatchers.containsString("unlessFieldValue")));
+				"Output should contain fields that are visible to user with username 'testPredicate': ",
+				bout.toString(), CoreMatchers
+						.containsString("predicateFieldValue"));
 	}
 
 	@Test
 	@WithOpenOlympusMockUser(username = "testPredicate", approved = true, superuser = false)
-	public void checkUnless() throws Exception {
+	public void checkPredicate() throws Exception {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		JsonFactory factory = new JsonFactory();
 		JsonGenerator generator = factory.createGenerator(bout);
@@ -286,15 +291,17 @@ public class SecurityClearanceTests {
 		assertThat(
 				"Output should contain fields that are visible to users with role: ",
 				bout.toString(),
-				CoreMatchers.containsString("unlessFieldValue"));
+				CoreMatchers.containsString("roleFieldValue"));
 
 		assertThat(
-				"Output should contain fields that are visible to user with username 'testPredicate': ",
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
 				bout.toString(),
-				CoreMatchers.containsString("unlessField"));
+				CoreMatchers
+						.not(CoreMatchers.containsString("predicateField")));
 		assertThat(
-				"Output should contain fields that are visible to user with username 'testPredicate': ",
+				"Output shouldn't contain fields that are visible to user with username 'testPredicate': ",
 				bout.toString(),
-				CoreMatchers.containsString("unlessFieldValue"));
+				CoreMatchers.not(
+						CoreMatchers.containsString("predicateFieldValue")));
 	}
 }

@@ -22,21 +22,39 @@
  */
 package org.ng200.openolympus.security;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.interfaces.IUser;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PrincipalMatchesUser implements SecurityClearanceUnlessPredicate {
+public class PrincipalMatchesUser implements SecurityClearancePredicate {
+
+	private SecurityClearanceType defaultClearance;
+
+	public class Private extends PrincipalMatchesUser {
+		public Private() {
+			super(SecurityClearanceType.ADMINISTRATIVE_USER);
+		}
+	}
+
+	public class Public extends PrincipalMatchesUser {
+		public Public() {
+			super(SecurityClearanceType.APPROVED_USER);
+		}
+	}
+
+	public PrincipalMatchesUser(SecurityClearanceType defaultClearance) {
+		this.defaultClearance = defaultClearance;
+	}
 
 	@Override
-	public boolean objectMatches(User user, Object obj) {
-		if (!(obj instanceof IUser))
-			return false;
+	public SecurityClearanceType getRequiredClearanceForObject(User user,
+			Object obj) {
 		IUser bean = (IUser) obj;
 		if (bean.getId() == user.getId())
-			return true;
-		return false;
+			return SecurityClearanceType.LOGGED_IN;
+		return defaultClearance;
 	}
 
 }

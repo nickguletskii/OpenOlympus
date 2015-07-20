@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.security.SecurityClearanceUnlessPredicate;
+import org.ng200.openolympus.security.SecurityClearancePredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +52,10 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
-	private final Map<Class<? extends SecurityClearanceUnlessPredicate>, SecurityClearanceUnlessPredicate> predicateBeans = new HashMap<>();
+	private final Map<Class<? extends SecurityClearancePredicate>, SecurityClearancePredicate> predicateBeans = new HashMap<>();
 
-	private SecurityClearanceUnlessPredicate getPredicate(
-			Class<? extends SecurityClearanceUnlessPredicate> predicateClass) {
+	private SecurityClearancePredicate getPredicate(
+			Class<? extends SecurityClearancePredicate> predicateClass) {
 		return this.predicateBeans.computeIfAbsent(predicateClass,
 				(c) -> this.autowireCapableBeanFactory
 						.createBean(c));
@@ -94,33 +94,54 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 				.map(authentication -> (User) authentication
 						.getPrincipal())
 				.orElse(null);
-		if (Stream.of(requestedClearance.unless())
-				.map(predicateClass -> this.getPredicate(predicateClass)
-						.objectMatches(user, object))
-				.reduce(false, (l, r) -> l || r)) {
+
+		// No annotation -> no restriction.
+		if (requestedClearance == null)
+			return true;
+
+		if (securityContextHasClearance(object,
+				requestedClearance.minimumClearance(),
+				propertyName) &&
+				Stream.of(requestedClearance.predicates())
+						.map(predicateClass -> this.getPredicate(predicateClass)
+								.getRequiredClearanceForObject(user, object))
+						.map(req -> req != SecurityClearanceType.DENIED
+								? securityContextHasClearance(object, req,
+										propertyName)
+								: false)
+						.reduce(true, (l, r) -> l && r)) {
 			SecurityClearanceJacksonFilter.logger.debug(
 					"Voted 'accept'  on object: {}, property: {}, clearance: {} because an unless predicate voted to allow access.",
 					object, propertyName,
 					requestedClearance);
 			return true;
 		}
-		if (requestedClearance == null || requestedClearance
-				.value() == SecurityClearanceType.ANONYMOUS) {
+		return false;
+	}
+
+	private boolean securityContextHasClearance(Object object,
+			SecurityClearanceType requestedClearance,
+			PropertyName propertyName) {
+		// No clearance requested
+		if (requestedClearance == null
+				|| requestedClearance == SecurityClearanceType.ANONYMOUS) {
 			SecurityClearanceJacksonFilter.logger.debug(
 					"Voted 'accept'  on object: {}, property: {}, clearance: {} because anonymous access is allowed",
 					object, propertyName,
 					requestedClearance);
 			return true;
 		}
+		// Not authenticated, but anonymous access is not allowed as per
+		// previous step
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
 			SecurityClearanceJacksonFilter.logger.debug(
 					"Voted 'deny' on object: {}, property: {}, clearance: {} because there is no security context",
 					object, propertyName, requestedClearance);
 			return false;
 		}
-		if (SecurityContextHolder.getContext().getAuthentication() != null
-				&& requestedClearance
-						.value() == SecurityClearanceType.LOGGED_IN) {
+		// The user is logged in, therefore if the requested clearance is
+		// LOGGED_IN we give clearance.
+		if (requestedClearance == SecurityClearanceType.LOGGED_IN) {
 			SecurityClearanceJacksonFilter.logger.debug(
 					"Voted 'accept' on object: {}, clearance {} because any logged in user has access to this information",
 					object, propertyName, requestedClearance);
@@ -148,8 +169,7 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 						(authority) -> authority instanceof Authorities.OlympusAuthority
 								&&
 								((Authorities.OlympusAuthority) authority)
-										.getClearanceType() == requestedClearance
-												.value());
+										.getClearanceType() == requestedClearance);
 
 		SecurityClearanceJacksonFilter.logger.debug(
 				"Voted {} on object: {}, property: {}, clearance: {} because of user's authorities",
