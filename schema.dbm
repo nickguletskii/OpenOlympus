@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="113,990" last-zoom="1"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="164,989" last-zoom="1"
 	 default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -1192,6 +1192,73 @@ END;]]></definition>
 			WHERE group_users."USER_id"=principal_id_p);
 END;]]></definition>
 </function>
+
+<function name="raise_contest_intersects_error"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[DECLARE end_time timestamp WITHOUT time ZONE;
+BEGIN
+    end_time = (
+        SELECT (
+                NEW.start_time + (
+                    NEW.duration * interval '1 MILLISECOND' )
+            + (
+                SELECT (
+                        COALESCE (
+                            max (
+                                extensions_per_user.duration ),
+                        0 )
+            * interval '1 MILLISECOND' )
+FROM (
+        SELECT
+            COALESCE (
+                sum (
+                    time_extension.duration ),
+            0 ) AS duration
+FROM
+    time_extension
+WHERE
+    time_extension.contest_id = NEW.id
+GROUP BY
+    time_extension.user_id ) AS extensions_per_user ) ) );
+RAISE NOTICE 'end time is %', end_time;
+IF EXISTS (
+    SELECT
+        1
+    FROM
+        contest
+    WHERE
+        tsrange (
+            get_contest_start (
+                contest.id ),
+        get_contest_end (
+            contest.id ) )
+&& tsrange (
+    NEW.start_time,
+    end_time )
+AND contest.id != NEW.id )
+THEN RAISE EXCEPTION 'contest intersects';
+END IF;
+RETURN NULL;
+END;]]></definition>
+</function>
+
+<trigger name="contest_intersection_consistency_check" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.contest">
+		<function signature="public.raise_contest_intersects_error()"/>
+</trigger>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

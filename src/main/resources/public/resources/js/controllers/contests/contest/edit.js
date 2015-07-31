@@ -20,71 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-var Util = require("oolutil");
+var moment = require("moment");
 var angular = require("angular");
-var _ = require("lodash");
-var moment = require("moment-timezone");
-
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, Upload, contest) {
-    $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    $scope.contest = {};
-
-    $scope.contest = contest;
-    $scope.contest.duration = contest.duration / (60 * 1000);
-
-    $scope.open = function($event) {
-        $event.preventDefault();
-        $event.stopPropagation();
-
-        $scope.opened = true;
-    };
-
-    $scope.uploadProgressBarColour = function() {
-        if ($scope.uploadFailure)
-            return "danger";
-        if ($scope.uploadSuccess)
-            return "success";
-        return "info";
-    };
-    $scope.isFormVisible = true;
-
-    function success(response) {
-        $scope.isFormVisible = false;
-        $scope.uploadSuccess = true;
-        $scope.uploadFailure = false;
-        $scope.processing = false;
-    }
-
-    function failure() {
-        $scope.isFormVisible = false;
-        $scope.uploadSuccess = false;
-        $scope.uploadFailure = true;
-        $scope.processing = false;
-    }
-
-    function reset() {
-        $scope.isFormVisible = true;
-        $scope.uploadSuccess = false;
-        $scope.uploadFailure = false;
-        $scope.processing = false;
-    }
-    $scope.reset = reset;
-
-    $scope.modifyContest = function(contest) {
-        $scope.isFormVisible = false;
-        try {
-            var fd = new FormData();
-            _.forEach(contest, function(value, key) {
-                if (key === "duration")
-                    fd.append(key, value * (60 * 1000));
-                else
-                    fd.append(key, value);
-            });
-            ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/edit', $scope.contestModificationForm, fd, success, failure, reset);
-        } catch (err) {
-            reset();
-        }
-    };
+	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, contest) {
+	$scope.contest = {};
+	$scope.contest.name = contest.name;
+	$scope.contest.duration = contest.duration / (60 * 1000);
+	$scope.contest.startTime = moment(contest.startTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ");
+	$scope.progress = {};
+	$scope.validationRules = require("controllers/contests/contestValidation")($q, moment);
+	$scope.modifyContest = function(newContest_) {
+		var newContest = angular.copy(newContest_);
+		newContest.duration *= (60 * 1000);
+		$scope.contestModificationSuccessfull = false;
+		$scope.submitting = true;
+		$scope.uploadProgress = null;
+		return ValidationService.postToServer("/api/contest/" + $stateParams.contestId + "/edit", newContest, (progress) => $scope.progress = progress)
+			.then(() => {
+				$scope.uploadProgress = null;
+				$scope.submitting = false;
+				$scope.contestModificationSuccessfull = true;
+			});
+	};
 };

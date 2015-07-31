@@ -36,7 +36,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 public class ContestDto {
 
 	@NotNull(message = "empty")
-	@Size(min = 2, max = 32, message = "length")
+	@Size(min = 2, max = 64, message = "length")
 	private String name;
 	@NotNull(message = "empty")
 	@DateTimeFormat(iso = ISO.DATE_TIME)

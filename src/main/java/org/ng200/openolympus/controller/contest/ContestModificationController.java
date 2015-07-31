@@ -64,15 +64,14 @@ public class ContestModificationController {
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	@Caching(evict = {
-			@CacheEvict(value = "contests", key = "#contest.id"),
-			@CacheEvict(value = "solutions", allEntries = true)
+						@CacheEvict(value = "contests", key = "#contest.id"),
+						@CacheEvict(value = "solutions", allEntries = true)
 	})
-	public BindingResponse editContest(final Model model,
-			final HttpServletRequest request,
+	public BindingResponse editContest(
 			@PathVariable("contest") Contest contest,
 			@Valid final ContestDto contestDto,
 			final BindingResult bindingResult) throws IllegalStateException,
-			IOException, ArchiveException, BindException {
+					IOException, ArchiveException, BindException {
 		Assertions.resourceExists(contest);
 
 		this.contestDtoValidator.validate(contestDto, contest, bindingResult);
@@ -82,7 +81,8 @@ public class ContestModificationController {
 		}
 		contest.setName(contestDto.getName());
 		contest.setDuration(contestDto.getDuration());
-		contest.setStartTime(new Timestamp(contestDto.getStartTime().getTime()));
+		contest.setStartTime(
+				new Timestamp(contestDto.getStartTime().getTime()));
 		contest.setShowFullTestsDuringContest(contestDto
 				.isShowFullTestsDuringContest());
 		contest = this.contestService.updateContest(contest);

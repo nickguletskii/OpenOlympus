@@ -20,43 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var _ = require("lodash");
+var moment = require("moment");
 var angular = require("angular");
-var app = require("app");
-angular.module('ool.services').factory('datetime', /*@ngInject*/ function($timeout, $http) {
+angular.module("ool.services").factory("datetime", /*@ngInject*/ function($timeout, $http) {
 
-    function timeTo(referenceTime) {
-        var currentTime = moment().add(currentServerTimeOffset());
-        var from = moment(referenceTime);
-        var dur = moment.duration(from.diff(currentTime), "milliseconds");
-        return {
-            days: dur.days(),
-            hours: dur.hours(),
-            minutes: dur.minutes(),
-            seconds: dur.seconds()
-        };
-    }
+	var offset = 0;
 
-    function currentServerTime(referenceTime) {
-        return moment().add(currentServerTimeOffset());
-    }
+	$http.get("/api/time").success(
+		function(time) {
+			offset = moment(time).diff(moment());
+		}
+	);
 
-    var offset = 0;
+	function currentServerTimeOffset() {
+		return offset;
+	}
 
-    $http.get("/api/time").success(
-        function(time) {
-            offset = moment(time).diff(moment());
-        }
-    );
+	function timeTo(referenceTime) {
+		var currentTime = moment().add(currentServerTimeOffset());
+		var from = moment(referenceTime);
+		var dur = moment.duration(from.diff(currentTime), "milliseconds");
+		return {
+			days: dur.days(),
+			hours: dur.hours(),
+			minutes: dur.minutes(),
+			seconds: dur.seconds()
+		};
+	}
 
-    function currentServerTimeOffset() {
-        return offset;
-    }
+	function currentServerTime() {
+		return moment().add(currentServerTimeOffset());
+	}
 
-    return {
-        timeTo: timeTo,
-        currentServerTime: currentServerTime,
-        currentServerTimeOffset: currentServerTimeOffset
-    };
+
+	return {
+		timeTo: timeTo,
+		currentServerTime: currentServerTime,
+		currentServerTimeOffset: currentServerTimeOffset
+	};
 });

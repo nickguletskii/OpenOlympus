@@ -22,28 +22,29 @@
     THE SOFTWARE.
 
 -->
-<form name="contestCreationForm" role="form" novalidate="" ng-submit="createContest(contest)" ng-show="isFormVisible">
-	<input label="contest.creationForm.labels.name" type="text" ng-model="contest.name" required="" oolinput="">
-	<input label="contest.creationForm.labels.startTime" type="datetime" ng-model="contest.startTime" required="" ng-date-time="" oolinput="">
-	<input label="contest.creationForm.labels.duration" type="number" ng-model="contest.duration" min="1" ng-min="1" required="" oolinput="">
-	<div class="checkbox">
-		<label>
-			<input type="checkbox" ng-model="contest.showFullTestsDuringContest"> {{'contest.creationForm.labels.showFullTestsDuringContest'|translate}}
-		</label>
+<h1>{{'contest.creationForm.labels.heading'|translate}}</h1>
+<form name="contestCreationForm" form-for="contest" validation-rules="validationRules" submit-with="createContest(contest)" disable="submitting" novalidate>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<text-field label="{{ 'contest.modificationForm.labels.name' | translate }}" type="text" attribute="name"></text-field>
+			<text-field label="{{ 'contest.modificationForm.labels.startTime' | translate }}" type="datetime" attribute="startTime"></text-field>
+			<text-field label="{{ 'contest.modificationForm.labels.duration' | translate }}" type="number" attribute="duration"></text-field>
+			
+			<checkbox-field attribute="showFullTestsDuringContest" label="{{'contest.modificationForm.labels.showFullTestsDuringContest'|translate }}"></checkbox-field>
+			<submit-button label="{{'contest.modificationForm.labels.createButton' | translate }}" button-class="btn btn-primary" icon="fa fa-fw fa-lg {{ submitting && 'fa-cog fa-spin' || 'fa-upload'}}"></submit-button>
+		</div>
 	</div>
-	<div class="form-group">
-		<button type="submit" class="btn btn-default">{{'contest.creationForm.labels.createButton' | translate}}</button>
+	<div class="panel panel-success" ng-show="lastContestId">
+		<div class="panel-heading">{{'contest.creationForm.labels.uploaded.heading'|translate}}</div>
+		<div class="panel-body">{{'contest.creationForm.labels.uploaded.body'|translate}}
+			<button class="btn btn-success" ui-sref="contestView({contestId: lastContestId})">{{'contest.creationForm.labels.goToContestButton'|translate}}</button>
+		</div>
 	</div>
-</form>
-<form ng-show="!isFormVisible">
-	<div class="form-group">
-		<label>{{'contest.creationForm.labels.uploading' | translate}}</label>
-		<progressbar value="uploadProgress" type="{{ uploadProgressBarColour() }}" class="progress-striped" ng-class="{'active': uploading }"><b>{{uploadProgress}}%</b>
-		</progressbar>
-		<label ng-if="processing">{{'contest.creationForm.labels.processing' | translate}}</label>
-		<button class="btn btn-danger" ng-if="uploadFailure" ng-click="reset()">{{'contest.creationForm.labels.back' | translate}}</button>
-		<button class="btn btn-success" ng-if="uploadSuccess" ng-click="reset()">{{'contest.creationForm.labels.again' | translate}}</button>
-		<button class="btn btn-success" ng-if="uploadSuccess" ui-sref="contestView({contestId: createdContestId})">{{'contest.creationForm.labels.toContest' | translate}}</button>
+	<div class="panel panel-primary" ng-show="progress.loaded !== progress.total">
+		<div class="panel-heading">{{'contest.creationForm.labels.uploading'|translate}}</div>
+		<div class="panel-body">
+			<progressbar class="progress-striped active" max="1" value="progress.loaded / progress.total "><b> {{progress.loaded | toKB}} / {{progress.total | toKB }} KB</b></progressbar>
+		</div>
 	</div>
 </form>
 
