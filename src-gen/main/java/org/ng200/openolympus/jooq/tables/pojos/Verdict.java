@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.interfaces.IVerdict;
+import org.ng200.openolympus.model.IVerdictSecurityDescription;
 
 
 /**
@@ -30,9 +31,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.IVerdict;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "verdict", schema = "public")
-public class Verdict implements IVerdict {
+public class Verdict implements IVerdictSecurityDescription, IVerdict {
 
-	private static final long serialVersionUID = 1384318309;
+	private static final long serialVersionUID = -1994850018;
 
 	private Long              id;
 	private BigDecimal        score;

@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.jooq.tables.interfaces.IContest;
+import org.ng200.openolympus.model.IContestSecurityDescription;
 
 
 /**
@@ -29,9 +30,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContest;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest", schema = "public")
-public class Contest implements IContest {
+public class Contest implements IContestSecurityDescription, IContest {
 
-	private static final long serialVersionUID = -34830586;
+	private static final long serialVersionUID = -886773305;
 
 	private Integer   id;
 	private Duration  duration;

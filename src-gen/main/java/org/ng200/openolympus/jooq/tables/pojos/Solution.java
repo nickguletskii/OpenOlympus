@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.jooq.tables.interfaces.ISolution;
+import org.ng200.openolympus.model.ISolutionSecurityDescription;
 
 
 /**
@@ -29,9 +30,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.ISolution;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "solution", schema = "public")
-public class Solution implements ISolution {
+public class Solution implements ISolutionSecurityDescription, ISolution {
 
-	private static final long serialVersionUID = 1692462022;
+	private static final long serialVersionUID = -1287791063;
 
 	private Long       id;
 	private String     file;

@@ -26,82 +26,107 @@ import java.sql.Timestamp;
 
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
+import org.ng200.openolympus.jooq.tables.interfaces.IUser;
 import org.ng200.openolympus.security.PrincipalMatchesUser;
 
-public interface IUserSecurityDescription {
-
+public interface IUserSecurityDescription extends IUser {
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.ANONYMOUS)
 	public Long getId();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.LOGGED_IN)
 	public String getUsername();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getFirstNameMain();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getAddressCity();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getAddressCountry();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getAddressLine1();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getAddressLine2();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getAddressState();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public Boolean getApprovalEmailSent();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public Timestamp getBirthDate();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getEmailAddress();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getEmailConfirmationToken();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.LOGGED_IN)
 	public Boolean getEnabled();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getFirstNameLocalised();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getLandline();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getLastNameLocalised();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getLastNameMain();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getMiddleNameLocalised();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getMiddleNameMain();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getMobile();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.INTERNAL)
 	public String getPassword();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getSchool();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getTeacherFirstName();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getTeacherLastName();
 
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getTeacherMiddleName();
 
