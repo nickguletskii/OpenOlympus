@@ -27,17 +27,18 @@ import org.ng200.openolympus.jooq.tables.interfaces.IUser;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.stereotype.Component;
 
-@Component
 public class PrincipalMatchesUser implements SecurityClearancePredicate {
 
 	private SecurityClearanceType defaultClearance;
 
+	@Component
 	public class Private extends PrincipalMatchesUser {
 		public Private() {
 			super(SecurityClearanceType.ADMINISTRATIVE_USER);
 		}
 	}
 
+	@Component
 	public class Public extends PrincipalMatchesUser {
 		public Public() {
 			super(SecurityClearanceType.APPROVED_USER);
