@@ -160,31 +160,14 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
-	public Contest getContestThatIntersects(final Date startDate,
+	public List<Contest> getContestsThatIntersect(final Date startDate,
 			final Date endDate) {
+
 		return dslContext
-				.selectFrom(Tables.CONTEST)
-				.where(
-
-		Routines.getContestStart(Tables.CONTEST.ID)
-				.between(Timestamp.from(startDate.toInstant()))
-				.and(Timestamp.from(endDate.toInstant()))
-
-		.or(Routines.getContestEnd(Tables.CONTEST.ID)
-				.between(Timestamp.from(startDate.toInstant()))
-				.and(Timestamp.from(endDate.toInstant())))
-
-		.or(DSL.val(Timestamp.from(startDate.toInstant()))
-				.between(
-						Routines.getContestStart(Tables.CONTEST.ID))
-				.and(Routines.getContestEnd(Tables.CONTEST.ID)))
-
-		.or(DSL.val(Timestamp.from(endDate.toInstant()))
-				.between(
-						Routines.getContestStart(Tables.CONTEST.ID))
-				.and(Routines.getContestEnd(Tables.CONTEST.ID)))
-
-		).fetchOneInto(Contest.class);
+				.selectFrom(Routines.getContestsThatIntersect(
+						Timestamp.from(startDate.toInstant()),
+						Timestamp.from(endDate.toInstant())))
+				.fetchInto(Contest.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
@@ -202,8 +185,11 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	public Contest getRunningContest() {
-		return this.getContestThatIntersects(Date.from(Instant.now()),
-				Date.from(Instant.now()));
+		return dslContext
+				.selectFrom(Routines.getContestsThatIntersect(
+						DSL.currentTimestamp(),
+						DSL.currentTimestamp()))
+				.fetchOneInto(Contest.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER

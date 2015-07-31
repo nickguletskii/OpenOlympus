@@ -23,6 +23,7 @@
 package org.ng200.openolympus.validation;
 
 import java.util.Date;
+import java.util.List;
 
 import org.ng200.openolympus.dto.ContestDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
@@ -44,7 +45,8 @@ public class ContestDtoValidator {
 		}
 
 		if ((contest == null || !contest.getName().equals(contestDto.getName()))
-				&& this.contestService.getContestByName(contestDto.getName()) != null) {
+				&& this.contestService
+						.getContestByName(contestDto.getName()) != null) {
 			errors.rejectValue("name", "",
 					"contest.add.form.errors.contestAlreadyExists");
 		}
@@ -52,9 +54,12 @@ public class ContestDtoValidator {
 		final Date start = contestDto.getStartTime();
 		final Date end = Date.from(contestDto.getStartTime().toInstant()
 				.plus(contestDto.getDuration()));
-		final Contest runningContest = this.contestService
-				.getContestThatIntersects(start, end);
-		if (runningContest != null && !runningContest.equals(contest)) {
+		List<Contest> contestsThatIntersect = this.contestService
+				.getContestsThatIntersect(start, end);
+
+		if (contestsThatIntersect.stream()
+				.anyMatch(
+						c -> contest == null || contest.getId() != c.getId())) {
 			errors.rejectValue("startTime", "",
 					"contest.add.form.errors.contestIntersects");
 		}

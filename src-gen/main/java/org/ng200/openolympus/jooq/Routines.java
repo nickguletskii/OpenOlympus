@@ -28,9 +28,11 @@ import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTask;
 import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTimeExtensions;
 import org.ng200.openolympus.jooq.routines.MaintainSolutionScore;
 import org.ng200.openolympus.jooq.routines.PermissionAppliesToPrincipal;
+import org.ng200.openolympus.jooq.routines.RaiseContestIntersectsError;
 import org.ng200.openolympus.jooq.routines.UpdateContest;
 import org.ng200.openolympus.jooq.routines.UpdateSolution;
 import org.ng200.openolympus.jooq.routines.UpdateUserInContest;
+import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
 
 
 /**
@@ -480,6 +482,25 @@ public class Routines {
 	}
 
 	/**
+	 * Call <code>public.raise_contest_intersects_error</code>
+	 */
+	public static Object raiseContestIntersectsError(Configuration configuration) {
+		RaiseContestIntersectsError f = new RaiseContestIntersectsError();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.raise_contest_intersects_error</code> as a field
+	 */
+	public static Field<Object> raiseContestIntersectsError() {
+		RaiseContestIntersectsError f = new RaiseContestIntersectsError();
+
+		return f.asField();
+	}
+
+	/**
 	 * Call <code>public.update_contest</code>
 	 */
 	public static void updateContest(Configuration configuration, Long _Param1) {
@@ -508,5 +529,19 @@ public class Routines {
 		p.set_Param2(_Param2);
 
 		p.execute(configuration);
+	}
+
+	/**
+	 * Get <code>public.get_contests_that_intersect</code> as a field
+	 */
+	public static GetContestsThatIntersect getContestsThatIntersect(Timestamp timeRangeStart, Timestamp timeRangeEnd) {
+		return GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT.call(timeRangeStart, timeRangeEnd);
+	}
+
+	/**
+	 * Get <code>public.get_contests_that_intersect</code> as a field
+	 */
+	public static GetContestsThatIntersect getContestsThatIntersect(Field<Timestamp> timeRangeStart, Field<Timestamp> timeRangeEnd) {
+		return GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT.call(timeRangeStart, timeRangeEnd);
 	}
 }

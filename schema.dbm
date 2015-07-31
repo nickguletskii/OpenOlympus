@@ -3,8 +3,8 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="164,989" last-zoom="1"
-	 default-owner="postgres">
+<dbmodel pgmodeler-ver="0.8.1" last-position="0,798" last-zoom="1"
+	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
 	<tablespace name="pg_default"/>
@@ -649,7 +649,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="group">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="773.635" y="993.99"/>
+	<position x="773.635" y="992.99"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -1259,6 +1259,29 @@ END;]]></definition>
 	 table="public.contest">
 		<function signature="public.raise_contest_intersects_error()"/>
 </trigger>
+
+<function name="get_contests_that_intersect"
+		window-func="false"
+		returns-setof="true"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="1">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="public.contest"/>
+	</return-type>
+	<parameter name="time_range_start" in="true">
+		<type name="timestamp"/>
+	</parameter>
+	<parameter name="time_range_end" in="true">
+		<type name="timestamp"/>
+	</parameter>
+	<definition><![CDATA[SELECT * FROM contest WHERE tsrange(get_contest_start(contest.id), get_contest_end(contest.id)) && tsrange(time_range_start, time_range_end)]]></definition>
+</function>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

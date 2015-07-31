@@ -4,14 +4,18 @@
 package org.ng200.openolympus.jooq;
 
 
+import java.sql.Timestamp;
+
 import javax.annotation.Generated;
 
+import org.jooq.Field;
 import org.ng200.openolympus.jooq.tables.Contest;
 import org.ng200.openolympus.jooq.tables.ContestMessage;
 import org.ng200.openolympus.jooq.tables.ContestParticipation;
 import org.ng200.openolympus.jooq.tables.ContestPermission;
 import org.ng200.openolympus.jooq.tables.ContestQuestion;
 import org.ng200.openolympus.jooq.tables.ContestTasks;
+import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
 import org.ng200.openolympus.jooq.tables.Group;
 import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
@@ -68,6 +72,25 @@ public class Tables {
 	 * The table public.contest_tasks
 	 */
 	public static final ContestTasks CONTEST_TASKS = org.ng200.openolympus.jooq.tables.ContestTasks.CONTEST_TASKS;
+
+	/**
+	 * The table public.get_contests_that_intersect
+	 */
+	public static final GetContestsThatIntersect GET_CONTESTS_THAT_INTERSECT = org.ng200.openolympus.jooq.tables.GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT;
+
+	/**
+	 * Get <code>public.get_contests_that_intersect</code> as a field
+	 */
+	public static GetContestsThatIntersect GET_CONTESTS_THAT_INTERSECT(Timestamp timeRangeStart, Timestamp timeRangeEnd) {
+		return GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT.call(timeRangeStart, timeRangeEnd);
+	}
+
+	/**
+	 * Get <code>public.get_contests_that_intersect</code> as a field
+	 */
+	public static GetContestsThatIntersect GET_CONTESTS_THAT_INTERSECT(Field<Timestamp> timeRangeStart, Field<Timestamp> timeRangeEnd) {
+		return GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT.call(timeRangeStart, timeRangeEnd);
+	}
 
 	/**
 	 * The table public.group
