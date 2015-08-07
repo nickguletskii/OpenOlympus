@@ -55,6 +55,7 @@ import org.ng200.openolympus.jooq.tables.pojos.ContestTasks;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.TimeExtension;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -360,9 +361,9 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	public void addContestTask(Contest contest, Task taskByName) {
-		dslContext.insertInto(Tables.CONTEST_TASKS)
-				.values(new ContestTasks(contest.getId(), taskByName.getId()))
-				.execute();
+		ContestTasksRecord record = new ContestTasksRecord(contest.getId(), taskByName.getId());
+		record.attach(dslContext.configuration());
+		record.insert();
 	}
 
 	public boolean userKnowsAboutContest(User user, Contest contest,

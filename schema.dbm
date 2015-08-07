@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="0,798" last-zoom="1"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="1001,797" last-zoom="1"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -1272,7 +1272,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest"/>
+	<type name="public.contest" precision="32766"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp"/>
@@ -1282,6 +1282,10 @@ END;]]></definition>
 	</parameter>
 	<definition><![CDATA[SELECT * FROM contest WHERE tsrange(get_contest_start(contest.id), get_contest_end(contest.id)) && tsrange(time_range_start, time_range_end)]]></definition>
 </function>
+
+<extension name="pg_trgm">
+	<schema name="public"/>
+</extension>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

@@ -50,6 +50,7 @@ import org.jooq.Cursor;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.TaskCreationDto;
@@ -67,8 +68,6 @@ import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
 import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -112,7 +111,8 @@ public class TaskService extends GenericCreateUpdateRepository {
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Task> findAFewTasksWithNameContaining(final String name) {
 		return dslContext.selectFrom(Tables.TASK)
-				.where(Tables.TASK.NAME.like(name))
+				.where(Tables.TASK.NAME.toString() + " % "
+						+ DSL.val(name, String.class))
 				.limit(LIMIT_TASKS_WITH_NAME_CONTAINING).fetchInto(Task.class);
 	}
 

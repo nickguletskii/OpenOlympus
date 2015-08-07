@@ -38,3 +38,4 @@ require("directives/simpleDirectives");
 require("directives/acl");
 require("directives/file-input");
 require("directives/file-ng-model");
+require("directives/typeahead");

@@ -20,10 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
-var app = require("app");
 
 function ValidationException(message, data) {
 	this.message = message;
@@ -71,7 +69,7 @@ angular.module("ool.services").factory("ValidationService", /*@ngInject*/ functi
 			});
 			return deferred.promise;
 		},
-		postToServer: function(path, data, progressListener) {
+		postToServer: function(path, data, progressListener, fieldTransformationMap) {
 			var deferred = $q.defer();
 			var formData = new FormData();
 			_.forEach(data, (value, key) => {
@@ -99,6 +97,14 @@ angular.module("ool.services").factory("ValidationService", /*@ngInject*/ functi
 					progressListener(evt);
 				}).success(function(response) {
 					if (response.status === "BINDING_ERROR") {
+						if (fieldTransformationMap) {
+							_.forEach(response.fieldErrors, (error) => {
+								if (fieldTransformationMap[error.field]) {
+									error.field = fieldTransformationMap[error.field];
+								}
+							});
+						}
+
 						ValidationService.transformBindingResultsIntoFormForMap(response.fieldErrors).then(function(msg) {
 							deferred.reject(
 								msg
