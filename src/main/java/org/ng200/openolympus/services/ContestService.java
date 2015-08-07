@@ -357,11 +357,14 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 	public void removeTaskFromContest(Task task, Contest contest) {
 		dslContext.delete(Tables.CONTEST_TASKS).where(
-				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId()));
+				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId())
+						.and(Tables.CONTEST_TASKS.TASK_ID.eq(task.getId())))
+				.execute();
 	}
 
 	public void addContestTask(Contest contest, Task taskByName) {
-		ContestTasksRecord record = new ContestTasksRecord(contest.getId(), taskByName.getId());
+		ContestTasksRecord record = new ContestTasksRecord(contest.getId(),
+				taskByName.getId());
 		record.attach(dslContext.configuration());
 		record.insert();
 	}

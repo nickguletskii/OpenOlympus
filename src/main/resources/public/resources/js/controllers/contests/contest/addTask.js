@@ -22,7 +22,7 @@
  */
 
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, Upload, $translate) {
+	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, Upload, $translate) {
 	$scope.getTaskSuggestions = function(name) {
 		return $http.get("/api/taskCompletion", {
 			params: {
@@ -32,21 +32,19 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 			return response.data;
 		});
 	};
-	$scope.taskAddition = {};
+
+	FormDefaultHelperService.setup($scope, "taskAddition", "taskAddedMessage");
+
 	$scope.addTask = function(taskAddition) {
-		$scope.submitting = true;
-		$scope.uploadProgress = null;
-		$scope.taskAddedMessage = null;
+		$scope.formHelper.startUpload();
+
 		return ValidationService.postToServer(
-				"/api/contest/" + $stateParams.contestId + "/addTask", taskAddition, (progress) => $scope.progress = progress)
+				"/api/contest/" + $stateParams.contestId + "/addTask", taskAddition, $scope.formHelper.progressReporter)
 			.then((response) => {
-				$scope.uploadProgress = null;
-				$scope.submitting = false;
-				$scope.taskAddition = {};
 				$translate("contest.addTask.lastAdded", {
 					taskName: response.data.taskName
-				}).then(function(d) {
-					$scope.taskAddedMessage = d;
+				}).then(function(message) {
+					$scope.formHelper.finishUpload(message);
 				});
 				$rootScope.$emit("taskAddedToContest");
 			});

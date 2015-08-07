@@ -15,7 +15,6 @@ angular.module("ool.directives").directive("typeaheadBootstrap", /*@ngInject*/ f
 			buttonText: "@?"
 		},
 		compile: function(_scope, element) {
-			console.log(element);
 			return {
 				pre: function($scope, $element, $attributes, formForController, $transclude) {
 					FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
@@ -36,8 +35,7 @@ angular.module("ool.directives").directive("typeaheadBootstrap", /*@ngInject*/ f
 		restrict: "A",
 		priority: 100000,
 		terminal: true,
-		compile: function(_scope, element) {
-			console.log(element);
+		compile: function() {
 			return {
 				post: function($scope, $element, $attributes) {
 					$attributes.$set("ngModel", "$$oolDirectiveIsolatedScope.model.bindable");

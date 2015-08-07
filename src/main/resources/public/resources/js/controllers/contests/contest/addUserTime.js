@@ -21,57 +21,42 @@
  * THE SOFTWARE.
  */
 
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
-
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, Upload, $translate) {
-    $scope.serverErrorReporter = new ServersideFormErrorReporter();
-    $scope.task = {};
-    $scope.uploadProgressBarColour = function() {
-        if ($scope.uploadFailure)
-            return "danger";
-        if ($scope.uploadSuccess)
-            return "success";
-        return "info";
-    };
-    $scope.isFormVisible = true;
+	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, Upload, $translate) {
+	$scope.validationRules = {
+		time: {
+			required: true,
+			custom: function(value) {
+				var val = parseInt(value);
+				var deferred = $q.defer();
+				if (val < 1) {
+					var key = "contest.addUserTime.timeNotPositive";
+					$translate([key]).then(function(message) {
+						deferred.reject(message[key]);
+					});
+					return deferred.promise;
+				}
+				deferred.resolve();
+				return deferred.promise;
+			}
+		}
+	};
 
-    function success(response) {
-        $scope.isSubmitting = false;
-        $scope.uploadSuccess = true;
-        $scope.uploadFailure = false;
-        $scope.processing = false;
-        $scope.$dismiss('close');
-    }
+	FormDefaultHelperService.setup($scope, "userTimeAddition", "userTimeAddedMessage");
 
-    function failure() {
-        $scope.isSubmitting = false;
-        $scope.uploadSuccess = false;
-        $scope.uploadFailure = true;
-        $scope.processing = false;
-    }
+	$scope.addUserTime = function(userTimeAddition) {
+		$scope.formHelper.startUpload();
 
-    function reset() {
-        $scope.isSubmitting = false;
-        $scope.uploadSuccess = false;
-        $scope.uploadFailure = false;
-        $scope.processing = false;
-    }
-
-    $scope.addUserTime = function(time) {
-        $scope.isSubmitting = true;
-
-        try {
-            var fd = new FormData();
-            fd.append("user", $stateParams.userId);
-            if (time)
-                fd.append("time", time * (60 * 1000));
-
-            ValidationService.postToServer($scope, '/api/contest/' + $stateParams.contestId + '/addUserTime', $scope.userTimeAdditionForm, fd, success, failure, reset);
-        } catch (err) {
-            reset();
-        }
-    };
+		return ValidationService.postToServer(
+				"/api/contest/" + $stateParams.contestId + "/addUserTime", {
+					"user": $stateParams.userId,
+					"time": userTimeAddition.time * (60 * 1000)
+				}, $scope.formHelper.progressReporter)
+			.then(() => {
+				var key = "contest.addUserTime.lastAdded";
+				$translate([key]).then(function(messages) {
+					$scope.formHelper.finishUpload(messages[key]);
+				});
+			});
+	};
 };

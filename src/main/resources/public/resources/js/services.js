@@ -36,3 +36,4 @@ require("services/taskService");
 require("services/contestService");
 require("services/timeService");
 require("services/aclService");
+require("services/formDefaultHelperService");

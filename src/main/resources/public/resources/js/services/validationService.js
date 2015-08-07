@@ -74,7 +74,6 @@ angular.module("ool.services").factory("ValidationService", /*@ngInject*/ functi
 			var formData = new FormData();
 			_.forEach(data, (value, key) => {
 				if (value instanceof FileList) {
-					console.log(value.length);
 					if (value.length !== 1 && value.length !== 0) {
 						throw new Error("TODO: multiple file upload support");
 					}

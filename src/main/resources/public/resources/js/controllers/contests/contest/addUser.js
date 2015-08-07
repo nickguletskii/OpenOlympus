@@ -23,7 +23,7 @@
 var angular = require("angular");
 
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, Upload, $translate) {
+	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, Upload, $translate) {
 	$scope.getUserSuggestions = function(name) {
 		return $http.get("/api/userCompletion", {
 			params: {
@@ -33,25 +33,22 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 			return response.data;
 		});
 	};
-	$scope.userAddition = {};
+
+	FormDefaultHelperService.setup($scope, "userAddition", "userAddedMessage");
+
 	$scope.addUser = function(userAddition) {
-		$scope.submitting = true;
-		$scope.uploadProgress = null;
-		$scope.userAddedMessage = null;
+		$scope.formHelper.startUpload();
 		return ValidationService.postToServer(
 				"/api/contest/" + $stateParams.contestId + "/addUser", {
 					username: angular.isString(userAddition.user) && userAddition.user || userAddition.user.username
-				}, (progress) => $scope.progress = progress, {
+				}, $scope.formHelper.progressReporter, {
 					"username": "user"
 				})
 			.then((response) => {
-				$scope.uploadProgress = null;
-				$scope.submitting = false;
-				$scope.userAddition = {};
 				$translate("contest.addUser.lastAdded", {
 					username: response.data.username
-				}).then(function(d) {
-					$scope.userAddedMessage = d;
+				}).then(function(message) {
+					$scope.formHelper.finishUpload(message);
 				});
 				$rootScope.$emit("userAddedToContest");
 			});
