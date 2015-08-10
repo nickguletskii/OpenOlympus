@@ -46,7 +46,7 @@ angular.module("ool.directives")
 
 		function link($scope, $element, $attributes) {
 			function updateStatus() {
-				$scope.changesCommited =
+				$scope.changesCommitted =
 					_.isEqual(
 						ACLService.cannonicalPermissionForm($scope.permissions),
 						$scope.origPermissions
