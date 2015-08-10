@@ -46,7 +46,7 @@ angular.module("ool.directives")
 
 		function link($scope, $element, $attributes) {
 			function updateStatus() {
-				$scope.changesCommitted =
+				$scope.changesCommited =
 					_.isEqual(
 						ACLService.cannonicalPermissionForm($scope.permissions),
 						$scope.origPermissions
@@ -136,6 +136,10 @@ angular.module("ool.directives")
 					return translateAndReject("user", $attributes.localisationNamespace + ".form.validation.userAlreadyInACL");
 				}
 
+				if (!permission.principals) {
+					permission.principals = [];
+				}
+
 				permission.principals.push(userForm.user);
 				updateStatus();
 
@@ -157,6 +161,10 @@ angular.module("ool.directives")
 				// Group is already in the permission list.
 				if (_.find(permission.principals, (val) => val.id === groupForm.group.id)) {
 					return translateAndReject("group", $attributes.localisationNamespace + ".form.validation.groupAlreadyInACL");
+				}
+
+				if (!permission.principals) {
+					permission.principals = [];
 				}
 
 				permission.principals.push(groupForm.group);
