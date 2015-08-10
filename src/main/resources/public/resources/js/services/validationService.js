@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var _ = require("lodash");
 var angular = require("angular");
 
@@ -31,6 +33,20 @@ function ValidationException(message, data) {
 
 angular.module("ool.services").factory("ValidationService", /*@ngInject*/ function($injector, $q, $translate) {
 	return {
+		toTranslationPromise: function(func) {
+			return _.flow(func, (key) => {
+				let deferred = $q.defer();
+				if (key) {
+					$translate(key)
+						.then(translation =>
+							deferred.reject(translation), (msg) =>
+							deferred.reject("No translation available: " + msg));
+				} else {
+					deferred.resolve();
+				}
+				return deferred.promise;
+			});
+		},
 		report: function(reporter, form, errors) {
 			_.map(_.filter(form, function(element) {
 				return _.has(element, "$setValidity");

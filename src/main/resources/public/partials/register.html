@@ -22,33 +22,85 @@
     THE SOFTWARE.
 
 -->
-<h1 >{{ 'register.form.heading' | translate }}</h1>
-
-<form name="userForm" form-for="user" validation-rules="validationRules" submit-with="register(user)">
-    <text-field label="{{ 'register.form.labels.username' | translate }}" attribute="username"></text-field>
-    <text-field label="{{ 'register.form.labels.password' | translate }}" type="password" attribute="password"></text-field>
-    <text-field label="{{ 'register.form.labels.passwordConfirmation' | translate }}" type="password" attribute="passwordConfirmation"></text-field>
-    <text-field label="{{ 'register.form.labels.emailAddress' | translate }}" type="email" attribute="emailAddress"></text-field>
-    <text-field label="{{ 'register.form.labels.firstNameMain' | translate }}" type="text" attribute="firstNameMain"></text-field>
-    <text-field label="{{ 'register.form.labels.middleNameMain' | translate }}" type="text" attribute="middleNameMain"></text-field>
-    <text-field label="{{ 'register.form.labels.lastNameMain' | translate }}" type="text" attribute="lastNameMain"></text-field>
-    <text-field label="{{ 'register.form.labels.firstNameLocalised' | translate }}" type="text" attribute="firstNameLocalised"></text-field>
-    <text-field label="{{ 'register.form.labels.middleNameLocalised' | translate }}" type="text" attribute="middleNameLocalised"></text-field>
-    <text-field label="{{ 'register.form.labels.lastNameLocalised' | translate }}" type="text" attribute="lastNameLocalised"></text-field>
-    <text-field label="{{ 'register.form.labels.teacherFirstName' | translate }}" type="text" attribute="teacherFirstName"></text-field>
-    <text-field label="{{ 'register.form.labels.teacherMiddleName' | translate }}" type="text" attribute="teacherMiddleName"></text-field>
-    <text-field label="{{ 'register.form.labels.teacherLastName' | translate }}" type="text" attribute="teacherLastName"></text-field>
-    <text-field label="{{ 'register.form.labels.addressLine1' | translate }}" type="text" attribute="addressLine1"></text-field>
-    <text-field label="{{ 'register.form.labels.addressLine2' | translate }}" type="text" attribute="addressLine2"></text-field>
-    <text-field label="{{ 'register.form.labels.addressCity' | translate }}" type="text" attribute="addressCity"></text-field>
-    <text-field label="{{ 'register.form.labels.addressState' | translate }}" type="text" attribute="addressState"></text-field>
-    <text-field label="{{ 'register.form.labels.addressCountry' | translate }}" type="text" attribute="addressCountry"></text-field>
-    <text-field label="{{ 'register.form.labels.landline' | translate }}" type="text" attribute="landline"></text-field>
-    <text-field label="{{ 'register.form.labels.mobile' | translate }}" type="text" attribute="mobile"></text-field>
-    <text-field label="{{ 'register.form.labels.school' | translate }}" type="text" attribute="school"></text-field>
-    <datepicker-field label="{{ 'register.form.labels.dateOfBirth' | translate }}" attribute="dateOfBirth"></datepicker-field>
-    <recaptcha label="{{ 'register.form.labels.captcha' | translate }}" attribute="recaptchaResponse" reset-on="formSubmissionRejected"></recaptcha>
-    <a ui-sref="eula" translate="register.form.eulaLabel"></a>
-    <checkbox-field type="checkbox" attribute="eulaAccepted" label="{{'register.form.eulaCheckbox'|translate}}"></checkbox-field>
-    <submit-button label="{{ 'register.registerButton' | translate }}" button-class="btn btn-default" disable="!user.eulaAccepted"></submit-button>
+<h1>{{ 'register.form.heading' | translate }}</h1>
+<form name="userForm"
+	controller="userFormController"
+	form-for="user"
+	validation-rules="validationRules"
+	submit-with="register(user)">
+	<text-field label="{{ 'register.form.labels.username' | translate }}"
+		attribute="username"></text-field>
+	<text-field label="{{ 'register.form.labels.password' | translate }}"
+		type="password"
+		attribute="password"></text-field>
+	<text-field label="{{ 'register.form.labels.passwordConfirmation' | translate }}"
+		type="password"
+		attribute="passwordConfirmation"></text-field>
+	<text-field label="{{ 'register.form.labels.emailAddress' | translate }}"
+		type="email"
+		attribute="emailAddress"></text-field>
+	<text-field label="{{ 'register.form.labels.firstNameMain' | translate }}"
+		type="text"
+		attribute="firstNameMain"></text-field>
+	<text-field label="{{ 'register.form.labels.middleNameMain' | translate }}"
+		type="text"
+		attribute="middleNameMain"></text-field>
+	<text-field label="{{ 'register.form.labels.lastNameMain' | translate }}"
+		type="text"
+		attribute="lastNameMain"></text-field>
+	<text-field label="{{ 'register.form.labels.firstNameLocalised' | translate }}"
+		type="text"
+		attribute="firstNameLocalised"></text-field>
+	<text-field label="{{ 'register.form.labels.middleNameLocalised' | translate }}"
+		type="text"
+		attribute="middleNameLocalised"></text-field>
+	<text-field label="{{ 'register.form.labels.lastNameLocalised' | translate }}"
+		type="text"
+		attribute="lastNameLocalised"></text-field>
+	<text-field label="{{ 'register.form.labels.teacherFirstName' | translate }}"
+		type="text"
+		attribute="teacherFirstName"></text-field>
+	<text-field label="{{ 'register.form.labels.teacherMiddleName' | translate }}"
+		type="text"
+		attribute="teacherMiddleName"></text-field>
+	<text-field label="{{ 'register.form.labels.teacherLastName' | translate }}"
+		type="text"
+		attribute="teacherLastName"></text-field>
+	<text-field label="{{ 'register.form.labels.addressLine1' | translate }}"
+		type="text"
+		attribute="addressLine1"></text-field>
+	<text-field label="{{ 'register.form.labels.addressLine2' | translate }}"
+		type="text"
+		attribute="addressLine2"></text-field>
+	<text-field label="{{ 'register.form.labels.addressCity' | translate }}"
+		type="text"
+		attribute="addressCity"></text-field>
+	<text-field label="{{ 'register.form.labels.addressState' | translate }}"
+		type="text"
+		attribute="addressState"></text-field>
+	<text-field label="{{ 'register.form.labels.addressCountry' | translate }}"
+		type="text"
+		attribute="addressCountry"></text-field>
+	<text-field label="{{ 'register.form.labels.landline' | translate }}"
+		type="text"
+		attribute="landline"></text-field>
+	<text-field label="{{ 'register.form.labels.mobile' | translate }}"
+		type="text"
+		attribute="mobile"></text-field>
+	<text-field label="{{ 'register.form.labels.school' | translate }}"
+		type="text"
+		attribute="school"></text-field>
+	<datepicker-field label="{{ 'register.form.labels.dateOfBirth' | translate }}"
+		attribute="dateOfBirth"></datepicker-field>
+	<recaptcha label="{{ 'register.form.labels.captcha' | translate }}"
+		attribute="recaptchaResponse"
+		reset-on="formSubmissionRejected"></recaptcha>
+	<a ui-sref="eula"
+		translate="register.form.eulaLabel"></a>
+	<checkbox-field type="checkbox"
+		attribute="eulaAccepted"
+		label="{{'register.form.eulaCheckbox'|translate}}"></checkbox-field>
+	<submit-button label="{{ 'register.registerButton' | translate }}"
+		button-class="btn btn-default"
+		disable="!user.eulaAccepted"></submit-button>
 </form>

@@ -20,10 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 var angular = require("angular");
+var _ = require("lodash");
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, Upload, $translate) {
+module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http, FormDefaultHelperService) {
 	$scope.getUserSuggestions = function(name) {
 		return $http.get("/api/userCompletion", {
 			params: {
@@ -34,23 +35,41 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 		});
 	};
 
-	FormDefaultHelperService.setup($scope, "userAddition", "userAddedMessage");
+	class ContestAddUserForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "contest.addUser");
+			this.submitUrl = "/api/contest/" + $stateParams.contestId + "/addUser";
+		}
 
-	$scope.addUser = function(userAddition) {
-		$scope.formHelper.startUpload();
-		return ValidationService.postToServer(
-				"/api/contest/" + $stateParams.contestId + "/addUser", {
-					username: angular.isString(userAddition.user) && userAddition.user || userAddition.user.username
-				}, $scope.formHelper.progressReporter, {
-					"username": "user"
-				})
-			.then((response) => {
-				$translate("contest.addUser.lastAdded", {
-					username: response.data.username
-				}).then(function(message) {
-					$scope.formHelper.finishUpload(message);
-				});
-				$rootScope.$emit("userAddedToContest");
+		transformDataForServer(data) {
+			return {
+				username: angular.isString(data.user) && data.user || data.user.username
+			};
+		}
+
+		transformFailureResponse(response) {
+			let x = _.mapKeys(response, (value, key) => {
+				if (key === "username") {
+					return "user";
+				}
+				return key;
 			});
-	};
+			return x;
+		}
+
+		preSubmit() {
+			super.preSubmit();
+			this.lastUserAdded = null;
+		}
+
+		postSubmit(response) {
+			super.postSubmit(response);
+			this.lastUserAdded = {
+				username: response.data.username
+			};
+			$rootScope.$emit("userAddedToContest");
+		}
+	}
+
+	$scope.form = new ContestAddUserForm();
 };

@@ -20,104 +20,97 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
-var Util = require("oolutil");
 var _ = require("lodash");
 
 module.exports = /*@ngInject*/ function($timeout, $q, $translate, $scope, $rootScope, $http,
-    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
+	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
 
-    $http.get("/api/security/userStatus").success(function(response) {
-        if (response) {
-            $state.go("home");
-        } else {
-            $scope.logInFormVisible = true;
-        }
-    });
-    $scope.serverErrorReporter = new ServersideFormErrorReporter();
+	$http.get("/api/security/userStatus").success(function(response) {
+		if (response) {
+			$state.go("home");
+		} else {
+			$scope.logInFormVisible = true;
+		}
+	});
+	$scope.serverErrorReporter = new ServersideFormErrorReporter();
 
-    $scope.user = {};
-    $scope.validationRules = {
-        username: {
-            required: true,
-            pattern: /[a-zA-Z0-9_-]+/,
-            minlength: 4,
-            maxlength: 16
-        },
-        password: {
-            required: true
-        },
-        passwordConfirmation: {
-            required: true,
-            custom: function(value, model) {
-                var deferred = $q.defer();
-                if (value === model.password) {
-                    deferred.resolve();
-                } else {
-                    var key = 'register.form.validation.passwordsDontMatch';
-                    $translate([key]).then(function(message) {
-                        deferred.reject(message[key]);
-                    });
-                }
-                return deferred.promise;
-            }
-        },
-        firstNameMain: {
-            required: true,
-            minlength: 1
-        },
-        middleNameMain: {
-            required: true,
-            minlength: 1
-        },
-        lastNameMain: {
-            required: true,
-            minlength: 1
-        },
-        landline: {
-            pattern: /^(\\+?[0-9]*)?$/
-        },
-        mobile: {
-            pattern: /^(\\+?[0-9]*)?$/
-        }
-    };
+	$scope.user = {};
+	$scope.validationRules = {
+		username: {
+			required: true,
+			pattern: /[a-zA-Z0-9_-]+/,
+			minlength: 4,
+			maxlength: 16
+		},
+		password: {
+			required: true
+		},
+		passwordConfirmation: {
+			required: true,
+			custom: ValidationService.toTranslationPromise(function(value, model) {
+				if (value !== model.password) {
+					return "register.form.validation.passwordsDontMatch";
+				}
+			})
+		},
+		firstNameMain: {
+			required: true,
+			minlength: 1
+		},
+		middleNameMain: {
+			required: true,
+			minlength: 1
+		},
+		lastNameMain: {
+			required: true,
+			minlength: 1
+		},
+		landline: {
+			pattern: /^(\\+?[0-9]*)?$/
+		},
+		mobile: {
+			pattern: /^(\\+?[0-9]*)?$/
+		}
+	};
 
-    $scope.setRecaptchaWidgetId = function(widgetId) {
-        $scope.recaptchaWidgetId = widgetId;
-    };
+	$scope.setRecaptchaWidgetId = function(widgetId) {
+		$scope.recaptchaWidgetId = widgetId;
+	};
 
-    $scope.register = function(user) {
-        var deferred = $q.defer();
-        $http({
-            method: 'POST',
-            url: '/api/user/register',
-            data: user
-        }).success(function(data) {
-            if (data.status === "BINDING_ERROR") {
-                ValidationService.transformBindingResultsIntoFormForMap(data.fieldErrors).then(function(msg) {
-                    deferred.reject(
-                        msg
-                    );
-                })
-            } else if (data.status === "RECAPTCHA_ERROR") {
-                $translate(data.recaptchaErrorCodes).then((translations) => {
-                    deferred.reject({
-                        recaptchaResponse: _.chain(data.recaptchaErrorCodes)
-                            .map(((key) => "register.form.recaptchaErrors." + translations[key]))
-                            .join("\n")
-                            .value()
-                    });
-                });
-            } else {
-                deferred.resolve();
-                $state.go("login", {
-                    showAdministratorApprovalRequiredMessage: true
-                });
-                return;
-            }
-            $scope.$broadcast("formSubmissionRejected")
-        });
+	$scope.register = function(user) {
+		var deferred = $q.defer();
+		$http({
+			method: "POST",
+			url: "/api/user/register",
+			data: user
+		}).success(function(data) {
+			if (data.status === "BINDING_ERROR") {
+				ValidationService.transformBindingResultsIntoFormForMap(data.fieldErrors).then(function(msg) {
+					deferred.reject(
+						msg
+					);
+				});
+			} else if (data.status === "RECAPTCHA_ERROR") {
+				$translate(data.recaptchaErrorCodes).then((translations) => {
+					deferred.reject({
+						recaptchaResponse: _.chain(data.recaptchaErrorCodes)
+							.map(((key) => "register.form.recaptchaErrors." + translations[key]))
+							.join("\n")
+							.value()
+					});
+				});
+			} else {
+				deferred.resolve();
+				$state.go("login", {
+					showAdministratorApprovalRequiredMessage: true
+				});
+				return;
+			}
+			$scope.$broadcast("formSubmissionRejected");
+		});
 
-        return deferred.promise;
-    };
+		return deferred.promise;
+	};
 };

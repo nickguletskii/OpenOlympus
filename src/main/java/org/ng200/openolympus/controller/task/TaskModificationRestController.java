@@ -94,12 +94,6 @@ public class TaskModificationRestController extends
 			if (taskModificationDto.getDescriptionFile() != null) {
 				this.uploadDescription(task, taskModificationDto
 						.getDescriptionFile().getInputStream());
-			} else {
-				this.uploadDescription(
-						task,
-						new ByteArrayInputStream(taskModificationDto
-								.getDescriptionText().getBytes(
-										Charset.forName("UTF8"))));
 			}
 			if (taskModificationDto.getJudgeFile() != null) {
 				this.uploadJudgeFile(task, taskModificationDto);

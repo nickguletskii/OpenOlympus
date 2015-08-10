@@ -20,52 +20,182 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 var angular = require("angular");
+var _ = require("lodash");
 
-
-angular.module("ool.services").factory("FormDefaultHelperService", /*@ngInject*/ function() {
+angular.module("ool.services").factory("FormDefaultHelperService", /*@ngInject*/ function(ValidationService, $q) {
+	const validationRules = {};
 	return {
-		setup: function($scope, id, submittedMessageId) {
-			let formId = id + "Form";
-			let formControllerId = id + "FormController";
-			if (angular.isUndefined($scope[id])) {
-				$scope[id] = {};
+		FormClass: class FormClass {
+
+			constructor($scope, localisationNamespace) {
+				if (!$scope || !localisationNamespace || !angular.isString(localisationNamespace)) {
+					throw new Error("Incorrect constructor parameters");
+				}
+
+				this.submitting = false;
+				this.uploadProgress = null;
+				this.localisationNamespace = localisationNamespace;
+				this.setUpWatches($scope);
+				this.setUpData();
 			}
 
-			let origValue = angular.copy($scope[id]);
-
-			if (angular.isUndefined($scope[formControllerId])) {
-				$scope[formControllerId] = {};
+			setUpData() {
+				this.data = {};
 			}
 
-			$scope.submitting = false;
-			$scope.uploadProgress = null;
-			$scope[submittedMessageId] = null;
+			setUpWatches($scope) {
+				this.setUpDirtyWatch($scope);
+			}
 
-			$scope.$watch(() => $scope[formId].$dirty, function() {
-				if ($scope[formId].$dirty) {
-					$scope[submittedMessageId] = null;
-				}
-			});
+			setUpDirtyWatch($scope) {
+				$scope.$watch(() => (this.form || {}).$dirty, () => {
+					if ((this.form || {}).$dirty) {
+						this.justSubmitted = false;
+					}
+				});
+			}
 
-			$scope.formHelper = {
-				startUpload: function() {
-					$scope.submitting = true;
-					$scope.uploadProgress = null;
-					$scope[submittedMessageId] = null;
-				},
-				finishUpload: function(message) {
-					$scope[submittedMessageId] = message;
-					$scope.uploadProgress = null;
-					$scope.submitting = false;
-					$scope[id] = angular.copy(origValue);
-					$scope[formId].$setPristine();
-					$scope[formControllerId].resetFields();
-				},
-				progressReporter: function(progress) {
-					$scope.progress = progress;
+			get submitButtonTextNormal() {
+				return this.localisationNamespace + ".submitButtonNormal";
+			}
+
+			get submitButtonTextWhileSubmitting() {
+				return this.localisationNamespace + ".submitButtonSubmitting";
+			}
+
+			get submitButtonTextAfterJustSubmitted() {
+				return this.localisationNamespace + ".submitButtonJustSubmitted";
+			}
+
+			get submitButtonText() {
+				if (this.submitting) {
+					return this.submitButtonTextWhileSubmitting;
 				}
-			};
+				if (this.justSubmitted) {
+					return this.submitButtonTextAfterJustSubmitted;
+				}
+				return this.submitButtonTextNormal;
+			}
+
+			get submitButtonIconBase() {
+				return " fa fa-fw fa-lg ";
+			}
+
+			get submitButtonIconNormal() {
+				return this.submitButtonIconBase + " fa-upload ";
+			}
+
+			get submitButtonIconWhileSubmitting() {
+				return this.submitButtonIconBase + " fa-cog fa-spinning ";
+			}
+
+			get submitButtonIconAfterJustSubmitted() {
+				return this.submitButtonIconBase + " fa-check ";
+			}
+
+			get submitButtonIcon() {
+				if (this.submitting) {
+					return this.submitButtonIconWhileSubmitting;
+				}
+				if (this.justSubmitted) {
+					return this.submitButtonIconAfterJustSubmitted;
+				}
+				return this.submitButtonIconNormal;
+			}
+
+			get submitButtonClassBase() {
+				return " btn ";
+			}
+
+			get submitButtonClassNormal() {
+				return this.submitButtonClassBase + " btn-primary ";
+			}
+
+			get submitButtonClassWhileSubmitting() {
+				return this.submitButtonClassBase + " btn-primary ";
+			}
+
+			get submitButtonClassAfterJustSubmitted() {
+				return this.submitButtonClassBase + " btn-success ";
+			}
+
+			get submitButtonClass() {
+				if (this.submitting) {
+					return this.submitButtonClassWhileSubmitting;
+				}
+				if (this.justSubmitted) {
+					return this.submitButtonClassAfterJustSubmitted;
+				}
+				return this.submitButtonClassNormal;
+			}
+
+			set progress(progress) {
+				if (!progress) {
+					this.progressVal = null;
+					return;
+				}
+				this.progressVal = {
+					loaded: progress.loaded,
+					total: progress.total
+				};
+			}
+
+			get progress() {
+				return this.progressVal;
+			}
+
+			preSubmit() {
+				this.submitting = true;
+				if (!this.progress) {
+					this.progress = {};
+				}
+				this.progress.loaded = 0;
+				this.progress.total = 0;
+			}
+
+			resetProgress() {
+				this.submitting = false;
+				this.progress = null;
+			}
+
+			postSubmit(serverResponse) {
+				this.resetProgress();
+				this.justSubmitted = true;
+				this.form.$setPristine();
+				this.formController.resetFields();
+				this.setUpData();
+			}
+
+			transformDataForServer(data) {
+				return data;
+			}
+
+			transformSuccessResponse(response) {
+				return response;
+			}
+
+			transformFailureResponse(response) {
+				return response;
+			}
+
+			submit() {
+				this.preSubmit();
+				console.log(this.data);
+				let transformedData = this.transformDataForServer(_.cloneDeep(this.data));
+				var deferred = $q.defer();
+				ValidationService.postToServer(this.submitUrl, transformedData, (progress) => this.progress = progress)
+					.then((response) => {
+						this.postSubmit(response);
+						deferred.resolve(this.transformSuccessResponse(response));
+					}, (response) => deferred.reject(this.transformFailureResponse(response)));
+				return deferred.promise;
+			}
+
+			get validationRules() {
+				return validationRules;
+			}
 		}
 	};
 });

@@ -20,76 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require("app");
-var _ = require("lodash");
-require("codemirror/mode/textile/textile");
+"use strict";
+
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, Upload, editTaskData) {
+	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, Upload, editTaskData) {
 	$scope.taskId = $stateParams.taskId;
-
-	$scope.editorOptions = {
-		lineWrapping: true,
-		lineNumbers: true,
-		mode: 'textile',
-		theme: 'solarized light'
-	};
-	$timeout(function() {
-		$scope.task = {
-			name: editTaskData.name,
-			published: editTaskData.published,
-			descriptionText: editTaskData.descriptionText
-		};
-	}, 1);
-
-	$scope.serverErrorReporter = new ServersideFormErrorReporter();
-	$scope.uploadProgressBarColour = function() {
-		if ($scope.uploadFailure)
-			return "danger";
-		if ($scope.uploadSuccess)
-			return "success";
-		return "info";
-	};
-	$scope.isFormVisible = true;
-
-	function success() {
-		$scope.isFormVisible = false;
-		$scope.uploadSuccess = true;
-		$scope.uploadFailure = false;
-		$scope.processing = false;
-	}
-
-	function failure() {
-		$scope.isFormVisible = false;
-		$scope.uploadSuccess = false;
-		$scope.uploadFailure = true;
-		$scope.processing = false;
-	}
-
-	function reset() {
-		$scope.isFormVisible = true;
-		$scope.uploadSuccess = false;
-		$scope.uploadFailure = false;
-		$scope.processing = false;
-	}
-	$scope.reset = reset;
-
-	$scope.modifyTask = function(task) {
-		$scope.isFormVisible = false;
-
-		try {
-			var fd = new FormData();
-
-			_.forEach(task, function(value, key) {
-				fd.append(key, value);
-			});
-
-			if (!!task.judgeFile)
-				fd.append("judgeFile", task.judgeFile[0]);
-			if (!!task.descriptionFile)
-				fd.append("descriptionFile", task.descriptionFile[0]);
-			ValidationService.postToServer($scope, '/api/task/' + $stateParams.taskId + '/edit', $scope.taskModificationForm, fd, success, failure, reset);
-		} catch (err) {
-			reset();
+	const validationRules = {
+		name: {
+			required: true
+		},
+		descriptionFile: {
+			required: true
+		},
+		judgeFile: {
+			required: true
 		}
 	};
+
+	class TaskModificationForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "task.editForm");
+			this.submitUrl = "/api/task/" + $scope.taskId + "/edit";
+		}
+
+		setUpData() {
+			if (this.data) {
+				return;
+			}
+			this.data = editTaskData;
+		}
+
+		get validationRules() {
+			return validationRules;
+		}
+	}
+
+	$scope.form = new TaskModificationForm();
 };

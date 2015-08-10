@@ -20,21 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
-	$scope.task = {};
-	$scope.lastTaskId = null;
-	$scope.progress = {};
-	$scope.createTask = function(task) {
-		$scope.lastTaskId = null;
-		$scope.submitting = true;
-		$scope.uploadProgress = null;
-		return ValidationService.postToServer("/api/task/create", task, (progress) => $scope.progress = progress)
-			.then((response) => {
-				$scope.uploadProgress = null;
-				$scope.submitting = false;
-				$scope.task = {};
-				$scope.lastTaskId = response.data.taskId;
-			});
+	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService) {
+
+	const validationRules = {
+		name: {
+			required: true
+		},
+		descriptionFile: {
+			required: true
+		},
+		judgeFile: {
+			required: true
+		}
 	};
+
+	class TaskCreationForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "task.createForm");
+			this.submitUrl = "/api/task/create";
+		}
+
+		preSubmit() {
+			super.preSubmit();
+			this.lastTaskId = null;
+		}
+
+		postSubmit(response) {
+			super.postSubmit(response);
+			this.lastTaskId = response.data.taskId;
+		}
+
+		get validationRules() {
+			return validationRules;
+		}
+	}
+
+	$scope.form = new TaskCreationForm();
 };

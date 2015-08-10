@@ -20,27 +20,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 var moment = require("moment");
-var angular = require("angular");
 module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService, contest) {
-	$scope.contest = {};
-	$scope.contest.name = contest.name;
-	$scope.contest.duration = contest.duration / (60 * 1000);
-	$scope.contest.startTime = moment(contest.startTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ");
-	$scope.progress = {};
-	$scope.validationRules = require("controllers/contests/contestValidation")($q, moment);
-	$scope.modifyContest = function(newContest_) {
-		var newContest = angular.copy(newContest_);
-		newContest.duration *= (60 * 1000);
-		$scope.contestModificationSuccessfull = false;
-		$scope.submitting = true;
-		$scope.uploadProgress = null;
-		return ValidationService.postToServer("/api/contest/" + $stateParams.contestId + "/edit", newContest, (progress) => $scope.progress = progress)
-			.then(() => {
-				$scope.uploadProgress = null;
-				$scope.submitting = false;
-				$scope.contestModificationSuccessfull = true;
-			});
-	};
+	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, contest) {
+	$scope.contestId = $stateParams.contestId;
+	const validationRules = require("controllers/contests/contestValidation")(ValidationService, moment);
+
+	class ContestModificationForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "contest.editForm");
+			this.submitUrl = "/api/contest/" + $stateParams.contestId + "/edit";
+		}
+
+		transformDataForServer(data) {
+			data.duration *= (60 * 1000);
+			return data;
+		}
+
+		preSubmit() {
+			super.preSubmit();
+		}
+
+		postSubmit(response) {
+			super.postSubmit(response);
+		}
+
+		setUpData() {
+			if (this.data) {
+				return;
+			}
+			this.data = {
+				name: contest.name,
+				duration: contest.duration / (60 * 1000),
+				startTime: moment(contest.startTime).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+			};
+		}
+
+		get validationRules() {
+			return validationRules;
+		}
+	}
+
+	$scope.form = new ContestModificationForm();
 };

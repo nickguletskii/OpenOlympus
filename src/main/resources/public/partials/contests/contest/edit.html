@@ -22,28 +22,35 @@
     THE SOFTWARE.
 
 -->
-<h1>{{'contest.modificationForm.labels.heading'|translate}}</h1>
-<form name="contestModificationForm" form-for="contest" validation-rules="validationRules" submit-with="modifyContest(contest)" disable="submitting" novalidate>
+<h1>{{'contest.editForm.labels.heading'|translate}}</h1>
+<form form-autoconfig="form"
+	novalidate>
 	<div class="panel panel-default">
 		<div class="panel-body">
-			<text-field label="{{ 'contest.modificationForm.labels.name' | translate }}" type="text" attribute="name"></text-field>
-			<text-field label="{{ 'contest.modificationForm.labels.startTime' | translate }}" type="datetime" attribute="startTime"></text-field>
-			<text-field label="{{ 'contest.modificationForm.labels.duration' | translate }}" type="number" attribute="duration"></text-field>
-			<checkbox-field attribute="showFullTestsDuringContest" label="{{'task.modificationForm.labels.showFullTestsDuringContest'|translate }}"></checkbox-field>
-			<submit-button label="{{'contest.modificationForm.labels.createButton' | translate }}" button-class="btn btn-primary" icon="fa fa-fw fa-lg {{ submitting && 'fa-cog fa-spin' || 'fa-upload'}}"></submit-button>
+			<text-field label-translate="contest.editForm.labels.name"
+				type="text"
+				attribute="name"></text-field>
+			<text-field label-translate="contest.editForm.labels.startTime"
+				type="datetime"
+				attribute="startTime"></text-field>
+			<text-field label-translate="contest.editForm.labels.duration"
+				type="number"
+				attribute="duration"></text-field>
+			<checkbox-field attribute="showFullTestsDuringContest"
+				label-translate="contest.editForm.labels.showFullTestsDuringContest"></checkbox-field>
+			<submit-button label="{{ form.submitButtonText | translate}}"
+				button-class="{{form.submitButtonClass}}"
+				icon="{{form.submitButtonIcon}}"></submit-button>
 		</div>
 	</div>
-	<div class="panel panel-success" ng-show="contestModificationSuccessfull">
-		<div class="panel-heading">{{'contest.modificationForm.labels.uploaded.heading'|translate}}</div>
-		<div class="panel-body">{{'contest.modificationForm.labels.uploaded.body'|translate}}
-			<button class="btn btn-success" ui-sref="contestView({contestId: contestId})">{{'contest.modificationForm.labels.goToContestButton'|translate}}</button>
+	<div class="panel panel-success"
+		ng-show="form.justSubmitted">
+		<div class="panel-heading">{{'contest.editForm.labels.uploaded.heading'|translate}}</div>
+		<div class="panel-body">{{'contest.editForm.labels.uploaded.body'|translate}}
+			<button class="btn btn-success"
+				ui-sref="contestView({contestId: contestId})">{{'contest.editForm.labels.goToContestButton'|translate}}</button>
 		</div>
 	</div>
-	<div class="panel panel-primary" ng-show="progress.loaded !== progress.total">
-		<div class="panel-heading">{{'contest.modificationForm.labels.uploading'|translate}}</div>
-		<div class="panel-body">
-			<progressbar class="progress-striped active" max="1" value="progress.loaded / progress.total "><b> {{progress.loaded | toKB}} / {{progress.total | toKB }} KB</b></progressbar>
-		</div>
-	</div>
+	<form-progress-panel form="form"
+		localisation-namespace="contest.editForm" />
 </form>
-

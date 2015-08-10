@@ -21,42 +21,42 @@
  * THE SOFTWARE.
  */
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, Upload, $translate) {
-	$scope.validationRules = {
+"use strict";
+module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http, FormDefaultHelperService, ValidationService) {
+	const validationRules = {
 		time: {
 			required: true,
-			custom: function(value) {
+			custom: ValidationService.toTranslationPromise(function(value) {
 				var val = parseInt(value);
-				var deferred = $q.defer();
 				if (val < 1) {
-					var key = "contest.addUserTime.timeNotPositive";
-					$translate([key]).then(function(message) {
-						deferred.reject(message[key]);
-					});
-					return deferred.promise;
+					return "contest.addUserTime.timeNotPositive";
 				}
-				deferred.resolve();
-				return deferred.promise;
-			}
+			})
 		}
 	};
 
-	FormDefaultHelperService.setup($scope, "userTimeAddition", "userTimeAddedMessage");
+	class ContestAddUserTimeForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "contest.addUser");
+			this.submitUrl = "/api/contest/" + $stateParams.contestId + "/addUserTime";
+		}
 
-	$scope.addUserTime = function(userTimeAddition) {
-		$scope.formHelper.startUpload();
+		transformDataForServer(data) {
+			return {
+				"user": $stateParams.userId,
+				"time": data.time * (60 * 1000)
+			};
+		}
 
-		return ValidationService.postToServer(
-				"/api/contest/" + $stateParams.contestId + "/addUserTime", {
-					"user": $stateParams.userId,
-					"time": userTimeAddition.time * (60 * 1000)
-				}, $scope.formHelper.progressReporter)
-			.then(() => {
-				var key = "contest.addUserTime.lastAdded";
-				$translate([key]).then(function(messages) {
-					$scope.formHelper.finishUpload(messages[key]);
-				});
-			});
-	};
+		postSubmit(response) {
+			super.postSubmit(response);
+			$rootScope.$emit("userTimeExtendedInContest");
+		}
+
+		get validationRules() {
+			return validationRules;
+		}
+	}
+
+	$scope.form = new ContestAddUserTimeForm();
 };

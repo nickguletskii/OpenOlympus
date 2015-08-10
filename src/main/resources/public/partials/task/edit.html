@@ -22,63 +22,36 @@
     THE SOFTWARE.
 
 -->
-<form name="taskModificationForm" role="form" novalidate="" ng-submit="modifyTask(task)" ng-show="isFormVisible">
-	<div class="container">
-		<input label="task.modificationForm.labels.name" type="text" ng-model="task.name" required="" oolinput="">
-	</div>
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<button type="button" class="btn btn-info" ng-click="toggleFullscreen(true)">
-				<span class="fa fa-expand"></span>
-			</button>
-		</div>
+<h1>{{'task.editForm.labels.heading'|translate}}</h1>
+<form form-autoconfig="form"
+	novalidate>
+	<div class="panel panel-default">
 		<div class="panel-body">
-			<div class="col-lg-6 miniCodemirror">
-				<ui-codemirror ui-codemirror-opts="editorOptions" ng-model="task.descriptionText"></ui-codemirror>
-			</div>
-			<div class="col-lg-6 miniTextilePreview" style="overflow-y: scroll;">
-				<div dynamic="task.descriptionText"></div>
-			</div>
+			<text-field label-translate="task.editForm.labels.name"
+				type="text"
+				attribute="name"></text-field>
+			<file-input label-translate="task.editForm.labels.descriptionFile"
+				type="text"
+				attribute="descriptionFile"
+				multiple="true"></file-input>
+			<file-input label-translate="task.editForm.labels.judgeFile"
+				type="text"
+				attribute="judgeFile"></file-input>
+			<checkbox-field attribute="published"
+				label-translate="task.editForm.labels.published"></checkbox-field>
+			<submit-button label="{{ form.submitButtonText | translate}}"
+				button-class="{{form.submitButtonClass}}"
+				icon="{{form.submitButtonIcon}}"></submit-button>
 		</div>
 	</div>
-	<div class="container">
-		<input label="task.modificationForm.labels.descriptionFile" type="button" class="btn btn-default" ng-file-select="" ng-model="task.descriptionFile" multiple="false" oolinput="">
-		<input label="task.modificationForm.labels.judgeFile" type="button" class="btn btn-default" ng-file-select="" ng-model="task.judgeFile" multiple="false" oolinput="">
-		<div class="checkbox">
-			<label>
-				<input type="checkbox" ng-model="task.published"> {{'task.modificationForm.labels.published'|translate}}
-			</label>
-		</div>
-		<div class="form-group">
-			<button type="submit" class="btn btn-default">{{'task.modificationForm.labels.editButton' | translate}}</button>
+	<div class="panel panel-success"
+		ng-show="form.justSubmitted">
+		<div class="panel-heading">{{'task.editForm.labels.uploaded.heading'|translate}}</div>
+		<div class="panel-body">{{'task.editForm.labels.uploaded.body'|translate}}
+			<button class="btn btn-success"
+				ui-sref="taskView({taskId: taskId})">{{'task.editForm.labels.goToTaskButton'|translate}}</button>
 		</div>
 	</div>
-	<div ng-if="fullScreen" class="panel panel-success fullScreen">
-		<div class="panel-heading">
-			<button type="button" class="btn btn-danger btn-xs fa fa-remove  pull-right" ng-click="toggleFullscreen(false)"></button>
-			<h3 class="panel-title" translate="task.modificationForm.fullScreenEditor.title" translate-data="task"></h3>
-		</div>
-		<div class="panel-body fullScreenBody">
-			<div class="col-lg-6 fullScreenCodemirror">
-				<ui-codemirror ui-codemirror-opts="editorOptions" ng-model="task.descriptionText"></ui-codemirror>
-			</div>
-			<div class="col-lg-6 fullScreenTextilePreview" style="overflow-y: scroll; height:100%">
-				<div dynamic="task.descriptionText"></div>
-			</div>
-		</div>
-	</div>
+	<form-progress-panel form="form"
+		localisation-namespace="contest.editForm" />
 </form>
-<form ng-show="!isFormVisible">
-	<div class="container">
-		<div class="form-group">
-			<label>{{'task.modificationForm.labels.uploading' | translate}}</label>
-			<progressbar value="uploadProgress" type="{{ uploadProgressBarColour() }}" class="progress-striped" ng-class="{'active': uploading }"><b>{{uploadProgress}}%</b>
-			</progressbar>
-			<label ng-if="processing">{{'task.modificationForm.labels.processing' | translate}}</label>
-			<button class="btn btn-danger" ng-if="uploadFailure" ng-click="reset()">{{'task.modificationForm.labels.back' | translate}}</button>
-			<button class="btn btn-success" ng-if="uploadSuccess" ng-click="reset()">{{'task.modificationForm.labels.again' | translate}}</button>
-			<a class="btn btn-success" ng-if="uploadSuccess" ui-sref="taskView({taskId: taskId})">{{'task.modificationForm.labels.toTask' | translate}}</a>
-		</div>
-	</div>
-</form>
-

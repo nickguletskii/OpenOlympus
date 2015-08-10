@@ -20,10 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var moment = require("moment");
-var angular = require("angular");
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
+module.exports = /*@ngInject*/ function($timeout, ValidationService, $scope, $rootScope, $http,
+	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService) {
 
 	function getSuggestedContestStartTime() {
 		let timeSuggestion = moment().startOf("minute");
@@ -33,24 +34,39 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 		return timeSuggestion;
 	}
 
-	$scope.contest = {
-		startTime: getSuggestedContestStartTime().format("YYYY-MM-DDTHH:mm:ss.SSSZ")
-	};
-	$scope.lastContestId = null;
-	$scope.progress = {};
-	$scope.validationRules = require("controllers/contests/contestValidation")($q, moment);
-	$scope.createContest = function(newContest_) {
-		var newContest = angular.copy(newContest_);
-		newContest.duration *= (60 * 1000);
-		$scope.lastContestId = null;
-		$scope.submitting = true;
-		$scope.uploadProgress = null;
-		return ValidationService.postToServer("/api/contests/create", newContest, (progress) => $scope.progress = progress)
-			.then((response) => {
-				$scope.uploadProgress = null;
-				$scope.submitting = false;
-				$scope.contest = {};
-				$scope.lastContestId = response.data.id;
-			});
-	};
+	const validationRules = require("controllers/contests/contestValidation")(ValidationService, moment);
+
+	class ContestCreationForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "contest.createForm");
+			this.submitUrl = "/api/contests/create";
+		}
+
+		transformDataForServer(data) {
+			data.duration *= (60 * 1000);
+			return data;
+		}
+
+		preSubmit() {
+			super.preSubmit();
+			this.lastContestId = null;
+		}
+
+		postSubmit(response) {
+			super.postSubmit(response);
+			this.lastContestId = response.data.id;
+		}
+
+		setUpData() {
+			this.data = {
+				startTime: getSuggestedContestStartTime().format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+			};
+		}
+
+		get validationRules() {
+			return validationRules;
+		}
+	}
+
+	$scope.form = new ContestCreationForm();
 };

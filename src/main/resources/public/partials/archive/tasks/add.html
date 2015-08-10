@@ -22,28 +22,36 @@
     THE SOFTWARE.
 
 -->
-<h1>{{'task.creationForm.labels.heading'|translate}}</h1>
-<form name="taskCreationForm" form-for="task" validation-rules="validationRules" submit-with="createTask(task)" disable="submitting" novalidate>
+<h1>{{'task.createForm.labels.heading'|translate}}</h1>
+<form form-autoconfig="form"
+	novalidate>
 	<div class="panel panel-default">
 		<div class="panel-body">
-			<text-field label="{{ 'task.creationForm.labels.name' | translate }}" type="text" attribute="name"></text-field>
-			<file-input label="{{ 'task.creationForm.labels.descriptionFile' | translate }}" type="text" attribute="descriptionFile" multiple="true"></file-input>
-			<file-input label="{{ 'task.creationForm.labels.judgeFile' | translate }}" type="text" attribute="judgeFile"></file-input>
-			<checkbox-field attribute="published" label="{{'task.modificationForm.labels.published'|translate }}"></checkbox-field>
-			<submit-button label="{{'task.creationForm.labels.createButton' | translate }}" button-class="btn btn-primary" icon="fa fa-fw fa-lg {{ submitting && 'fa-cog fa-spin' || 'fa-upload'}}"></submit-button>
+			<text-field label-translate="task.createForm.labels.name"
+				type="text"
+				attribute="name"></text-field>
+			<file-input label-translate="task.createForm.labels.descriptionFile"
+				type="text"
+				attribute="descriptionFile"
+				multiple="true"></file-input>
+			<file-input label-translate="task.createForm.labels.judgeFile"
+				type="text"
+				attribute="judgeFile"></file-input>
+			<checkbox-field attribute="published"
+				label-translate="task.modificationForm.labels.published"></checkbox-field>
+			<submit-button label="{{ form.submitButtonText | translate}}"
+				button-class="{{form.submitButtonClass}}"
+				icon="{{form.submitButtonIcon}}"></submit-button>
 		</div>
 	</div>
-	<div class="panel panel-success" ng-show="lastTaskId">
-		<div class="panel-heading">{{'task.creationForm.labels.uploaded.heading'|translate}}</div>
-		<div class="panel-body">{{'task.creationForm.labels.uploaded.body'|translate}}
-			<button class="btn btn-success" ui-sref="taskView({taskId: lastTaskId})">{{'task.creationForm.labels.goToTaskButton'|translate}}</button>
+	<div class="panel panel-success"
+		ng-show="form.lastTaskId">
+		<div class="panel-heading">{{'task.createForm.labels.uploaded.heading'|translate}}</div>
+		<div class="panel-body">{{'task.createForm.labels.uploaded.body'|translate}}
+			<button class="btn btn-success"
+				ui-sref="taskView({taskId: form.lastTaskId})">{{'task.createForm.labels.goToTaskButton'|translate}}</button>
 		</div>
 	</div>
-	<div class="panel panel-primary" ng-show="progress.loaded !== progress.total">
-		<div class="panel-heading">{{'task.creationForm.labels.uploading'|translate}}</div>
-		<div class="panel-body">
-			<progressbar class="progress-striped active" max="1" value="progress.loaded / progress.total "><b> {{progress.loaded | toKB}} / {{progress.total | toKB }} KB</b></progressbar>
-		</div>
-	</div>
+	<form-progress-panel form="form"
+		localisation-namespace="contest.createForm" />
 </form>
-

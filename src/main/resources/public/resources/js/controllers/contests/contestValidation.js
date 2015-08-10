@@ -1,5 +1,6 @@
+"use strict";
 module.exports =
-	function($q, moment) {
+	function(ValidationService, moment) {
 		return {
 			name: {
 				required: true,
@@ -7,26 +8,20 @@ module.exports =
 				maxlength: 64
 			},
 			startTime: {
-				custom: function(value) {
-					var deferred = $q.defer();
+				custom: ValidationService.toTranslationPromise(function(value) {
 					if (!moment(value, "YYYY-MM-DDTHH:mm:ss.SSSZ", true).isValid()) {
-						deferred.reject("invalidDateTimeFormat");
+						return "validation.failed.invalidDateTimeFormat";
 					}
-					deferred.resolve();
-					return deferred.promise;
-				}
+				})
 			},
 			duration: {
 				requried: true,
-				custom: function(value) {
-					var deferred = $q.defer();
+				custom: ValidationService.toTranslationPromise(function(value) {
 					var num = parseInt(value);
 					if (num < 1) {
-						deferred.reject("minimumDuration");
+						return "contest.form.validation.minimumDuration";
 					}
-					deferred.resolve();
-					return deferred.promise;
-				}
+				})
 			}
 		};
 	};

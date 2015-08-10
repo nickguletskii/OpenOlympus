@@ -23,21 +23,35 @@
 
 -->
 <h1>{{ 'login.form.heading' | translate }}</h1>
-<spinner ng-show="!logInFormVisible" class="spinner-large">
+<spinner ng-show="!logInFormVisible"
+	class="spinner-large">
 </spinner>
 <div ng-show="!!logInFormVisible">
-    <form name="loginForm" form-for="user" validation-rules="validationRules" submit-with="login(user)">
-        <div class="panel panel-success" ng-if="showAdministratorApprovalRequiredMessage">
-            <div class="panel-heading">
-                <h3 class="panel-title" translate="login.administratorApprovalRequired.title"></h3>
-                <div class="panel-body" translate="login.administratorApprovalRequired.body">
-                </div>
-            </div>
-        </div>
-        <text-field label="{{ 'login.username' | translate }}" type="text" attribute="username"></text-field>
-        <text-field label="{{ 'login.password' | translate }}" type="password" attribute="password"></text-field>
-        <recaptcha label="{{ 'login.form.labels.captcha' | translate }}" attribute="recaptchaResponse"></recaptcha>
-        <submit-button label="{{ 'login.loginButton' | translate }}" button-class="btn btn-default"></submit-button>
-    </form>
+	<form name="loginForm"
+		controller="loginFormController"
+		form-for="user"
+		validation-rules="validationRules"
+		submit-with="login(user)"
+		novalidate>
+		<div class="panel panel-success"
+			ng-if="showAdministratorApprovalRequiredMessage">
+			<div class="panel-heading">
+				<h3 class="panel-title"
+					translate="login.administratorApprovalRequired.title"></h3>
+				<div class="panel-body"
+					translate="login.administratorApprovalRequired.body">
+				</div>
+			</div>
+		</div>
+		<text-field label="{{ 'login.username' | translate }}"
+			type="text"
+			attribute="username"></text-field>
+		<text-field label="{{ 'login.password' | translate }}"
+			type="password"
+			attribute="password"></text-field>
+		<recaptcha label="{{ 'login.form.labels.captcha' | translate }}"
+			attribute="recaptchaResponse"></recaptcha>
+		<submit-button label="{{ 'login.loginButton' | translate }}"
+			button-class="btn btn-default"></submit-button>
+	</form>
 </div>
-
