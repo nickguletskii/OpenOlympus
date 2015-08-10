@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="1001,797" last-zoom="1"
+<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="147,784" last-zoom="1"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -1024,12 +1024,13 @@ END;]]></definition>
 		RETURN NEW;
 	ELSIF (TG_OP = 'UPDATE' AND NEW.superuser = FALSE AND OLD.superuser = TRUE) THEN
 		DELETE FROM group_users
-			 WHERE group_users.USER_id =NEW.id
+			WHERE group_users.USER_id =NEW.id
 			AND group_users.group_id=(SELECT id FROM "group" WHERE name='#{superusers}');
 		RETURN NEW;
+	ELSIF (TG_OP = 'UPDATE') THEN
+		RETURN NEW;
 	ELSIF (TG_OP = 'INSERT') THEN
-		INSERT INTO group_users(
-			group_id, "USER_id", can_add_others_to_group)
+		INSERT INTO group_users(group_id, "USER_id", can_add_others_to_group)
 		VALUES ((SELECT id FROM "group" WHERE name='#{allUsers}'), NEW.id, FALSE);
 		IF(NEW.superuser=TRUE) THEN
 			INSERT INTO group_users(
@@ -1037,6 +1038,11 @@ END;]]></definition>
 			VALUES ((SELECT id FROM "group" WHERE name='#{superusers}'), NEW.id, FALSE);
 		END IF;
 		RETURN NEW;
+	ELSIF (TG_OP = 'DELETE') THEN
+		DELETE FROM group_users
+		WHERE (name='#{superusers}' OR name='#{allUsers}')
+		AND USER_id=OLD.id;
+		RETURN OLD;
 	END IF;
 END;]]></definition>
 </function>

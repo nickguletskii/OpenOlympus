@@ -23,10 +23,10 @@
 package org.ng200.openolympus.controller.user;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
-import org.jooq.impl.DSL;
 import org.ng200.openolympus.dto.UserInfoDto;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.UserService;
@@ -58,7 +58,8 @@ public class AbstractUserInfoController {
 		user.setLandline(userInfoDto.getLandline());
 		user.setMobile(userInfoDto.getMobile());
 		user.setSchool(userInfoDto.getSchool());
-		user.setBirthDate(new Timestamp(userInfoDto.getDateOfBirth().getTime()));
+		user.setBirthDate(Optional.ofNullable(userInfoDto.getDateOfBirth())
+				.map((date) -> Timestamp.from(date.toInstant())).orElse(null));
 		this.userService.updateUser(user);
 	}
 

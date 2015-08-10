@@ -36,13 +36,7 @@ const controller = /*@ngInject*/ function($q, $translate, $scope, $http, $state,
 	$scope.serverErrorReporter = new ServersideFormErrorReporter();
 
 	$scope.user = {};
-	$scope.validationRules = {
-		username: {
-			required: true,
-			pattern: /[a-zA-Z0-9_-]+/,
-			minlength: 4,
-			maxlength: 16
-		},
+	$scope.validationRules = _.defaults({
 		password: {
 			required: true
 		},
@@ -53,26 +47,8 @@ const controller = /*@ngInject*/ function($q, $translate, $scope, $http, $state,
 					return "register.form.validation.passwordsDontMatch";
 				}
 			})
-		},
-		firstNameMain: {
-			required: true,
-			minlength: 1
-		},
-		middleNameMain: {
-			required: true,
-			minlength: 1
-		},
-		lastNameMain: {
-			required: true,
-			minlength: 1
-		},
-		landline: {
-			pattern: /^(\\+?[0-9]*)?$/
-		},
-		mobile: {
-			pattern: /^(\\+?[0-9]*)?$/
 		}
-	};
+	}, require("controllers/user/userInfoValidation"));
 
 	$scope.setRecaptchaWidgetId = function(widgetId) {
 		$scope.recaptchaWidgetId = widgetId;

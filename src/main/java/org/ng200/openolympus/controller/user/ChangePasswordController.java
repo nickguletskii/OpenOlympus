@@ -52,11 +52,11 @@ public class ChangePasswordController {
 	@Autowired
 	private PasswordChangeDtoValidator passwordChangeDtoValidator;
 
-	@RequestMapping(value = "/api/user/changePassword", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/api/user/changePassword", method = RequestMethod.POST)
 	public BindingResponse changePassword(
-			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,
+			@Valid final PasswordChangeDto passwordChangeDto,
 			final BindingResult bindingResult, final Principal principal)
-			throws BindException {
+					throws BindException {
 		final User user = this.userService.getUserByUsername(principal
 				.getName());
 

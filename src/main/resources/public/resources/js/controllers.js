@@ -97,15 +97,15 @@ controllers.config( /*@ngInject*/ function($stateProvider, modalStateProvider) {
 
 	_.each(stateList, function(state) {
 		var stateConfig = _.clone(state);
-		if (state.width && WIDTH_CLASS_MAP[state.width]) {
-			stateConfig.width = WIDTH_CLASS_MAP[state.width];
+		if (state.customWidth && WIDTH_CLASS_MAP[state.customWidth]) {
+			stateConfig.customWidth = WIDTH_CLASS_MAP[state.customWidth];
 		}
 		$stateProvider.state(stateConfig);
 	});
 	_.each(modalStateList, function(state) {
 		var stateConfig = _.clone(state);
-		if (state.width && WIDTH_CLASS_MAP[state.width]) {
-			stateConfig.width = WIDTH_CLASS_MAP[state.width];
+		if (state.customWidth && WIDTH_CLASS_MAP[state.customWidth]) {
+			stateConfig.customWidth = WIDTH_CLASS_MAP[state.customWidth];
 		}
 		modalStateProvider.state(stateConfig.name, stateConfig);
 	});

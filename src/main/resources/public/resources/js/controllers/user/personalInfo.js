@@ -22,51 +22,72 @@
  */
 "use strict";
 
-const controller = /*@ngInject*/ function($scope, $http,
-	$stateParams, ServersideFormErrorReporter, ValidationService,
-	personalInfoPatchUrl, requireExistingPassword, UserService) {
-	$scope.serverErrorReporter = new ServersideFormErrorReporter();
-	$scope.user = {};
-	$scope.password = {};
+var Util = require("oolutil");
+var _ = require("lodash");
+
+const controller = /*@ngInject*/ function($scope, FormDefaultHelperService, ValidationService, personalInfoPatchUrl, requireExistingPassword, existingPersonalInfo, passwordPatchUrl) {
 	$scope.requireExistingPassword = requireExistingPassword;
-	$scope.$watch("userForm.$pristine", function(newValue) {
-		if (!newValue) {
-			$scope.updatedUser = false;
+
+	const personalInfoValidationRules = require("controllers/user/userInfoValidation");
+
+	const passwordFormValidationRules = {
+		password: {
+			required: true
+		},
+		passwordConfirmation: {
+			required: true,
+			custom: ValidationService.toTranslationPromise(function(value, model) {
+				if (value !== model.password) {
+					return "user.passwordForm.validation.passwordsDontMatch";
+				}
+			})
 		}
-	});
-
-	$scope.$watch("passwordForm.$pristine", function(newValue) {
-		if (!newValue) {
-			$scope.updatedPassword = false;
-		}
-	});
-
-	$http.get(personalInfoPatchUrl).success(function(user) {
-		$scope.user = user;
-		$scope.loaded = true;
-	});
-
-	$scope.patchUser = function(user) {
-		UserService.patchUser(user, $stateParams.userId).then(function(data) {
-			if (data.status === "BINDING_ERROR") {
-				ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
-			} else {
-				$scope.updatedUser = true;
-				$scope.userForm.$setPristine();
-			}
-		});
 	};
 
-	$scope.changePassword = function(passwordObj) {
-		UserService.changePassword(passwordObj, $stateParams.userId).then(function(data) {
-			if (data.status === "BINDING_ERROR") {
-				ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
-			} else {
-				$scope.updatedPassword = true;
-				$scope.passwordForm.$setPristine();
+	class PersonalInfoForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "user.personalInfoForm");
+			this.submitUrl = personalInfoPatchUrl;
+		}
+
+		setUpData() {
+			if (this.data) {
+				return;
 			}
-		});
-	};
+
+			this.data = existingPersonalInfo;
+		}
+
+		transformDataForServer(data) {
+			return _.pick(Util.emptyToNull(data), (value) => !(_.isNull(value)));
+		}
+
+		get validationRules() {
+			return personalInfoValidationRules;
+		}
+	}
+
+	$scope.personalInfoForm = new PersonalInfoForm();
+
+	class PasswordForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "user.changePasswordForm");
+			this.submitUrl = passwordPatchUrl;
+		}
+
+		transformDataForServer(data) {
+			return {
+				password: data.password,
+				existingPassword: data.existingPassword
+			};
+		}
+
+		get validationRules() {
+			return passwordFormValidationRules;
+		}
+	}
+
+	$scope.passwordForm = new PasswordForm();
 };
 
 module.exports = {
@@ -76,6 +97,9 @@ module.exports = {
 	"controller": controller,
 	"customWidth": "narrow",
 	"resolve": {
+		existingPersonalInfo: function(UserService) {
+			return UserService.getCurrentUser();
+		},
 		personalInfoPatchUrl: function() {
 			return "/api/user/personalInfo";
 		},

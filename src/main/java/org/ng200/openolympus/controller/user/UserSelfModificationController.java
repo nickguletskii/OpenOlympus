@@ -28,11 +28,11 @@ import javax.validation.Valid;
 
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.UserInfoDto;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,11 +43,11 @@ public class UserSelfModificationController extends AbstractUserInfoController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.POST)
 	public BindingResponse changePersonInfo(
-			@Valid @RequestBody final UserInfoDto userInfoDto,
+			@Valid final UserInfoDto userInfoDto,
 			final BindingResult bindingResult, final Principal principal)
-			throws BindException {
+					throws BindException {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
@@ -57,10 +57,7 @@ public class UserSelfModificationController extends AbstractUserInfoController {
 	}
 
 	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.GET)
-	public UserInfoDto showUxserDetailsForm(final Principal principal) {
-		final UserInfoDto userInfoDto = new UserInfoDto();
-		super.initialiseDTO(userInfoDto,
-				this.userService.getUserByUsername(principal.getName()));
-		return userInfoDto;
+	public User showUserDetailsForm(final Principal principal) {
+		return this.userService.getUserByUsername(principal.getName());
 	}
 }
