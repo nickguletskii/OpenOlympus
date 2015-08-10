@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var $ = require("jquery");
 var _ = require("lodash");
 var angular = require("angular");
@@ -27,7 +29,7 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 	return {
 		restrict: "E",
 		require: "^formFor",
-		template: require("ng-cache!directives/captcha.html"),
+		template: require("ng-cache!directives/captcha/captcha.html"),
 		scope: {
 			attribute: "@",
 			label: "@"

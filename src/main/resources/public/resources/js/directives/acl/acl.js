@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var angular = require("angular");
 var _ = require("lodash");
 
@@ -27,8 +29,8 @@ let builtinGroups = ["superusers", "allUsers"]; // TODO: move to service
 
 angular.module("ool.directives")
 	.run( /*@ngInject*/ function($templateCache) {
-		$templateCache.put("directives/aclEditor/typeaheadUserItem.html", require("ng-cache!directives/acl-type-ahead-item-user.html"));
-		$templateCache.put("directives/aclEditor/typeaheadGroupItem.html", require("ng-cache!directives/acl-type-ahead-item-group.html"));
+		$templateCache.put("directives/aclEditor/typeaheadUserItem.html", require("ng-cache!directives/acl/aclTypeaheadItemUser.html"));
+		$templateCache.put("directives/aclEditor/typeaheadGroupItem.html", require("ng-cache!directives/acl/aclTypeaheadItemGroup.html"));
 	})
 	.directive("aclEditor", /*@ngInject*/ function(ACLService, $q, $http, $translate) {
 
@@ -223,7 +225,7 @@ angular.module("ool.directives")
 
 		return {
 			restrict: "E",
-			template: require("ng-cache!directives/acl.html"),
+			template: require("ng-cache!directives/acl/acl.html"),
 			scope: {
 				aclGetter: "@",
 				aclSetter: "@"
@@ -231,11 +233,11 @@ angular.module("ool.directives")
 			link: link
 		};
 	})
-	.directive("aclTypeAhead", /*@ngInject*/ function(ACLService, FieldHelper, groupNameFilter) {
+	.directive("aclTypeahead", /*@ngInject*/ function(FieldHelper, groupNameFilter) {
 		return {
 			require: "^formFor",
 			restrict: "EA",
-			template: require("ng-cache!directives/acl-type-ahead.html"),
+			template: require("ng-cache!directives/acl/aclTypeahead.html"),
 			scope: {
 				attribute: "@",
 				debounce: "@?",

@@ -20,10 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var moment = require("moment");
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-	$stateParams, contest, datetime, ContestService) {
+const controller = /*@ngInject*/ function($timeout, $scope, $rootScope, $stateParams, contest, datetime, ContestService) {
 	function updateTasks() {
 		ContestService.getContestInfo($stateParams.contestId).then(function(contestInfo) {
 			$scope.contest = contestInfo;
@@ -53,4 +54,19 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 	$rootScope.$on("taskAddedToContest", function() {
 		updateTasks();
 	});
+};
+
+module.exports = {
+	"name": "contestView",
+	"url": "/contest/{contestId:[0-9]+}?taskId",
+	"templateUrl": "/partials/contests/contest.html",
+	"controller": controller,
+	"params": {
+		"taskId": null
+	},
+	"resolve": {
+		"contest": function(ContestService, $stateParams) {
+			return ContestService.getContestInfo($stateParams.contestId);
+		}
+	}
 };

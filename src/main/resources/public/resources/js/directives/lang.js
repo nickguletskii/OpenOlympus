@@ -20,9 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var angular = require("angular");
 
-angular.module("ool.directives").directive("lang", /*@ngInject*/ function($compile, $translate, $rootScope) {
+angular.module("ool.directives").directive("lang", /*@ngInject*/ function($rootScope) {
 	return {
 		restrict: "AE",
 		link: function(scope, element, attrs) {

@@ -24,8 +24,7 @@
 
 var _ = require("lodash");
 
-module.exports = /*@ngInject*/ function($timeout, $q, $translate, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService) {
+const controller = /*@ngInject*/ function($q, $translate, $scope, $http, $state, ServersideFormErrorReporter, ValidationService) {
 
 	$http.get("/api/security/userStatus").success(function(response) {
 		if (response) {
@@ -113,4 +112,12 @@ module.exports = /*@ngInject*/ function($timeout, $q, $translate, $scope, $rootS
 
 		return deferred.promise;
 	};
+};
+
+module.exports = {
+	"name": "register",
+	"url": "/register",
+	"templateUrl": "/partials/register.html",
+	"controller": controller,
+	"customWidth": "narrow"
 };

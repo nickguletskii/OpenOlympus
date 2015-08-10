@@ -21,10 +21,11 @@
  * THE SOFTWARE.
  */
 "use strict";
+
 var angular = require("angular");
 var _ = require("lodash");
 
-module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http, FormDefaultHelperService) {
+const controller = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http, FormDefaultHelperService) {
 	$scope.getUserSuggestions = function(name) {
 		return $http.get("/api/userCompletion", {
 			params: {
@@ -72,4 +73,12 @@ module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http,
 	}
 
 	$scope.form = new ContestAddUserForm();
+};
+
+module.exports = {
+	"parent": "contestView",
+	"name": "contestView.addUser",
+	"templateUrl": "/partials/contests/contest/addUser.html",
+	"controller": controller,
+	"backdrop": true
 };

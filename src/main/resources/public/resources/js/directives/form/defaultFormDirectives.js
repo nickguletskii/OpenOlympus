@@ -23,32 +23,33 @@
 "use strict";
 
 var angular = require("angular");
-angular.module("ool.directives").directive("formAutoconfig", /*@ngInject*/ function($compile) {
-	return {
-		restrict: "A",
-		priority: 100000,
-		terminal: true,
-		scope: false,
-		compile: function() {
-			return {
-				post: function($scope, $element, $attributes) {
-					let root = $attributes.formAutoconfig;
-					$attributes.$set("name", root + ".form");
-					$attributes.$set("controller", root + ".formController");
-					$attributes.$set("formFor", root + ".data");
-					$attributes.$set("validationRules", root + ".validationRules");
-					$attributes.$set("submitWith", root + ".submit()");
-					$attributes.$set("disable", root + ".submitting");
-					$attributes.$set("disable", root + ".submitting");
-					$compile($element, null, 100000)($scope);
-				}
-			};
-		}
-	};
-}).directive("formProgressPanel", /*@ngInject*/ function() {
+angular.module("ool.directives").directive("formAutoconfig", /*@ngInject*/
+	function($compile) {
+		return {
+			restrict: "A",
+			priority: 100000,
+			terminal: true,
+			scope: false,
+			compile: function() {
+				return {
+					post: function($scope, $element, $attributes) {
+						let root = $attributes.formAutoconfig;
+						$attributes.$set("name", root + ".form");
+						$attributes.$set("controller", root + ".formController");
+						$attributes.$set("formFor", root + ".data");
+						$attributes.$set("validationRules", root + ".validationRules");
+						$attributes.$set("submitWith", root + ".submit()");
+						$attributes.$set("disable", root + ".submitting");
+						$attributes.$set("disable", root + ".submitting");
+						$compile($element, null, 100000)($scope);
+					}
+				};
+			}
+		};
+	}).directive("formProgressPanel", /*@ngInject*/ function() {
 	return {
 		restrict: "E",
-		template: require("ng-cache!directives/form-progress-bar.html"),
+		template: require("ng-cache!directives/form/formProgressPanel.html"),
 		scope: {
 			localisationNamespace: "@",
 			form: "="

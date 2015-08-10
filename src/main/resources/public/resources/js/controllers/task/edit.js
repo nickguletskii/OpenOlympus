@@ -22,8 +22,7 @@
  */
 "use strict";
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, Upload, editTaskData) {
+const controller = /*@ngInject*/ function($scope, $stateParams, FormDefaultHelperService, editTaskData) {
 	$scope.taskId = $stateParams.taskId;
 	const validationRules = {
 		name: {
@@ -56,4 +55,17 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 	}
 
 	$scope.form = new TaskModificationForm();
+};
+
+module.exports = {
+	"name": "taskModificationView",
+	"url": "/task/{taskId:[0-9]+}/edit?contestId",
+	"templateUrl": "/partials/task/edit.html",
+	"controller": controller,
+	"fluidContainer": true,
+	"resolve": {
+		"editTaskData": function(TaskService, $stateParams) {
+			return TaskService.getTaskEditData($stateParams.taskId);
+		}
+	}
 };

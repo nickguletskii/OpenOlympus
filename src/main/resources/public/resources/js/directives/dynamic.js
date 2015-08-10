@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var angular = require("angular");
 
 angular.module("ool.directives").directive("dynamic", /*@ngInject*/ function($compile) {

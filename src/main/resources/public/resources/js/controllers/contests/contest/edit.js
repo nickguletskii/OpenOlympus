@@ -21,9 +21,10 @@
  * THE SOFTWARE.
  */
 "use strict";
+
 var moment = require("moment");
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService, ValidationService, contest) {
+
+const controller = /*@ngInject*/ function($scope, $stateParams, FormDefaultHelperService, ValidationService, contest) {
 	$scope.contestId = $stateParams.contestId;
 	const validationRules = require("controllers/contests/contestValidation")(ValidationService, moment);
 
@@ -63,4 +64,16 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 	}
 
 	$scope.form = new ContestModificationForm();
+};
+
+module.exports = {
+	"name": "editContest",
+	"url": "/contest/{contestId:[0-9]+}/edit",
+	"templateUrl": "/partials/contests/contest/edit.html",
+	"controller": controller,
+	"resolve": {
+		"contest": function(ContestService, $stateParams) {
+			return ContestService.getContestEditData($stateParams.contestId);
+		}
+	}
 };

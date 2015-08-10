@@ -20,16 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
-var Util = require("oolutil");
-var _ = require("lodash");
+const controller = /*@ngInject*/ function($scope,
+	$stateParams, contests, contestsCount) {
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, contests, contestsCount) {
-    var page = $stateParams.page;
+	$scope.page = $stateParams.page;
 
-    $scope.page = $stateParams.page;
-
-    $scope.contests = contests;
-    $scope.contestsCount = contestsCount;
+	$scope.contests = contests;
+	$scope.contestsCount = contestsCount;
+};
+module.exports = {
+	"name": "contestList",
+	"url": "/contests?page",
+	"templateUrl": "/partials/contests.html",
+	"controller": controller,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"contests": function(ContestService, $stateParams) {
+			return ContestService.getContestsPage($stateParams.page);
+		},
+		"contestsCount": function(ContestService) {
+			return ContestService.countContests();
+		}
+	}
 };

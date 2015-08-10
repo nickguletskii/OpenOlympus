@@ -20,29 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
+"use strict";
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, users, userCount, ContestService) {
-    var page = $stateParams.page;
+const controller = /*@ngInject*/ function($scope, $stateParams, users, userCount, ContestService) {
+	function updateParticipants() {
+		ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page).then(function(users) {
+			$scope.users = users;
+		});
+		ContestService.countContestParticipants($stateParams.contestId).then(function(userCount) {
+			$scope.userCount = userCount;
+		});
+	}
 
-    function updateParticipants() {
-        ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page).then(function(users) {
-            $scope.users = users;
-        });
-        ContestService.countContestParticipants($stateParams.contestId).then(function(userCount) {
-            $scope.userCount = userCount;
-        });
-    }
+	$scope.removeUser = function(user) {
+		ContestService.removeParticipant($stateParams.contestId, user.id).then(updateParticipants);
+	};
 
-    $scope.removeUser = function(user) {
-        ContestService.removeParticipant($stateParams.contestId, user.id).then(updateParticipants);
-    };
+	$scope.page = $stateParams.page;
 
-    $scope.page = $stateParams.page;
+	$scope.users = users;
+	$scope.userCount = userCount;
+};
 
-    $scope.users = users;
-    $scope.userCount = userCount;
+module.exports = {
+	"name": "contestParticipantsList",
+	"url": "/contest/{contestId:[0-9]+}/participants?userId",
+	"templateUrl": "/partials/contests/contest/participants.html",
+	"controller": controller,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"users": function(ContestService, $stateParams) {
+			return ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page);
+		},
+		"userCount": function(ContestService, $stateParams) {
+			return ContestService.countContestParticipants($stateParams.contestId);
+		}
+	}
 };

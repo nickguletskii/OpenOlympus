@@ -20,17 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
+"use strict";
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, SolutionService, solutions, solutionCount) {
+const controller = /*@ngInject*/ function($scope, $stateParams, solutions, solutionCount) {
 
-    var page = $stateParams.page;
+	$scope.page = $stateParams.page;
 
-    $scope.page = $stateParams.page;
-
-    $scope.solutions = solutions;
-    $scope.solutionCount = solutionCount;
+	$scope.solutions = solutions;
+	$scope.solutionCount = solutionCount;
+};
+module.exports = {
+	"name": "userSolutionList",
+	"url": "/user/solutions?page",
+	"templateUrl": "/partials/user/solutions.html",
+	"controller": controller,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"solutions": function(SolutionService, $stateParams) {
+			return SolutionService.getUserSolutionsPage($stateParams.page);
+		},
+		"solutionCount": function(SolutionService) {
+			return SolutionService.countUserSolutions();
+		}
+	}
 };

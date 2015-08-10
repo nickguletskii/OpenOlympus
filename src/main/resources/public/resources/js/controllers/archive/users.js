@@ -20,26 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
+const controller = /*@ngInject*/ function($scope, $http, $stateParams) {
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams) {
+	var page = $stateParams.page;
 
-    var page = $stateParams.page;
+	$scope.page = $stateParams.page;
 
-    $scope.page = $stateParams.page;
-
-    $http.get('api/archive/rank', {
-        params: {
-            page: page
-        }
-    }).success(function(users) {
-        $scope.users = users;
-    });
-    $http.get('api/archive/rankCount').success(function(count) {
-        $scope.userCount = count;
-    });
+	$http.get("api/archive/rank", {
+		params: {
+			page: page
+		}
+	}).success(function(users) {
+		$scope.users = users;
+	});
+	$http.get("api/archive/rankCount").success(function(count) {
+		$scope.userCount = count;
+	});
+};
+module.exports = {
+	"name": "archiveRank",
+	"url": "/archive/users?page",
+	"templateUrl": "/partials/archive/users.html",
+	"controller": controller,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"users": function(UserService, $stateParams) {
+			return UserService.getArchiveRankPage($stateParams.page);
+		},
+		"userCount": function(UserService) {
+			return UserService.countArchiveUsers();
+		}
+	}
 };

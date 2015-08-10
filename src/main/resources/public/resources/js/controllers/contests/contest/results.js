@@ -20,19 +20,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var angular = require("angular");
+"use strict";
+
 var _ = require("lodash");
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, users, userCount) {
-    var page = $stateParams.page;
+const controller = /*@ngInject*/ function($scope, $stateParams, users, userCount) {
+	$scope.page = $stateParams.page;
 
-    $scope.page = $stateParams.page;
-
-    $scope.users = users;
-    $scope.tasks = _.map(users[0].taskScores, function(taskScore) {
-        return taskScore.first;
-    });
-    $scope.userCount = userCount;
+	$scope.users = users;
+	$scope.tasks = _.map(users[0].taskScores, function(taskScore) {
+		return taskScore.first;
+	});
+	$scope.userCount = userCount;
+};
+module.exports = {
+	"name": "contestResults",
+	"url": "/contest/{contestId:[0-9]+}/results",
+	"templateUrl": "/partials/contests/contest/results.html",
+	"controller": controller,
+	"customWidth": "wide",
+	"fluidContainer": true,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"users": function(ContestService, $stateParams) {
+			return ContestService.getContestResultsPage($stateParams.contestId, $stateParams.page);
+		},
+		"userCount": function(ContestService, $stateParams) {
+			return ContestService.countContestParticipants($stateParams.contestId);
+		}
+	}
 };

@@ -20,16 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
-
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, $state) {
-    $http.post('/api/task/' + $stateParams.taskId + '/rejudgeTask').success(function(response) {
-        $state.go("^.rejudgeTaskSuccess", {
-            taskId: $stateParams.taskId
-        });
-    });
+const controller = /*@ngInject*/ function($http, $stateParams, $state) {
+	$http.post("/api/task/" + $stateParams.taskId + "/rejudgeTask").success(() => {
+		$state.go("^.rejudgeTaskSuccess", {
+			taskId: $stateParams.taskId
+		});
+	});
+};
+module.exports = {
+	"parent": "archiveTaskList",
+	"name": "archiveTaskList.rejudgeTaskWorking",
+	"templateUrl": "/partials/archive/tasks/rejudgeTask/working.html",
+	"controller": controller,
+	"backdrop": true
 };

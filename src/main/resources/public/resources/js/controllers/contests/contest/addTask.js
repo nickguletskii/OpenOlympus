@@ -22,7 +22,7 @@
  */
 "use strict";
 
-module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http, FormDefaultHelperService) {
+const controller = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http, FormDefaultHelperService) {
 	$scope.getTaskSuggestions = function(name) {
 		return $http.get("/api/taskCompletion", {
 			params: {
@@ -54,4 +54,12 @@ module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http,
 	}
 
 	$scope.form = new ContestAddTaskForm();
+};
+
+module.exports = {
+	"parent": "contestView",
+	"name": "contestView.addTask",
+	"templateUrl": "/partials/contests/contest/addTask.html",
+	"controller": controller,
+	"backdrop": true
 };

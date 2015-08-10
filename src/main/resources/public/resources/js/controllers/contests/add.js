@@ -23,8 +23,8 @@
 "use strict";
 
 var moment = require("moment");
-module.exports = /*@ngInject*/ function($timeout, ValidationService, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService) {
+
+const controller = /*@ngInject*/ function(ValidationService, $scope, FormDefaultHelperService) {
 
 	function getSuggestedContestStartTime() {
 		let timeSuggestion = moment().startOf("minute");
@@ -69,4 +69,11 @@ module.exports = /*@ngInject*/ function($timeout, ValidationService, $scope, $ro
 	}
 
 	$scope.form = new ContestCreationForm();
+};
+
+module.exports = {
+	"name": "createContest",
+	"url": "/contests/add",
+	"templateUrl": "/partials/contests/add.html",
+	"controller": controller
 };

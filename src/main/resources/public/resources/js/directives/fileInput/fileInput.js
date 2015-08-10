@@ -20,16 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
+var $ = require("jquery");
 var angular = require("angular");
-var moment = require("moment");
-angular.module("ool.directives").directive("ngDateTime", /*@ngInject*/ function() {
+
+angular.module("ool.directives").directive("fileInput", /*@ngInject*/ function(FieldHelper) {
 	return {
-		require: "ngModel",
-		restrict: "A",
-		link: function(scope, elm, attrs, ctrl) {
-			ctrl.$validators.dateTime = function(modelValue, viewValue) {
-				return moment(viewValue, "YYYY-MM-DDTHH:mm:ss.SSSZ", true).isValid();
-			};
+		restrict: "E",
+		require: "^formFor",
+		template: require("ng-cache!directives/fileInput/fileInput.html"),
+		scope: {
+			attribute: "@",
+			label: "@",
+			multiple: "@"
+		},
+		link: function($scope, $element, $attributes, formForController) {
+			FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
+			let bindableFix = $scope.$watch(() => $scope.model.bindable, function() {
+				Object.defineProperty($scope.model, "bindable", {
+					set: (value) => {
+						//Hide bindable from Angular's shitty built-in validation that somehow casts the files to string.
+						if (angular.isString(value)) {
+							return;
+						}
+						this.hideYoBindable = value;
+					},
+					get: () => this.hideYoBindable
+				});
+			});
+			let watcher = $scope.$watch($attributes.multiple, function(val) {
+				$($element[0]).find(".directive-main-element").attr("multiple", val);
+			});
+			$scope.$on("$destroy", () => {
+				watcher();
+				bindableFix();
+			});
 		}
 	};
 });

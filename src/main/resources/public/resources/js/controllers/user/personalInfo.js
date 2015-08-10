@@ -20,51 +20,70 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
+"use strict";
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, googleGrecaptcha,
-    $location, $stateParams, $state, AuthenticationProvider, ServersideFormErrorReporter, ValidationService,
-    personalInfoPatchUrl, passwordPatchUrl, requireExistingPassword, UserService) {
-    $scope.serverErrorReporter = new ServersideFormErrorReporter();;
-    $scope.user = {};
-    $scope.password = {};
-    $scope.requireExistingPassword = requireExistingPassword;
-    $scope.$watch("userForm.$pristine", function(newValue, oldValue) {
-        if (!newValue)
-            $scope.updatedUser = false;
-    });
+const controller = /*@ngInject*/ function($scope, $http,
+	$stateParams, ServersideFormErrorReporter, ValidationService,
+	personalInfoPatchUrl, requireExistingPassword, UserService) {
+	$scope.serverErrorReporter = new ServersideFormErrorReporter();
+	$scope.user = {};
+	$scope.password = {};
+	$scope.requireExistingPassword = requireExistingPassword;
+	$scope.$watch("userForm.$pristine", function(newValue) {
+		if (!newValue) {
+			$scope.updatedUser = false;
+		}
+	});
 
-    $scope.$watch("passwordForm.$pristine", function(newValue, oldValue) {
-        if (!newValue)
-            $scope.updatedPassword = false;
-    });
+	$scope.$watch("passwordForm.$pristine", function(newValue) {
+		if (!newValue) {
+			$scope.updatedPassword = false;
+		}
+	});
 
-    $http.get(personalInfoPatchUrl).success(function(user) {
-        $scope.user = user;
-        $scope.loaded = true;
-    });
+	$http.get(personalInfoPatchUrl).success(function(user) {
+		$scope.user = user;
+		$scope.loaded = true;
+	});
 
-    $scope.patchUser = function(user) {
-        UserService.patchUser(user, $stateParams.userId).then(function(data) {
-            if (data.status === "BINDING_ERROR") {
-                ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
-            } else {
-                $scope.updatedUser = true;
-                $scope.userForm.$setPristine();
-            }
-        });
-    };
+	$scope.patchUser = function(user) {
+		UserService.patchUser(user, $stateParams.userId).then(function(data) {
+			if (data.status === "BINDING_ERROR") {
+				ValidationService.report($scope.serverErrorReporter, $scope.userForm, data.fieldErrors);
+			} else {
+				$scope.updatedUser = true;
+				$scope.userForm.$setPristine();
+			}
+		});
+	};
 
-    $scope.changePassword = function(passwordObj) {
-        UserService.changePassword(passwordObj, $stateParams.userId).then(function(data) {
-            if (data.status === "BINDING_ERROR") {
-                ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
-            } else {
-                $scope.updatedPassword = true;
-                $scope.passwordForm.$setPristine();
-            }
-        });
-    };
+	$scope.changePassword = function(passwordObj) {
+		UserService.changePassword(passwordObj, $stateParams.userId).then(function(data) {
+			if (data.status === "BINDING_ERROR") {
+				ValidationService.report($scope.serverErrorReporter, $scope.passwordForm, data.fieldErrors);
+			} else {
+				$scope.updatedPassword = true;
+				$scope.passwordForm.$setPristine();
+			}
+		});
+	};
+};
+
+module.exports = {
+	"name": "personalInfoModificationView",
+	"url": "/user/personalInfo",
+	"templateUrl": "/partials/user/personalInfo.html",
+	"controller": controller,
+	"customWidth": "narrow",
+	"resolve": {
+		personalInfoPatchUrl: function() {
+			return "/api/user/personalInfo";
+		},
+		passwordPatchUrl: function() {
+			return "/api/user/changePassword";
+		},
+		requireExistingPassword: function() {
+			return true;
+		}
+	}
 };

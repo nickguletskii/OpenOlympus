@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
 var _ = require("lodash");
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, $translate) {
+const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $state, AuthenticationProvider, $translate) {
 	AuthenticationProvider.update();
 	$scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === "true");
 
@@ -89,4 +89,16 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 			});
 		return deferred.promise;
 	};
+};
+
+module.exports = {
+	"name": "login",
+	"url": "/login?failure",
+	"templateUrl": "/partials/login.html",
+	"controller": controller,
+	"customWidth": "narrow",
+	"params": {
+		"failure": "false",
+		"showAdministratorApprovalRequiredMessage": "false"
+	}
 };

@@ -20,78 +20,97 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
-var Util = require("oolutil");
-var angular = require("angular");
 var _ = require("lodash");
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, UserService, users, userCount) {
-    var page = $stateParams.page;
+const controller = /*@ngInject*/ function($scope, $stateParams, UserService, users, userCount) {
+	var page = $stateParams.page;
 
-    $scope.page = $stateParams.page;
+	$scope.page = $stateParams.page;
 
-    $scope.users = users;
-    $scope.userCount = userCount;
+	$scope.users = users;
+	$scope.userCount = userCount;
 
-    function updateUsers() {
-        UserService.getPendingUsersPage(page).then(function(users) {
-            $scope.users = users;
-        });
-        UserService.countPendingUsers().then(function(count) {
-            $scope.userCount = count;
-        });
-    }
+	function updateUsers() {
+		UserService.getPendingUsersPage(page).then(function(users) {
+			$scope.users = users;
+		});
+		UserService.countPendingUsers().then(function(count) {
+			$scope.userCount = count;
+		});
+	}
 
-    function handleApprovalResponse(userApprovals) {
-        UserService.getPendingUsersPage(page).then(function(users) {
-            $scope.users = _.map(users, function(user) {
-                var oldUser = _.find($scope.users, function(oldUser) {
-                    return oldUser.id == user.id;
-                });
-                if (!!oldUser)
-                    user = oldUser;
-                var userResponse = _.find(userApprovals, function(userResponse) {
-                    return userResponse.id == user.id;
-                });
-                if (!userResponse)
-                    return user;
-                return _.assign(user, {
-                    "checked": true,
-                    "error": userResponse.statusMessage,
-                });
-            });
-            $scope.loading = false;
-        });
-        UserService.countPendingUsers().then(function(count) {
-            $scope.userCount = count;
-        });
-    }
-    $scope.approveUsers = function() {
-        $scope.loading = true;
-        UserService.approveUsers(_($scope.users).filter(function(user) {
-            return user.checked;
-        }).map(function(user) {
-            return user.id;
-        }).value()).then(handleApprovalResponse);
-    };
+	function handleApprovalResponse(userApprovals) {
+		UserService.getPendingUsersPage(page).then(function(users) {
+			$scope.users = _.map(users, function(user) {
+				var oldUser = _.find($scope.users, function(oldUser) {
+					return oldUser.id === user.id;
+				});
+				if (oldUser) {
+					user = oldUser;
+				}
+				var userResponse = _.find(userApprovals, function(userResponse) {
+					return userResponse.id === user.id;
+				});
+				if (!userResponse) {
+					return user;
+				}
+				return _.assign(user, {
+					"checked": true,
+					"error": userResponse.statusMessage
+				});
+			});
+			$scope.loading = false;
+		});
+		UserService.countPendingUsers().then(function(count) {
+			$scope.userCount = count;
+		});
+	}
+	$scope.approveUsers = function() {
+		$scope.loading = true;
+		UserService.approveUsers(_($scope.users).filter(function(user) {
+			return user.checked;
+		}).map(function(user) {
+			return user.id;
+		}).value()).then(handleApprovalResponse);
+	};
 
-    $scope.retryApprovingFailedUsers = function() {
-        $scope.loading = true;
-        UserService.approveUsers(_($scope.users).filter(function(user) {
-            return !!user.error;
-        }).map(function(user) {
-            return user.id;
-        }).value()).then(handleApprovalResponse);
-    };
+	$scope.retryApprovingFailedUsers = function() {
+		$scope.loading = true;
+		UserService.approveUsers(_($scope.users).filter(function(user) {
+			return !!user.error;
+		}).map(function(user) {
+			return user.id;
+		}).value()).then(handleApprovalResponse);
+	};
 
-    $scope.deleteUsersWithErrors = function() {
-        UserService.deleteUsers(_($scope.users).filter(function(user) {
-            return user.checked && !!user.error;
-        }).map(function(user) {
-            return user.id;
-        }).value()).then(function() {
-            updateUsers();
-        });
-    };
+	$scope.deleteUsersWithErrors = function() {
+		UserService.deleteUsers(_($scope.users).filter(function(user) {
+			return user.checked && !!user.error;
+		}).map(function(user) {
+			return user.id;
+		}).value()).then(function() {
+			updateUsers();
+		});
+	};
+};
+
+module.exports = {
+	"name": "pendingUsersList",
+	"url": "/admin/pendingUsers?page",
+	"templateUrl": "/partials/admin/pendingUsers.html",
+	"customWidth": "wide",
+	"controller": controller,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"users": function(UserService, $stateParams) {
+			return UserService.getPendingUsersPage($stateParams.page);
+		},
+		"userCount": function(UserService) {
+			return UserService.countPendingUsers();
+		}
+	}
 };

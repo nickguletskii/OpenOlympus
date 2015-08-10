@@ -22,7 +22,8 @@
  */
 
 "use strict";
-module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http, FormDefaultHelperService, ValidationService) {
+
+const controller = /*@ngInject*/ function($scope, $rootScope, $stateParams, FormDefaultHelperService, ValidationService) {
 	const validationRules = {
 		time: {
 			required: true,
@@ -59,4 +60,12 @@ module.exports = /*@ngInject*/ function($scope, $rootScope, $stateParams, $http,
 	}
 
 	$scope.form = new ContestAddUserTimeForm();
+};
+
+module.exports = {
+	"parent": "contestParticipantsList",
+	"name": "contestParticipantsList.addUserTime",
+	"templateUrl": "/partials/contests/contest/addUserTime.html",
+	"controller": controller,
+	"backdrop": true
 };

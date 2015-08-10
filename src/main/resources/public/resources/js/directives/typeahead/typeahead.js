@@ -1,3 +1,5 @@
+"use strict";
+
 var angular = require("angular");
 angular.module("ool.directives").directive("typeaheadBootstrap", /*@ngInject*/ function(FieldHelper) {
 	return {
@@ -5,7 +7,7 @@ angular.module("ool.directives").directive("typeaheadBootstrap", /*@ngInject*/ f
 		restrict: "E",
 		transclude: true,
 
-		template: require("ng-cache!directives/typeahead.html"),
+		template: require("ng-cache!directives/typeahead/typeahead.html"),
 		scope: {
 			attribute: "@",
 			debounce: "@?",

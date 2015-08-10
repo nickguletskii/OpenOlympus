@@ -22,8 +22,7 @@
  */
 "use strict";
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
-	$location, $stateParams, $state, AuthenticationProvider, FormDefaultHelperService) {
+const controller = /*@ngInject*/ function($scope, FormDefaultHelperService) {
 
 	const validationRules = {
 		name: {
@@ -59,4 +58,10 @@ module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http,
 	}
 
 	$scope.form = new TaskCreationForm();
+};
+module.exports = {
+	"name": "createTask",
+	"url": "/archive/tasks/add",
+	"templateUrl": "/partials/archive/tasks/add.html",
+	"controller": controller
 };

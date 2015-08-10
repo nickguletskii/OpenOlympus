@@ -20,43 +20,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, SolutionService, data) {
+const controller = /*@ngInject*/ function($timeout, $scope, $stateParams, SolutionService, data) {
 
-    var DELAY_MIN = 100;
-    var DELAY_STEP = 100;
-    var DELAY_MAX = 1000;
-    var delay = DELAY_MIN;
+	var DELAY_MIN = 100;
+	var DELAY_STEP = 100;
+	var DELAY_MAX = 1000;
+	var delay = DELAY_MIN;
 
-    function setData(solution) {
-        if (!Util.equalsWithoutAngular($scope.solution, solution)) {
-            $scope.solution = solution;
-            delay = DELAY_MIN;
-        }
-        return solution;
-    }
+	function setData(solution) {
+		if (!Util.equalsWithoutAngular($scope.solution, solution)) {
+			$scope.solution = solution;
+			delay = DELAY_MIN;
+		}
+		return solution;
+	}
 
-    function update(callback) {
-        SolutionService.getVerdicts($stateParams.solutionId).then(setData).then(callback);
-    }
-    setData(data);
+	function update(callback) {
+		SolutionService.getVerdicts($stateParams.solutionId).then(setData).then(callback);
+	}
+	setData(data);
 
-    var promise;
+	var promise;
 
-    function poller() {
-        delay = Math.min(delay + DELAY_STEP, DELAY_MAX);
-        update(function() {
-            promise = $timeout(poller, delay);
-        });
-    }
-    promise = $timeout(poller, delay);
-    $scope.$on('$destroy', function() {
-        $timeout.cancel(promise);
-    });
+	function poller() {
+		delay = Math.min(delay + DELAY_STEP, DELAY_MAX);
+		update(function() {
+			promise = $timeout(poller, delay);
+		});
+	}
+	promise = $timeout(poller, delay);
+	$scope.$on("$destroy", function() {
+		$timeout.cancel(promise);
+	});
 
-    // TODO: Websocket integration: server should push verdict updates.
+	// TODO: Websocket integration: server should push verdict updates.
+};
+
+module.exports = {
+	"name": "solutionView",
+	"url": "/solution/{solutionId:[0-9]+}",
+	"templateUrl": "/partials/solution.html",
+	"controller": controller,
+	"resolve": {
+		"data": function(SolutionService, $stateParams) {
+			return SolutionService.getVerdicts($stateParams.solutionId);
+		}
+	}
 };

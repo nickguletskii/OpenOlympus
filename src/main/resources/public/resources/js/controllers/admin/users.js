@@ -20,30 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
+const controller = /*@ngInject*/ function($scope, $stateParams, UserService, users, userCount) {
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, UserService, users, userCount) {
+	var page = $stateParams.page;
 
-    var page = $stateParams.page;
+	$scope.page = $stateParams.page;
+	$scope.users = users;
+	$scope.userCount = userCount;
 
-    $scope.page = $stateParams.page;
-    $scope.users = users;
-    $scope.userCount = userCount;
+	$scope.deleteUser = function(user) {
+		UserService.deleteUsers([user.id]).then(updateUsers);
+	};
 
-    $scope.deleteUser = function(user) {
-        UserService.deleteUsers([user.id]).then(updateUsers);
-    };
+	function updateUsers() {
+		UserService.getUsersPage(page).then(function(users) {
+			$scope.users = users;
+		});
+		UserService.countUsers().then(function(count) {
+			$scope.userCount = count;
+		});
+	}
+};
 
-    function updateUsers() {
-        UserService.getUsersPage(page).then(function(users) {
-            $scope.users = users;
-        });
-        UserService.countUsers().then(function(count) {
-            $scope.userCount = count;
-        });
-    }
+module.exports = {
+	"name": "adminUsersList",
+	"url": "/admin/users?page",
+	"templateUrl": "/partials/admin/users.html",
+	"customWidth": "wide",
+	"controller": controller,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"users": function(UserService, $stateParams) {
+			return UserService.getUsersPage($stateParams.page);
+		},
+		"userCount": function(UserService) {
+			return UserService.countUsers();
+		}
+	}
 };

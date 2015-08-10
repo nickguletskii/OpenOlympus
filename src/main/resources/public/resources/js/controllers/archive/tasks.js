@@ -20,17 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
 
-var Util = require("oolutil");
-var angular = require("angular");
-var _ = require("lodash");
+const controller = /*@ngInject*/ function($scope, $stateParams, tasks, taskCount) {
+	$scope.page = $stateParams.page;
 
-module.exports = /*@ngInject*/ function($timeout, $q, $scope, $rootScope, $http, $location,
-    $stateParams, tasks, taskCount) {
-    var page = $stateParams.page;
+	$scope.tasks = tasks;
+	$scope.taskCount = taskCount;
+};
 
-    $scope.page = $stateParams.page;
-
-    $scope.tasks = tasks;
-    $scope.taskCount = taskCount;
+module.exports = {
+	"name": "archiveTaskList",
+	"url": "/archive/tasks?page?taskId",
+	"templateUrl": "/partials/archive/tasks.html",
+	"controller": controller,
+	"params": {
+		"page": "1",
+		"taskId": null
+	},
+	"resolve": {
+		"tasks": function(TaskService, $stateParams) {
+			return TaskService.getArchiveTasksPage($stateParams.page);
+		},
+		"taskCount": function(TaskService) {
+			return TaskService.countArchiveTasks();
+		}
+	}
 };
