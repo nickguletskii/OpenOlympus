@@ -188,8 +188,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 	public Contest getRunningContest() {
 		return dslContext
 				.selectFrom(Routines.getContestsThatIntersect(
-						DSL.currentTimestamp(),
-						DSL.currentTimestamp()))
+						DSL.field("LOCALTIMESTAMP", Timestamp.class),
+						DSL.field("LOCALTIMESTAMP", Timestamp.class)))
 				.fetchOneInto(Contest.class);
 	}
 

@@ -44,8 +44,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 @RestController
 public class SolutionListController {
 
@@ -98,7 +96,7 @@ public class SolutionListController {
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
-	
+
 	public List<SolutionDto> showUserSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
 			final Model model, final Principal principal) {
@@ -110,7 +108,8 @@ public class SolutionListController {
 			solutions
 					.addAll(this.solutionService.getPage(user, pageNumber,
 							SolutionListController.PAGE_SIZE, contest
-									.getStartTime(), this.contestService
+									.getStartTime(),
+							this.contestService
 									.getContestEndTimeForUser(contest, user)));
 		} else {
 			solutions.addAll(this.solutionService.getPageOutsideOfContest(user,
@@ -120,7 +119,8 @@ public class SolutionListController {
 		return solutions
 				.stream()
 				.map(solution -> new SolutionDto(solution, taskService
-						.getById(solution.getTaskId()))).map(dto -> {
+						.getById(solution.getTaskId())))
+				.map(dto -> {
 					if (contest != null) {
 						dto.setScore(null);
 					}

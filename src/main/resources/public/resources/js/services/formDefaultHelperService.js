@@ -23,6 +23,7 @@
 "use strict";
 var angular = require("angular");
 var _ = require("lodash");
+var Util = require("oolutil");
 
 angular.module("ool.services").factory("FormDefaultHelperService", /*@ngInject*/ function(ValidationService, $q) {
 	const validationRules = {};
@@ -180,10 +181,14 @@ angular.module("ool.services").factory("FormDefaultHelperService", /*@ngInject*/
 				return response;
 			}
 
+			omitEmpty(data) {
+				return _.pick(Util.emptyToNull(data), (value) => !(_.isNull(value)));
+			}
+
 			submit() {
 				this.preSubmit();
 				console.log(this.data);
-				let transformedData = this.transformDataForServer(_.cloneDeep(this.data));
+				let transformedData = this.transformDataForServer(this.omitEmpty(_.cloneDeep(this.data)));
 				var deferred = $q.defer();
 				ValidationService.postToServer(this.submitUrl, transformedData, (progress) => this.progress = progress)
 					.then((response) => {

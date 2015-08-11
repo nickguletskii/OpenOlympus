@@ -144,9 +144,9 @@ public class SolutionService extends GenericCreateUpdateRepository {
 			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<Solution> getPageOutsideOfContest(final User user,
 			final Integer pageNumber, final int pageSize) {
-		return dslContext.selectCount().from(Tables.SOLUTION)
+		return dslContext.selectFrom(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId()))
-				.groupBy(Tables.SOLUTION.TIME_ADDED)
+				.groupBy(Tables.SOLUTION.ID)
 				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
@@ -206,7 +206,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + "#solution.user"
 			+ SecurityExpressionConstants.IS_OWNER + ')')
-	@CacheEvict(value = "solutions", key = "#solution.id")
+	@Transactional
 	public Solution insertSolution(Solution solution) {
 		return insert(solution, Tables.SOLUTION);
 	}

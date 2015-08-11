@@ -34,6 +34,7 @@ import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
 import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
+import org.ng200.openolympus.jooq.tables.daos.VerdictDao;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.slf4j.Logger;
@@ -144,4 +145,8 @@ public class DaoConfig {
 		return new GroupUsersDao(dslContext.configuration());
 	}
 
+	@Bean
+	public VerdictDao verdictDao() {
+		return new VerdictDao(dslContext.configuration());
+	}
 }

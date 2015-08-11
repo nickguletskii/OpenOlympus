@@ -27,7 +27,6 @@ import java.util.Locale;
 
 import javax.servlet.MultipartConfigElement;
 
-import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
 import org.ng200.openolympus.services.StorageService;
 import org.slf4j.Logger;
@@ -36,8 +35,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.MultipartConfigFactory;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -112,15 +109,6 @@ public class Application {
 		pool.setMaxPoolSize(10);
 		pool.setWaitForTasksToCompleteOnShutdown(true);
 		return pool;
-	}
-
-	@Bean
-	public SimpleCacheManager cacheManager() {
-		SimpleCacheManager cacheManager = new SimpleCacheManager();
-
-		cacheManager.setCaches(Lists.from(new ConcurrentMapCache("solutions"),
-				new ConcurrentMapCache("contests")));
-		return cacheManager;
 	}
 
 }

@@ -32,8 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.joor.Reflect;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.ApplicationContext;
@@ -98,6 +100,8 @@ public class BinderAdvice implements ApplicationContextAware {
 		registerModelType(binder, User.class);
 		registerModelType(binder, Task.class);
 		registerModelType(binder, Contest.class);
+		registerModelType(binder, Solution.class);
+		registerModelType(binder, Verdict.class);
 	}
 
 	private void registerModelType(ServletRequestDataBinder binder,

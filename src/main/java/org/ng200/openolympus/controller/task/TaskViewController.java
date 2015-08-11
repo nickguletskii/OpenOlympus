@@ -170,7 +170,8 @@ public class TaskViewController {
 
 		Solution solution = new Solution().setTaskId(task.getId())
 				.setUserId(user.getId())
-				.setTimeAdded(Timestamp.from(Instant.now()));
+				.setTimeAdded(Timestamp.from(Instant.now()))
+				.setTested(false);
 
 		this.storageService.setSolutionFile(solution, solutionFile);
 

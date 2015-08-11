@@ -65,6 +65,7 @@ import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
+import org.ng200.openolympus.jooq.tables.daos.VerdictDao;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
@@ -152,6 +153,9 @@ public class TestingService {
 	private TaskDao taskDao;
 
 	@Autowired
+	private VerdictDao verdictDao;
+
+	@Autowired
 	private DSLContext dslContext;
 
 	@Autowired
@@ -178,19 +182,19 @@ public class TestingService {
 									.contains(verdict))
 							.sorted((l, r) -> {
 
-								if (l.getViewableDuringContest() != r
-										.getViewableDuringContest()) {
-									// Schedule base tests first
-									return Boolean.compare(
-											r.getViewableDuringContest(),
-											l.getViewableDuringContest());
-								}
-								return Long.compare(l.getId(), r.getId());
-							}).forEach((verdict) -> {
-								alreadyScheduledJobs.add(verdict);
-								this.processVerdict(verdict);
-							});
-				}, 0, 100, TimeUnit.MILLISECONDS);
+						if (l.getViewableDuringContest() != r
+								.getViewableDuringContest()) {
+							// Schedule base tests first
+							return Boolean.compare(
+									r.getViewableDuringContest(),
+									l.getViewableDuringContest());
+						}
+						return Long.compare(l.getId(), r.getId());
+					}).forEach((verdict) -> {
+						alreadyScheduledJobs.add(verdict);
+						this.processVerdict(verdict);
+					});
+				} , 0, 100, TimeUnit.MILLISECONDS);
 	}
 
 	private void checkVerdict(final Verdict verdict, final SolutionJudge judge,
@@ -230,11 +234,12 @@ public class TestingService {
 			Thread.currentThread().setContextClassLoader(
 					new URLClassLoader(taskContainer.getClassLoaderURLs()
 							.toArray(new URL[0]), Thread.currentThread()
-							.getContextClassLoader()));
+									.getContextClassLoader()));
 
 			job.add(new JacksonSerializationDelegatingTask<>(
 					new VerdictCheckingTask(judge, testFiles, maximumScore,
-							properties), taskContainer.getClassLoaderURLs()));
+							properties),
+					taskContainer.getClassLoaderURLs()));
 
 			job.setBlocking(true);
 
@@ -315,7 +320,8 @@ public class TestingService {
 		}
 	}
 
-	private VerdictStatusType convertCerberusResultToVerdictStatus(Result result) {
+	private VerdictStatusType convertCerberusResultToVerdictStatus(
+			Result result) {
 		switch (result) {
 		case COMPILE_ERROR:
 			return VerdictStatusType.compile_error;
@@ -347,7 +353,7 @@ public class TestingService {
 
 	private SolutionJudge compileSolution(final Solution solution,
 			final SolutionJudge judge, final Properties properties)
-			throws ExecutionException {
+					throws ExecutionException {
 		if (this.dataProvider == null) {
 			throw new IllegalStateException("Shared data provider is null!");
 		}
@@ -379,11 +385,12 @@ public class TestingService {
 			Thread.currentThread().setContextClassLoader(
 					new URLClassLoader(taskContainer.getClassLoaderURLs()
 							.toArray(new URL[0]), Thread.currentThread()
-							.getContextClassLoader()));
+									.getContextClassLoader()));
 			job.add(new JacksonSerializationDelegatingTask<>(
 					new SolutionCompilationTask(judge, Lists
 							.from(storageService.getSolutionFile(solution)),
-							properties), taskContainer.getClassLoaderURLs()));
+							properties),
+					taskContainer.getClassLoaderURLs()));
 
 			job.setBlocking(false);
 
@@ -400,7 +407,8 @@ public class TestingService {
 			return result.getResult();
 
 		} catch (final Throwable throwable) {
-			throw new RuntimeException("Couldn't compile solution: ", throwable);
+			throw new RuntimeException("Couldn't compile solution: ",
+					throwable);
 		} finally {
 			lock.unlock();
 		}
@@ -428,61 +436,61 @@ public class TestingService {
 				return futureJudge
 						.thenApplyAsync(
 								(final SolutionJudge judge) -> {
-									this.logInAsSystem();
-									try {
-										if (!judge.isCompiled()) {
-											return this.compileSolution(
-													solution, judge,
-													taskContainer
-															.getProperties());
-										}
-									} catch (final Exception e) {
-										TestingService.logger.error(
-												"Solution compilation failed "
-														+ "because judge for task "
-														+ "\"{}\"({}) thew an "
-														+ "exception: {}",
-												task.getName(), task.getId(), e);
-									} finally {
-										Janitor.cleanUp(judge);
-									}
-									return judge;
-								}, this.compilationAndCheckingExecutor)
+					this.logInAsSystem();
+					try {
+						if (!judge.isCompiled()) {
+							return this.compileSolution(
+									solution, judge,
+									taskContainer
+											.getProperties());
+						}
+					} catch (final Exception e) {
+						TestingService.logger.error(
+								"Solution compilation failed "
+										+ "because judge for task "
+										+ "\"{}\"({}) thew an "
+										+ "exception: {}",
+								task.getName(), task.getId(), e);
+					} finally {
+						Janitor.cleanUp(judge);
+					}
+					return judge;
+				} , this.compilationAndCheckingExecutor)
 						.thenApplyAsync(
 								(final SolutionJudge judge) -> {
-									this.logInAsSystem();
-									try {
-										this.checkVerdict(verdict, judge,
-												taskContainer
-														.getTestFiles(verdict
-																.getPath()),
-												verdict.getMaximumScore(),
-												taskContainer.getProperties());
-									} catch (final Throwable e) {
-										Task t = taskService.getTaskFromVerdict(verdict);
-										TestingService.logger
-												.error("Solution judgement failed "
-														+ "because judge for task "
-														+ "\"{}\"({}) thew an "
-														+ "exception: {}",
-														t.getName(), t.getId(),
-														e);
-									} finally {
-										Janitor.cleanUp(judge);
-									}
+					this.logInAsSystem();
+					try {
+						this.checkVerdict(verdict, judge,
+								taskContainer
+										.getTestFiles(verdict
+												.getPath()),
+								verdict.getMaximumScore(),
+								taskContainer.getProperties());
+					} catch (final Throwable e) {
+						Task t = taskService.getTaskFromVerdict(verdict);
+						TestingService.logger
+								.error("Solution judgement failed "
+										+ "because judge for task "
+										+ "\"{}\"({}) thew an "
+										+ "exception: {}",
+										t.getName(), t.getId(),
+										e);
+					} finally {
+						Janitor.cleanUp(judge);
+					}
 
-									return judge;
-								}, this.compilationAndCheckingExecutor)
+					return judge;
+				} , this.compilationAndCheckingExecutor)
 						.handle((final SolutionJudge judge,
 								final Throwable throwable) -> {
-							this.logInAsSystem();
+					this.logInAsSystem();
 
-							if (throwable != null) {
-								throw new RuntimeException(
-										"Couldn't judge verdict: ", throwable);
-							}
-							return judge;
-						});
+					if (throwable != null) {
+						throw new RuntimeException(
+								"Couldn't judge verdict: ", throwable);
+					}
+					return judge;
+				});
 			};
 			this.logInAsSystem();
 
@@ -508,6 +516,6 @@ public class TestingService {
 		final List<Verdict> verdicts = this.taskContainerCache
 				.getTaskContainerForTask(task).generateTestVerdicts(solution);
 
-		dslContext.insertInto(Tables.VERDICT).values(verdicts).execute();
+		verdictDao.insert(verdicts);
 	}
 }

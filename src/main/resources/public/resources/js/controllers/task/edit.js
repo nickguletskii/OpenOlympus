@@ -27,12 +27,6 @@ const controller = /*@ngInject*/ function($scope, $stateParams, FormDefaultHelpe
 	const validationRules = {
 		name: {
 			required: true
-		},
-		descriptionFile: {
-			required: true
-		},
-		judgeFile: {
-			required: true
 		}
 	};
 

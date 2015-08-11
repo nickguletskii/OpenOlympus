@@ -8,66 +8,28 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN * THE SOFTWARE.*/
 "use strict";
 
-var _ = require("lodash");
-
-const controller = /*@ngInject*/ function($scope, $stateParams, $state, ServersideFormErrorReporter, ValidationService, task) {
+const controller = /*@ngInject*/ function($scope, $state, $stateParams, FormDefaultHelperService, task) {
 	$scope.name = task.name;
 	$scope.description = task.description;
 
-	$scope.serverErrorReporter = new ServersideFormErrorReporter();
 	$scope.taskId = $stateParams.taskId;
-	$scope.task = {};
-	$scope.isFormVisible = true;
 
-	$scope.uploadProgressBarColour = function() {
-		if ($scope.uploadFailure) {
-			return "danger";
+	class SolutionSubmissionForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "task.createForm");
+			this.submitUrl = "/api/task/" + $stateParams.taskId + "/submitSolution";
 		}
-		if ($scope.uploadSuccess) {
-			return "success";
-		}
-		return "info";
-	};
-	$scope.isFormVisible = true;
 
-	function success(response) {
-		$state.go("solutionView", {
-			"solutionId": response.data.id
-		});
-	}
-
-	function failure() {
-		$scope.isFormVisible = false;
-		$scope.uploadSuccess = false;
-		$scope.uploadFailure = true;
-		$scope.processing = false;
-	}
-
-	function reset() {
-		$scope.isFormVisible = true;
-		$scope.uploadSuccess = false;
-		$scope.uploadFailure = false;
-		$scope.processing = false;
-	}
-	$scope.reset = reset;
-
-	$scope.submitSolution = function(solution) {
-		$scope.isFormVisible = false;
-		try {
-			var fd = new FormData();
-
-			_.forEach(solution, function(value, key) {
-				fd.append(key, value);
+		postSubmit(response) {
+			super.postSubmit(response);
+			$state.go("solutionView", {
+				"solutionId": response.data.id
 			});
-
-			if (solution.solutionFile) {
-				fd.append("solutionFile", solution.solutionFile[0]);
-			}
-			ValidationService.postToServer($scope, "/api/task/" + $stateParams.taskId + "/submitSolution", $scope.solutionSubmissionForm, fd, success, failure, reset);
-		} catch (err) {
-			reset();
 		}
-	};
+
+	}
+
+	$scope.solutionSubmissionForm = new SolutionSubmissionForm();
 };
 
 module.exports = {

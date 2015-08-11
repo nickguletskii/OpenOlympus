@@ -58,10 +58,6 @@ const controller = /*@ngInject*/ function($scope, FormDefaultHelperService, Vali
 			this.data = existingPersonalInfo;
 		}
 
-		transformDataForServer(data) {
-			return _.pick(Util.emptyToNull(data), (value) => !(_.isNull(value)));
-		}
-
 		get validationRules() {
 			return personalInfoValidationRules;
 		}
