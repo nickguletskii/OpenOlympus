@@ -39,7 +39,7 @@ public class TaskValidator {
 
 	public void validate(final UploadableTask task, final Errors errors,
 			final String prevName, final boolean ignoreEmptyFiles)
-			throws IOException {
+					throws IOException {
 		if (errors.hasErrors()) {
 			return;
 		}
@@ -47,22 +47,11 @@ public class TaskValidator {
 				&& this.taskService.getTaskByName(task.getName()) != null) {
 			errors.rejectValue("name", "", "task.add.form.errors.name.exists");
 		}
-		if (!ignoreEmptyFiles) {
-			if (task.getDescriptionFile() != null) {
-				if (task.getDescriptionFile().getSize() == 0) {
-					errors.rejectValue("descriptionFile", "",
-							"task.add.form.errors.descriptionFile.empty");
-				}
-				if (task.getDescriptionFile().getSize() > TaskValidator.DESCRIPTION_SIZE_LIMIT) {
-					errors.rejectValue("descriptionFile", "",
-							"task.add.form.errors.descriptionFile.tooLong");
-				}
-			}
-			if (task.getJudgeFile() == null
-					|| task.getJudgeFile().getSize() == 0) {
-				errors.rejectValue("judgeFile", "",
-						"task.add.form.errors.judgeFile.empty");
-			}
+		if (!ignoreEmptyFiles && (task.getJudgeFile() == null
+				|| task.getJudgeFile().getSize() == 0)) {
+			errors.rejectValue("judgeFile", "",
+					"task.add.form.errors.judgeFile.empty");
 		}
+
 	}
 }

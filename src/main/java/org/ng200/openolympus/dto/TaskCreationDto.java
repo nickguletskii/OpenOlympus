@@ -32,17 +32,7 @@ public class TaskCreationDto implements UploadableTask {
 	private String name;
 
 	@NotNull(message = "empty")
-	private MultipartFile descriptionFile;
-
-	@NotNull(message = "empty")
 	private MultipartFile judgeFile;
-
-	private boolean published;
-
-	@Override
-	public MultipartFile getDescriptionFile() {
-		return this.descriptionFile;
-	}
 
 	@Override
 	public MultipartFile getJudgeFile() {
@@ -54,25 +44,12 @@ public class TaskCreationDto implements UploadableTask {
 		return this.name;
 	}
 
-	@Override
-	public boolean isPublished() {
-		return this.published;
-	}
-
-	public void setDescriptionFile(MultipartFile descriptionFile) {
-		this.descriptionFile = descriptionFile;
-	}
-
 	public void setJudgeFile(MultipartFile judgeFile) {
 		this.judgeFile = judgeFile;
 	}
 
 	public void setName(final String name) {
 		this.name = name;
-	}
-
-	public void setPublished(boolean published) {
-		this.published = published;
 	}
 
 }

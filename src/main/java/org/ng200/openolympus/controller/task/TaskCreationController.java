@@ -25,6 +25,10 @@ package org.ng200.openolympus.controller.task;
 import java.io.IOException;
 import java.security.Principal;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
@@ -60,7 +64,9 @@ public class TaskCreationController {
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 	private BindingResponse createTask(final TaskCreationDto taskCreationDto,
 			final BindingResult bindingResult, Principal principal)
-					throws IOException, BindException {
+					throws IOException, BindException,
+					RefAlreadyExistsException, RefNotFoundException,
+					InvalidRefNameException, GitAPIException {
 		this.taskValidator.validate(taskCreationDto, bindingResult, null,
 				false);
 

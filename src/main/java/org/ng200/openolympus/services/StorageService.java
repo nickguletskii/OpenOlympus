@@ -23,20 +23,16 @@
 package org.ng200.openolympus.services;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.io.IOUtils;
+import org.eclipse.jgit.api.Git;
 import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.config.StorageConfiguration;
+import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +50,6 @@ public class StorageService implements Serializable {
 	@Autowired
 	private StorageConfiguration storageConfig;
 
-	@Autowired
-	private transient TaskDescriptionProvider taskDescriptionProvider;
-
 	public Path createSolutionDirectory() throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault()
@@ -67,17 +60,23 @@ public class StorageService implements Serializable {
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
-	public Path createTaskDescriptionFileStorage(Task task) throws IOException {
+	public Path createTaskDescriptionDirectory(Task task)
+			throws IOException {
 		final UUID uuid = UUID.randomUUID();
-		final String idString = System.currentTimeMillis() + "_"
-				+ uuid.toString();
-		final Path file = FileSystems.getDefault().getPath(
+		final Path dir = FileSystems.getDefault().getPath(
 				this.storageConfig.getStoragePath(),
-				"tasks", "descriptions", idString);
-		FileAccess.createDirectories(file);
-		FileAccess.createFile(file.resolve("source"));
-		task.setDescriptionFile(idString);
-		return file;
+				"tasks", "descriptions", uuid.toString());
+		FileAccess.createDirectories(dir);
+		try {
+			Git.init().setDirectory(dir.toFile()).call();
+
+			task.setDescriptionFile(uuid.toString());
+			return dir;
+		} catch (Exception e) {
+			FileAccess.deleteDirectoryByWalking(dir);
+			throw new GeneralNestedRuntimeException(
+					"Couldn't initialise task description directory: ", e);
+		}
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
@@ -101,25 +100,10 @@ public class StorageService implements Serializable {
 		return this.storageConfig.getStoragePath();
 	}
 
-	public String getTaskDescription(final Task task) throws IOException {
-		final Path compiled = FileSystems.getDefault().getPath(
-				this.storageConfig.getStoragePath(), "tasks", "descriptions",
-				task.getDescriptionFile(), "compiled");
-
-		if (!FileAccess.exists(compiled)) {
-			return null;
-		}
-
-		return new String(FileAccess.readAllBytes(compiled),
-				Charset.forName("UTF8"));
-	}
-
-	public String getTaskDescriptionSourcecode(Task task) throws IOException {
-		final Path source = FileSystems.getDefault().getPath(
-				this.storageConfig.getStoragePath(),
-				"tasks", "descriptions", task.getDescriptionFile(), "source");
-		return new String(FileAccess.readAllBytes(source),
-				Charset.forName("UTF8"));
+	public Path getTaskDescriptionDirectory(Task task) throws IOException {
+		return FileSystems.getDefault().getPath(
+				this.storageConfig.getStoragePath(), "tasks",
+				"descriptions", task.getDescriptionFile());
 	}
 
 	public Path getTaskJudgeFile(final Task task) {
@@ -138,22 +122,4 @@ public class StorageService implements Serializable {
 				.relativize(file)
 				.toString());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
-	public void writeTaskDescription(Task task, InputStream inputStream)
-			throws ExecuteException, IOException {
-		final Path source = FileSystems.getDefault().getPath(
-				this.storageConfig.getStoragePath(),
-				"tasks", "descriptions", task.getDescriptionFile(), "source");
-
-		try (OutputStream outputStream = Files.newOutputStream(source)) {
-			IOUtils.copy(inputStream, outputStream);
-		}
-
-		final Path compiled = FileSystems.getDefault().getPath(
-				this.storageConfig.getStoragePath(), "tasks", "descriptions",
-				task.getDescriptionFile(), "compiled");
-		this.taskDescriptionProvider.transform(source, compiled);
-	}
-
 }

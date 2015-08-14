@@ -40,8 +40,6 @@ import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
-import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
-import org.ng200.openolympus.jooq.tables.records.VerdictRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -83,7 +81,8 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.selectCount()
 				.from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
-						Tables.SOLUTION.TASK_ID.eq(task.getId()))).fetchOne()
+						Tables.SOLUTION.TASK_ID.eq(task.getId())))
+				.fetchOne()
 				.value1();
 	}
 
@@ -157,7 +156,8 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				dslContext
 						.selectFrom(Tables.VERDICT)
 						.where(Tables.VERDICT.STATUS
-								.eq(VerdictStatusType.waiting)).spliterator(),
+								.eq(VerdictStatusType.waiting))
+						.spliterator(),
 				false).map(record -> record.into(Verdict.class));
 	}
 
@@ -191,7 +191,8 @@ public class SolutionService extends GenericCreateUpdateRepository {
 			+ SecurityExpressionConstants.IS_USER
 			+ SecurityExpressionConstants.AND + '(' + "#solution.user"
 			+ SecurityExpressionConstants.IS_OWNER + ')' + ')')
-	public List<Verdict> getVerdictsVisibleDuringContest(final Solution solution) {
+	public List<Verdict> getVerdictsVisibleDuringContest(
+			final Solution solution) {
 		// TODO: show full tests during contest should be an option
 		if (this.contestService.getRunningContest() == null) {
 			return dslContext.selectFrom(Tables.VERDICT)
@@ -224,8 +225,11 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
 						Tables.SOLUTION.TIME_ADDED.between(
 								Routines.getContestStartForUser(
-										contest.getId(), user.getId())).and(
-								Routines.getContestEndForUser(contest.getId(),
-										user.getId())))).execute();
+										contest.getId(), user.getId()))
+								.and(
+										Routines.getContestEndForUser(
+												contest.getId(),
+												user.getId()))))
+				.execute();
 	}
 }

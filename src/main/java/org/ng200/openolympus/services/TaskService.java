@@ -44,7 +44,10 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.exec.ExecuteException;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.jooq.Condition;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
@@ -54,8 +57,10 @@ import org.jooq.impl.DSL;
 import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.TaskCreationDto;
+import org.ng200.openolympus.dto.TaskModificationDto;
 import org.ng200.openolympus.dto.UploadableTask;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
+import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
@@ -294,12 +299,6 @@ public class TaskService extends GenericCreateUpdateRepository {
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
-	protected void uploadDescription(final Task task, InputStream inputStream)
-			throws ExecuteException, IOException {
-		this.storageService.writeTaskDescription(task, inputStream);
-	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	protected void uploadJudgeFile(final Task task,
 			final UploadableTask taskDto)
 					throws IOException, Exception {
@@ -315,12 +314,14 @@ public class TaskService extends GenericCreateUpdateRepository {
 	@Transactional
 	public Task uploadTask(final TaskCreationDto taskCreationDto,
 			final BindingResult bindingResult, User owner)
-					throws IOException, BindException {
+					throws IOException, BindException,
+					RefAlreadyExistsException, RefNotFoundException,
+					InvalidRefNameException, GitAPIException {
 		Task task = new Task().setName(taskCreationDto.getName())
 				.setCreatedDate(LocalDateTime.now());
 
 		final Path localDescriptionFile = this.storageService
-				.createTaskDescriptionFileStorage(task);
+				.createTaskDescriptionDirectory(task);
 		final Path judgeDir = this.storageService
 				.createTaskJudgeDirectory(task);
 
@@ -331,8 +332,6 @@ public class TaskService extends GenericCreateUpdateRepository {
 		lock.lock();
 
 		try {
-			this.uploadDescription(task, taskCreationDto
-					.getDescriptionFile().getInputStream());
 			this.uploadJudgeFile(task, taskCreationDto);
 
 			task = this.updateTask(task);
@@ -369,5 +368,31 @@ public class TaskService extends GenericCreateUpdateRepository {
 							return record;
 						}).collect(Collectors.toList()))
 				.execute();
+	}
+
+	public boolean doesUserHaveTaskPermission(Task task, User user,
+			TaskPermissionType permission) {
+		return Routines.hasTaskPermission(dslContext.configuration(),
+				task.getId(), user.getId(), permission);
+	}
+
+	public boolean canModifyTask(Task task, User user) {
+		return user.getSuperuser()
+				|| Routines.hasTaskPermission(dslContext.configuration(),
+						task.getId(), user.getId(), TaskPermissionType.modify);
+	}
+
+	@Transactional
+	public void patchTask(final Task task,
+			final TaskModificationDto taskModificationDto)
+					throws IOException, Exception {
+		task.setName(taskModificationDto.getName());
+
+		if (taskModificationDto.getJudgeFile() != null) {
+			this.uploadJudgeFile(task, taskModificationDto);
+		}
+
+		this.updateTask(task);
+		this.testingService.reloadTasks();
 	}
 }

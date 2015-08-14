@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -49,6 +50,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -131,6 +133,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			throws Exception {
 		auth.userDetailsService(this.userSecurityService).passwordEncoder(
 				this.passwordEncoder);
+	}
+
+	public BasicAuthenticationFilter getBasicAuthenticationFilter()
+			throws Exception {
+
+		BasicAuthenticationFilter filter = new BasicAuthenticationFilter(
+				authenticationManager());
+		return filter;
 	}
 
 	@Override

@@ -28,9 +28,6 @@ const controller = /*@ngInject*/ function($scope, FormDefaultHelperService) {
 		name: {
 			required: true
 		},
-		descriptionFile: {
-			required: true
-		},
 		judgeFile: {
 			required: true
 		}

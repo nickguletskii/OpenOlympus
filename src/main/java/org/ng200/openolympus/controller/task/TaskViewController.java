@@ -23,28 +23,25 @@
 package org.ng200.openolympus.controller.task;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.security.Principal;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import javax.validation.Valid;
 
-import org.jooq.impl.DSL;
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.SolutionSubmissionDto;
+import org.ng200.openolympus.exceptions.TaskDescriptionIncorrectFormatException;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.services.SolutionService;
+import org.ng200.openolympus.services.SolutionSubmissionService;
 import org.ng200.openolympus.services.StorageService;
-import org.ng200.openolympus.services.TestingService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.SolutionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +53,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 @RestController
@@ -95,13 +93,10 @@ public class TaskViewController {
 	private SolutionDtoValidator solutionDtoValidator;
 
 	@Autowired
-	private TestingService testingService;
-
-	@Autowired
 	private StorageService storageService;
 
 	@Autowired
-	private SolutionService solutionService;
+	private SolutionSubmissionService solutionSubmissionService;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
@@ -117,6 +112,9 @@ public class TaskViewController {
 		return task.getName();
 	}
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
 			+ SecurityExpressionConstants.IS_USER
@@ -127,10 +125,50 @@ public class TaskViewController {
 	@RequestMapping(value = "/api/task/{task}", method = RequestMethod.GET)
 	public TaskDescriptionView showTaskView(
 			@PathVariable(value = "task") final Task task, final Locale locale)
-			throws IOException {
+					throws IOException,
+					TaskDescriptionIncorrectFormatException {
 		Assertions.resourceExists(task);
-		return new TaskDescriptionView(task.getName(),
-				this.storageService.getTaskDescription(task));
+
+		Path taskDescriptionDir = storageService
+				.getTaskDescriptionDirectory(task);
+		Path taskDescriptionLocalisationManifest = taskDescriptionDir
+				.resolve("localisation.json");
+
+		if (!FileAccess.exists(taskDescriptionLocalisationManifest)) {
+			throw new TaskDescriptionIncorrectFormatException(
+					"Task description localisation manifest (localisation.json) is missing!");
+		}
+
+		HashMap<String, String> localisationMap = objectMapper.readValue(
+				taskDescriptionLocalisationManifest.toFile(), HashMap.class);
+
+		if (!localisationMap.containsKey("default")) {
+			throw new TaskDescriptionIncorrectFormatException(
+					"Security: Attempt to serve file outside of current task scope!");
+
+		}
+
+		if (localisationMap.containsKey(locale.getLanguage())) {
+			Path childPath = taskDescriptionDir
+					.resolve(localisationMap.get(locale.getLanguage()));
+			if (!childPath.toAbsolutePath()
+					.startsWith(taskDescriptionDir.toAbsolutePath())) { // TODO:
+																		// check
+																		// if
+																		// this
+																		// check
+																		// is
+																		// definitive
+				throw new TaskDescriptionIncorrectFormatException(
+						"Security: Attempt to serve file outside of current task scope!");
+			}
+
+			return new TaskDescriptionView(task.getName(),
+					FileAccess.readUTF8String(childPath));
+		}
+		return new TaskDescriptionView(task.getName(), FileAccess
+				.readUTF8String(taskDescriptionDir
+						.resolve(localisationMap.get("default"))));
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
@@ -145,7 +183,7 @@ public class TaskViewController {
 			@PathVariable("task") final Task task, final Principal principal,
 			@Valid final SolutionSubmissionDto solutionDto,
 			final BindingResult bindingResult) throws BindException,
-			IOException {
+					IOException {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
@@ -161,22 +199,8 @@ public class TaskViewController {
 			throw new BindException(bindingResult);
 		}
 
-		final Path solutionFile = this.storageService.createSolutionDirectory()
-				.resolve(
-						this.storageService.sanitizeName(solutionDto
-								.getSolutionFile().getOriginalFilename()));
-
-		solutionDto.getSolutionFile().transferTo(solutionFile.toFile());
-
-		Solution solution = new Solution().setTaskId(task.getId())
-				.setUserId(user.getId())
-				.setTimeAdded(Timestamp.from(Instant.now()))
-				.setTested(false);
-
-		this.storageService.setSolutionFile(solution, solutionFile);
-
-		solution = this.solutionService.insertSolution(solution);
-		this.testingService.testSolutionOnAllTests(solution);
+		Solution solution = solutionSubmissionService.submitTask(task,
+				solutionDto, user);
 
 		final long id = solution.getId();
 

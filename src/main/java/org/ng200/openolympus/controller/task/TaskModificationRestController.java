@@ -22,9 +22,7 @@
  */
 package org.ng200.openolympus.controller.task;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
 
 import javax.validation.Valid;
@@ -33,9 +31,7 @@ import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.TaskModificationDto;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
-import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.TaskService;
-import org.ng200.openolympus.services.TestingService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,12 +51,6 @@ public class TaskModificationRestController extends
 	@Autowired
 	private TaskService taskService;
 
-	@Autowired
-	private TestingService testingService;
-
-	@Autowired
-	private StorageService storageService;
-
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
@@ -68,8 +58,6 @@ public class TaskModificationRestController extends
 
 		final TaskModificationDto taskModificationDto = new TaskModificationDto();
 		taskModificationDto.setName(task.getName());
-		taskModificationDto.setDescriptionText(this.storageService
-				.getTaskDescriptionSourcecode(task));
 		return taskModificationDto;
 	}
 
@@ -89,20 +77,10 @@ public class TaskModificationRestController extends
 				throw new BindException(bindingResult);
 			}
 
-			task.setName(taskModificationDto.getName());
-
-			if (taskModificationDto.getDescriptionFile() != null) {
-				this.uploadDescription(task, taskModificationDto
-						.getDescriptionFile().getInputStream());
-			}
-			if (taskModificationDto.getJudgeFile() != null) {
-				this.uploadJudgeFile(task, taskModificationDto);
-			}
-
-			this.taskService.updateTask(task);
-			this.testingService.reloadTasks();
+			taskService.patchTask(task, taskModificationDto);
 			return BindingResponse.OK;
 		};
 
 	}
+
 }

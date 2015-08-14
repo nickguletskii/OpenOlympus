@@ -26,12 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UploadableTask {
 
-	public MultipartFile getDescriptionFile();
-
 	public MultipartFile getJudgeFile();
 
-	public abstract String getName();
-
-	public abstract boolean isPublished();
+	public String getName();
 
 }

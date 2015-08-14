@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class TaskDescriptionSourcecodeController extends
-TaskFilesystemManipulatingController {
+		TaskFilesystemManipulatingController {
 
 	@Autowired
 	private StorageService storageService;
@@ -56,8 +56,7 @@ TaskFilesystemManipulatingController {
 		final HttpHeaders responseHeaders = new HttpHeaders();
 		final Charset charset = Charset.forName("UTF-8");
 		responseHeaders.setContentType(new MediaType("text", "plain", charset));
-		return new ResponseEntity<String>(
-				this.storageService.getTaskDescriptionSourcecode(task),
+		return new ResponseEntity<String>("", // TODO remove this controller altogether
 				responseHeaders, HttpStatus.OK);
 	}
 }

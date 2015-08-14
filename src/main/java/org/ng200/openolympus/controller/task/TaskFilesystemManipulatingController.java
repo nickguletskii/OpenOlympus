@@ -59,7 +59,8 @@ public class TaskFilesystemManipulatingController {
 				} else {
 					FileAccess.createDirectories(dest.getParent());
 					FileAccess.createFile(dest);
-					Files.copy(input, dest, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(input, dest,
+							StandardCopyOption.REPLACE_EXISTING);
 				}
 			}
 		}
@@ -68,12 +69,14 @@ public class TaskFilesystemManipulatingController {
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	protected void uploadDescription(final Task task, InputStream inputStream)
 			throws ExecuteException, IOException {
-		this.storageService.writeTaskDescription(task, inputStream);
+		// TODO: remove this?
+		// this.storageService.writeTaskDescription(task, inputStream);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
-	protected void uploadJudgeFile(final Task task, final UploadableTask taskDto)
-			throws IOException, Exception {
+	protected void uploadJudgeFile(final Task task,
+			final UploadableTask taskDto)
+					throws IOException, Exception {
 		final Path judgeFile = this.storageService.getTaskJudgeFile(task);
 		if (FileAccess.exists(judgeFile)) {
 			FileAccess.deleteDirectoryByWalking(judgeFile);
