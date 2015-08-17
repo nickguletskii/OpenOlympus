@@ -32,7 +32,15 @@
 <acl-editor acl-getter="/api/task/{{taskId}}/acl"
 	acl-setter="/api/task/{{taskId}}/acl"
 	localisation-namespace="task.permissions"></acl-editor>
-<div dynamic="description"></div>
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h3 class="panel-title">{{ 'task.description.heading' | translate }}</h3>
+	</div>
+	<div class="panel-body">
+		<ng-include src="'/api/task/'+taskId+'/data/'+indexPath">
+		</ng-include>
+	</div>
+</div>
 <div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">{{ 'task.submit.heading' | translate }}</h3>

@@ -20,27 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
+"use strict";
+
 var _ = require("lodash");
 var angular = require("angular");
-var app = require("app");
-angular.module('ool.services').factory('TaskService', /*@ngInject*/ function($http) {
-    return {
-        getTask: function(taskId) {
-            return $http.get("/api/task/" + taskId).then(_.property("data"));
-        },
-        getTaskEditData: function(taskId) {
-            return $http.get("/api/task/" + taskId + "/edit").then(_.property("data"));
-        },
-        getArchiveTasksPage: function(page) {
-            return $http.get('api/archive/tasks', {
-                params: {
-                    page: page
-                }
-            }).then(_.property("data"));
-        },
-        countArchiveTasks: function() {
-            return $http.get('api/archive/tasksCount').then(_.property("data"));
-        }
-    };
+angular.module("ool.services").factory("TaskService", /*@ngInject*/ function($http, $rootScope, $q) {
+	return {
+		getTaskIndexPage: function(taskId) {
+			let deferred = $q.defer();
+			$http.get(
+					"/api/task/" + taskId + "/data/localisation.json"
+				)
+				.then((response) => {
+					let path = response.data[$rootScope.currentLanguage] ||
+						response.data.default;
+					if (!path) {
+						deferred.reject(404);
+					} else {
+						deferred.resolve(path);
+					}
+				});
+			return deferred.promise;
+		},
+		getTaskName: function(taskId) {
+			return $http.get("/api/task/" + taskId + "/name").then(_.property("data"));
+		},
+		getTaskEditData: function(taskId) {
+			return $http.get("/api/task/" + taskId + "/edit").then(_.property("data"));
+		},
+		getArchiveTasksPage: function(page) {
+			return $http.get("api/archive/tasks", {
+				params: {
+					page: page
+				}
+			}).then(_.property("data"));
+		},
+		countArchiveTasks: function() {
+			return $http.get("api/archive/tasksCount").then(_.property("data"));
+		}
+	};
 });

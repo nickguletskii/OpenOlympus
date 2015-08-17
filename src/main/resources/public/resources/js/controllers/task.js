@@ -8,9 +8,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN * THE SOFTWARE.*/
 "use strict";
 
-const controller = /*@ngInject*/ function($scope, $state, $stateParams, FormDefaultHelperService, task) {
-	$scope.name = task.name;
-	$scope.description = task.description;
+const controller = /*@ngInject*/ function($scope, $state, $stateParams, FormDefaultHelperService, taskName, taskIndexPage) {
+	$scope.name = taskName;
+	$scope.indexPath = taskIndexPage;
 
 	$scope.taskId = $stateParams.taskId;
 
@@ -38,8 +38,11 @@ module.exports = {
 	"templateUrl": "/partials/task.html",
 	"controller": controller,
 	"resolve": {
-		"task": function(TaskService, $stateParams) {
-			return TaskService.getTask($stateParams.taskId);
+		"taskIndexPage": function(TaskService, $stateParams) {
+			return TaskService.getTaskIndexPage($stateParams.taskId);
+		},
+		"taskName": function(TaskService, $stateParams) {
+			return TaskService.getTaskName($stateParams.taskId);
 		}
 	}
 };

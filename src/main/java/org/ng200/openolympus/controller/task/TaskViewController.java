@@ -25,9 +25,9 @@ package org.ng200.openolympus.controller.task;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
@@ -36,6 +36,8 @@ import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.SolutionSubmissionDto;
+import org.ng200.openolympus.exceptions.ForbiddenException;
+import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.exceptions.TaskDescriptionIncorrectFormatException;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
@@ -45,13 +47,18 @@ import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.SolutionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -105,15 +112,13 @@ public class TaskViewController {
 			+ SecurityExpressionConstants.TASK_PUBLISHED
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.TASK_IN_CONTEST + ')')
-	@RequestMapping(value = "/api/task/{task}/name", method = RequestMethod.GET)
+	@ResponseBody
+	@RequestMapping(value = "/api/task/{btask}/name", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public String getTaskName(@PathVariable(value = "task") final Task task,
 			final Locale locale) throws IOException {
 		Assertions.resourceExists(task);
 		return task.getName();
 	}
-
-	@Autowired
-	private ObjectMapper objectMapper;
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + '('
@@ -122,53 +127,40 @@ public class TaskViewController {
 			+ SecurityExpressionConstants.TASK_PUBLISHED
 			+ SecurityExpressionConstants.AND
 			+ SecurityExpressionConstants.TASK_IN_CONTEST + ')')
-	@RequestMapping(value = "/api/task/{task}", method = RequestMethod.GET)
-	public TaskDescriptionView showTaskView(
-			@PathVariable(value = "task") final Task task, final Locale locale)
+	@ResponseBody
+	@RequestMapping(value = "/api/task/{task}/data/**", method = RequestMethod.GET)
+	public FileSystemResource getTaskData(
+			@PathVariable(value = "task") final Task task,
+			HttpServletRequest request)
 					throws IOException,
 					TaskDescriptionIncorrectFormatException {
 		Assertions.resourceExists(task);
 
+		String pathWithinHandler = (String) request.getAttribute(
+				HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		String bestMatchPattern = (String) request
+				.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+
+		AntPathMatcher apm = new AntPathMatcher();
+		String relativePath = apm.extractPathWithinPattern(bestMatchPattern,
+				pathWithinHandler);
+
 		Path taskDescriptionDir = storageService
 				.getTaskDescriptionDirectory(task);
-		Path taskDescriptionLocalisationManifest = taskDescriptionDir
-				.resolve("localisation.json");
+		Path path = taskDescriptionDir.resolve(relativePath);
 
-		if (!FileAccess.exists(taskDescriptionLocalisationManifest)) {
-			throw new TaskDescriptionIncorrectFormatException(
-					"Task description localisation manifest (localisation.json) is missing!");
-		}
-
-		HashMap<String, String> localisationMap = objectMapper.readValue(
-				taskDescriptionLocalisationManifest.toFile(), HashMap.class);
-
-		if (!localisationMap.containsKey("default")) {
-			throw new TaskDescriptionIncorrectFormatException(
+		if (!path.toAbsolutePath()
+				.startsWith(taskDescriptionDir.toAbsolutePath())) {
+			throw new ForbiddenException(
 					"Security: Attempt to serve file outside of current task scope!");
-
 		}
 
-		if (localisationMap.containsKey(locale.getLanguage())) {
-			Path childPath = taskDescriptionDir
-					.resolve(localisationMap.get(locale.getLanguage()));
-			if (!childPath.toAbsolutePath()
-					.startsWith(taskDescriptionDir.toAbsolutePath())) { // TODO:
-																		// check
-																		// if
-																		// this
-																		// check
-																		// is
-																		// definitive
-				throw new TaskDescriptionIncorrectFormatException(
-						"Security: Attempt to serve file outside of current task scope!");
-			}
-
-			return new TaskDescriptionView(task.getName(),
-					FileAccess.readUTF8String(childPath));
+		if (!FileAccess.exists(path)) {
+			throw new ResourceNotFoundException(
+					"The requested file doesn't exist!");
 		}
-		return new TaskDescriptionView(task.getName(), FileAccess
-				.readUTF8String(taskDescriptionDir
-						.resolve(localisationMap.get("default"))));
+
+		return new FileSystemResource(path.toAbsolutePath().toFile());
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
