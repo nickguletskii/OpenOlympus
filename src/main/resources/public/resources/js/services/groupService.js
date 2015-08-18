@@ -22,19 +22,34 @@
  */
 "use strict";
 
+var _ = require("lodash");
 var angular = require("angular");
-
-angular.module("ool.services", []);
-
-require("services/authenticationProvider");
-require("services/serversideFormErrorReporter");
-require("services/validationService");
-require("services/modalState");
-require("services/userService");
-require("services/solutionService");
-require("services/taskService");
-require("services/contestService");
-require("services/timeService");
-require("services/aclService");
-require("services/formDefaultHelperService");
-require("services/groupService");
+angular.module("ool.services").factory("GroupService", /*@ngInject*/ function($http) {
+	return {
+		getGroupsPage: function(page) {
+			return $http.get("/api/groups", {
+				params: {
+					page: page
+				}
+			}).then(_.property("data"));
+		},
+		countGroups: function() {
+			return $http.get("/api/groupsCount").then(_.property("data"));
+		},
+		getMembersPage: function(contestId, page) {
+			return $http.get("/api/group/" + contestId, {
+				params: {
+					page: page
+				}
+			}).then(_.property("data"));
+		},
+		countMembers: function(contestId) {
+			return $http.get("/api/group/" + contestId + "/memberCount").then(_.property("data"));
+		},
+		getGroupEditData: function(groupId) {
+			return $http
+				.get("/api/group/" + groupId + "/edit")
+				.then(_.property("data"));
+		}
+	};
+});

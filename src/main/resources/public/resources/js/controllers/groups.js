@@ -22,19 +22,28 @@
  */
 "use strict";
 
-var angular = require("angular");
+const controller = /*@ngInject*/ function($scope,
+	$stateParams, groups, groupsCount) {
 
-angular.module("ool.services", []);
+	$scope.page = $stateParams.page;
 
-require("services/authenticationProvider");
-require("services/serversideFormErrorReporter");
-require("services/validationService");
-require("services/modalState");
-require("services/userService");
-require("services/solutionService");
-require("services/taskService");
-require("services/contestService");
-require("services/timeService");
-require("services/aclService");
-require("services/formDefaultHelperService");
-require("services/groupService");
+	$scope.groups = groups;
+	$scope.groupsCount = groupsCount;
+};
+module.exports = {
+	"name": "groupList",
+	"url": "/groups?page",
+	"templateUrl": "/partials/groups.html",
+	"controller": controller,
+	"params": {
+		"page": "1"
+	},
+	"resolve": {
+		"groups": function(GroupService, $stateParams) {
+			return GroupService.getGroupsPage($stateParams.page);
+		},
+		"groupsCount": function(GroupService) {
+			return GroupService.countGroups();
+		}
+	}
+};

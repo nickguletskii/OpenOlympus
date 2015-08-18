@@ -20,58 +20,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
+"use strict";
+
 var _ = require("lodash");
 var angular = require("angular");
-var app = require("app");
-angular.module('ool.services').factory('ContestService', /*@ngInject*/ function($http) {
-    return {
-        getContestsPage: function(page) {
-            return $http.get('/api/contests', {
-                params: {
-                    page: page
-                }
-            }).then(_.property("data"));
-        },
-        countContests: function() {
-            return $http.get('/api/contestsCount').then(_.property("data"));
-        },
-        getContestInfo: function(contestId) {
-            return $http.get('/api/contest/' + contestId).then(_.property("data"));
-        },
-        countContestParticipants: function(contestId) {
-            return $http.get('api/contest/' + contestId + "/participantsCount").then(_.property("data"));
-        },
-        getContestParticipantsPage: function(contestId, page) {
-            return $http.get('api/contest/' + contestId + "/participants", {
-                params: {
-                    page: page
-                }
-            }).then(_.property("data"));
-        },
-        getContestResultsPage: function(contestId, page) {
-            return $http.get('api/contest/' + contestId + "/results", {
-                params: {
-                    page: page
-                }
-            }).then(_.property("data"));
-        },
-        getContestEditData: function(contestId) {
-            return $http.get("/api/contest/" + contestId + "/edit").then(_.property("data"));
-        },
-        removeParticipant: function(contestId, id) {
-            return $http.delete("/api/contest/" + contestId + "/removeUser", {
-                params: {
-                    user: id
-                }
-            });
-        },
-        removeTask: function(contestId, id) {
-            return $http.delete("/api/contest/" + contestId + "/removeTask", {
-                params: {
-                    task: id
-                }
-            });
-        }
-    };
+angular.module("ool.services").factory("ContestService", /*@ngInject*/ function($http) {
+	return {
+		getContestsPage: function(page) {
+			return $http.get("/api/contests", {
+				params: {
+					page: page
+				}
+			}).then(_.property("data"));
+		},
+		countContests: function() {
+			return $http.get("/api/contestsCount").then(_.property("data"));
+		},
+		getContestInfo: function(contestId) {
+			return $http.get("/api/contest/" + contestId).then(_.property("data"));
+		},
+		countContestParticipants: function(contestId) {
+			return $http.get("api/contest/" + contestId + "/participantsCount").then(_.property("data"));
+		},
+		getContestParticipantsPage: function(contestId, page) {
+			return $http.get("api/contest/" + contestId + "/participants", {
+				params: {
+					page: page
+				}
+			}).then(_.property("data"));
+		},
+		getContestResultsPage: function(contestId, page) {
+			return $http.get("api/contest/" + contestId + "/results", {
+				params: {
+					page: page
+				}
+			}).then(_.property("data"));
+		},
+		getContestEditData: function(contestId) {
+			return $http.get("/api/contest/" + contestId + "/edit").then(_.property("data"));
+		},
+		removeParticipant: function(contestId, id) {
+			return $http.delete("/api/contest/" + contestId + "/removeUser", {
+				params: {
+					user: id
+				}
+			});
+		},
+		removeTask: function(contestId, id) {
+			return $http.delete("/api/contest/" + contestId + "/removeTask", {
+				params: {
+					task: id
+				}
+			});
+		}
+	};
 });

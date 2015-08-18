@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.joor.Reflect;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
@@ -102,6 +103,7 @@ public class BinderAdvice implements ApplicationContextAware {
 		registerModelType(binder, Contest.class);
 		registerModelType(binder, Solution.class);
 		registerModelType(binder, Verdict.class);
+		registerModelType(binder, Group.class);
 	}
 
 	private void registerModelType(ServletRequestDataBinder binder,

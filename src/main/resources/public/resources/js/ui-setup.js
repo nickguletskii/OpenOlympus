@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var angular = require("angular");
 var moment = require("moment");
 require("app");
@@ -61,7 +63,8 @@ angular.module("ool")
 
 		$rootScope.$on("$stateNotFound",
 			function(event, unfoundState, fromState, fromParams) {
-				throw new Error("Couldn't find state: " + unfoundState);
+				console.error("Couldn't find state: ", unfoundState);
+				throw new Error("Couldn't find state: " + unfoundState.to);
 			});
 		$rootScope.$on("$stateChangeStart",
 			function(event, toState, toParams, fromState, fromParams) {

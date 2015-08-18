@@ -22,19 +22,41 @@
  */
 "use strict";
 
-var angular = require("angular");
+var _ = require("lodash");
 
-angular.module("ool.services", []);
+const controller = /*@ngInject*/ function($scope, $stateParams, FormDefaultHelperService, ValidationService, group) {
+	$scope.groupId = $stateParams.groupId;
+	const validationRules = require("controllers/groups/groupValidation")(ValidationService);
 
-require("services/authenticationProvider");
-require("services/serversideFormErrorReporter");
-require("services/validationService");
-require("services/modalState");
-require("services/userService");
-require("services/solutionService");
-require("services/taskService");
-require("services/contestService");
-require("services/timeService");
-require("services/aclService");
-require("services/formDefaultHelperService");
-require("services/groupService");
+	class GroupModificationForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "group.editForm");
+			this.submitUrl = "/api/group/" + $stateParams.groupId + "/edit";
+		}
+
+		setUpData() {
+			if (this.data) {
+				return;
+			}
+			this.data = _.clone(group);
+		}
+
+		get validationRules() {
+			return validationRules;
+		}
+	}
+
+	$scope.form = new GroupModificationForm();
+};
+
+module.exports = {
+	"name": "editGroup",
+	"url": "/group/{groupId:[0-9]+}/edit",
+	"templateUrl": "/partials/groups/group/edit.html",
+	"controller": controller,
+	"resolve": {
+		"group": function(GroupService, $stateParams) {
+			return GroupService.getGroupEditData($stateParams.groupId);
+		}
+	}
+};

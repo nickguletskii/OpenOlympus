@@ -156,8 +156,12 @@ public class ContestService extends GenericCreateUpdateRepository {
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
 			final int pageSize) {
-		return dslContext.selectFrom(Tables.CONTEST).limit(pageSize)
-				.offset((pageNumber - 1) * pageSize).fetchInto(Contest.class);
+		return dslContext.selectFrom(Tables.CONTEST)
+				.groupBy(Tables.CONTEST.ID)
+				.orderBy(Tables.CONTEST.START_TIME.desc())
+				.limit(pageSize)
+				.offset((pageNumber - 1) * pageSize)
+				.fetchInto(Contest.class);
 	}
 
 	@PreAuthorize(SecurityExpressionConstants.IS_USER)

@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-beta1" last-position="147,784" last-zoom="1"
+<dbmodel pgmodeler-ver="0.8.1" last-position="146,783" last-zoom="1"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -656,9 +656,6 @@ WHERE contest.id = contest_id ]]></definition>
 	<column name="name" not-null="true">
 		<type name="text"/>
 	</column>
-	<column name="hidden" not-null="true" default-value="false">
-		<type name="boolean"/>
-	</column>
 	<constraint name="group_pk" type="pk-constr" table="public.&quot;group&quot;">
 		<columns names="id" ref-type="src-columns"/>
 	</constraint>
@@ -980,7 +977,7 @@ END;]]></definition>
 	upd-action="NO ACTION"
 	del-action="NO ACTION">
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="0"/>
+		<type name="public.task_permission_type" precision="32615"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1098,7 +1095,7 @@ END;]]></definition>
 	 src-required="false" dst-required="false"
 	 table-name="contest_permission">
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="0"/>
+		<type name="public.contest_permission_type" precision="32615"/>
 	</column>
 </relationship>
 

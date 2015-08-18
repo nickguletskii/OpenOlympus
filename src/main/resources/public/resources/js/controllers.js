@@ -66,7 +66,11 @@ var stateList = [{
 	require("controllers/register"),
 	require("controllers/user/personalInfo"),
 	require("controllers/admin/pendingUsers"),
-	require("controllers/admin/users")
+	require("controllers/admin/users"),
+	require("controllers/groups"),
+	require("controllers/groups/add"),
+	require("controllers/groups/group"),
+	require("controllers/groups/group/edit")
 ];
 
 var modalStateList = [{

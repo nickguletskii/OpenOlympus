@@ -18,6 +18,19 @@ import org.ng200.openolympus.jooq.routines.GetContestStart;
 import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
 import org.ng200.openolympus.jooq.routines.GetSolutionAuthor;
 import org.ng200.openolympus.jooq.routines.GetSolutionTimeAdded;
+import org.ng200.openolympus.jooq.routines.GinExtractQueryTrgm;
+import org.ng200.openolympus.jooq.routines.GinExtractValueTrgm;
+import org.ng200.openolympus.jooq.routines.GinTrgmConsistent;
+import org.ng200.openolympus.jooq.routines.GtrgmCompress;
+import org.ng200.openolympus.jooq.routines.GtrgmConsistent;
+import org.ng200.openolympus.jooq.routines.GtrgmDecompress;
+import org.ng200.openolympus.jooq.routines.GtrgmDistance;
+import org.ng200.openolympus.jooq.routines.GtrgmIn;
+import org.ng200.openolympus.jooq.routines.GtrgmOut;
+import org.ng200.openolympus.jooq.routines.GtrgmPenalty;
+import org.ng200.openolympus.jooq.routines.GtrgmPicksplit;
+import org.ng200.openolympus.jooq.routines.GtrgmSame;
+import org.ng200.openolympus.jooq.routines.GtrgmUnion;
 import org.ng200.openolympus.jooq.routines.HasContestPermission;
 import org.ng200.openolympus.jooq.routines.HasTaskPermission;
 import org.ng200.openolympus.jooq.routines.KeepGroupAsPrincipal;
@@ -29,6 +42,12 @@ import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTimeExtensions
 import org.ng200.openolympus.jooq.routines.MaintainSolutionScore;
 import org.ng200.openolympus.jooq.routines.PermissionAppliesToPrincipal;
 import org.ng200.openolympus.jooq.routines.RaiseContestIntersectsError;
+import org.ng200.openolympus.jooq.routines.SetLimit;
+import org.ng200.openolympus.jooq.routines.ShowLimit;
+import org.ng200.openolympus.jooq.routines.ShowTrgm;
+import org.ng200.openolympus.jooq.routines.Similarity;
+import org.ng200.openolympus.jooq.routines.SimilarityDist;
+import org.ng200.openolympus.jooq.routines.SimilarityOp;
 import org.ng200.openolympus.jooq.routines.UpdateContest;
 import org.ng200.openolympus.jooq.routines.UpdateSolution;
 import org.ng200.openolympus.jooq.routines.UpdateUserInContest;
@@ -236,6 +255,490 @@ public class Routines {
 	public static Field<Timestamp> getSolutionTimeAdded(Field<Long> solutionId) {
 		GetSolutionTimeAdded f = new GetSolutionTimeAdded();
 		f.setSolutionId(solutionId);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gin_extract_query_trgm</code>
+	 */
+	public static Object ginExtractQueryTrgm(Configuration configuration, String __1, Object __2, Short __3, Object __4, Object __5, Object __6, Object __7) {
+		GinExtractQueryTrgm f = new GinExtractQueryTrgm();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+		f.set__6(__6);
+		f.set__7(__7);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gin_extract_query_trgm</code> as a field
+	 */
+	public static Field<Object> ginExtractQueryTrgm(String __1, Object __2, Short __3, Object __4, Object __5, Object __6, Object __7) {
+		GinExtractQueryTrgm f = new GinExtractQueryTrgm();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+		f.set__6(__6);
+		f.set__7(__7);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gin_extract_query_trgm</code> as a field
+	 */
+	public static Field<Object> ginExtractQueryTrgm(Field<String> __1, Field<Object> __2, Field<Short> __3, Field<Object> __4, Field<Object> __5, Field<Object> __6, Field<Object> __7) {
+		GinExtractQueryTrgm f = new GinExtractQueryTrgm();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+		f.set__6(__6);
+		f.set__7(__7);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gin_extract_value_trgm</code>
+	 */
+	public static Object ginExtractValueTrgm(Configuration configuration, String __1, Object __2) {
+		GinExtractValueTrgm f = new GinExtractValueTrgm();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gin_extract_value_trgm</code> as a field
+	 */
+	public static Field<Object> ginExtractValueTrgm(String __1, Object __2) {
+		GinExtractValueTrgm f = new GinExtractValueTrgm();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gin_extract_value_trgm</code> as a field
+	 */
+	public static Field<Object> ginExtractValueTrgm(Field<String> __1, Field<Object> __2) {
+		GinExtractValueTrgm f = new GinExtractValueTrgm();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gin_trgm_consistent</code>
+	 */
+	public static Boolean ginTrgmConsistent(Configuration configuration, Object __1, Short __2, String __3, Integer __4, Object __5, Object __6, Object __7, Object __8) {
+		GinTrgmConsistent f = new GinTrgmConsistent();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+		f.set__6(__6);
+		f.set__7(__7);
+		f.set__8(__8);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gin_trgm_consistent</code> as a field
+	 */
+	public static Field<Boolean> ginTrgmConsistent(Object __1, Short __2, String __3, Integer __4, Object __5, Object __6, Object __7, Object __8) {
+		GinTrgmConsistent f = new GinTrgmConsistent();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+		f.set__6(__6);
+		f.set__7(__7);
+		f.set__8(__8);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gin_trgm_consistent</code> as a field
+	 */
+	public static Field<Boolean> ginTrgmConsistent(Field<Object> __1, Field<Short> __2, Field<String> __3, Field<Integer> __4, Field<Object> __5, Field<Object> __6, Field<Object> __7, Field<Object> __8) {
+		GinTrgmConsistent f = new GinTrgmConsistent();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+		f.set__6(__6);
+		f.set__7(__7);
+		f.set__8(__8);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_compress</code>
+	 */
+	public static Object gtrgmCompress(Configuration configuration, Object __1) {
+		GtrgmCompress f = new GtrgmCompress();
+		f.set__1(__1);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_compress</code> as a field
+	 */
+	public static Field<Object> gtrgmCompress(Object __1) {
+		GtrgmCompress f = new GtrgmCompress();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_compress</code> as a field
+	 */
+	public static Field<Object> gtrgmCompress(Field<Object> __1) {
+		GtrgmCompress f = new GtrgmCompress();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_consistent</code>
+	 */
+	public static Boolean gtrgmConsistent(Configuration configuration, Object __1, String __2, Integer __3, Long __4, Object __5) {
+		GtrgmConsistent f = new GtrgmConsistent();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_consistent</code> as a field
+	 */
+	public static Field<Boolean> gtrgmConsistent(Object __1, String __2, Integer __3, Long __4, Object __5) {
+		GtrgmConsistent f = new GtrgmConsistent();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_consistent</code> as a field
+	 */
+	public static Field<Boolean> gtrgmConsistent(Field<Object> __1, Field<String> __2, Field<Integer> __3, Field<Long> __4, Field<Object> __5) {
+		GtrgmConsistent f = new GtrgmConsistent();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+		f.set__5(__5);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_decompress</code>
+	 */
+	public static Object gtrgmDecompress(Configuration configuration, Object __1) {
+		GtrgmDecompress f = new GtrgmDecompress();
+		f.set__1(__1);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_decompress</code> as a field
+	 */
+	public static Field<Object> gtrgmDecompress(Object __1) {
+		GtrgmDecompress f = new GtrgmDecompress();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_decompress</code> as a field
+	 */
+	public static Field<Object> gtrgmDecompress(Field<Object> __1) {
+		GtrgmDecompress f = new GtrgmDecompress();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_distance</code>
+	 */
+	public static Double gtrgmDistance(Configuration configuration, Object __1, String __2, Integer __3, Long __4) {
+		GtrgmDistance f = new GtrgmDistance();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_distance</code> as a field
+	 */
+	public static Field<Double> gtrgmDistance(Object __1, String __2, Integer __3, Long __4) {
+		GtrgmDistance f = new GtrgmDistance();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_distance</code> as a field
+	 */
+	public static Field<Double> gtrgmDistance(Field<Object> __1, Field<String> __2, Field<Integer> __3, Field<Long> __4) {
+		GtrgmDistance f = new GtrgmDistance();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+		f.set__4(__4);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_in</code>
+	 */
+	public static Object gtrgmIn(Configuration configuration, Object __1) {
+		GtrgmIn f = new GtrgmIn();
+		f.set__1(__1);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_in</code> as a field
+	 */
+	public static Field<Object> gtrgmIn(Object __1) {
+		GtrgmIn f = new GtrgmIn();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_in</code> as a field
+	 */
+	public static Field<Object> gtrgmIn(Field<Object> __1) {
+		GtrgmIn f = new GtrgmIn();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_out</code>
+	 */
+	public static Object gtrgmOut(Configuration configuration, Object __1) {
+		GtrgmOut f = new GtrgmOut();
+		f.set__1(__1);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_out</code> as a field
+	 */
+	public static Field<Object> gtrgmOut(Object __1) {
+		GtrgmOut f = new GtrgmOut();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_out</code> as a field
+	 */
+	public static Field<Object> gtrgmOut(Field<Object> __1) {
+		GtrgmOut f = new GtrgmOut();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_penalty</code>
+	 */
+	public static Object gtrgmPenalty(Configuration configuration, Object __1, Object __2, Object __3) {
+		GtrgmPenalty f = new GtrgmPenalty();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_penalty</code> as a field
+	 */
+	public static Field<Object> gtrgmPenalty(Object __1, Object __2, Object __3) {
+		GtrgmPenalty f = new GtrgmPenalty();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_penalty</code> as a field
+	 */
+	public static Field<Object> gtrgmPenalty(Field<Object> __1, Field<Object> __2, Field<Object> __3) {
+		GtrgmPenalty f = new GtrgmPenalty();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_picksplit</code>
+	 */
+	public static Object gtrgmPicksplit(Configuration configuration, Object __1, Object __2) {
+		GtrgmPicksplit f = new GtrgmPicksplit();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_picksplit</code> as a field
+	 */
+	public static Field<Object> gtrgmPicksplit(Object __1, Object __2) {
+		GtrgmPicksplit f = new GtrgmPicksplit();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_picksplit</code> as a field
+	 */
+	public static Field<Object> gtrgmPicksplit(Field<Object> __1, Field<Object> __2) {
+		GtrgmPicksplit f = new GtrgmPicksplit();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_same</code>
+	 */
+	public static Object gtrgmSame(Configuration configuration, Object __1, Object __2, Object __3) {
+		GtrgmSame f = new GtrgmSame();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_same</code> as a field
+	 */
+	public static Field<Object> gtrgmSame(Object __1, Object __2, Object __3) {
+		GtrgmSame f = new GtrgmSame();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_same</code> as a field
+	 */
+	public static Field<Object> gtrgmSame(Field<Object> __1, Field<Object> __2, Field<Object> __3) {
+		GtrgmSame f = new GtrgmSame();
+		f.set__1(__1);
+		f.set__2(__2);
+		f.set__3(__3);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.gtrgm_union</code>
+	 */
+	public static Integer[] gtrgmUnion(Configuration configuration, byte[] __1, Object __2) {
+		GtrgmUnion f = new GtrgmUnion();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_union</code> as a field
+	 */
+	public static Field<Integer[]> gtrgmUnion(byte[] __1, Object __2) {
+		GtrgmUnion f = new GtrgmUnion();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.gtrgm_union</code> as a field
+	 */
+	public static Field<Integer[]> gtrgmUnion(Field<byte[]> __1, Field<Object> __2) {
+		GtrgmUnion f = new GtrgmUnion();
+		f.set__1(__1);
+		f.set__2(__2);
 
 		return f.asField();
 	}
@@ -496,6 +999,189 @@ public class Routines {
 	 */
 	public static Field<Object> raiseContestIntersectsError() {
 		RaiseContestIntersectsError f = new RaiseContestIntersectsError();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.set_limit</code>
+	 */
+	public static Float setLimit(Configuration configuration, Float __1) {
+		SetLimit f = new SetLimit();
+		f.set__1(__1);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.set_limit</code> as a field
+	 */
+	public static Field<Float> setLimit(Float __1) {
+		SetLimit f = new SetLimit();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.set_limit</code> as a field
+	 */
+	public static Field<Float> setLimit(Field<Float> __1) {
+		SetLimit f = new SetLimit();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.show_limit</code>
+	 */
+	public static Float showLimit(Configuration configuration) {
+		ShowLimit f = new ShowLimit();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.show_limit</code> as a field
+	 */
+	public static Field<Float> showLimit() {
+		ShowLimit f = new ShowLimit();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.show_trgm</code>
+	 */
+	public static String[] showTrgm(Configuration configuration, String __1) {
+		ShowTrgm f = new ShowTrgm();
+		f.set__1(__1);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.show_trgm</code> as a field
+	 */
+	public static Field<String[]> showTrgm(String __1) {
+		ShowTrgm f = new ShowTrgm();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.show_trgm</code> as a field
+	 */
+	public static Field<String[]> showTrgm(Field<String> __1) {
+		ShowTrgm f = new ShowTrgm();
+		f.set__1(__1);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.similarity</code>
+	 */
+	public static Float similarity(Configuration configuration, String __1, String __2) {
+		Similarity f = new Similarity();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.similarity</code> as a field
+	 */
+	public static Field<Float> similarity(String __1, String __2) {
+		Similarity f = new Similarity();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.similarity</code> as a field
+	 */
+	public static Field<Float> similarity(Field<String> __1, Field<String> __2) {
+		Similarity f = new Similarity();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.similarity_dist</code>
+	 */
+	public static Float similarityDist(Configuration configuration, String __1, String __2) {
+		SimilarityDist f = new SimilarityDist();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.similarity_dist</code> as a field
+	 */
+	public static Field<Float> similarityDist(String __1, String __2) {
+		SimilarityDist f = new SimilarityDist();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.similarity_dist</code> as a field
+	 */
+	public static Field<Float> similarityDist(Field<String> __1, Field<String> __2) {
+		SimilarityDist f = new SimilarityDist();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.similarity_op</code>
+	 */
+	public static Boolean similarityOp(Configuration configuration, String __1, String __2) {
+		SimilarityOp f = new SimilarityOp();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.similarity_op</code> as a field
+	 */
+	public static Field<Boolean> similarityOp(String __1, String __2) {
+		SimilarityOp f = new SimilarityOp();
+		f.set__1(__1);
+		f.set__2(__2);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.similarity_op</code> as a field
+	 */
+	public static Field<Boolean> similarityOp(Field<String> __1, Field<String> __2) {
+		SimilarityOp f = new SimilarityOp();
+		f.set__1(__1);
+		f.set__2(__2);
 
 		return f.asField();
 	}

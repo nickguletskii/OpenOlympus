@@ -22,19 +22,37 @@
  */
 "use strict";
 
-var angular = require("angular");
+const controller = /*@ngInject*/ function(ValidationService, $scope, FormDefaultHelperService) {
 
-angular.module("ool.services", []);
+	const validationRules = require("controllers/groups/groupValidation")(ValidationService);
 
-require("services/authenticationProvider");
-require("services/serversideFormErrorReporter");
-require("services/validationService");
-require("services/modalState");
-require("services/userService");
-require("services/solutionService");
-require("services/taskService");
-require("services/contestService");
-require("services/timeService");
-require("services/aclService");
-require("services/formDefaultHelperService");
-require("services/groupService");
+	class GroupCreationForm extends FormDefaultHelperService.FormClass {
+		constructor() {
+			super($scope, "group.createForm");
+			this.submitUrl = "/api/groups/create";
+		}
+
+		preSubmit() {
+			super.preSubmit();
+			this.lastGroupId = null;
+		}
+
+		postSubmit(response) {
+			super.postSubmit(response);
+			this.lastGroupId = response.data.id;
+		}
+
+		get validationRules() {
+			return validationRules;
+		}
+	}
+
+	$scope.form = new GroupCreationForm();
+};
+
+module.exports = {
+	"name": "createGroup",
+	"url": "/groups/add",
+	"templateUrl": "/partials/groups/add.html",
+	"controller": controller
+};

@@ -76,13 +76,6 @@ public class GroupDao extends DAOImpl<GroupRecord, org.ng200.openolympus.jooq.ta
 	public org.ng200.openolympus.jooq.tables.pojos.Group fetchOneByName(String value) {
 		return fetchOne(Group.GROUP.NAME, value);
 	}
-
-	/**
-	 * Fetch records that have <code>hidden IN (values)</code>
-	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.Group> fetchByHidden(Boolean... values) {
-		return fetch(Group.GROUP.HIDDEN, values);
-	}
 	public org.ng200.openolympus.jooq.tables.pojos.Group fetchOneById(String id) {
 		return fetchOneById(java.lang.Long.valueOf(id));
 	}

@@ -34,7 +34,7 @@ import org.ng200.openolympus.jooq.tables.records.GroupRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Group extends TableImpl<GroupRecord> {
 
-	private static final long serialVersionUID = -738328255;
+	private static final long serialVersionUID = -991262986;
 
 	/**
 	 * The reference instance of <code>public.group</code>
@@ -58,11 +58,6 @@ public class Group extends TableImpl<GroupRecord> {
 	 * The column <code>public.group.name</code>.
 	 */
 	public final TableField<GroupRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
-
-	/**
-	 * The column <code>public.group.hidden</code>.
-	 */
-	public final TableField<GroupRecord, Boolean> HIDDEN = createField("hidden", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.group</code> table reference

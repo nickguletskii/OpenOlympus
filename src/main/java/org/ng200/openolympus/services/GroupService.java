@@ -85,4 +85,38 @@ public class GroupService extends GenericCreateUpdateRepository {
 				.execute();
 	}
 
+	public int countGroups() {
+		return dslContext.selectCount().from(Tables.GROUP).execute();
+	}
+
+	public List<Group> getGroups(Integer pageNumber, int pageSize) {
+		return dslContext.selectFrom(Tables.GROUP)
+				.groupBy(Tables.GROUP.ID)
+				.orderBy(Tables.GROUP.NAME)
+				.limit(pageSize)
+				.offset((pageNumber - 1) * pageSize)
+				.fetchInto(Group.class);
+	}
+
+	public int countParticipants(Group group) {
+		return dslContext.selectCount()
+				.from(Tables.GROUP_USERS)
+				.where(Tables.GROUP_USERS.USER_ID.eq(group.getId()))
+				.execute();
+	}
+
+	public List<User> getParticipants(Group group, Integer pageNumber,
+			int pageSize) {
+		return dslContext.select(Tables.USER.fields())
+				.from(Tables.GROUP_USERS)
+				.join(Tables.USER)
+				.on(Tables.GROUP_USERS.USER_ID.eq(Tables.USER.ID))
+				.where(Tables.GROUP_USERS.GROUP_ID.eq(group.getId()))
+				.groupBy(Tables.USER.ID)
+				.orderBy(Tables.USER.USERNAME)
+				.limit(pageSize)
+				.offset((pageNumber - 1) * pageSize)
+				.fetchInto(User.class);
+	}
+
 }

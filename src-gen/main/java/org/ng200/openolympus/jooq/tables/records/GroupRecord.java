@@ -12,8 +12,8 @@ import javax.persistence.Table;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record3;
-import org.jooq.Row3;
+import org.jooq.Record2;
+import org.jooq.Row2;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.ng200.openolympus.jooq.tables.Group;
 import org.ng200.openolympus.jooq.tables.interfaces.IGroup;
@@ -32,9 +32,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.IGroup;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "group", schema = "public")
-public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Record3<Long, String, Boolean>, IGroup {
+public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Record2<Long, String>, IGroup {
 
-	private static final long serialVersionUID = -1201428554;
+	private static final long serialVersionUID = -1120798093;
 
 	/**
 	 * Setter for <code>public.group.id</code>.
@@ -73,24 +73,6 @@ public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Rec
 		return (String) getValue(1);
 	}
 
-	/**
-	 * Setter for <code>public.group.hidden</code>.
-	 */
-	@Override
-	public GroupRecord setHidden(Boolean value) {
-		setValue(2, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.group.hidden</code>.
-	 */
-	@Column(name = "hidden", nullable = false)
-	@Override
-	public Boolean getHidden() {
-		return (Boolean) getValue(2);
-	}
-
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -104,23 +86,23 @@ public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Rec
 	}
 
 	// -------------------------------------------------------------------------
-	// Record3 type implementation
+	// Record2 type implementation
 	// -------------------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, String, Boolean> fieldsRow() {
-		return (Row3) super.fieldsRow();
+	public Row2<Long, String> fieldsRow() {
+		return (Row2) super.fieldsRow();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, String, Boolean> valuesRow() {
-		return (Row3) super.valuesRow();
+	public Row2<Long, String> valuesRow() {
+		return (Row2) super.valuesRow();
 	}
 
 	/**
@@ -143,14 +125,6 @@ public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Rec
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Field<Boolean> field3() {
-		return Group.GROUP.HIDDEN;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public Long value1() {
 		return getId();
 	}
@@ -161,14 +135,6 @@ public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Rec
 	@Override
 	public String value2() {
 		return getName();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Boolean value3() {
-		return getHidden();
 	}
 
 	/**
@@ -193,19 +159,9 @@ public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Rec
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GroupRecord value3(Boolean value) {
-		setHidden(value);
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public GroupRecord values(Long value1, String value2, Boolean value3) {
+	public GroupRecord values(Long value1, String value2) {
 		value1(value1);
 		value2(value2);
-		value3(value3);
 		return this;
 	}
 
@@ -220,7 +176,6 @@ public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Rec
 	public void from(IGroup from) {
 		setId(from.getId());
 		setName(from.getName());
-		setHidden(from.getHidden());
 	}
 
 	/**
@@ -246,11 +201,10 @@ public class GroupRecord extends UpdatableRecordImpl<GroupRecord> implements Rec
 	/**
 	 * Create a detached, initialised GroupRecord
 	 */
-	public GroupRecord(Long id, String name, Boolean hidden) {
+	public GroupRecord(Long id, String name) {
 		super(Group.GROUP);
 
 		setValue(0, id);
 		setValue(1, name);
-		setValue(2, hidden);
 	}
 }

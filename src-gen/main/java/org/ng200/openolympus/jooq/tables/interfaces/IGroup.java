@@ -51,17 +51,6 @@ public interface IGroup extends Serializable {
 	@Column(name = "name", unique = true, nullable = false)
 	public String getName();
 
-	/**
-	 * Setter for <code>public.group.hidden</code>.
-	 */
-	public IGroup setHidden(Boolean value);
-
-	/**
-	 * Getter for <code>public.group.hidden</code>.
-	 */
-	@Column(name = "hidden", nullable = false)
-	public Boolean getHidden();
-
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------

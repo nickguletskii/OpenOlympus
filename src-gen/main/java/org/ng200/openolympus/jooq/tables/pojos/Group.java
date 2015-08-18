@@ -30,28 +30,24 @@ import org.ng200.openolympus.model.OlympusPrincipal;
 @Table(name = "group", schema = "public")
 public class Group implements OlympusPrincipal, IGroupSecurityDescription, IGroup {
 
-	private static final long serialVersionUID = -914529782;
+	private static final long serialVersionUID = 532719483;
 
-	private Long    id;
-	private String  name;
-	private Boolean hidden;
+	private Long   id;
+	private String name;
 
 	public Group() {}
 
 	public Group(Group value) {
 		this.id = value.id;
 		this.name = value.name;
-		this.hidden = value.hidden;
 	}
 
 	public Group(
-		Long    id,
-		String  name,
-		Boolean hidden
+		Long   id,
+		String name
 	) {
 		this.id = id;
 		this.name = name;
-		this.hidden = hidden;
 	}
 
 	@Id
@@ -79,18 +75,6 @@ public class Group implements OlympusPrincipal, IGroupSecurityDescription, IGrou
 		return this;
 	}
 
-	@Column(name = "hidden", nullable = false)
-	@Override
-	public Boolean getHidden() {
-		return this.hidden;
-	}
-
-	@Override
-	public Group setHidden(Boolean hidden) {
-		this.hidden = hidden;
-		return this;
-	}
-
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------
@@ -102,7 +86,6 @@ public class Group implements OlympusPrincipal, IGroupSecurityDescription, IGrou
 	public void from(IGroup from) {
 		setId(from.getId());
 		setName(from.getName());
-		setHidden(from.getHidden());
 	}
 
 	/**

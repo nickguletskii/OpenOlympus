@@ -10,8 +10,7 @@ public class GroupHiddenPredicate implements SecurityClearancePredicate {
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
 		Group group = (Group) obj;
-		if (group.getHidden())
-			return SecurityClearanceType.ADMINISTRATIVE_USER;
+		// TODO: implement ACL controls
 		return SecurityClearanceType.APPROVED_USER;
 	}
 

@@ -14,6 +14,4 @@ public interface IGroupSecurityDescription extends IGroup {
 	@Override
 	public String getName();
 
-	@Override
-	public Boolean getHidden();
 }
