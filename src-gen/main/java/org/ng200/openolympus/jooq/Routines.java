@@ -750,7 +750,7 @@ public class Routines {
 	/**
 	 * Call <code>public.has_contest_permission</code>
 	 */
-	public static Boolean hasContestPermission(Configuration configuration, Long contestIdP, Long principalIdP, ContestPermissionType permissionP) {
+	public static Boolean hasContestPermission(Configuration configuration, Integer contestIdP, Long principalIdP, ContestPermissionType permissionP) {
 		HasContestPermission f = new HasContestPermission();
 		f.setContestIdP(contestIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -763,7 +763,7 @@ public class Routines {
 	/**
 	 * Get <code>public.has_contest_permission</code> as a field
 	 */
-	public static Field<Boolean> hasContestPermission(Long contestIdP, Long principalIdP, ContestPermissionType permissionP) {
+	public static Field<Boolean> hasContestPermission(Integer contestIdP, Long principalIdP, ContestPermissionType permissionP) {
 		HasContestPermission f = new HasContestPermission();
 		f.setContestIdP(contestIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -775,7 +775,7 @@ public class Routines {
 	/**
 	 * Get <code>public.has_contest_permission</code> as a field
 	 */
-	public static Field<Boolean> hasContestPermission(Field<Long> contestIdP, Field<Long> principalIdP, Field<ContestPermissionType> permissionP) {
+	public static Field<Boolean> hasContestPermission(Field<Integer> contestIdP, Field<Long> principalIdP, Field<ContestPermissionType> permissionP) {
 		HasContestPermission f = new HasContestPermission();
 		f.setContestIdP(contestIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -858,7 +858,7 @@ public class Routines {
 	/**
 	 * Call <code>public.has_task_permission</code>
 	 */
-	public static Boolean hasTaskPermission(Configuration configuration, Long taskIdP, Long principalIdP, TaskPermissionType permissionP) {
+	public static Boolean hasTaskPermission(Configuration configuration, Integer taskIdP, Long principalIdP, TaskPermissionType permissionP) {
 		HasTaskPermission f = new HasTaskPermission();
 		f.setTaskIdP(taskIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -871,7 +871,7 @@ public class Routines {
 	/**
 	 * Get <code>public.has_task_permission</code> as a field
 	 */
-	public static Field<Boolean> hasTaskPermission(Long taskIdP, Long principalIdP, TaskPermissionType permissionP) {
+	public static Field<Boolean> hasTaskPermission(Integer taskIdP, Long principalIdP, TaskPermissionType permissionP) {
 		HasTaskPermission f = new HasTaskPermission();
 		f.setTaskIdP(taskIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -883,7 +883,7 @@ public class Routines {
 	/**
 	 * Get <code>public.has_task_permission</code> as a field
 	 */
-	public static Field<Boolean> hasTaskPermission(Field<Long> taskIdP, Field<Long> principalIdP, Field<TaskPermissionType> permissionP) {
+	public static Field<Boolean> hasTaskPermission(Field<Integer> taskIdP, Field<Long> principalIdP, Field<TaskPermissionType> permissionP) {
 		HasTaskPermission f = new HasTaskPermission();
 		f.setTaskIdP(taskIdP);
 		f.setPrincipalIdP(principalIdP);

@@ -26,7 +26,7 @@ import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class HasTaskPermission extends AbstractRoutine<Boolean> {
 
-	private static final long serialVersionUID = -906334771;
+	private static final long serialVersionUID = 278718608;
 
 	/**
 	 * The parameter <code>public.has_task_permission.RETURN_VALUE</code>.
@@ -36,7 +36,7 @@ public class HasTaskPermission extends AbstractRoutine<Boolean> {
 	/**
 	 * The parameter <code>public.has_task_permission.task_id_p</code>.
 	 */
-	public static final Parameter<Long> TASK_ID_P = createParameter("task_id_p", org.jooq.impl.SQLDataType.BIGINT, false);
+	public static final Parameter<Integer> TASK_ID_P = createParameter("task_id_p", org.jooq.impl.SQLDataType.INTEGER, false);
 
 	/**
 	 * The parameter <code>public.has_task_permission.principal_id_p</code>.
@@ -63,14 +63,14 @@ public class HasTaskPermission extends AbstractRoutine<Boolean> {
 	/**
 	 * Set the <code>task_id_p</code> parameter IN value to the routine
 	 */
-	public void setTaskIdP(Long value) {
+	public void setTaskIdP(Integer value) {
 		setValue(TASK_ID_P, value);
 	}
 
 	/**
 	 * Set the <code>task_id_p</code> parameter to the function to be used with a {@link org.jooq.Select} statement
 	 */
-	public HasTaskPermission setTaskIdP(Field<Long> field) {
+	public HasTaskPermission setTaskIdP(Field<Integer> field) {
 		setField(TASK_ID_P, field);
 		return this;
 	}

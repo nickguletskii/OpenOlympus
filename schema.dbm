@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="164,837" last-zoom="1"
+<dbmodel pgmodeler-ver="0.8.1" last-position="163,836" last-zoom="1"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -527,7 +527,7 @@ WHERE contest.id = contest_id ]]></definition>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
-	<column name="permissions" not-null="true">
+	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
 		<type name="public.general_permission_type" dimension="1"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
@@ -955,7 +955,7 @@ END;]]></definition>
 	upd-action="NO ACTION"
 	del-action="NO ACTION">
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32569"/>
+		<type name="public.task_permission_type" precision="32608"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1070,7 +1070,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32569"/>
+		<type name="public.contest_permission_type" precision="32765"/>
 	</column>
 </relationship>
 
@@ -1100,11 +1100,11 @@ END;]]></definition>
 		(
 			principal.id = principal_id_p
 			OR
-			principal_id_p IN (SELECT group_id FROM group_users
+			principal.id IN (SELECT group_id FROM group_users
 			WHERE group_users."USER_id"=principal_id_p)
 		)
 		AND
-	 	principal.general_permissions @>
+	 	principal.permissions @>
 	 		ARRAY[permission_p]::public.general_permission_type[]
 	 	) THEN
 		RETURN TRUE;
@@ -1128,7 +1128,7 @@ END;]]></definition>
 	<type name="boolean"/>
 	</return-type>
 	<parameter name="contest_id_p" in="true">
-		<type name="bigint"/>
+		<type name="integer"/>
 	</parameter>
 	<parameter name="principal_id_p" in="true">
 		<type name="bigint"/>
@@ -1169,7 +1169,7 @@ END;]]></definition>
 	<type name="boolean"/>
 	</return-type>
 	<parameter name="task_id_p" in="true">
-		<type name="bigint"/>
+		<type name="integer"/>
 	</parameter>
 	<parameter name="principal_id_p" in="true">
 		<type name="bigint"/>
@@ -1295,7 +1295,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32766"/>
+	<type name="public.contest" precision="32765"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp"/>
