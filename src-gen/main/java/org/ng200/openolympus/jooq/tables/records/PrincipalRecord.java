@@ -12,8 +12,10 @@ import javax.persistence.Table;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Row1;
+import org.jooq.Record2;
+import org.jooq.Row2;
 import org.jooq.impl.UpdatableRecordImpl;
+import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.tables.Principal;
 import org.ng200.openolympus.jooq.tables.interfaces.IPrincipal;
 
@@ -31,9 +33,9 @@ import org.ng200.openolympus.jooq.tables.interfaces.IPrincipal;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "principal", schema = "public")
-public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implements Record1<Long>, IPrincipal {
+public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implements Record2<Long, GeneralPermissionType[]>, IPrincipal {
 
-	private static final long serialVersionUID = 2146923756;
+	private static final long serialVersionUID = -1783300926;
 
 	/**
 	 * Setter for <code>public.principal.id</code>.
@@ -54,6 +56,24 @@ public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implem
 		return (Long) getValue(0);
 	}
 
+	/**
+	 * Setter for <code>public.principal.permissions</code>.
+	 */
+	@Override
+	public PrincipalRecord setPermissions(GeneralPermissionType[] value) {
+		setValue(1, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.principal.permissions</code>.
+	 */
+	@Column(name = "permissions", nullable = false)
+	@Override
+	public GeneralPermissionType[] getPermissions() {
+		return (GeneralPermissionType[]) getValue(1);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -67,23 +87,23 @@ public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implem
 	}
 
 	// -------------------------------------------------------------------------
-	// Record1 type implementation
+	// Record2 type implementation
 	// -------------------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row1<Long> fieldsRow() {
-		return (Row1) super.fieldsRow();
+	public Row2<Long, GeneralPermissionType[]> fieldsRow() {
+		return (Row2) super.fieldsRow();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row1<Long> valuesRow() {
-		return (Row1) super.valuesRow();
+	public Row2<Long, GeneralPermissionType[]> valuesRow() {
+		return (Row2) super.valuesRow();
 	}
 
 	/**
@@ -98,8 +118,24 @@ public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implem
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Field<GeneralPermissionType[]> field2() {
+		return Principal.PRINCIPAL.PERMISSIONS;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Long value1() {
 		return getId();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GeneralPermissionType[] value2() {
+		return getPermissions();
 	}
 
 	/**
@@ -115,8 +151,18 @@ public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implem
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PrincipalRecord values(Long value1) {
+	public PrincipalRecord value2(GeneralPermissionType[] value) {
+		setPermissions(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public PrincipalRecord values(Long value1, GeneralPermissionType[] value2) {
 		value1(value1);
+		value2(value2);
 		return this;
 	}
 
@@ -130,6 +176,7 @@ public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implem
 	@Override
 	public void from(IPrincipal from) {
 		setId(from.getId());
+		setPermissions(from.getPermissions());
 	}
 
 	/**
@@ -155,9 +202,10 @@ public class PrincipalRecord extends UpdatableRecordImpl<PrincipalRecord> implem
 	/**
 	 * Create a detached, initialised PrincipalRecord
 	 */
-	public PrincipalRecord(Long id) {
+	public PrincipalRecord(Long id, GeneralPermissionType[] permissions) {
 		super(Principal.PRINCIPAL);
 
 		setValue(0, id);
+		setValue(1, permissions);
 	}
 }

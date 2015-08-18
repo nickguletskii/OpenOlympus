@@ -11,6 +11,8 @@ import javax.annotation.Generated;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
+import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
+import org.ng200.openolympus.jooq.enums.GroupPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.routines.GetContestEnd;
 import org.ng200.openolympus.jooq.routines.GetContestEndForUser;
@@ -32,6 +34,8 @@ import org.ng200.openolympus.jooq.routines.GtrgmPicksplit;
 import org.ng200.openolympus.jooq.routines.GtrgmSame;
 import org.ng200.openolympus.jooq.routines.GtrgmUnion;
 import org.ng200.openolympus.jooq.routines.HasContestPermission;
+import org.ng200.openolympus.jooq.routines.HasGeneralPermission;
+import org.ng200.openolympus.jooq.routines.HasGroupPermission;
 import org.ng200.openolympus.jooq.routines.HasTaskPermission;
 import org.ng200.openolympus.jooq.routines.KeepGroupAsPrincipal;
 import org.ng200.openolympus.jooq.routines.KeepUserAsMemberOfGroups;
@@ -746,7 +750,7 @@ public class Routines {
 	/**
 	 * Call <code>public.has_contest_permission</code>
 	 */
-	public static Boolean hasContestPermission(Configuration configuration, Integer contestIdP, Long principalIdP, ContestPermissionType permissionP) {
+	public static Boolean hasContestPermission(Configuration configuration, Long contestIdP, Long principalIdP, ContestPermissionType permissionP) {
 		HasContestPermission f = new HasContestPermission();
 		f.setContestIdP(contestIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -759,7 +763,7 @@ public class Routines {
 	/**
 	 * Get <code>public.has_contest_permission</code> as a field
 	 */
-	public static Field<Boolean> hasContestPermission(Integer contestIdP, Long principalIdP, ContestPermissionType permissionP) {
+	public static Field<Boolean> hasContestPermission(Long contestIdP, Long principalIdP, ContestPermissionType permissionP) {
 		HasContestPermission f = new HasContestPermission();
 		f.setContestIdP(contestIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -771,9 +775,80 @@ public class Routines {
 	/**
 	 * Get <code>public.has_contest_permission</code> as a field
 	 */
-	public static Field<Boolean> hasContestPermission(Field<Integer> contestIdP, Field<Long> principalIdP, Field<ContestPermissionType> permissionP) {
+	public static Field<Boolean> hasContestPermission(Field<Long> contestIdP, Field<Long> principalIdP, Field<ContestPermissionType> permissionP) {
 		HasContestPermission f = new HasContestPermission();
 		f.setContestIdP(contestIdP);
+		f.setPrincipalIdP(principalIdP);
+		f.setPermissionP(permissionP);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.has_general_permission</code>
+	 */
+	public static Boolean hasGeneralPermission(Configuration configuration, Long principalIdP, GeneralPermissionType permissionP) {
+		HasGeneralPermission f = new HasGeneralPermission();
+		f.setPrincipalIdP(principalIdP);
+		f.setPermissionP(permissionP);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.has_general_permission</code> as a field
+	 */
+	public static Field<Boolean> hasGeneralPermission(Long principalIdP, GeneralPermissionType permissionP) {
+		HasGeneralPermission f = new HasGeneralPermission();
+		f.setPrincipalIdP(principalIdP);
+		f.setPermissionP(permissionP);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.has_general_permission</code> as a field
+	 */
+	public static Field<Boolean> hasGeneralPermission(Field<Long> principalIdP, Field<GeneralPermissionType> permissionP) {
+		HasGeneralPermission f = new HasGeneralPermission();
+		f.setPrincipalIdP(principalIdP);
+		f.setPermissionP(permissionP);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.has_group_permission</code>
+	 */
+	public static Boolean hasGroupPermission(Configuration configuration, Long groupIdP, Long principalIdP, GroupPermissionType permissionP) {
+		HasGroupPermission f = new HasGroupPermission();
+		f.setGroupIdP(groupIdP);
+		f.setPrincipalIdP(principalIdP);
+		f.setPermissionP(permissionP);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.has_group_permission</code> as a field
+	 */
+	public static Field<Boolean> hasGroupPermission(Long groupIdP, Long principalIdP, GroupPermissionType permissionP) {
+		HasGroupPermission f = new HasGroupPermission();
+		f.setGroupIdP(groupIdP);
+		f.setPrincipalIdP(principalIdP);
+		f.setPermissionP(permissionP);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.has_group_permission</code> as a field
+	 */
+	public static Field<Boolean> hasGroupPermission(Field<Long> groupIdP, Field<Long> principalIdP, Field<GroupPermissionType> permissionP) {
+		HasGroupPermission f = new HasGroupPermission();
+		f.setGroupIdP(groupIdP);
 		f.setPrincipalIdP(principalIdP);
 		f.setPermissionP(permissionP);
 
@@ -783,7 +858,7 @@ public class Routines {
 	/**
 	 * Call <code>public.has_task_permission</code>
 	 */
-	public static Boolean hasTaskPermission(Configuration configuration, Integer taskIdP, Long principalIdP, TaskPermissionType permissionP) {
+	public static Boolean hasTaskPermission(Configuration configuration, Long taskIdP, Long principalIdP, TaskPermissionType permissionP) {
 		HasTaskPermission f = new HasTaskPermission();
 		f.setTaskIdP(taskIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -796,7 +871,7 @@ public class Routines {
 	/**
 	 * Get <code>public.has_task_permission</code> as a field
 	 */
-	public static Field<Boolean> hasTaskPermission(Integer taskIdP, Long principalIdP, TaskPermissionType permissionP) {
+	public static Field<Boolean> hasTaskPermission(Long taskIdP, Long principalIdP, TaskPermissionType permissionP) {
 		HasTaskPermission f = new HasTaskPermission();
 		f.setTaskIdP(taskIdP);
 		f.setPrincipalIdP(principalIdP);
@@ -808,7 +883,7 @@ public class Routines {
 	/**
 	 * Get <code>public.has_task_permission</code> as a field
 	 */
-	public static Field<Boolean> hasTaskPermission(Field<Integer> taskIdP, Field<Long> principalIdP, Field<TaskPermissionType> permissionP) {
+	public static Field<Boolean> hasTaskPermission(Field<Long> taskIdP, Field<Long> principalIdP, Field<TaskPermissionType> permissionP) {
 		HasTaskPermission f = new HasTaskPermission();
 		f.setTaskIdP(taskIdP);
 		f.setPrincipalIdP(principalIdP);

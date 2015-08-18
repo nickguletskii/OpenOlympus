@@ -17,6 +17,7 @@ import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 import org.ng200.openolympus.jooq.Keys;
 import org.ng200.openolympus.jooq.Public;
+import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.tables.records.PrincipalRecord;
 
 
@@ -33,7 +34,7 @@ import org.ng200.openolympus.jooq.tables.records.PrincipalRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Principal extends TableImpl<PrincipalRecord> {
 
-	private static final long serialVersionUID = 1055950692;
+	private static final long serialVersionUID = -126379051;
 
 	/**
 	 * The reference instance of <code>public.principal</code>
@@ -52,6 +53,11 @@ public class Principal extends TableImpl<PrincipalRecord> {
 	 * The column <code>public.principal.id</code>.
 	 */
 	public final TableField<PrincipalRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>public.principal.permissions</code>.
+	 */
+	public final TableField<PrincipalRecord, GeneralPermissionType[]> PERMISSIONS = createField("permissions", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(org.ng200.openolympus.jooq.enums.GeneralPermissionType.class).getArrayDataType(), this, "");
 
 	/**
 	 * Create a <code>public.principal</code> table reference

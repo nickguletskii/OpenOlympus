@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.tables.interfaces.IPrincipal;
 
 
@@ -28,20 +29,24 @@ import org.ng200.openolympus.jooq.tables.interfaces.IPrincipal;
 @Table(name = "principal", schema = "public")
 public class Principal implements IPrincipal {
 
-	private static final long serialVersionUID = 1378057910;
+	private static final long serialVersionUID = 1127224046;
 
-	private Long id;
+	private Long                    id;
+	private GeneralPermissionType[] permissions;
 
 	public Principal() {}
 
 	public Principal(Principal value) {
 		this.id = value.id;
+		this.permissions = value.permissions;
 	}
 
 	public Principal(
-		Long id
+		Long                    id,
+		GeneralPermissionType[] permissions
 	) {
 		this.id = id;
+		this.permissions = permissions;
 	}
 
 	@Id
@@ -57,6 +62,18 @@ public class Principal implements IPrincipal {
 		return this;
 	}
 
+	@Column(name = "permissions", nullable = false)
+	@Override
+	public GeneralPermissionType[] getPermissions() {
+		return this.permissions;
+	}
+
+	@Override
+	public Principal setPermissions(GeneralPermissionType[] permissions) {
+		this.permissions = permissions;
+		return this;
+	}
+
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------
@@ -67,6 +84,7 @@ public class Principal implements IPrincipal {
 	@Override
 	public void from(IPrincipal from) {
 		setId(from.getId());
+		setPermissions(from.getPermissions());
 	}
 
 	/**

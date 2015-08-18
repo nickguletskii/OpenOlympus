@@ -10,6 +10,7 @@ import javax.annotation.Generated;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
+import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.tables.Principal;
 import org.ng200.openolympus.jooq.tables.records.PrincipalRecord;
 
@@ -61,6 +62,13 @@ public class PrincipalDao extends DAOImpl<PrincipalRecord, org.ng200.openolympus
 	 */
 	public org.ng200.openolympus.jooq.tables.pojos.Principal fetchOneById(Long value) {
 		return fetchOne(Principal.PRINCIPAL.ID, value);
+	}
+
+	/**
+	 * Fetch records that have <code>permissions IN (values)</code>
+	 */
+	public List<org.ng200.openolympus.jooq.tables.pojos.Principal> fetchByPermissions(GeneralPermissionType[]... values) {
+		return fetch(Principal.PRINCIPAL.PERMISSIONS, values);
 	}
 	public org.ng200.openolympus.jooq.tables.pojos.Principal fetchOneById(String id) {
 		return fetchOneById(java.lang.Long.valueOf(id));

@@ -26,7 +26,7 @@ import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class HasContestPermission extends AbstractRoutine<Boolean> {
 
-	private static final long serialVersionUID = 1462871445;
+	private static final long serialVersionUID = 557880290;
 
 	/**
 	 * The parameter <code>public.has_contest_permission.RETURN_VALUE</code>.
@@ -36,7 +36,7 @@ public class HasContestPermission extends AbstractRoutine<Boolean> {
 	/**
 	 * The parameter <code>public.has_contest_permission.contest_id_p</code>.
 	 */
-	public static final Parameter<Integer> CONTEST_ID_P = createParameter("contest_id_p", org.jooq.impl.SQLDataType.INTEGER, false);
+	public static final Parameter<Long> CONTEST_ID_P = createParameter("contest_id_p", org.jooq.impl.SQLDataType.BIGINT, false);
 
 	/**
 	 * The parameter <code>public.has_contest_permission.principal_id_p</code>.
@@ -63,14 +63,14 @@ public class HasContestPermission extends AbstractRoutine<Boolean> {
 	/**
 	 * Set the <code>contest_id_p</code> parameter IN value to the routine
 	 */
-	public void setContestIdP(Integer value) {
+	public void setContestIdP(Long value) {
 		setValue(CONTEST_ID_P, value);
 	}
 
 	/**
 	 * Set the <code>contest_id_p</code> parameter to the function to be used with a {@link org.jooq.Select} statement
 	 */
-	public HasContestPermission setContestIdP(Field<Integer> field) {
+	public HasContestPermission setContestIdP(Field<Long> field) {
 		setField(CONTEST_ID_P, field);
 		return this;
 	}

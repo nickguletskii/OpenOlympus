@@ -17,6 +17,7 @@ import org.ng200.openolympus.jooq.tables.ContestQuestion;
 import org.ng200.openolympus.jooq.tables.ContestTasks;
 import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
 import org.ng200.openolympus.jooq.tables.Group;
+import org.ng200.openolympus.jooq.tables.GroupPermission;
 import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
 import org.ng200.openolympus.jooq.tables.Principal;
@@ -96,6 +97,11 @@ public class Tables {
 	 * The table public.group
 	 */
 	public static final Group GROUP = org.ng200.openolympus.jooq.tables.Group.GROUP;
+
+	/**
+	 * The table public.group_permission
+	 */
+	public static final GroupPermission GROUP_PERMISSION = org.ng200.openolympus.jooq.tables.GroupPermission.GROUP_PERMISSION;
 
 	/**
 	 * The table public.group_users

@@ -22,6 +22,7 @@ import org.ng200.openolympus.jooq.tables.ContestQuestion;
 import org.ng200.openolympus.jooq.tables.ContestTasks;
 import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
 import org.ng200.openolympus.jooq.tables.Group;
+import org.ng200.openolympus.jooq.tables.GroupPermission;
 import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
 import org.ng200.openolympus.jooq.tables.Principal;
@@ -48,7 +49,7 @@ import org.ng200.openolympus.jooq.tables.Verdict;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -1066762415;
+	private static final long serialVersionUID = 1895929415;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -100,6 +101,7 @@ public class Public extends SchemaImpl {
 			ContestTasks.CONTEST_TASKS,
 			GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT,
 			Group.GROUP,
+			GroupPermission.GROUP_PERMISSION,
 			GroupUsers.GROUP_USERS,
 			PersistentLogins.PERSISTENT_LOGINS,
 			Principal.PRINCIPAL,
