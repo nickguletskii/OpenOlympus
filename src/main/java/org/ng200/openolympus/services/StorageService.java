@@ -30,7 +30,7 @@ import java.util.UUID;
 
 import org.eclipse.jgit.api.Git;
 import org.ng200.openolympus.FileAccess;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.config.StorageConfiguration;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;

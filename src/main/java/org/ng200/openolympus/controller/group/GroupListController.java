@@ -25,7 +25,7 @@ package org.ng200.openolympus.controller.group;
 import java.security.Principal;
 import java.util.List;
 
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.services.GroupService;

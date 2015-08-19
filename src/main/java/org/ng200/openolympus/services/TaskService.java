@@ -55,7 +55,6 @@ import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.ng200.openolympus.FileAccess;
-import org.ng200.openolympus.SecurityExpressionConstants;
 import org.ng200.openolympus.dto.TaskCreationDto;
 import org.ng200.openolympus.dto.TaskModificationDto;
 import org.ng200.openolympus.dto.UploadableTask;
@@ -161,8 +160,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 						.and(Tables.SOLUTION.USER_ID.eq(user.getId())))
 				.fetchOne().value1();
 	}
-	@PostAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + " #returnObject.published")
+	
 	public Task getTaskByName(final String taskName) {
 		return taskDao.fetchOneByName(taskName);
 	}

@@ -25,7 +25,7 @@ package org.ng200.openolympus.controller.contest;
 import java.security.Principal;
 import java.util.List;
 
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;

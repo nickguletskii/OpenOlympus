@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.controller.solution.VerdictStatusController.VerdictDto;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;

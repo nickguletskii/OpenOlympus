@@ -22,7 +22,7 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.services.PropertyService;
 import org.ng200.openolympus.services.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;

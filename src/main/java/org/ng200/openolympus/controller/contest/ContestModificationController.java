@@ -31,7 +31,7 @@ import javax.validation.Valid;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.jooq.impl.DSL;
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;

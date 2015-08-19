@@ -30,7 +30,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.jooq.DSLContext;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
 import org.ng200.openolympus.jooq.tables.pojos.Property;

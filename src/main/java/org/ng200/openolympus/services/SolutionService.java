@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.jooq.DSLContext;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;

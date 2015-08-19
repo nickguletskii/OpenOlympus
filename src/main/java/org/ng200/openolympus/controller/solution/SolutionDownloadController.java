@@ -27,7 +27,7 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.StorageService;

@@ -34,7 +34,7 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.exec.ExecuteException;
 import org.ng200.openolympus.FileAccess;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.dto.UploadableTask;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.StorageService;

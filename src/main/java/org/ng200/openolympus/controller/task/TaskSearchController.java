@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

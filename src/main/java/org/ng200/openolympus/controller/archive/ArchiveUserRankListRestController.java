@@ -24,7 +24,7 @@ package org.ng200.openolympus.controller.archive;
 
 import java.util.List;
 
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.UserService;

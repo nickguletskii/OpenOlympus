@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;

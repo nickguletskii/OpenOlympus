@@ -29,7 +29,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;

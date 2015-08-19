@@ -25,7 +25,7 @@ package org.ng200.openolympus.controller.contest;
 import java.util.HashSet;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.ContestService;

@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;

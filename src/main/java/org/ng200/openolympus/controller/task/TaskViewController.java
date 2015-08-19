@@ -32,7 +32,7 @@ import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.FileAccess;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.SolutionSubmissionDto;

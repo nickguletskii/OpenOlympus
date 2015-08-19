@@ -29,7 +29,7 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.mail.EmailException;
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.controller.auth.EmailConfirmationController;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.PriviligedView;

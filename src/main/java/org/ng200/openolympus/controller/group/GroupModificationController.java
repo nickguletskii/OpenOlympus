@@ -3,7 +3,7 @@ package org.ng200.openolympus.controller.group;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.services.GroupService;

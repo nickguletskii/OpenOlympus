@@ -27,7 +27,7 @@ import java.time.Duration;
 import java.util.Locale;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.exceptions.ForbiddenException;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;

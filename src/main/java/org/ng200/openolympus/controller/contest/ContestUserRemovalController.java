@@ -23,7 +23,7 @@
 package org.ng200.openolympus.controller.contest;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.ContestService;

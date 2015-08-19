@@ -25,7 +25,7 @@ package org.ng200.openolympus.services;
 import java.util.List;
 
 import org.jooq.DSLContext;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.GroupDao;
 import org.ng200.openolympus.jooq.tables.pojos.Group;

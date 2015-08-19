@@ -27,7 +27,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.views.UnprivilegedView;

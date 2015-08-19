@@ -25,7 +25,7 @@ package org.ng200.openolympus.controller.group;
 import java.util.List;
 
 import org.ng200.openolympus.Assertions;
-import org.ng200.openolympus.SecurityExpressionConstants;
+
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.GroupService;
