@@ -29,8 +29,6 @@ import org.springframework.stereotype.Component;
 
 public class PrincipalMatchesUser implements SecurityClearancePredicate {
 
-	private SecurityClearanceType defaultClearance;
-
 	@Component
 	public static class Private extends PrincipalMatchesUser {
 		public Private() {
@@ -45,6 +43,8 @@ public class PrincipalMatchesUser implements SecurityClearancePredicate {
 		}
 	}
 
+	private final SecurityClearanceType defaultClearance;
+
 	public PrincipalMatchesUser(SecurityClearanceType defaultClearance) {
 		this.defaultClearance = defaultClearance;
 	}
@@ -52,10 +52,11 @@ public class PrincipalMatchesUser implements SecurityClearancePredicate {
 	@Override
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
-		IUser bean = (IUser) obj;
-		if (bean.getId() == user.getId())
+		final IUser bean = (IUser) obj;
+		if (bean.getId() == user.getId()) {
 			return SecurityClearanceType.LOGGED_IN;
-		return defaultClearance;
+		}
+		return this.defaultClearance;
 	}
 
 }

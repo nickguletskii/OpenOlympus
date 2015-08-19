@@ -30,13 +30,11 @@ import java.util.UUID;
 
 import org.eclipse.jgit.api.Git;
 import org.ng200.openolympus.FileAccess;
-
 import org.ng200.openolympus.config.StorageConfiguration;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,6 +56,7 @@ public class StorageService implements Serializable {
 		FileAccess.createDirectories(dir);
 		return dir;
 	}
+
 	public Path createTaskDescriptionDirectory(Task task)
 			throws IOException {
 		final UUID uuid = UUID.randomUUID();
@@ -70,12 +69,13 @@ public class StorageService implements Serializable {
 
 			task.setDescriptionFile(uuid.toString());
 			return dir;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FileAccess.deleteDirectoryByWalking(dir);
 			throw new GeneralNestedRuntimeException(
 					"Couldn't initialise task description directory: ", e);
 		}
 	}
+
 	public Path createTaskJudgeDirectory(Task task) throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault().getPath(

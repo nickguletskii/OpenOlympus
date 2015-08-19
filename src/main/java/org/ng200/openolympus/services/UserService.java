@@ -29,7 +29,6 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
-
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
@@ -37,9 +36,7 @@ import org.ng200.openolympus.jooq.tables.daos.GroupDao;
 import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.jooq.tables.records.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.ImmutableList;
@@ -65,25 +62,30 @@ public class UserService extends GenericCreateUpdateRepository {
 	public UserService() {
 
 	}
+
 	public long countUnapprovedUsers() {
 		// TODO: Check
-		return dslContext.selectCount().from(Tables.USER)
+		return this.dslContext.selectCount().from(Tables.USER)
 				.where(Tables.USER.APPROVED.eq(false)).execute();
 	}
+
 	public long countUsers() {
-		return userDao.count();
+		return this.userDao.count();
 	}
+
 	public void deleteUser(final User user) {
-		userDao.delete(user);
+		this.userDao.delete(user);
 
 	}
+
 	public void deleteUsers(List<User> users) {
-		userDao.delete(users);
+		this.userDao.delete(users);
 	}
+
 	public List<User> findAFewUsersWithNameContaining(final String name) {
 		// TODO: use something better for searching...
-		String pattern = "%" + name + "%";
-		return dslContext
+		final String pattern = "%" + name + "%";
+		return this.dslContext
 				.select(Tables.USER.fields())
 				.from(Tables.USER)
 				.where(
@@ -98,10 +100,11 @@ public class UserService extends GenericCreateUpdateRepository {
 
 		).limit(30).fetchInto(User.class);
 	}
+
 	public List<UserRanking> getArchiveRankPage(final int page,
 			final int pageSize) {
 
-		final Table<?> userTasks = dslContext
+		final Table<?> userTasks = this.dslContext
 				.select(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID,
 						Tables.SOLUTION.SCORE)
 				.distinctOn(Tables.SOLUTION.USER_ID, Tables.SOLUTION.TASK_ID)
@@ -117,7 +120,7 @@ public class UserService extends GenericCreateUpdateRepository {
 				.coalesce(DSL.sum(userTasks.field(Tables.SOLUTION.SCORE)),
 						DSL.field("0"))
 				.as("user_score");
-		List<Field<?>> fields = ImmutableList
+		final List<Field<?>> fields = ImmutableList
 				.<Field<?>> builder()
 				.add(user_score)
 				.add(
@@ -130,7 +133,7 @@ public class UserService extends GenericCreateUpdateRepository {
 				.add(Tables.USER.fields())
 
 		.build();
-		return dslContext
+		return this.dslContext
 				.select(fields)
 				.from(Tables.USER)
 				.leftOuterJoin(userTasks)
@@ -138,32 +141,35 @@ public class UserService extends GenericCreateUpdateRepository {
 				.groupBy(Tables.USER.ID).orderBy(user_score).limit(pageSize)
 				.offset(pageSize * (page - 1)).fetchInto(UserRanking.class);
 	}
+
 	public List<User> getPendingUsers(int pageNumber, int pageSize) {
-		return dslContext.selectFrom(Tables.USER)
+		return this.dslContext.selectFrom(Tables.USER)
 				.where(Tables.USER.APPROVAL_EMAIL_SENT.eq(false))
 				.limit(pageSize).offset((pageNumber - 1) * pageSize)
 				.fetchInto(User.class);
 	}
+
 	public User getUserById(final Long id) {
-		return userDao.findById(id);
+		return this.userDao.findById(id);
 	}
 
 	public User getUserByUsername(final String username) {
-		return userDao.fetchOneByUsername(username);
+		return this.userDao.fetchOneByUsername(username);
 	}
+
 	public List<User> getUsersAlphabetically(final Integer pageNumber,
 			final int pageSize) {
-		return dslContext.selectFrom(Tables.USER)
+		return this.dslContext.selectFrom(Tables.USER)
 				.groupBy(Tables.USER.ID)
 				.orderBy(Tables.USER.USERNAME).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(User.class);
 	}
 
 	public User insertUser(User user) {
-		return insert(user, Tables.USER);
+		return this.insert(user, Tables.USER);
 	}
 
 	public User updateUser(User user) {
-		return update(user, Tables.USER);
+		return this.update(user, Tables.USER);
 	}
 }

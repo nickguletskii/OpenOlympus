@@ -39,7 +39,6 @@ import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.jooq.util.postgres.PostgresDataType;
-
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
@@ -51,15 +50,11 @@ import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
 import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.ContestParticipation;
-import org.ng200.openolympus.jooq.tables.pojos.ContestTasks;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.TimeExtension;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,40 +71,71 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private DSLContext dslContext;
+
 	public void addContestParticipant(final Contest contest, final User user) {
-		contestParticipationDao.insert(new ContestParticipation(null, null,
+		this.contestParticipationDao.insert(new ContestParticipation(null, null,
 				user.getId(), contest.getId()));
 	}
-	public long countContests() {
-		return contestDao.count();
+
+	public void addContestTask(Contest contest, Task taskByName) {
+		final ContestTasksRecord record = new ContestTasksRecord(
+				contest.getId(),
+				taskByName.getId());
+		record.attach(this.dslContext.configuration());
+		record.insert();
 	}
+
+	public long countContests() {
+		return this.contestDao.count();
+	}
+
 	@Transactional
 	public void deleteContest(Contest contest) {
-		contestDao.delete(contest);
+		this.contestDao.delete(contest);
 	}
+
 	public void extendTimeForUser(final Contest contest, final User user,
 			final Duration time) {
-		timeExtensionDao.insert(new TimeExtension(null, time, null, user
+		this.timeExtensionDao.insert(new TimeExtension(null, time, null, user
 				.getId(), contest.getId()));
 	}
+
 	public Contest getContestByName(final String name) {
-		return contestDao.fetchOneByName(name);
+		return this.contestDao.fetchOneByName(name);
 	}
+
 	public Instant getContestEndIncludingAllTimeExtensions(
 			final Contest contest) {
-		GetContestEnd procedure = new GetContestEnd();
+		final GetContestEnd procedure = new GetContestEnd();
 		procedure.setContestId(contest.getId());
-		procedure.attach(dslContext.configuration());
+		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
 		return procedure.getReturnValue().toInstant();
 	}
+
+	public Date getContestEndTimeForUser(Contest contest, User user) {
+		final GetContestEndForUser procedure = new GetContestEndForUser();
+		procedure.setContestId(contest.getId());
+		procedure.setUserId(user.getId());
+		procedure.attach(this.dslContext.configuration());
+		procedure.execute();
+		return Date.from(procedure.getReturnValue().toInstant());
+	}
+
 	public List<UserRanking> getContestResults(Contest contest) {
-		return getContestResultsQuery(contest).fetchInto(UserRanking.class);
+		return this.getContestResultsQuery(contest)
+				.fetchInto(UserRanking.class);
+	}
+
+	public List<UserRanking> getContestResultsPage(Contest contest, int page,
+			int pageSize) {
+		return this.getContestResultsQuery(contest).limit(pageSize)
+				.offset((page - 1) * pageSize).fetchInto(UserRanking.class);
 	}
 
 	private SelectConditionStep<Record3<Long, BigDecimal, Integer>> getContestResultsQuery(
 			Contest contest) {
-		return dslContext
+		return this.dslContext
 				.select(Tables.CONTEST_PARTICIPATION.USER_ID,
 						DSL.coalesce(Tables.CONTEST_PARTICIPATION.SCORE,
 								DSL.field("0")).as("score"),
@@ -122,32 +148,41 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
 						.getId()));
 	}
-	public List<UserRanking> getContestResultsPage(Contest contest, int page,
-			int pageSize) {
-		return getContestResultsQuery(contest).limit(pageSize)
-				.offset((page - 1) * pageSize).fetchInto(UserRanking.class);
-	}
+
 	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
 			final int pageSize) {
-		return dslContext.selectFrom(Tables.CONTEST)
+		return this.dslContext.selectFrom(Tables.CONTEST)
 				.groupBy(Tables.CONTEST.ID)
 				.orderBy(Tables.CONTEST.START_TIME.desc())
 				.limit(pageSize)
 				.offset((pageNumber - 1) * pageSize)
 				.fetchInto(Contest.class);
 	}
+
 	public List<Contest> getContestsThatIntersect(final Date startDate,
 			final Date endDate) {
 
-		return dslContext
+		return this.dslContext
 				.selectFrom(Routines.getContestsThatIntersect(
 						Timestamp.from(startDate.toInstant()),
 						Timestamp.from(endDate.toInstant())))
 				.fetchInto(Contest.class);
 	}
+
+	public List<Task> getContestTasks(Contest contest) {
+		return this.dslContext
+				.selectFrom(Tables.TASK)
+				.where(Tables.TASK.ID.in(this.dslContext
+						.select(Tables.CONTEST_TASKS.TASK_ID)
+						.from(Tables.CONTEST_TASKS)
+						.where(Tables.CONTEST_TASKS.CONTEST_ID.eq(contest
+								.getId()))))
+				.fetchInto(Task.class);
+	}
+
 	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber,
 			int pageSize) {
-		return dslContext
+		return this.dslContext
 				.select(Tables.USER.fields())
 				.from(Tables.CONTEST_PARTICIPATION)
 				.leftOuterJoin(Tables.USER)
@@ -159,15 +194,16 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	public Contest getRunningContest() {
-		return dslContext
+		return this.dslContext
 				.selectFrom(Routines.getContestsThatIntersect(
 						DSL.field("LOCALTIMESTAMP", Timestamp.class),
 						DSL.field("LOCALTIMESTAMP", Timestamp.class)))
 				.fetchOneInto(Contest.class);
 	}
+
 	public BigDecimal getUserTaskScoreInContest(final Contest contest,
 			final User user, final Task task) {
-		return dslContext
+		return this.dslContext
 				.select(Tables.SOLUTION.SCORE)
 				.from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.TASK_ID
@@ -190,9 +226,10 @@ public class ContestService extends GenericCreateUpdateRepository {
 		}
 		return !contest.getStartTime().toInstant().isAfter(Instant.now());
 	}
+
 	@SuppressWarnings("unchecked")
 	public boolean hasContestTestingFinished(Contest contest) {
-		Param<Integer> contestF = DSL.val(contest.getId(),
+		final Param<Integer> contestF = DSL.val(contest.getId(),
 				PostgresDataType.INTEGER);
 		final Condition solutionWithinTimeBounds = Tables.SOLUTION.TIME_ADDED
 				.between(Routines.getContestStartForUser(contestF,
@@ -200,7 +237,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 						Routines.getContestEndForUser(contestF,
 								Tables.SOLUTION.USER_ID));
 
-		final Table<Record> currentTasks = dslContext.select()
+		final Table<Record> currentTasks = this.dslContext.select()
 				.from(Tables.CONTEST_TASKS)
 				.where(Tables.CONTEST_TASKS.CONTEST_ID.eq(contestF))
 				.asTable("current_tasks");
@@ -227,10 +264,10 @@ public class ContestService extends GenericCreateUpdateRepository {
 						.eq((Field<Long>) solutionsTasks.field("user_id")))
 				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contestF))
 				.asTable("users_tasks");
-		return dslContext
+		return this.dslContext
 				.select(DSL
 						.decode()
-						.when(DSL.exists(dslContext.select(
+						.when(DSL.exists(this.dslContext.select(
 								userTasks.field(Tables.SOLUTION.USER_ID)).from(
 										userTasks)),
 								false)
@@ -238,6 +275,11 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.fetchOne()
 				.value1();
 	}
+
+	public Contest insertContest(Contest contest) {
+		return this.insert(contest, Tables.CONTEST);
+	}
+
 	public boolean isContestInProgressForUser(final Contest contest,
 			final User user) {
 		if (Instant.now().isBefore(contest.getStartTime().toInstant())) {
@@ -246,26 +288,20 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return !this.getContestEndTimeForUser(contest, user).toInstant()
 				.isAfter(Instant.now());
 	}
-	public Date getContestEndTimeForUser(Contest contest, User user) {
-		GetContestEndForUser procedure = new GetContestEndForUser();
-		procedure.setContestId(contest.getId());
-		procedure.setUserId(user.getId());
-		procedure.attach(dslContext.configuration());
-		procedure.execute();
-		return Date.from(procedure.getReturnValue().toInstant());
-	}
+
 	public boolean isContestOverIncludingAllTimeExtensions(
 			final Contest contest) {
 		return this.getContestEndIncludingAllTimeExtensions(contest).isBefore(
 				Instant.now());
 	}
+
 	public boolean isUserParticipatingIn(final User user,
 			final Contest contest) {
-		return dslContext
+		return this.dslContext
 				.select(DSL
 						.decode()
 						.when(DSL
-								.exists(dslContext
+								.exists(this.dslContext
 										.select(Tables.CONTEST_PARTICIPATION.ID)
 										.from(Tables.CONTEST_PARTICIPATION)
 										.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID
@@ -276,16 +312,17 @@ public class ContestService extends GenericCreateUpdateRepository {
 						.otherwise(false))
 				.fetchOne().value1();
 	}
-	public Contest insertContest(Contest contest) {
-		return insert(contest, Tables.CONTEST);
-	}
-	public Contest updateContest(Contest contest) {
-		return update(contest, Tables.CONTEST);
+
+	public void removeTaskFromContest(Task task, Contest contest) {
+		this.dslContext.delete(Tables.CONTEST_TASKS).where(
+				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId())
+						.and(Tables.CONTEST_TASKS.TASK_ID.eq(task.getId())))
+				.execute();
 	}
 
 	@Transactional
 	public void removeUserFromContest(Contest contest, User user) {
-		dslContext
+		this.dslContext
 				.delete(Tables.CONTEST_PARTICIPATION)
 				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
 						.getId()),
@@ -293,39 +330,20 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.execute();
 	}
 
-	public List<Task> getContestTasks(Contest contest) {
-		return dslContext
-				.selectFrom(Tables.TASK)
-				.where(Tables.TASK.ID.in(dslContext
-						.select(Tables.CONTEST_TASKS.TASK_ID)
-						.from(Tables.CONTEST_TASKS)
-						.where(Tables.CONTEST_TASKS.CONTEST_ID.eq(contest
-								.getId()))))
-				.fetchInto(Task.class);
-	}
-
-	public void removeTaskFromContest(Task task, Contest contest) {
-		dslContext.delete(Tables.CONTEST_TASKS).where(
-				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId())
-						.and(Tables.CONTEST_TASKS.TASK_ID.eq(task.getId())))
-				.execute();
-	}
-
-	public void addContestTask(Contest contest, Task taskByName) {
-		ContestTasksRecord record = new ContestTasksRecord(contest.getId(),
-				taskByName.getId());
-		record.attach(dslContext.configuration());
-		record.insert();
+	public Contest updateContest(Contest contest) {
+		return this.update(contest, Tables.CONTEST);
 	}
 
 	public boolean userKnowsAboutContest(User user, Contest contest,
 			ContestPermissionType knowAbout) {
-		return Routines.hasContestPermission(dslContext.configuration(),
+		return Routines.hasContestPermission(this.dslContext.configuration(),
 				contest.getId(), user.getId(), ContestPermissionType.know_about)
 				.booleanValue()
-				|| Routines.hasContestPermission(dslContext.configuration(),
-						contest.getId(), user.getId(),
-						ContestPermissionType.manage_acl).booleanValue();
+				|| Routines
+						.hasContestPermission(this.dslContext.configuration(),
+								contest.getId(), user.getId(),
+								ContestPermissionType.manage_acl)
+						.booleanValue();
 	}
 
 }

@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OpenOlympusAuthenticationFailureHandler implements
-AuthenticationFailureHandler {
+		AuthenticationFailureHandler {
 
 	public OpenOlympusAuthenticationFailureHandler() {
 	}

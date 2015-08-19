@@ -49,40 +49,40 @@ public class SolutionCompilationTask implements
 	}
 
 	public SolutionJudge getJudge() {
-		return judge;
+		return this.judge;
+	}
+
+	public Properties getProperties() {
+		return this.properties;
+	}
+
+	public List<Path> getSolutionFiles() {
+		return this.solutionFiles;
+	}
+
+	@Override
+	public SolutionJudge run() throws Exception {
+		try {
+			this.judge.compile(this.solutionFiles, this.properties);
+			return this.judge;
+		} finally {
+			if (this.judge != null) {
+				this.judge.closeLocal();
+				Janitor.cleanUp(this.judge);
+			}
+		}
 	}
 
 	public void setJudge(SolutionJudge judge) {
 		this.judge = judge;
 	}
 
-	public Properties getProperties() {
-		return properties;
-	}
-
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
 
-	public List<Path> getSolutionFiles() {
-		return solutionFiles;
-	}
-
 	public void setSolutionFiles(List<Path> solutionFiles) {
 		this.solutionFiles = solutionFiles;
-	}
-
-	@Override
-	public SolutionJudge run() throws Exception {
-		try {
-			judge.compile(solutionFiles, properties);
-			return judge;
-		} finally {
-			if (judge != null) {
-				judge.closeLocal();
-				Janitor.cleanUp(judge);
-			}
-		}
 	}
 
 }

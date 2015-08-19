@@ -31,19 +31,22 @@ import org.joor.Reflect;
 
 public class OpenOlympusCodeGenerator extends JavaGenerator {
 	@Override
-	protected void generateDaoClassFooter(TableDefinition table, JavaWriter out) {
-		ColumnDefinition idColumn = table.getColumn("id", true);
+	protected void generateDaoClassFooter(TableDefinition table,
+			JavaWriter out) {
+		final ColumnDefinition idColumn = table.getColumn("id", true);
 
-		if (idColumn == null)
+		if (idColumn == null) {
 			return;
+		}
 
-		String identityName = getJavaType(idColumn.getType());
+		final String identityName = this.getJavaType(idColumn.getType());
 
-		if (!Number.class.isAssignableFrom(Reflect.on(identityName).type()))
+		if (!Number.class.isAssignableFrom(Reflect.on(identityName).type())) {
 			return;
+		}
 
 		out.tab(1).println("public %s fetchOneById(String id) {",
-				getStrategy().getFullJavaClassName(table, Mode.POJO));
+				this.getStrategy().getFullJavaClassName(table, Mode.POJO));
 		out.tab(2)
 				.println("return fetchOneById(%s.valueOf(id));", identityName);
 		out.tab(1).println("}");

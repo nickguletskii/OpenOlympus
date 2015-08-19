@@ -46,22 +46,22 @@ public abstract class LockableResourceImpl<IdType> implements
 			});
 
 	@Override
-	public Lock writeLock() {
+	public Lock readLock() {
 		try {
-			return locks.get(getId()).writeLock();
-		} catch (ExecutionException e) {
-			throw new GeneralNestedRuntimeException(
-					"Couldn't get write lock: ", e);
+			return LockableResourceImpl.locks.get(this.getId()).readLock();
+		} catch (final ExecutionException e) {
+			throw new GeneralNestedRuntimeException("Couldn't get read lock: ",
+					e);
 		}
 	}
 
 	@Override
-	public Lock readLock() {
+	public Lock writeLock() {
 		try {
-			return locks.get(getId()).readLock();
-		} catch (ExecutionException e) {
-			throw new GeneralNestedRuntimeException("Couldn't get read lock: ",
-					e);
+			return LockableResourceImpl.locks.get(this.getId()).writeLock();
+		} catch (final ExecutionException e) {
+			throw new GeneralNestedRuntimeException(
+					"Couldn't get write lock: ", e);
 		}
 	}
 

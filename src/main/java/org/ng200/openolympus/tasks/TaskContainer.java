@@ -72,25 +72,25 @@ public class TaskContainer {
 
 		@Override
 		public CompletableFuture<SolutionJudge> remove(final Object object) {
-			final CompletableFuture<SolutionJudge> futureJudge = super
-					.remove(object);
+			final CompletableFuture<SolutionJudge> futureJudge = super.remove(
+					object);
 			if (futureJudge != null) {
 				futureJudge
 						.whenComplete((judge, throwable) -> {
-							if (judge != null) {
-								try {
-									judge.closeShared();
-									TaskContainer.logger
-											.info("Cleaned up after judge");
-								} catch (final Exception e) {
-									throw new RuntimeException(
-											"Couldn't close judge: ", e);
-								}
-							}
-							if (throwable != null) {
-								throw new RuntimeException(throwable);
-							}
-						});
+					if (judge != null) {
+						try {
+							judge.closeShared();
+							TaskContainer.logger
+									.info("Cleaned up after judge");
+						} catch (final Exception e) {
+							throw new RuntimeException(
+									"Couldn't close judge: ", e);
+						}
+					}
+					if (throwable != null) {
+						throw new RuntimeException(throwable);
+					}
+				});
 			}
 			return futureJudge;
 		}
@@ -103,8 +103,8 @@ public class TaskContainer {
 	public TaskContainer(final Path path,
 			final SharedTemporaryStorageFactory sharedTemporaryStorageFactory,
 			final ExecutorService executorService) throws IOException,
-			ClassNotFoundException, InstantiationException,
-			IllegalAccessException {
+					ClassNotFoundException, InstantiationException,
+					IllegalAccessException {
 		this.path = path;
 		this.sharedTemporaryStorageFactory = sharedTemporaryStorageFactory;
 		this.executorService = executorService;
@@ -112,14 +112,15 @@ public class TaskContainer {
 		this.solutionJudgeFactory = this.loadFactoryClass(
 				this.factoryClassName.trim()).newInstance();
 
-		logger.info("Creating solution judge factory: {}", solutionJudgeFactory
-				.getClass().toString());
+		TaskContainer.logger.info("Creating solution judge factory: {}",
+				this.solutionJudgeFactory
+						.getClass().toString());
 	}
 
 	public void applyToJudge(
 			final Solution solution,
 			final Function<CompletableFuture<SolutionJudge>, CompletableFuture<SolutionJudge>> function)
-			throws ExecutionException {
+					throws ExecutionException {
 		synchronized (solution) {
 			this.judgeCache
 					.compute(
@@ -181,6 +182,25 @@ public class TaskContainer {
 		return verdicts;
 	}
 
+	public ClassLoader getClassLoader() throws MalformedURLException {
+		@SuppressWarnings("resource")
+		final ClassLoader classLoader = new URLClassLoader(
+				this.getClassLoaderURLs()
+						.toArray(new URL[0]),
+				Thread.currentThread()
+						.getContextClassLoader());
+		return classLoader;
+	}
+
+	public List<URL> getClassLoaderURLs() throws MalformedURLException {
+		final Path jarFile = this.path.resolve("task.jar");
+		final URL url = jarFile.toUri().toURL();
+		final URL[] urls = new URL[] {
+										url
+		};
+		return Lists.from(urls);
+	}
+
 	public Properties getProperties() {
 		return this.properties;
 	}
@@ -198,8 +218,8 @@ public class TaskContainer {
 	@SuppressWarnings("unchecked")
 	public Class<? extends SolutionJudgeFactory> loadFactoryClass(
 			final String className) throws MalformedURLException,
-			ClassNotFoundException {
-		return (Class<? extends SolutionJudgeFactory>) getClassLoader()
+					ClassNotFoundException {
+		return (Class<? extends SolutionJudgeFactory>) this.getClassLoader()
 				.loadClass(className);
 	}
 
@@ -210,23 +230,6 @@ public class TaskContainer {
 		}
 		this.factoryClassName = this.properties.getProperty("judgeFactory",
 				"org.ng200.openolympus.cerberus.DefaultSolutionJudgeFactory");
-	}
-
-	public ClassLoader getClassLoader() throws MalformedURLException {
-		@SuppressWarnings("resource")
-		final ClassLoader classLoader = new URLClassLoader(getClassLoaderURLs()
-				.toArray(new URL[0]), Thread.currentThread()
-				.getContextClassLoader());
-		return classLoader;
-	}
-
-	public List<URL> getClassLoaderURLs() throws MalformedURLException {
-		final Path jarFile = this.path.resolve("task.jar");
-		final URL url = jarFile.toUri().toURL();
-		final URL[] urls = new URL[] {
-			url
-		};
-		return Lists.from(urls);
 	}
 
 }

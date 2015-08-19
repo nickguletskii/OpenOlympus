@@ -31,7 +31,7 @@ public class StorageConfiguration {
 	private String storagePath;
 
 	public String getStoragePath() {
-		return storagePath;
+		return this.storagePath;
 	}
 
 	public void setStoragePath(String storagePath) {

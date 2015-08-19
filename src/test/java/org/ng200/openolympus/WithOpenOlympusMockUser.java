@@ -30,9 +30,9 @@ import org.springframework.security.test.context.support.WithSecurityContext;
 @Retention(RetentionPolicy.RUNTIME)
 @WithSecurityContext(factory = OpenOlympusTestUserSecurityContextFactory.class)
 public @interface WithOpenOlympusMockUser {
-	public String username();
-
 	public boolean approved();
 
 	public boolean superuser();
+
+	public String username();
 }

@@ -33,13 +33,17 @@ import org.slf4j.LoggerFactory;
 
 public class ToStringMatcher<T> extends BaseMatcher<Object> {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(ToStringMatcher.class);
+
 	public static ToStringMatcher<BigDecimal> compareBigDecimals(
 			BigDecimal decimal) {
 		return ToStringMatcher.toStringEquals(decimal, x -> new BigDecimal(x),
 				(x, y) -> x.compareTo(y) == 0);
 	}
 
-	public static ToStringMatcher<BigDecimal> compareBigDecimals(String decimal) {
+	public static ToStringMatcher<BigDecimal> compareBigDecimals(
+			String decimal) {
 		return ToStringMatcher.compareBigDecimals(new BigDecimal(decimal));
 	}
 
@@ -56,9 +60,6 @@ public class ToStringMatcher<T> extends BaseMatcher<Object> {
 			Function<String, T> func, BiFunction<T, T, Boolean> matchesFunc) {
 		return new ToStringMatcher<T>(obj, func, matchesFunc);
 	}
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(ToStringMatcher.class);
 
 	private final Object obj;
 

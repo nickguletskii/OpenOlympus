@@ -39,10 +39,11 @@ public class UserSecurityService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
-		User user = userDao.fetchOneByUsername(username);
-		if (user == null)
+		final User user = this.userDao.fetchOneByUsername(username);
+		if (user == null) {
 			throw new UsernameNotFoundException(
 					"The requested user does not exist!");
+		}
 		return user;
 	}
 

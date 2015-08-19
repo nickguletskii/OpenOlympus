@@ -114,7 +114,8 @@ public class BindingResponse {
 		this.setFieldErrors(fieldErrors
 				.stream()
 				.map((x) -> new FieldErrorDescription(x.getField(), x
-						.getDefaultMessage())).collect(Collectors.toList()));
+						.getDefaultMessage()))
+				.collect(Collectors.toList()));
 	}
 
 	public void setStatus(BindingResponse.Status status) {

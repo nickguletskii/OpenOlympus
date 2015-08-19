@@ -37,7 +37,6 @@ import org.ng200.openolympus.FileAccess;
 import org.ng200.openolympus.config.StorageConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 public final class OpenOlympusMessageSource extends

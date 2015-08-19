@@ -49,20 +49,9 @@ public class TaskACLController {
 		public ACLItem() {
 		}
 
-		public List<OlympusPrincipal> getPrincipals() {
-			return principals;
-		}
-
-		public void setPrincipals(List<OlympusPrincipal> principals) {
-			this.principals = principals;
-		}
-
-		public TaskPermissionType getPermission() {
-			return permission;
-		}
-
-		public void setPermission(TaskPermissionType permission) {
-			this.permission = permission;
+		public ACLItem(Entry<TaskPermissionType, List<OlympusPrincipal>> e) {
+			this.permission = e.getKey();
+			this.principals = e.getValue();
 		}
 
 		public ACLItem(List<OlympusPrincipal> principals,
@@ -71,9 +60,20 @@ public class TaskACLController {
 			this.permission = permission;
 		}
 
-		public ACLItem(Entry<TaskPermissionType, List<OlympusPrincipal>> e) {
-			this.permission = e.getKey();
-			this.principals = e.getValue();
+		public TaskPermissionType getPermission() {
+			return this.permission;
+		}
+
+		public List<OlympusPrincipal> getPrincipals() {
+			return this.principals;
+		}
+
+		public void setPermission(TaskPermissionType permission) {
+			this.permission = permission;
+		}
+
+		public void setPrincipals(List<OlympusPrincipal> principals) {
+			this.principals = principals;
 		}
 
 	}
@@ -81,10 +81,22 @@ public class TaskACLController {
 	@Autowired
 	private TaskService taskService;
 
+	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.PUT)
+	public void getTaskACL(
+			@PathVariable("task") int id,
+			@RequestBody Map<String, List<Long>> dto,
+			final BindingResult bindingResult, final Principal principal) {
+		this.taskService.setTaskPermissionsAndPrincipals(id,
+				dto.entrySet().stream().collect(
+						Collectors.toMap(
+								e -> TaskPermissionType.valueOf(e.getKey()),
+								e -> e.getValue())));
+	}
+
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.GET)
 	public Map<TaskPermissionType, ACLItem> getTaskACL(
 			@PathVariable("task") int id, final Principal principal) {
-		Map<TaskPermissionType, List<OlympusPrincipal>> taskPermissionsAndPrincipalData = taskService
+		final Map<TaskPermissionType, List<OlympusPrincipal>> taskPermissionsAndPrincipalData = this.taskService
 				.getTaskPermissionsAndPrincipalData(id);
 		return Stream.of(TaskPermissionType.values())
 				.collect(Collectors.toMap(type -> type,
@@ -92,17 +104,5 @@ public class TaskACLController {
 								taskPermissionsAndPrincipalData.get(type),
 								type)));
 
-	}
-
-	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.PUT)
-	public void getTaskACL(
-			@PathVariable("task") int id,
-			@RequestBody Map<String, List<Long>> dto,
-			final BindingResult bindingResult, final Principal principal) {
-		taskService.setTaskPermissionsAndPrincipals(id,
-				dto.entrySet().stream().collect(
-						Collectors.toMap(
-								e -> TaskPermissionType.valueOf(e.getKey()),
-								e -> e.getValue())));
 	}
 }

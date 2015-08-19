@@ -34,17 +34,16 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.exec.ExecuteException;
 import org.ng200.openolympus.FileAccess;
-
 import org.ng200.openolympus.dto.UploadableTask;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 public class TaskFilesystemManipulatingController {
 
 	@Autowired
 	private StorageService storageService;
+
 	private void extractZipFile(final InputStream zipFile,
 			final Path destination) throws Exception {
 		try (ArchiveInputStream input = new ArchiveStreamFactory()
@@ -63,11 +62,13 @@ public class TaskFilesystemManipulatingController {
 			}
 		}
 	}
+
 	protected void uploadDescription(final Task task, InputStream inputStream)
 			throws ExecuteException, IOException {
 		// TODO: remove this?
 		// this.storageService.writeTaskDescription(task, inputStream);
 	}
+
 	protected void uploadJudgeFile(final Task task,
 			final UploadableTask taskDto)
 					throws IOException, Exception {

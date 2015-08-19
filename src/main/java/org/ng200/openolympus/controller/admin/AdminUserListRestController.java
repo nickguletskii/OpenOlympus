@@ -24,31 +24,28 @@ package org.ng200.openolympus.controller.admin;
 
 import java.util.List;
 
-
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 public class AdminUserListRestController {
 	private static final int PAGE_SIZE = 10;
 	@Autowired
 	private UserService userService;
+
 	@RequestMapping(value = "/api/admin/usersCount", method = RequestMethod.GET)
-	
+
 	public long countUsers() {
 		return this.userService.countUsers();
 	}
+
 	@RequestMapping(value = "/api/admin/users", method = RequestMethod.GET)
-	
+
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUsersAlphabetically(page,
 				AdminUserListRestController.PAGE_SIZE);

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-
 import org.ng200.openolympus.controller.solution.VerdictStatusController.VerdictDto;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
@@ -36,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,14 +85,15 @@ public class SolutionStatusController {
 		}
 	}
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(SolutionStatusController.class);
+
 	@Autowired
 	private SolutionService solutionService;
 
 	@Autowired
 	private VerdictStatusController verdictJSONController;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SolutionStatusController.class);
 	@RequestMapping(method = RequestMethod.GET)
 	@Cacheable(value = "solutions", key = "#solution.id")
 	public @ResponseBody SolutionDto solutionApi(
@@ -107,7 +106,8 @@ public class SolutionStatusController {
 				.stream()
 				.sorted((l, r) -> Long.compare(l.getId(), r.getId()))
 				.map(verdict -> this.verdictJSONController.showVerdict(verdict,
-						locale)).collect(Collectors.toList()));
+						locale))
+				.collect(Collectors.toList()));
 		return dto;
 	}
 }

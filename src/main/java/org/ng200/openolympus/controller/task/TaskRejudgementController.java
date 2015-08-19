@@ -26,12 +26,10 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +42,7 @@ public class TaskRejudgementController {
 
 	@Autowired
 	private TaskService taskService;
+
 	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void rejudgeTask(@PathVariable(value = "task") final Task task,

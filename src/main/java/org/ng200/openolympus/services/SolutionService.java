@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.jooq.DSLContext;
-
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
@@ -42,7 +41,6 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,13 +55,15 @@ public class SolutionService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private ContestService contestService;
+
 	public int countUserSolutions(final User user) {
-		return dslContext.selectCount().from(Tables.SOLUTION)
+		return this.dslContext.selectCount().from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId())).fetchOne()
 				.value1();
 	}
+
 	public int countUserSolutionsForTask(final User user, final Task task) {
-		return dslContext
+		return this.dslContext
 				.selectCount()
 				.from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
@@ -71,95 +71,9 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.fetchOne()
 				.value1();
 	}
-	public int getNumberOfPendingVerdicts() {
-		return dslContext.selectCount().from(Tables.VERDICT)
-				.where(Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting))
-				.fetchOne().value1();
-	}
-	public long getNumberOfPendingVerdicts(final Solution solution) {
-		return dslContext
-				.selectCount()
-				.from(Tables.VERDICT)
-				.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()).and(
-						Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting)))
-				.fetchOne().value1();
-	}
-	public List<Solution> getPage(final int pageNumber, final int pageSize) {
-		return dslContext.selectCount().from(Tables.SOLUTION)
-				.groupBy(Tables.SOLUTION.ID)
-				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
-				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
-	}
-	public List<Solution> getPage(final User user, final Integer pageNumber,
-			final int pageSize, final Date startTime, final Date endTime) {
-		return dslContext
-				.selectCount()
-				.from(Tables.SOLUTION)
-				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
-						Tables.SOLUTION.TIME_ADDED.between(
-								Timestamp.from(startTime.toInstant()),
-								Timestamp.from(endTime.toInstant()))))
-				.groupBy(Tables.SOLUTION.ID)
-				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
-				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
-	}
-	public List<Solution> getPageOutsideOfContest(final User user,
-			final Integer pageNumber, final int pageSize) {
-		return dslContext.selectFrom(Tables.SOLUTION)
-				.where(Tables.SOLUTION.USER_ID.eq(user.getId()))
-				.groupBy(Tables.SOLUTION.ID)
-				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
-				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
-	}
-	public Stream<Verdict> getPendingVerdicts() {
-		return StreamSupport.stream(
-				dslContext
-						.selectFrom(Tables.VERDICT)
-						.where(Tables.VERDICT.STATUS
-								.eq(VerdictStatusType.waiting))
-						.spliterator(),
-				false).map(record -> record.into(Verdict.class));
-	}
-	public long getSolutionCount() {
-		return solutionDao.count();
-	}
-
-	public BigDecimal getSolutionMaximumScore(final Solution solution) {
-		return this.getVerdictsVisibleDuringContest(solution).stream()
-				.map((verdict) -> verdict.getMaximumScore())
-				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
-	}
-	public BigDecimal getSolutionScore(final Solution solution) {
-		if (solution == null) {
-			return BigDecimal.ZERO;
-		}
-		return this.getVerdictsVisibleDuringContest(solution).stream()
-				.map((verdict) -> verdict.getScore())
-				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
-	}
-	public List<Verdict> getVerdictsVisibleDuringContest(
-			final Solution solution) {
-		// TODO: show full tests during contest should be an option
-		if (this.contestService.getRunningContest() == null) {
-			return dslContext.selectFrom(Tables.VERDICT)
-					.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()))
-					.fetchInto(Verdict.class);
-		}
-		return getVerdictsVisibleDuringContest(solution);
-	}
-	@Transactional
-	public Solution insertSolution(Solution solution) {
-		return insert(solution, Tables.SOLUTION);
-	}
-
-	@CacheEvict(value = "solutions", key = "#verdict.solution.id")
-	@Transactional
-	public synchronized Verdict updateVerdict(Verdict verdict) {
-		return update(verdict, Tables.VERDICT);
-	}
 
 	public long countUserSolutionsInContest(User user, Contest contest) {
-		return dslContext
+		return this.dslContext
 				.selectCount()
 				.from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
@@ -171,5 +85,101 @@ public class SolutionService extends GenericCreateUpdateRepository {
 												contest.getId(),
 												user.getId()))))
 				.execute();
+	}
+
+	public int getNumberOfPendingVerdicts() {
+		return this.dslContext.selectCount().from(Tables.VERDICT)
+				.where(Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting))
+				.fetchOne().value1();
+	}
+
+	public long getNumberOfPendingVerdicts(final Solution solution) {
+		return this.dslContext
+				.selectCount()
+				.from(Tables.VERDICT)
+				.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()).and(
+						Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting)))
+				.fetchOne().value1();
+	}
+
+	public List<Solution> getPage(final int pageNumber, final int pageSize) {
+		return this.dslContext.selectCount().from(Tables.SOLUTION)
+				.groupBy(Tables.SOLUTION.ID)
+				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
+				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
+	}
+
+	public List<Solution> getPage(final User user, final Integer pageNumber,
+			final int pageSize, final Date startTime, final Date endTime) {
+		return this.dslContext
+				.selectCount()
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
+						Tables.SOLUTION.TIME_ADDED.between(
+								Timestamp.from(startTime.toInstant()),
+								Timestamp.from(endTime.toInstant()))))
+				.groupBy(Tables.SOLUTION.ID)
+				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
+				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
+	}
+
+	public List<Solution> getPageOutsideOfContest(final User user,
+			final Integer pageNumber, final int pageSize) {
+		return this.dslContext.selectFrom(Tables.SOLUTION)
+				.where(Tables.SOLUTION.USER_ID.eq(user.getId()))
+				.groupBy(Tables.SOLUTION.ID)
+				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
+				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
+	}
+
+	public Stream<Verdict> getPendingVerdicts() {
+		return StreamSupport.stream(
+				this.dslContext
+						.selectFrom(Tables.VERDICT)
+						.where(Tables.VERDICT.STATUS
+								.eq(VerdictStatusType.waiting))
+						.spliterator(),
+				false).map(record -> record.into(Verdict.class));
+	}
+
+	public long getSolutionCount() {
+		return this.solutionDao.count();
+	}
+
+	public BigDecimal getSolutionMaximumScore(final Solution solution) {
+		return this.getVerdictsVisibleDuringContest(solution).stream()
+				.map((verdict) -> verdict.getMaximumScore())
+				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
+	}
+
+	public BigDecimal getSolutionScore(final Solution solution) {
+		if (solution == null) {
+			return BigDecimal.ZERO;
+		}
+		return this.getVerdictsVisibleDuringContest(solution).stream()
+				.map((verdict) -> verdict.getScore())
+				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
+	}
+
+	public List<Verdict> getVerdictsVisibleDuringContest(
+			final Solution solution) {
+		// TODO: show full tests during contest should be an option
+		if (this.contestService.getRunningContest() == null) {
+			return this.dslContext.selectFrom(Tables.VERDICT)
+					.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()))
+					.fetchInto(Verdict.class);
+		}
+		return this.getVerdictsVisibleDuringContest(solution);
+	}
+
+	@Transactional
+	public Solution insertSolution(Solution solution) {
+		return this.insert(solution, Tables.SOLUTION);
+	}
+
+	@CacheEvict(value = "solutions", key = "#verdict.solution.id")
+	@Transactional
+	public synchronized Verdict updateVerdict(Verdict verdict) {
+		return this.update(verdict, Tables.VERDICT);
 	}
 }

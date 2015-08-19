@@ -41,16 +41,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JacksonSerializationDelegatingTask<V, T extends ExceptionalProducer<V>>
 		extends AbstractTask<String> {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -4648573373270853023L;
 	private static final ObjectMapper OBJECT_MAPPER = JacksonSerializationFactory
 			.createObjectMapper();
-	private String value;
-	private String[] taskClassesUrls;
+	private final String value;
+	private final String[] taskClassesUrls;
 
 	public JacksonSerializationDelegatingTask(T task, List<URL> classloaderURLs)
 			throws JsonProcessingException {
-		value = OBJECT_MAPPER.writeValueAsString(task);
-		taskClassesUrls = classloaderURLs.stream().map(x -> x.toString())
+		this.value = JacksonSerializationDelegatingTask.OBJECT_MAPPER
+				.writeValueAsString(task);
+		this.taskClassesUrls = classloaderURLs.stream().map(x -> x.toString())
 				.toArray(n -> new String[n]);
+	}
+
+	public JsonTaskExecutionResult<V> getResultOrThrowable()
+			throws JsonParseException, JsonMappingException, IOException {
+		return JacksonSerializationDelegatingTask.OBJECT_MAPPER.readValue(
+				this.getResult(),
+				JsonTaskExecutionResult.class);
 	}
 
 	@Override
@@ -59,41 +71,40 @@ public class JacksonSerializationDelegatingTask<V, T extends ExceptionalProducer
 		Thread.currentThread()
 				.setContextClassLoader(
 						new URLClassLoader(
-								Arrays.stream(taskClassesUrls)
+								Arrays.stream(this.taskClassesUrls)
 										.map(url -> {
 											try {
 												return new URL(url);
-											} catch (Exception e) {
+											} catch (final Exception e) {
 												throw new GeneralNestedRuntimeException(
 														"Couldn't set up the classloader: ",
 														e);
 											}
-										}).toArray(n -> new URL[n]), Thread
+										}).toArray(n -> new URL[n]),
+								Thread
 										.currentThread()
 										.getContextClassLoader()));
 
 		JsonTaskExecutionResult<V> result;
 		try {
-			result = JsonTaskExecutionResult.<V> success((V) OBJECT_MAPPER
-					.readValue(value, ExceptionalProducer.class).run());
-		} catch (Throwable throwable) {
+			result = JsonTaskExecutionResult.<V> success(
+					(V) JacksonSerializationDelegatingTask.OBJECT_MAPPER
+							.readValue(this.value, ExceptionalProducer.class)
+							.run());
+		} catch (final Throwable throwable) {
 			result = JsonTaskExecutionResult.failure(throwable);
 		}
 		try {
-			setResult(OBJECT_MAPPER.writeValueAsString(result));
-		} catch (JsonProcessingException e) {
+			this.setResult(JacksonSerializationDelegatingTask.OBJECT_MAPPER
+					.writeValueAsString(result));
+		} catch (final JsonProcessingException e) {
 			try {
-				setResult(OBJECT_MAPPER
-						.writeValueAsString(JsonTaskExecutionResult.failure(e)));
-			} catch (JsonProcessingException e1) {
-				setThrowable(e1);
+				this.setResult(JacksonSerializationDelegatingTask.OBJECT_MAPPER
+						.writeValueAsString(
+								JsonTaskExecutionResult.failure(e)));
+			} catch (final JsonProcessingException e1) {
+				this.setThrowable(e1);
 			}
 		}
-	}
-
-	public JsonTaskExecutionResult<V> getResultOrThrowable()
-			throws JsonParseException, JsonMappingException, IOException {
-		return OBJECT_MAPPER.readValue(getResult(),
-				JsonTaskExecutionResult.class);
 	}
 }

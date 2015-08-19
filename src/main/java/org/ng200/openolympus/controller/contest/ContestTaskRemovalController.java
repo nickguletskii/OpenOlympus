@@ -22,16 +22,12 @@
  */
 package org.ng200.openolympus.controller.contest;
 
-import java.util.HashSet;
-
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +40,7 @@ public class ContestTaskRemovalController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@CacheEvict(value = "contests", key = "#contest.id")
 	@RequestMapping(value = "/api/contest/{contest}/removeTask", method = RequestMethod.DELETE)
 	public void removeTask(
@@ -52,7 +49,7 @@ public class ContestTaskRemovalController {
 		Assertions.resourceExists(contest);
 		Assertions.resourceExists(task);
 
-		contestService.removeTaskFromContest(task, contest);
+		this.contestService.removeTaskFromContest(task, contest);
 	}
 
 }

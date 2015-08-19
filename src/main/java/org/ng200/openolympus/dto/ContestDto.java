@@ -47,14 +47,6 @@ public class ContestDto {
 
 	private boolean showFullTestsDuringContest;
 
-	public boolean isShowFullTestsDuringContest() {
-		return showFullTestsDuringContest;
-	}
-
-	public void setShowFullTestsDuringContest(boolean showFullTestsDuringContest) {
-		this.showFullTestsDuringContest = showFullTestsDuringContest;
-	}
-
 	public Duration getDuration() {
 		return this.duration;
 	}
@@ -67,12 +59,21 @@ public class ContestDto {
 		return this.startTime;
 	}
 
+	public boolean isShowFullTestsDuringContest() {
+		return this.showFullTestsDuringContest;
+	}
+
 	public void setDuration(final Duration duration) {
 		this.duration = duration;
 	}
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public void setShowFullTestsDuringContest(
+			boolean showFullTestsDuringContest) {
+		this.showFullTestsDuringContest = showFullTestsDuringContest;
 	}
 
 	public void setStartTime(final Date startTime) {

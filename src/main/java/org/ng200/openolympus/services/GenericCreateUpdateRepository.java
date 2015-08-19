@@ -33,11 +33,11 @@ import com.google.common.base.Throwables;
 
 public abstract class GenericCreateUpdateRepository {
 
-	@Autowired
-	private DSLContext dslContext;
-
 	private static final Logger logger = LoggerFactory
 			.getLogger(GenericCreateUpdateRepository.class);
+
+	@Autowired
+	private DSLContext dslContext;
 
 	@SuppressWarnings("unchecked")
 	protected <T, R extends UpdatableRecordImpl<?>> T insert(T value,
@@ -45,7 +45,7 @@ public abstract class GenericCreateUpdateRepository {
 		try {
 			R record;
 			record = table.getRecordType().newInstance();
-			record.attach(dslContext.configuration());
+			record.attach(this.dslContext.configuration());
 			record.from(value);
 			record.store();
 			return (T) record.into(value.getClass());
@@ -60,7 +60,7 @@ public abstract class GenericCreateUpdateRepository {
 		try {
 			R record;
 			record = table.getRecordType().newInstance();
-			record.attach(dslContext.configuration());
+			record.attach(this.dslContext.configuration());
 			record.from(value);
 			record.update();
 			return (T) record.into(value.getClass());

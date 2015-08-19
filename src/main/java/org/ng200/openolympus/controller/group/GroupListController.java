@@ -25,12 +25,10 @@ package org.ng200.openolympus.controller.group;
 import java.security.Principal;
 import java.util.List;
 
-
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,11 +42,13 @@ public class GroupListController {
 
 	@Autowired
 	private GroupService groupService;
+
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupsCount")
 	@ResponseBody
 	public long groupCount() {
 		return this.groupService.countGroups();
 	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groups")
 	@ResponseBody
 	public List<Group> groupList(

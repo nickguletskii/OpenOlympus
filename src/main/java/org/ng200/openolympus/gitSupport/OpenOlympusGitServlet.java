@@ -1,3 +1,25 @@
+/**
+ * The MIT License
+ * Copyright (c) 2014-2015 Nick Guletskii
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.ng200.openolympus.gitSupport;
 
 import java.util.Enumeration;
@@ -18,7 +40,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class OpenOlympusGitServlet extends MetaServlet {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -27,9 +49,8 @@ public class OpenOlympusGitServlet extends MetaServlet {
 	/**
 	 * New servlet that will load its base directory from {@code web.xml}.
 	 * <p>
-	 * The required parameter {@code base-path} must be configured to point
-	 * to the local filesystem directory where all served Git repositories
-	 * reside.
+	 * The required parameter {@code base-path} must be configured to point to
+	 * the local filesystem directory where all served Git repositories reside.
 	 */
 	public OpenOlympusGitServlet(
 			BasicAuthenticationFilter authenticationFilter) {
@@ -45,32 +66,37 @@ public class OpenOlympusGitServlet extends MetaServlet {
 
 		});
 
-		gitFilter = (GitFilter) getDelegateFilter();
-	}
-
-	public void setRepositoryResolver(
-			RepositoryResolver<HttpServletRequest> resolver) {
-		gitFilter.setRepositoryResolver(resolver);
+		this.gitFilter = (GitFilter) this.getDelegateFilter();
 	}
 
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
-		gitFilter.init(new FilterConfig() {
+		this.gitFilter.init(new FilterConfig() {
+			@Override
 			public String getFilterName() {
-				return gitFilter.getClass().getName();
+				return OpenOlympusGitServlet.this.gitFilter.getClass()
+						.getName();
 			}
 
+			@Override
 			public String getInitParameter(String name) {
 				return config.getInitParameter(name);
 			}
 
+			@Override
 			public Enumeration<String> getInitParameterNames() {
 				return config.getInitParameterNames();
 			}
 
+			@Override
 			public ServletContext getServletContext() {
 				return config.getServletContext();
 			}
 		});
+	}
+
+	public void setRepositoryResolver(
+			RepositoryResolver<HttpServletRequest> resolver) {
+		this.gitFilter.setRepositoryResolver(resolver);
 	}
 }

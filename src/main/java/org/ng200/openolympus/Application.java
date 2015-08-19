@@ -61,16 +61,11 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 @EnableCaching
 @EnableTransactionManagement
 public class Application {
+	static final Logger logger = LoggerFactory.getLogger(Application.class);
+
 	public static void main(final String[] args) throws SQLException {
 		SpringApplication.run(
 				Application.class, args);
-	}
-
-	static final Logger logger = LoggerFactory.getLogger(Application.class);
-
-	@Bean
-	public StorageService storageService() {
-		return new StorageService();
 	}
 
 	@Bean
@@ -100,6 +95,11 @@ public class Application {
 	public PasswordEncoder passwordEncoder() {
 		Application.logger.info("Creating password encoder");
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public StorageService storageService() {
+		return new StorageService();
 	}
 
 	@Bean

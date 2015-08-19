@@ -34,7 +34,7 @@ public class AuthenticationResponder {
 
 	public static void writeLoginStatusJson(Writer out, String authMessage,
 			List<String> captchaErrorCodes) throws IOException,
-			JsonGenerationException {
+					JsonGenerationException {
 		final JsonFactory factory = new JsonFactory();
 		final JsonGenerator generator = factory.createGenerator(out);
 		generator.writeStartObject();

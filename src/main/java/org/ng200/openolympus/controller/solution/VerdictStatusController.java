@@ -27,8 +27,6 @@ import java.time.Duration;
 import java.util.Locale;
 
 import org.ng200.openolympus.Assertions;
-
-import org.ng200.openolympus.exceptions.ForbiddenException;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.services.ContestService;
@@ -36,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.AbstractMessageSource;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,14 +55,6 @@ public class VerdictStatusController {
 		boolean success;
 		private String additionalInformation;
 
-		public String getAdditionalInformation() {
-			return additionalInformation;
-		}
-
-		public void setAdditionalInformation(String additionalInformation) {
-			this.additionalInformation = additionalInformation;
-		}
-
 		public VerdictDto(long id, BigDecimal score, BigDecimal maximumScore,
 				Duration cpuTime, Duration realTime, long memoryPeak,
 				String message, boolean tested, boolean success,
@@ -81,6 +70,14 @@ public class VerdictStatusController {
 			this.tested = tested;
 			this.success = success;
 			this.additionalInformation = additionalInformation;
+		}
+
+		public String getAdditionalInformation() {
+			return this.additionalInformation;
+		}
+
+		public Duration getCpuTime() {
+			return this.cpuTime;
 		}
 
 		public long getId() {
@@ -99,6 +96,10 @@ public class VerdictStatusController {
 			return this.message;
 		}
 
+		public Duration getRealTime() {
+			return this.realTime;
+		}
+
 		public BigDecimal getScore() {
 			return this.score;
 		}
@@ -109,6 +110,14 @@ public class VerdictStatusController {
 
 		public boolean isTested() {
 			return this.tested;
+		}
+
+		public void setAdditionalInformation(String additionalInformation) {
+			this.additionalInformation = additionalInformation;
+		}
+
+		public void setCpuTime(Duration cpuTime) {
+			this.cpuTime = cpuTime;
 		}
 
 		public void setId(long id) {
@@ -125,18 +134,6 @@ public class VerdictStatusController {
 
 		public void setMessage(String message) {
 			this.message = message;
-		}
-
-		public Duration getCpuTime() {
-			return cpuTime;
-		}
-
-		public void setCpuTime(Duration cpuTime) {
-			this.cpuTime = cpuTime;
-		}
-
-		public Duration getRealTime() {
-			return realTime;
 		}
 
 		public void setRealTime(Duration realTime) {
@@ -165,6 +162,7 @@ public class VerdictStatusController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@RequestMapping(value = "/api/verdict", method = RequestMethod.GET)
 	public @ResponseBody VerdictDto showVerdict(
 			@RequestParam(value = "id") final Verdict verdict,

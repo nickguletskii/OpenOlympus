@@ -25,12 +25,10 @@ package org.ng200.openolympus.controller.admin;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.user.AbstractUserInfoController;
 import org.ng200.openolympus.dto.UserInfoDto;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +49,7 @@ public class AdministrativeUserInfoController extends
 		super.copyDtoIntoDatabase(userInfoDto, bindingResult, user);
 		return BindingResponse.OK;
 	}
+
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(
 			@PathVariable(value = "user") final User user) {

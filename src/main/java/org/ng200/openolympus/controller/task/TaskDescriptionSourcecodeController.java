@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,6 +45,7 @@ public class TaskDescriptionSourcecodeController extends
 
 	@Autowired
 	private StorageService storageService;
+
 	@RequestMapping(value = "/api/taskSourcecode", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<String> getTaskSourcecode(
 			@RequestParam(value = "id") final Task task) throws IOException {
@@ -54,7 +53,8 @@ public class TaskDescriptionSourcecodeController extends
 		final HttpHeaders responseHeaders = new HttpHeaders();
 		final Charset charset = Charset.forName("UTF-8");
 		responseHeaders.setContentType(new MediaType("text", "plain", charset));
-		return new ResponseEntity<String>("", // TODO remove this controller altogether
+		return new ResponseEntity<String>("", // TODO remove this controller
+												// altogether
 				responseHeaders, HttpStatus.OK);
 	}
 }

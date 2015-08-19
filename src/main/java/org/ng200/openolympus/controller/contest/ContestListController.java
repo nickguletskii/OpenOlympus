@@ -25,12 +25,10 @@ package org.ng200.openolympus.controller.contest;
 import java.security.Principal;
 import java.util.List;
 
-
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,11 +42,13 @@ public class ContestListController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contestsCount")
 	@ResponseBody
 	public long contestCount() {
 		return this.contestService.countContests();
 	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
 	@ResponseBody
 	public List<Contest> contestList(

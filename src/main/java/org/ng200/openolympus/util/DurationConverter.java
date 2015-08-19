@@ -28,19 +28,24 @@ import org.jooq.Converter;
 
 public class DurationConverter implements Converter<Long, Duration> {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -2243242623779870370L;
+
 	@Override
 	public Duration from(Long databaseObject) {
 		return Duration.ofMillis(databaseObject);
 	}
 
 	@Override
-	public Long to(Duration userObject) {
-		return userObject.toMillis();
+	public Class<Long> fromType() {
+		return Long.class;
 	}
 
 	@Override
-	public Class<Long> fromType() {
-		return Long.class;
+	public Long to(Duration userObject) {
+		return userObject.toMillis();
 	}
 
 	@Override

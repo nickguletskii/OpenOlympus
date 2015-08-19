@@ -31,18 +31,6 @@ import org.ng200.openolympus.security.PrincipalMatchesUser;
 
 public interface IUserSecurityDescription extends IUser {
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.ANONYMOUS)
-	public Long getId();
-
-	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.LOGGED_IN)
-	public String getUsername();
-
-	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
-	public String getFirstNameMain();
-
-	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getAddressCity();
 
@@ -87,6 +75,14 @@ public interface IUserSecurityDescription extends IUser {
 	public String getFirstNameLocalised();
 
 	@Override
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
+	public String getFirstNameMain();
+
+	@Override
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.ANONYMOUS)
+	public Long getId();
+
+	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
 	public String getLandline();
 
@@ -129,5 +125,9 @@ public interface IUserSecurityDescription extends IUser {
 	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Public.class)
 	public String getTeacherMiddleName();
+
+	@Override
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.LOGGED_IN)
+	public String getUsername();
 
 }

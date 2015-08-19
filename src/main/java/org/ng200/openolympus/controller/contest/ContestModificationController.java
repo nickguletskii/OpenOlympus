@@ -25,13 +25,10 @@ package org.ng200.openolympus.controller.contest;
 import java.io.IOException;
 import java.sql.Timestamp;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
-import org.jooq.impl.DSL;
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
@@ -40,9 +37,7 @@ import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,6 +54,7 @@ public class ContestModificationController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	@Caching(evict = {
@@ -86,6 +82,7 @@ public class ContestModificationController {
 		contest = this.contestService.updateContest(contest);
 		return BindingResponse.OK;
 	}
+
 	@RequestMapping(method = RequestMethod.GET)
 	public Contest showContestEditingForm(
 			@PathVariable("contest") final Contest contest) {

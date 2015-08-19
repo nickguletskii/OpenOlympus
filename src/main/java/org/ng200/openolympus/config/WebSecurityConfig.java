@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -59,16 +58,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private static final String REMEMBERME_COOKIE_NAME = "openolympus-rememberme";
-	@Autowired
-	private UserSecurityService userSecurityService;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private PersistentTokenConfiguration persistentTokenConfiguration;
-	@Autowired
-	private DataSource dataSource;
-
 	private static String[] permittedAny = {
 												"/",
 												"/translation",
@@ -76,7 +65,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 												"/api/user/register/",
 												"/errors/**"
 	};
-
 	private static String[] authorisedAny = {
 												"/api/archive/rank",
 												"/api/archive/rankCount",
@@ -99,7 +87,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 												"/api/task/*/submitSolution"
 	};
 	private static String[] authorisedGet = {};
+
 	private static String[] permittedGet = {};
+
 	private static String[] administrativeAny = {
 													"/api/admin/**",
 													"/api/task/create",
@@ -118,6 +108,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 													"/api/taskSourcecode"
 	};
 
+	@Autowired
+	private UserSecurityService userSecurityService;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PersistentTokenConfiguration persistentTokenConfiguration;
+	@Autowired
+	private DataSource dataSource;
+
 	@Bean
 	public OpenOlympusAuthenticationFailureHandler authenticationFailureHandler() {
 		return new OpenOlympusAuthenticationFailureHandler();
@@ -133,14 +132,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			throws Exception {
 		auth.userDetailsService(this.userSecurityService).passwordEncoder(
 				this.passwordEncoder);
-	}
-
-	public BasicAuthenticationFilter getBasicAuthenticationFilter()
-			throws Exception {
-
-		BasicAuthenticationFilter filter = new BasicAuthenticationFilter(
-				authenticationManager());
-		return filter;
 	}
 
 	@Override
@@ -169,7 +160,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.permitAll().and()
 				.rememberMe()
 				.rememberMeServices(this.rememberMeServices())
-				.tokenRepository(persistentTokenRepository())
+				.tokenRepository(this.persistentTokenRepository())
 				.key(this.persistentTokenConfiguration.getPersistentTokenKey())
 				.tokenValiditySeconds(60 * 60 * 24 * 14)
 				.userDetailsService(this.userSecurityService).and()
@@ -195,6 +186,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						UsernamePasswordAuthenticationFilter.class)
 				.httpBasic();
 		//@formatter:on
+	}
+
+	public BasicAuthenticationFilter getBasicAuthenticationFilter()
+			throws Exception {
+
+		final BasicAuthenticationFilter filter = new BasicAuthenticationFilter(
+				this.authenticationManager());
+		return filter;
+	}
+
+	@Bean
+	public PersistentTokenRepository persistentTokenRepository() {
+		final JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl() {
+
+			@Override
+			protected void initDao() {
+				this.getJdbcTemplate()
+						.execute(
+								"create table if not exists persistent_logins (username varchar(64) not null, series varchar(64) primary key, "
+										+ "token varchar(64) not null, last_used timestamp not null)");
+			}
+
+		};
+		db.setDataSource(this.dataSource);
+		return db;
 	}
 
 	@Bean
@@ -243,22 +259,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.setCookieName(WebSecurityConfig.REMEMBERME_COOKIE_NAME);
 		rememberMeServices.setAlwaysRemember(true);
 		return rememberMeServices;
-	}
-
-	@Bean
-	public PersistentTokenRepository persistentTokenRepository() {
-		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl() {
-
-			@Override
-			protected void initDao() {
-				getJdbcTemplate()
-						.execute(
-								"create table if not exists persistent_logins (username varchar(64) not null, series varchar(64) primary key, "
-										+ "token varchar(64) not null, last_used timestamp not null)");
-			}
-
-		};
-		db.setDataSource(dataSource);
-		return db;
 	}
 }

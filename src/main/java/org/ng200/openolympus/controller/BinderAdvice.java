@@ -23,7 +23,6 @@
 package org.ng200.openolympus.controller;
 
 import java.beans.PropertyEditorSupport;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -64,15 +63,15 @@ public class BinderAdvice implements ApplicationContextAware {
 
 	private final class ModelTypeEditor extends PropertyEditorSupport {
 
-		private Reflect dao;
+		private final Reflect dao;
 
 		public ModelTypeEditor(Class<?> clazz,
 				ApplicationContext applicationContext)
-				throws NoSuchMethodException, SecurityException,
-				ClassNotFoundException {
-			Class<?> daoClass = clazz.getClassLoader().loadClass(
+						throws NoSuchMethodException, SecurityException,
+						ClassNotFoundException {
+			final Class<?> daoClass = clazz.getClassLoader().loadClass(
 					clazz.getName().replaceAll("pojos", "daos") + "Dao");
-			dao = Reflect.on(applicationContext.getBean(daoClass));
+			this.dao = Reflect.on(applicationContext.getBean(daoClass));
 		}
 
 		@Override
@@ -83,7 +82,7 @@ public class BinderAdvice implements ApplicationContextAware {
 
 		@Override
 		public void setAsText(String text) throws IllegalArgumentException {
-			this.setValue(dao.call("fetchOneById", text).get());
+			this.setValue(this.dao.call("fetchOneById", text).get());
 		}
 
 	}
@@ -98,19 +97,19 @@ public class BinderAdvice implements ApplicationContextAware {
 		binder.registerCustomEditor(LocalDate.class, BinderAdvice.dateEditor);
 		binder.registerCustomEditor(Duration.class, new DurationEditor());
 
-		registerModelType(binder, User.class);
-		registerModelType(binder, Task.class);
-		registerModelType(binder, Contest.class);
-		registerModelType(binder, Solution.class);
-		registerModelType(binder, Verdict.class);
-		registerModelType(binder, Group.class);
+		this.registerModelType(binder, User.class);
+		this.registerModelType(binder, Task.class);
+		this.registerModelType(binder, Contest.class);
+		this.registerModelType(binder, Solution.class);
+		this.registerModelType(binder, Verdict.class);
+		this.registerModelType(binder, Group.class);
 	}
 
 	private void registerModelType(ServletRequestDataBinder binder,
 			Class<?> clazz) throws NoSuchMethodException, SecurityException,
-			ClassNotFoundException {
+					ClassNotFoundException {
 		binder.registerCustomEditor(clazz, new ModelTypeEditor(clazz,
-				applicationContext));
+				this.applicationContext));
 	}
 
 	@Override

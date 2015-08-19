@@ -42,11 +42,11 @@ import org.springframework.web.filter.GenericFilterBean;
 
 public class RecaptchaAuthenticationFilter extends GenericFilterBean {
 
-	private final AntPathRequestMatcher LOGIN_REQUEST_MATCHER = new AntPathRequestMatcher(
-			"/login", "POST");
-
 	private static final Logger logger = LoggerFactory
 			.getLogger(RecaptchaAuthenticationFilter.class);
+
+	private final AntPathRequestMatcher LOGIN_REQUEST_MATCHER = new AntPathRequestMatcher(
+			"/login", "POST");
 	@Autowired
 	private CaptchaService captchaService;
 
@@ -79,7 +79,7 @@ public class RecaptchaAuthenticationFilter extends GenericFilterBean {
 
 	private void recaptchaError(ServletRequest request,
 			ServletResponse response, List<String> recaptchaErrors)
-			throws IOException {
+					throws IOException {
 
 		response.setContentType("application/json");
 		AuthenticationResponder.writeLoginStatusJson(response.getWriter(),

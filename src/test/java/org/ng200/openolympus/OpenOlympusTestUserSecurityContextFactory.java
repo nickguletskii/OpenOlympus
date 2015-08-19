@@ -35,12 +35,12 @@ public class OpenOlympusTestUserSecurityContextFactory
 	@Override
 	public SecurityContext createSecurityContext(
 			WithOpenOlympusMockUser annotation) {
-		SecurityContext context = SecurityContextHolder
+		final SecurityContext context = SecurityContextHolder
 				.createEmptyContext();
-		User principal = new User().setUsername(annotation.username())
+		final User principal = new User().setUsername(annotation.username())
 				.setApproved(annotation.approved())
 				.setSuperuser(annotation.superuser());
-		Authentication auth = new UsernamePasswordAuthenticationToken(
+		final Authentication auth = new UsernamePasswordAuthenticationToken(
 				principal, "password", principal.getAuthorities());
 		context.setAuthentication(auth);
 		return context;

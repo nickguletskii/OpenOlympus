@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OpenOlympusAuthenticationSuccessHandler implements
-AuthenticationSuccessHandler {
+		AuthenticationSuccessHandler {
 
 	public OpenOlympusAuthenticationSuccessHandler() {
 	}

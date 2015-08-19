@@ -32,7 +32,6 @@ import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.FileAccess;
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.SolutionSubmissionDto;
@@ -49,7 +48,6 @@ import org.ng200.openolympus.validation.SolutionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -60,7 +58,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerMapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 @RestController
@@ -104,13 +101,7 @@ public class TaskViewController {
 
 	@Autowired
 	private SolutionSubmissionService solutionSubmissionService;
-	@ResponseBody
-	@RequestMapping(value = "/api/task/{btask}/name", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-	public String getTaskName(@PathVariable(value = "task") final Task task,
-			final Locale locale) throws IOException {
-		Assertions.resourceExists(task);
-		return task.getName();
-	}
+
 	@ResponseBody
 	@RequestMapping(value = "/api/task/{task}/data/**", method = RequestMethod.GET)
 	public FileSystemResource getTaskData(
@@ -120,18 +111,19 @@ public class TaskViewController {
 					TaskDescriptionIncorrectFormatException {
 		Assertions.resourceExists(task);
 
-		String pathWithinHandler = (String) request.getAttribute(
+		final String pathWithinHandler = (String) request.getAttribute(
 				HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		String bestMatchPattern = (String) request
+		final String bestMatchPattern = (String) request
 				.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 
-		AntPathMatcher apm = new AntPathMatcher();
-		String relativePath = apm.extractPathWithinPattern(bestMatchPattern,
+		final AntPathMatcher apm = new AntPathMatcher();
+		final String relativePath = apm.extractPathWithinPattern(
+				bestMatchPattern,
 				pathWithinHandler);
 
-		Path taskDescriptionDir = storageService
+		final Path taskDescriptionDir = this.storageService
 				.getTaskDescriptionDirectory(task);
-		Path path = taskDescriptionDir.resolve(relativePath);
+		final Path path = taskDescriptionDir.resolve(relativePath);
 
 		if (!path.toAbsolutePath()
 				.startsWith(taskDescriptionDir.toAbsolutePath())) {
@@ -146,6 +138,15 @@ public class TaskViewController {
 
 		return new FileSystemResource(path.toAbsolutePath().toFile());
 	}
+
+	@ResponseBody
+	@RequestMapping(value = "/api/task/{btask}/name", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+	public String getTaskName(@PathVariable(value = "task") final Task task,
+			final Locale locale) throws IOException {
+		Assertions.resourceExists(task);
+		return task.getName();
+	}
+
 	@RequestMapping(value = "/api/task/{task}/submitSolution", method = RequestMethod.POST)
 	public BindingResponse submitSolution(
 			@PathVariable("task") final Task task, final Principal principal,
@@ -167,7 +168,8 @@ public class TaskViewController {
 			throw new BindException(bindingResult);
 		}
 
-		Solution solution = solutionSubmissionService.submitTask(task,
+		final Solution solution = this.solutionSubmissionService.submitTask(
+				task,
 				solutionDto, user);
 
 		final long id = solution.getId();

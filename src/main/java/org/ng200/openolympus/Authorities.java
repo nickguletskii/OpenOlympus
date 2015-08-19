@@ -28,11 +28,11 @@ public class Authorities {
 
 	public static class OlympusAuthority implements GrantedAuthority {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 6009653253064200656L;
 		private final String authority;
-		private SecurityClearanceType clearanceType;
+		private final SecurityClearanceType clearanceType;
 
 		public OlympusAuthority(String authority,
 				SecurityClearanceType clearanceType) {
@@ -42,11 +42,11 @@ public class Authorities {
 
 		@Override
 		public String getAuthority() {
-			return authority;
+			return this.authority;
 		}
 
 		public SecurityClearanceType getClearanceType() {
-			return clearanceType;
+			return this.clearanceType;
 		}
 
 	}

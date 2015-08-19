@@ -27,17 +27,13 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
-import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.StorageService;
-import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +47,7 @@ public class SolutionDownloadController {
 
 	@Autowired
 	private StorageService storageService;
+
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<FileSystemResource> solutionDownload(
 			final HttpServletRequest request, final Model model,

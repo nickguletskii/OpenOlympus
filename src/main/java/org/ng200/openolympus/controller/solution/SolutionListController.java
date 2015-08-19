@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 import org.ng200.openolympus.dto.SolutionDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
@@ -37,7 +36,6 @@ import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,10 +58,12 @@ public class SolutionListController {
 
 	@Autowired
 	private TaskService taskService;
+
 	@RequestMapping(value = "/api/admin/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCount(final User user) {
 		return this.solutionService.getSolutionCount();
 	}
+
 	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCountForUser(final Principal principal) {
 		final User user = this.userService.getUserByUsername(principal
@@ -73,9 +73,10 @@ public class SolutionListController {
 		if (this.contestService.getRunningContest() == null) {
 			return this.solutionService.countUserSolutions(user);
 		}
-		return solutionService.countUserSolutionsInContest(user,
+		return this.solutionService.countUserSolutionsInContest(user,
 				this.contestService.getRunningContest());
 	}
+
 	@RequestMapping(value = "/api/admin/solutions", method = RequestMethod.GET)
 	public List<SolutionDto> showAllSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
@@ -83,10 +84,11 @@ public class SolutionListController {
 		return this.solutionService
 				.getPage(pageNumber, SolutionListController.PAGE_SIZE)
 				.stream()
-				.map(solution -> new SolutionDto(solution, taskService
+				.map(solution -> new SolutionDto(solution, this.taskService
 						.getById(solution.getTaskId())))
 				.collect(Collectors.toList());
 	}
+
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
 
 	public List<SolutionDto> showUserSolutions(
@@ -110,7 +112,7 @@ public class SolutionListController {
 
 		return solutions
 				.stream()
-				.map(solution -> new SolutionDto(solution, taskService
+				.map(solution -> new SolutionDto(solution, this.taskService
 						.getById(solution.getTaskId())))
 				.map(dto -> {
 					if (contest != null) {

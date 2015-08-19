@@ -38,7 +38,8 @@ public class ContestRemovalController {
 
 	@CacheEvict(value = "contest", key = "#contest.id")
 	@RequestMapping(value = "/api/contest/{contest}/remove", method = RequestMethod.POST)
-	public void removeContest(@PathVariable(value = "contest") Contest contest) {
+	public void removeContest(
+			@PathVariable(value = "contest") Contest contest) {
 		Assertions.resourceExists(contest);
 		this.contestService.deleteContest(contest);
 		return;

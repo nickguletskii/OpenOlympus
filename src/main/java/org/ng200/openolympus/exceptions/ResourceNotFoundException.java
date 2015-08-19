@@ -39,7 +39,8 @@ public class ResourceNotFoundException extends RuntimeException {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ResourceNotFoundException(final String message, final Throwable cause) {
+	public ResourceNotFoundException(final String message,
+			final Throwable cause) {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}

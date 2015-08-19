@@ -25,7 +25,6 @@ package org.ng200.openolympus.controller.contest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestTaskAdditionDto;
@@ -35,7 +34,6 @@ import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -56,6 +54,7 @@ public class ContestTaskAdditionController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@CacheEvict(value = "contests", key = "#contest.id")
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addTask")
 	public BindingResponse addTask(final Model model,
@@ -72,8 +71,8 @@ public class ContestTaskAdditionController {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
-		contestService
-				.addContestTask(contest, taskService
+		this.contestService
+				.addContestTask(contest, this.taskService
 						.getTaskByName(contestTaskAdditionDto.getTaskName()));
 		return new BindingResponse(Status.OK, null, ImmutableMap
 				.<String, Object> builder()

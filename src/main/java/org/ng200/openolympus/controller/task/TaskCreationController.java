@@ -29,7 +29,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.TaskCreationDto;
@@ -39,7 +38,6 @@ import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +57,7 @@ public class TaskCreationController {
 
 	@Autowired
 	private UserService userService;
+
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 	private BindingResponse createTask(final TaskCreationDto taskCreationDto,
 			final BindingResult bindingResult, Principal principal)
@@ -71,9 +70,11 @@ public class TaskCreationController {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
-		User owner = userService.getUserByUsername(principal.getName());
+		final User owner = this.userService
+				.getUserByUsername(principal.getName());
 
-		Task task = taskService.uploadTask(taskCreationDto, bindingResult,
+		final Task task = this.taskService.uploadTask(taskCreationDto,
+				bindingResult,
 				owner);
 
 		return new BindingResponse(Status.OK,

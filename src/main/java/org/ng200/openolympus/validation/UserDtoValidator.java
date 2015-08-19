@@ -36,7 +36,8 @@ public class UserDtoValidator {
 
 	public void validate(final UserDto user, final Errors errors) {
 		if (!errors.hasFieldErrors("username")
-				&& this.userService.getUserByUsername(user.getUsername()) != null) {
+				&& this.userService
+						.getUserByUsername(user.getUsername()) != null) {
 			errors.rejectValue("username", "",
 					"register.form.errors.username.exists");
 		}

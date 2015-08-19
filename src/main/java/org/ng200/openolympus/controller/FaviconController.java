@@ -31,18 +31,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class FaviconController {
-	private ClassPathResource ico = new ClassPathResource("public/favicon.ico");
-	private ClassPathResource png = new ClassPathResource("public/favicon.png");
+	private final ClassPathResource ico = new ClassPathResource(
+			"public/favicon.ico");
+	private final ClassPathResource png = new ClassPathResource(
+			"public/favicon.png");
 
 	@RequestMapping(value = "/**/favicon.ico", method = RequestMethod.GET)
 	@ResponseBody
 	public Resource faviconIco() {
-		return ico;
+		return this.ico;
 	}
 
 	@RequestMapping(value = "/**/favicon.png", method = RequestMethod.GET)
 	@ResponseBody
 	public Resource faviconPng() {
-		return png;
+		return this.png;
 	}
 }

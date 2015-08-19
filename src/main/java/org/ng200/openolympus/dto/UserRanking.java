@@ -27,10 +27,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.util.Beans;
-
-import com.fasterxml.jackson.annotation.JsonView;
 
 public class UserRanking extends User {
 
@@ -44,6 +41,13 @@ public class UserRanking extends User {
 	private BigInteger rank;
 
 	public UserRanking() {
+	}
+
+	public UserRanking(BigInteger rank, User user, BigDecimal score) {
+		this.rank = rank;
+		this.score = score;
+
+		Beans.copy(user, this);
 	}
 
 	public UserRanking(Long id, String username, String firstNameMain,
@@ -69,19 +73,10 @@ public class UserRanking extends User {
 		this.rank = rank;
 	}
 
-	public UserRanking(BigInteger rank, User user, BigDecimal score) {
-		this.rank = rank;
-		this.score = score;
-
-		Beans.copy(user, this);
-	}
-
-	
 	public BigInteger getRank() {
 		return this.rank;
 	}
 
-	
 	public BigDecimal getScore() {
 		return this.score;
 	}

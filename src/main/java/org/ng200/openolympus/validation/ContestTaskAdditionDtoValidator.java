@@ -53,7 +53,7 @@ public class ContestTaskAdditionDtoValidator {
 					"contest.addTask.form.errors.taskNull");
 			return;
 		}
-		if (contestService.getContestTasks(contest).stream().anyMatch(
+		if (this.contestService.getContestTasks(contest).stream().anyMatch(
 				t -> task.getId().equals(t.getId()))) {
 			errors.rejectValue("taskName", "",
 					"contest.addTask.form.errors.taskAlreadyInContest");

@@ -146,7 +146,7 @@ public class RegistrationRestController {
 
 		this.validate(userDto, bindingResult);
 
-		User user = new User().setAddressCity(userDto.getAddressCity())
+		final User user = new User().setAddressCity(userDto.getAddressCity())
 				.setAddressCountry(userDto.getAddressCountry())
 				.setAddressLine1(userDto.getAddressLine1())
 				.setAddressLine2(userDto.getAddressLine2())
@@ -163,7 +163,7 @@ public class RegistrationRestController {
 				.setMiddleNameLocalised(userDto.getMiddleNameLocalised())
 				.setMiddleNameMain(userDto.getMiddleNameLocalised())
 				.setMobile(userDto.getMobile())
-				.setPassword(passwordEncoder.encode(userDto.getPassword()))
+				.setPassword(this.passwordEncoder.encode(userDto.getPassword()))
 				.setSchool(userDto.getSchool())
 				.setTeacherFirstName(userDto.getTeacherFirstName())
 				.setTeacherLastName(userDto.getTeacherLastName())
@@ -172,7 +172,7 @@ public class RegistrationRestController {
 				.setSuperuser(false).setApprovalEmailSent(false)
 				.setEnabled(true);
 
-		userService.insertUser(user);
+		this.userService.insertUser(user);
 
 		return new RegistrationResponse(Status.OK, null, null, null);
 	}

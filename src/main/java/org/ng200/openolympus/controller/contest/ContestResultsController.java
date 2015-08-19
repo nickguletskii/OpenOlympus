@@ -28,28 +28,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
-import org.ng200.openolympus.model.views.PriviligedView;
-import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.util.Beans;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.annotation.JsonView;
 
 //TODO: Port contest results to new API
 @RestController
@@ -69,7 +63,6 @@ public class ContestResultsController {
 			// TODO: fix contest ranking DTO
 		}
 
-		
 		public List<Pair<Task, BigDecimal>> getTaskScores() {
 			return this.taskScores;
 		}
@@ -85,7 +78,8 @@ public class ContestResultsController {
 		public String taskName;
 		public List<BigDecimal> results;
 
-		public TaskColumn(final String taskName, final List<BigDecimal> results) {
+		public TaskColumn(final String taskName,
+				final List<BigDecimal> results) {
 			super();
 			this.taskName = taskName;
 			this.results = results;
@@ -117,6 +111,7 @@ public class ContestResultsController {
 
 	@Autowired
 	private TaskService taskService;
+
 	@RequestMapping(value = "/api/contest/{contest}/testingFinished", method = RequestMethod.GET)
 	public boolean hasContestTestingFinished(
 			@PathVariable(value = "contest") final Contest contest) {
@@ -125,8 +120,9 @@ public class ContestResultsController {
 
 		return this.contestService.hasContestTestingFinished(contest);
 	}
+
 	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
-	
+
 	public List<ContestUserRankingDto> showCompleteResultsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			final Model model, final Principal principal) {
@@ -136,8 +132,9 @@ public class ContestResultsController {
 				.map(ranking -> new ContestUserRankingDto(contest, ranking))
 				.collect(Collectors.toList());
 	}
+
 	@RequestMapping(value = "/api/contest/{contest}/results", method = RequestMethod.GET)
-	
+
 	public List<ContestUserRankingDto> showResultsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,

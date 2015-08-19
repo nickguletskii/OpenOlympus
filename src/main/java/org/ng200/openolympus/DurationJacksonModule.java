@@ -36,31 +36,43 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class DurationJacksonModule extends SimpleModule {
+	public static class DurationMixins {
+		@JsonCreator
+		public static Duration ofMillis(long val) {
+			return Duration.ofMillis(val);
+		}
+
+		@JsonCreator
+		public static Duration ofMillis(String val) {
+			return Duration.ofMillis(Long.valueOf(val));
+		}
+	}
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 5894603418971898080L;
 
 	public DurationJacksonModule() {
-		addSerializer(new JsonSerializer<Duration>() {
+		this.addSerializer(new JsonSerializer<Duration>() {
+			@Override
+			public Class<Duration> handledType() {
+				return Duration.class;
+			}
+
 			@Override
 			public void serialize(Duration duration, JsonGenerator gen,
 					SerializerProvider serializerProvider) throws IOException,
 							JsonProcessingException {
 				gen.writeNumber(duration.toMillis());
 			}
-
-			@Override
-			public Class<Duration> handledType() {
-				return Duration.class;
-			}
 		});
-		addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
+		this.addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
 			@Override
 			public Duration deserialize(JsonParser jp,
 					DeserializationContext ctxt) throws IOException,
 							JsonProcessingException {
-				long l = jp.getValueAsLong();
+				final long l = jp.getValueAsLong();
 				return Duration.ofMillis(l);
 			}
 
@@ -75,17 +87,5 @@ public class DurationJacksonModule extends SimpleModule {
 	public void setupModule(SetupContext context) {
 		super.setupModule(context);
 		context.setMixInAnnotations(Duration.class, DurationMixins.class);
-	}
-
-	public static class DurationMixins {
-		@JsonCreator
-		public static Duration ofMillis(long val) {
-			return Duration.ofMillis(val);
-		}
-
-		@JsonCreator
-		public static Duration ofMillis(String val) {
-			return Duration.ofMillis(Long.valueOf(val));
-		}
 	}
 }

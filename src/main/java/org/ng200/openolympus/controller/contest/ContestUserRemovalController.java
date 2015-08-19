@@ -23,12 +23,10 @@
 package org.ng200.openolympus.controller.contest;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,13 +39,14 @@ public class ContestUserRemovalController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@RequestMapping(value = "/api/contest/{contest}/removeUser", method = RequestMethod.DELETE)
 	public void removeTask(
 			@PathVariable(value = "contest") final Contest contest,
 			@RequestParam(value = "user") final User user, final Model model) {
 		Assertions.resourceExists(contest);
 		Assertions.resourceExists(user);
-		contestService.removeUserFromContest(contest, user);
+		this.contestService.removeUserFromContest(contest, user);
 	}
 
 }

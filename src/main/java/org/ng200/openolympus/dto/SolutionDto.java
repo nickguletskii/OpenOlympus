@@ -30,8 +30,6 @@ import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 @SuppressWarnings("unused")
 public class SolutionDto implements Serializable {
 

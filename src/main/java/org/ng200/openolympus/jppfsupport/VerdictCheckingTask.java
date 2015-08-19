@@ -38,7 +38,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties({
-	"taskObject"
+						"taskObject"
 })
 public class VerdictCheckingTask implements
 		ExceptionalProducer<Pair<SolutionJudge, SolutionResult>> {
@@ -53,46 +53,6 @@ public class VerdictCheckingTask implements
 	private BigDecimal maximumScore;
 	private Properties properties;
 
-	public boolean isUserTest() {
-		return isUserTest;
-	}
-
-	public void setUserTest(boolean isUserTest) {
-		this.isUserTest = isUserTest;
-	}
-
-	public SolutionJudge getJudge() {
-		return judge;
-	}
-
-	public void setJudge(SolutionJudge judge) {
-		this.judge = judge;
-	}
-
-	public List<Path> getTestFiles() {
-		return testFiles;
-	}
-
-	public void setTestFiles(List<Path> testFiles) {
-		this.testFiles = testFiles;
-	}
-
-	public BigDecimal getMaximumScore() {
-		return maximumScore;
-	}
-
-	public void setMaximumScore(BigDecimal maximumScore) {
-		this.maximumScore = maximumScore;
-	}
-
-	public Properties getProperties() {
-		return properties;
-	}
-
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
 	@JsonCreator
 	public VerdictCheckingTask(
 			@JsonProperty("judge") final SolutionJudge judge,
@@ -105,20 +65,62 @@ public class VerdictCheckingTask implements
 		this.properties = properties;
 	}
 
+	public SolutionJudge getJudge() {
+		return this.judge;
+	}
+
+	public BigDecimal getMaximumScore() {
+		return this.maximumScore;
+	}
+
+	public Properties getProperties() {
+		return this.properties;
+	}
+
+	public List<Path> getTestFiles() {
+		return this.testFiles;
+	}
+
+	public boolean isUserTest() {
+		return this.isUserTest;
+	}
+
 	@Override
 	public Pair<SolutionJudge, SolutionResult> run() throws Exception {
-		if (isUserTest) {
+		if (this.isUserTest) {
 			throw new UnsupportedOperationException(
 					"User tests aren't supported yet");
 		} else {
 			try {
-				final SolutionResult result = judge.run(testFiles, true,
-						maximumScore, properties);
-				return new Pair<SolutionJudge, SolutionResult>(judge, result);
+				final SolutionResult result = this.judge.run(this.testFiles,
+						true,
+						this.maximumScore, this.properties);
+				return new Pair<SolutionJudge, SolutionResult>(this.judge,
+						result);
 			} finally {
-				judge.closeLocal();
-				Janitor.cleanUp(judge);
+				this.judge.closeLocal();
+				Janitor.cleanUp(this.judge);
 			}
 		}
+	}
+
+	public void setJudge(SolutionJudge judge) {
+		this.judge = judge;
+	}
+
+	public void setMaximumScore(BigDecimal maximumScore) {
+		this.maximumScore = maximumScore;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
+	public void setTestFiles(List<Path> testFiles) {
+		this.testFiles = testFiles;
+	}
+
+	public void setUserTest(boolean isUserTest) {
+		this.isUserTest = isUserTest;
 	}
 }

@@ -27,7 +27,7 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 
 /**
  * @author Nick Guletskii
- * 
+ *
  *         While a SecurityClearancePredicate is not a true predicate, it's
  *         still a predicate in the sense that when composed with common
  *         security logic, it becomes a proper predicate.

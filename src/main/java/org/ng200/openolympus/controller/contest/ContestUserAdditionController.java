@@ -25,7 +25,6 @@ package org.ng200.openolympus.controller.contest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestUserAdditionDto;
@@ -34,7 +33,6 @@ import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.ContestUserAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,6 +53,7 @@ public class ContestUserAdditionController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addUser")
 	public BindingResponse addUser(
 			@PathVariable(value = "contest") final Contest contest,

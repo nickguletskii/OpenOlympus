@@ -35,24 +35,24 @@ public class RecaptchaConfiguration {
 
 	private String recaptchaPublicKey;
 
+	public String getRecaptchaPrivateKey() {
+		return this.recaptchaPrivateKey;
+	}
+
+	public String getRecaptchaPublicKey() {
+		return this.recaptchaPublicKey;
+	}
+
 	public boolean isRecaptchaEnabled() {
-		return recaptchaEnabled;
+		return this.recaptchaEnabled;
 	}
 
 	public void setRecaptchaEnabled(boolean recaptchaEnabled) {
 		this.recaptchaEnabled = recaptchaEnabled;
 	}
 
-	public String getRecaptchaPrivateKey() {
-		return recaptchaPrivateKey;
-	}
-
 	public void setRecaptchaPrivateKey(String recaptchaPrivateKey) {
 		this.recaptchaPrivateKey = recaptchaPrivateKey;
-	}
-
-	public String getRecaptchaPublicKey() {
-		return recaptchaPublicKey;
 	}
 
 	public void setRecaptchaPublicKey(String recaptchaPublicKey) {

@@ -42,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
 import org.jppf.client.JPPFClient;
@@ -57,11 +56,6 @@ import org.ng200.openolympus.cerberus.SolutionResult;
 import org.ng200.openolympus.cerberus.SolutionResult.Result;
 import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.factory.JacksonSerializationFactory;
-import org.ng200.openolympus.jppfsupport.JacksonSerializationDelegatingTask;
-import org.ng200.openolympus.jppfsupport.JsonTaskExecutionResult;
-import org.ng200.openolympus.jppfsupport.SolutionCompilationTask;
-import org.ng200.openolympus.jppfsupport.VerdictCheckingTask;
-import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
@@ -69,6 +63,10 @@ import org.ng200.openolympus.jooq.tables.daos.VerdictDao;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
+import org.ng200.openolympus.jppfsupport.JacksonSerializationDelegatingTask;
+import org.ng200.openolympus.jppfsupport.JsonTaskExecutionResult;
+import org.ng200.openolympus.jppfsupport.SolutionCompilationTask;
+import org.ng200.openolympus.jppfsupport.VerdictCheckingTask;
 import org.ng200.openolympus.tasks.TaskContainer;
 import org.ng200.openolympus.util.Pair;
 import org.slf4j.Logger;
@@ -77,7 +75,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,11 +116,11 @@ public class TestingService {
 		}
 	}
 
-	private final JPPFClient jppfClient = new JPPFClient();
-	private final DataProvider dataProvider = new MemoryMapDataProvider();
-
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestingService.class);
+	private final JPPFClient jppfClient = new JPPFClient();
+
+	private final DataProvider dataProvider = new MemoryMapDataProvider();
 
 	private final Cache<Integer, Pair<String, String>> internalErrors = CacheBuilder
 			.newBuilder().maximumSize(30).build();
@@ -176,7 +173,7 @@ public class TestingService {
 		this.verdictCheckSchedulingExecutorService.scheduleAtFixedRate(
 				() -> {
 					this.logInAsSystem();
-					solutionService
+					this.solutionService
 							.getPendingVerdicts()
 							.filter((verdict) -> !alreadyScheduledJobs
 									.contains(verdict))
@@ -203,8 +200,9 @@ public class TestingService {
 		if (this.dataProvider == null) {
 			throw new IllegalStateException("Shared data provider is null!");
 		}
-		Solution solution = solutionDao.fetchOneById(verdict.getSolutionId());
-		Task task = taskDao.fetchOneById(solution.getTaskId());
+		final Solution solution = this.solutionDao
+				.fetchOneById(verdict.getSolutionId());
+		final Task task = this.taskDao.fetchOneById(solution.getTaskId());
 
 		final Lock lock = task.readLock();
 		lock.lock();
@@ -228,7 +226,7 @@ public class TestingService {
 					.setDispatchExpirationSchedule(new JPPFSchedule(60000L));
 			job.getSLA().setMaxDispatchExpirations(3);
 
-			TaskContainer taskContainer = taskContainerCache
+			final TaskContainer taskContainer = this.taskContainerCache
 					.getTaskContainerForTask(task);
 
 			Thread.currentThread().setContextClassLoader(
@@ -243,7 +241,7 @@ public class TestingService {
 
 			job.setBlocking(true);
 
-			jppfClient.registerClassLoader(taskContainer.getClassLoader(),
+			this.jppfClient.registerClassLoader(taskContainer.getClassLoader(),
 					job.getUuid());
 			this.jppfClient.submitJob(job);
 			@SuppressWarnings("unchecked")
@@ -254,7 +252,7 @@ public class TestingService {
 				throw jppfTask.getThrowable();
 			}
 
-			ObjectMapper objectMapper = JacksonSerializationFactory
+			final ObjectMapper objectMapper = JacksonSerializationFactory
 					.createObjectMapper();
 
 			final JsonTaskExecutionResult<Pair<SolutionJudge, SolutionResult>> checkingResult = ((JacksonSerializationDelegatingTask<Pair<SolutionJudge, SolutionResult>, VerdictCheckingTask>) job
@@ -273,7 +271,7 @@ public class TestingService {
 			verdict.setCpuTime(Duration.ofMillis(result.getCpuTime()));
 			verdict.setRealTime(Duration.ofMillis(result.getRealTime()));
 
-			verdict.setStatus(convertCerberusResultToVerdictStatus(result
+			verdict.setStatus(this.convertCerberusResultToVerdictStatus(result
 					.getResult()));
 			switch (result.getResult()) {
 			case OK:
@@ -320,6 +318,70 @@ public class TestingService {
 		}
 	}
 
+	private SolutionJudge compileSolution(final Solution solution,
+			final SolutionJudge judge, final Properties properties)
+					throws ExecutionException {
+		if (this.dataProvider == null) {
+			throw new IllegalStateException("Shared data provider is null!");
+		}
+		final Task task = this.taskDao.fetchOneById(solution.getTaskId());
+
+		final Lock lock = task.readLock();
+		lock.lock();
+
+		try {
+			TestingService.logger
+					.info("Scheduling solution {} for compilation.",
+							solution.getId());
+
+			final JPPFJob job = new JPPFJob();
+			job.setDataProvider(this.dataProvider);
+
+			job.setName("Compile solution " + solution.getId());
+
+			job.getSLA().setMaxNodes(1);
+			job.getSLA().setPriority(
+					(int) (Integer.MAX_VALUE - solution.getId()));
+			job.getSLA()
+					.setDispatchExpirationSchedule(new JPPFSchedule(20000L));
+			job.getSLA().setMaxDispatchExpirations(5);
+
+			final TaskContainer taskContainer = this.taskContainerCache
+					.getTaskContainerForTask(task);
+
+			Thread.currentThread().setContextClassLoader(
+					new URLClassLoader(taskContainer.getClassLoaderURLs()
+							.toArray(new URL[0]), Thread.currentThread()
+									.getContextClassLoader()));
+			job.add(new JacksonSerializationDelegatingTask<>(
+					new SolutionCompilationTask(judge, Lists
+							.from(this.storageService
+									.getSolutionFile(solution)),
+							properties),
+					taskContainer.getClassLoaderURLs()));
+
+			job.setBlocking(false);
+
+			this.jppfClient.registerClassLoader(taskContainer.getClassLoader(),
+					job.getUuid());
+			this.jppfClient.submitJob(job);
+			final JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) job
+					.awaitResults().get(0)).getResultOrThrowable();
+
+			if (result.getError() != null) {
+				throw result.getError();
+			}
+
+			return result.getResult();
+
+		} catch (final Throwable throwable) {
+			throw new RuntimeException("Couldn't compile solution: ",
+					throwable);
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	private VerdictStatusType convertCerberusResultToVerdictStatus(
 			Result result) {
 		switch (result) {
@@ -351,69 +413,6 @@ public class TestingService {
 		}
 	}
 
-	private SolutionJudge compileSolution(final Solution solution,
-			final SolutionJudge judge, final Properties properties)
-					throws ExecutionException {
-		if (this.dataProvider == null) {
-			throw new IllegalStateException("Shared data provider is null!");
-		}
-		Task task = taskDao.fetchOneById(solution.getTaskId());
-
-		final Lock lock = task.readLock();
-		lock.lock();
-
-		try {
-			TestingService.logger
-					.info("Scheduling solution {} for compilation.",
-							solution.getId());
-
-			final JPPFJob job = new JPPFJob();
-			job.setDataProvider(this.dataProvider);
-
-			job.setName("Compile solution " + solution.getId());
-
-			job.getSLA().setMaxNodes(1);
-			job.getSLA().setPriority(
-					(int) (Integer.MAX_VALUE - solution.getId()));
-			job.getSLA()
-					.setDispatchExpirationSchedule(new JPPFSchedule(20000L));
-			job.getSLA().setMaxDispatchExpirations(5);
-
-			TaskContainer taskContainer = taskContainerCache
-					.getTaskContainerForTask(task);
-
-			Thread.currentThread().setContextClassLoader(
-					new URLClassLoader(taskContainer.getClassLoaderURLs()
-							.toArray(new URL[0]), Thread.currentThread()
-									.getContextClassLoader()));
-			job.add(new JacksonSerializationDelegatingTask<>(
-					new SolutionCompilationTask(judge, Lists
-							.from(storageService.getSolutionFile(solution)),
-							properties),
-					taskContainer.getClassLoaderURLs()));
-
-			job.setBlocking(false);
-
-			jppfClient.registerClassLoader(taskContainer.getClassLoader(),
-					job.getUuid());
-			this.jppfClient.submitJob(job);
-			final JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) job
-					.awaitResults().get(0)).getResultOrThrowable();
-
-			if (result.getError() != null) {
-				throw result.getError();
-			}
-
-			return result.getResult();
-
-		} catch (final Throwable throwable) {
-			throw new RuntimeException("Couldn't compile solution: ",
-					throwable);
-		} finally {
-			lock.unlock();
-		}
-	}
-
 	public List<Pair<String, String>> getJudgeInternalErrors() {
 		return new ArrayList<>(this.internalErrors.asMap().values());
 	}
@@ -425,9 +424,9 @@ public class TestingService {
 
 	private void processVerdict(final Verdict verdict) {
 		try {
-			Solution solution = solutionDao.fetchOneById(verdict
+			final Solution solution = this.solutionDao.fetchOneById(verdict
 					.getSolutionId());
-			Task task = taskDao.fetchOneById(solution.getTaskId());
+			final Task task = this.taskDao.fetchOneById(solution.getTaskId());
 			final TaskContainer taskContainer = this.taskContainerCache
 					.getTaskContainerForTask(task);
 			final Function<CompletableFuture<SolutionJudge>, CompletableFuture<SolutionJudge>> functionToApplyToJudge = (
@@ -467,7 +466,8 @@ public class TestingService {
 								verdict.getMaximumScore(),
 								taskContainer.getProperties());
 					} catch (final Throwable e) {
-						Task t = taskService.getTaskFromVerdict(verdict);
+						final Task t = this.taskService
+								.getTaskFromVerdict(verdict);
 						TestingService.logger
 								.error("Solution judgement failed "
 										+ "because judge for task "
@@ -512,10 +512,10 @@ public class TestingService {
 	@Transactional
 	@CacheEvict(value = "solutions", key = "#solution.id")
 	public void testSolutionOnAllTests(Solution solution) throws IOException {
-		Task task = taskDao.fetchOneById(solution.getTaskId());
+		final Task task = this.taskDao.fetchOneById(solution.getTaskId());
 		final List<Verdict> verdicts = this.taskContainerCache
 				.getTaskContainerForTask(task).generateTestVerdicts(solution);
 
-		verdictDao.insert(verdicts);
+		this.verdictDao.insert(verdicts);
 	}
 }

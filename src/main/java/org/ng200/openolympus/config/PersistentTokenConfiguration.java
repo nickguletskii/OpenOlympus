@@ -31,7 +31,7 @@ public class PersistentTokenConfiguration {
 	private String persistentTokenKey;
 
 	public String getPersistentTokenKey() {
-		return persistentTokenKey;
+		return this.persistentTokenKey;
 	}
 
 	public void setPersistentTokenKey(String persistentTokenKey) {

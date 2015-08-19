@@ -27,21 +27,16 @@ import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 public class ArchiveTaskListRestController {
@@ -84,11 +79,13 @@ public class ArchiveTaskListRestController {
 
 	@Autowired
 	private UserService userService;
+
 	@RequestMapping(value = "/api/archive/tasksCount", method = RequestMethod.GET)
 
 	public Long countUsers() {
 		return this.taskService.countTasks();
 	}
+
 	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
 
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,

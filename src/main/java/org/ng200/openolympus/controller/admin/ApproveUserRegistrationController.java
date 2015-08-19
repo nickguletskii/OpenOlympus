@@ -29,23 +29,16 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.mail.EmailException;
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.controller.auth.EmailConfirmationController;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.EmailService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.ImmutableMap;
 
 @RestController
 public class ApproveUserRegistrationController {
@@ -72,14 +65,16 @@ public class ApproveUserRegistrationController {
 		}
 	}
 
-	private boolean emailConfirmationEnabled = false;// TODO: reimplement email
-														// confirmation
+	private final boolean emailConfirmationEnabled = false;// TODO: reimplement
+															// email
+															// confirmation
 
 	@Autowired
 	private EmailService emailService;
 
 	@Autowired
 	private UserService userService;
+
 	public void approveUser(User user) throws MessagingException,
 			EmailException {
 		Assertions.resourceExists(user);
@@ -100,6 +95,7 @@ public class ApproveUserRegistrationController {
 			this.userService.updateUser(user);
 		}
 	}
+
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
 
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {

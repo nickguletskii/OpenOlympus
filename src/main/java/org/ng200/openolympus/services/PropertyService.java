@@ -30,14 +30,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.jooq.DSLContext;
-
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
 import org.ng200.openolympus.jooq.tables.pojos.Property;
 import org.ng200.openolympus.jooq.tables.records.PropertyRecord;
-import org.ng200.openolympus.jooq.tables.records.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -48,15 +45,6 @@ public class PropertyService {
 
 	@Autowired
 	private DSLContext dslContext;
-
-	private byte[] serializeObject(Serializable serializable)
-			throws IOException {
-		try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-				ObjectOutputStream o = new ObjectOutputStream(b);) {
-			o.writeObject(serializable);
-			return b.toByteArray();
-		}
-	}
 
 	private Object deserializeObject(byte[] obj) throws IOException,
 			ClassNotFoundException {
@@ -70,16 +58,28 @@ public class PropertyService {
 			throws IOException {
 		Property property = this.propertyDao.fetchOneByPropertyKey(key);
 		if (property == null) {
-			property = new Property(null, key, serializeObject(defaultValue));
-			propertyDao.insert(property);
+			property = new Property(null, key,
+					this.serializeObject(defaultValue));
+			this.propertyDao.insert(property);
 		}
 		return property;
 	}
+
+	private byte[] serializeObject(Serializable serializable)
+			throws IOException {
+		try (ByteArrayOutputStream b = new ByteArrayOutputStream();
+				ObjectOutputStream o = new ObjectOutputStream(b);) {
+			o.writeObject(serializable);
+			return b.toByteArray();
+		}
+	}
+
 	public void set(final String key, final Serializable value)
 			throws IOException {
-		Property property = get(key, value);
-		property.setPropertyValue(serializeObject(value));
-		PropertyRecord propertyRecord = dslContext.newRecord(Tables.PROPERTY);
+		final Property property = this.get(key, value);
+		property.setPropertyValue(this.serializeObject(value));
+		final PropertyRecord propertyRecord = this.dslContext
+				.newRecord(Tables.PROPERTY);
 		propertyRecord.from(property);
 		propertyRecord.store();
 	}

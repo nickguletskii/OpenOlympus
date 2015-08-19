@@ -45,7 +45,8 @@ public class SinglepageController {
 	@RequestMapping(value = "/**", produces = MediaType.TEXT_HTML_VALUE)
 	@ResponseBody
 	public Resource singlepage(WebRequest requst) throws ResourceException {
-		logger.debug("Singlepage controller called for URI: {}",
+		SinglepageController.logger.debug(
+				"Singlepage controller called for URI: {}",
 				requst.getDescription(false));
 		return new ClassPathResource("public/index.html");
 	}

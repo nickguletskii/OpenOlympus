@@ -26,14 +26,11 @@ import java.security.Principal;
 import java.util.List;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.model.views.PriviligedView;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,15 +38,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 @RestController
 public class ContestParticipantsController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
-	
+
 	public List<User> showParticipantsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,

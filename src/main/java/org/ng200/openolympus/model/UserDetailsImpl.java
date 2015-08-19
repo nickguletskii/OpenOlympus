@@ -42,12 +42,14 @@ public interface UserDetailsImpl extends IUser, UserDetails {
 
 	@Override
 	public default Collection<? extends GrantedAuthority> getAuthorities() {
-		Builder<GrantedAuthority> builder = ImmutableList
+		final Builder<GrantedAuthority> builder = ImmutableList
 				.<GrantedAuthority> builder();
-		if (getApproved())
+		if (this.getApproved()) {
 			builder.add(Authorities.USER);
-		if (getSuperuser())
+		}
+		if (this.getSuperuser()) {
 			builder.add(Authorities.SUPERUSER);
+		}
 		return builder.build();
 	}
 
@@ -68,7 +70,7 @@ public interface UserDetailsImpl extends IUser, UserDetails {
 
 	@Override
 	public default boolean isEnabled() {
-		return getEnabled();
+		return this.getEnabled();
 	}
 
 }

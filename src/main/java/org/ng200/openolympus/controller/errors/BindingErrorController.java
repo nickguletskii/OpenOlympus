@@ -44,7 +44,7 @@ public class BindingErrorController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@ExceptionHandler({
-		BindException.class
+						BindException.class
 	})
 	@ResponseBody
 	public BindingResponse handleBindException(BindException exception) {

@@ -25,15 +25,11 @@ package org.ng200.openolympus.services;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Date;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Param;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
-import org.markdown4j.YumlPlugin;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.ContestTasksDao;
@@ -71,18 +67,28 @@ public class SecurityService {
 	@Autowired
 	private DSLContext dslContext;
 
+	public boolean canViewVerdictDuringContest(Verdict verdict) {
+		return verdict.getViewableDuringContest();
+	}
+
+	public Contest getCurrentContest() {
+		return this.contestService.getRunningContest();
+	}
+
 	public boolean isContestInProgressForUser(final Contest contest,
 			String username) {
-		Param<Integer> contestV = DSL.val(contest.getId());
-		Field<Timestamp> now = DSL.val(Timestamp.from(Instant.now()));
-		Field<Long> userV = dslContext.select(Tables.USER.ID).from(Tables.USER)
+		final Param<Integer> contestV = DSL.val(contest.getId());
+		final Field<Timestamp> now = DSL.val(Timestamp.from(Instant.now()));
+		final Field<Long> userV = this.dslContext.select(Tables.USER.ID)
+				.from(Tables.USER)
 				.where(Tables.USER.USERNAME.eq(username)).asField();
-		return dslContext
+		return this.dslContext
 				.select(DSL.field(Routines
 						.getContestStartForUser(contestV, userV)
 						.le(now)
 						.and(Routines.getContestEndForUser(contestV, userV).ge(
-								now)))).fetchOne().value1();
+								now))))
+				.fetchOne().value1();
 	}
 
 	public boolean isContestOver(final Contest contest) {
@@ -99,23 +105,25 @@ public class SecurityService {
 		final Contest runningContest = this.contestService.getRunningContest();
 		return runningContest == null
 				|| (this.isTaskInContest(
-						taskDao.fetchOneById(solution.getTaskId()),
+						this.taskDao.fetchOneById(solution.getTaskId()),
 						runningContest)
 						&&
 
-						runningContest.getStartTime().toInstant()
-								.isBefore(solution.getTimeAdded().toInstant()) && this.contestService
-						.getContestEndTimeForUser(runningContest,
-								userDao.fetchOneById(solution.getUserId()))
-						.toInstant()
-						.isAfter(solution.getTimeAdded().toInstant()));
+		runningContest.getStartTime().toInstant()
+				.isBefore(solution.getTimeAdded().toInstant())
+						&& this.contestService
+								.getContestEndTimeForUser(runningContest,
+										this.userDao.fetchOneById(
+												solution.getUserId()))
+								.toInstant()
+								.isAfter(solution.getTimeAdded().toInstant()));
 	}
 
 	public boolean isSuperuser(final Principal principal) {
 		if (principal == null) {
 			return false;
 		}
-		return dslContext.select(Tables.USER.SUPERUSER).from(Tables.USER)
+		return this.dslContext.select(Tables.USER.SUPERUSER).from(Tables.USER)
 				.where(Tables.USER.USERNAME.eq(principal.getName())).fetchOne()
 				.value1();
 	}
@@ -128,14 +136,15 @@ public class SecurityService {
 	}
 
 	public boolean isTaskInContest(Task task, Contest contest) {
-		return contestTasksDao.exists(new ContestTasks(contest.getId(), task
-				.getId()));
+		return this.contestTasksDao
+				.exists(new ContestTasks(contest.getId(), task
+						.getId()));
 	}
 
 	public boolean isTaskInCurrentContest(Task task) {
 		final Contest runningContest = this.contestService.getRunningContest();
 		return runningContest == null
-				|| contestTasksDao.exists(new ContestTasks(runningContest
+				|| this.contestTasksDao.exists(new ContestTasks(runningContest
 						.getId(), task.getId()));
 	}
 
@@ -145,13 +154,5 @@ public class SecurityService {
 
 	public boolean noLockdown() {
 		return !this.isOnLockdown();
-	}
-
-	public boolean canViewVerdictDuringContest(Verdict verdict) {
-		return verdict.getViewableDuringContest();
-	}
-
-	public Contest getCurrentContest() {
-		return contestService.getRunningContest();
 	}
 }

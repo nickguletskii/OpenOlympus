@@ -54,7 +54,11 @@ public class TaskContainerCache {
 		this.executorService.scheduleAtFixedRate(() -> {
 			this.taskContainers.forEach((id, taskContainer) -> taskContainer
 					.collectGarbage(this.solutionService));
-		}, 10, 10, TimeUnit.SECONDS);
+		} , 10, 10, TimeUnit.SECONDS);
+	}
+
+	public void clear() {
+		this.taskContainers.clear();
 	}
 
 	public TaskContainer getTaskContainerForTask(final Task task) {
@@ -76,9 +80,5 @@ public class TaskContainerCache {
 								"Couldn't load task container", e);
 					}
 				});
-	}
-
-	public void clear() {
-		taskContainers.clear();
 	}
 }

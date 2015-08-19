@@ -24,11 +24,8 @@ package org.ng200.openolympus.util;
 
 import java.io.Serializable;
 
-import org.ng200.openolympus.model.views.UnprivilegedView;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 public class Pair<F, S> implements Serializable {
 	/**
@@ -78,13 +75,13 @@ public class Pair<F, S> implements Serializable {
 	}
 
 	@JsonProperty("first")
-	
+
 	public F getFirst() {
 		return this.first;
 	}
 
 	@JsonProperty("second")
-	
+
 	public S getSecond() {
 		return this.second;
 	}

@@ -44,7 +44,7 @@ public class AccessDeniedExceptionHandler {
 
 	@ResponseStatus(value = HttpStatus.FORBIDDEN)
 	@ExceptionHandler({
-		AccessDeniedException.class
+						AccessDeniedException.class
 	})
 	@RequestMapping(produces = "application/json;charset=UTF-8")
 	@ResponseBody
@@ -54,7 +54,7 @@ public class AccessDeniedExceptionHandler {
 
 	@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler({
-		CookieTheftException.class
+						CookieTheftException.class
 	})
 	@RequestMapping(produces = "application/json;charset=UTF-8")
 	@ResponseBody

@@ -96,17 +96,18 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 				.orElse(null);
 
 		// No annotation -> no restriction.
-		if (requestedClearance == null)
+		if (requestedClearance == null) {
 			return true;
+		}
 
-		if (securityContextHasClearance(object,
+		if (this.securityContextHasClearance(object,
 				requestedClearance.minimumClearance(),
 				propertyName) &&
 				Stream.of(requestedClearance.predicates())
 						.map(predicateClass -> this.getPredicate(predicateClass)
 								.getRequiredClearanceForObject(user, object))
 						.map(req -> req != SecurityClearanceType.DENIED
-								? securityContextHasClearance(object, req,
+								? this.securityContextHasClearance(object, req,
 										propertyName)
 								: false)
 						.reduce(true, (l, r) -> l && r)) {

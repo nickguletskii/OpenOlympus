@@ -33,8 +33,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class IsoDateSerializer extends JsonSerializer<Date> {
 	@Override
-	public void serialize(Date value, JsonGenerator gen, SerializerProvider arg2)
-			throws IOException, JsonProcessingException {
+	public void serialize(Date value, JsonGenerator gen,
+			SerializerProvider arg2)
+					throws IOException, JsonProcessingException {
 		final SimpleDateFormat formatter = new SimpleDateFormat(
 				"yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 		final String formattedDate = formatter.format(value);

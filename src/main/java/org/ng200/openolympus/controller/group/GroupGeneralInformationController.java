@@ -25,12 +25,9 @@ package org.ng200.openolympus.controller.group;
 import java.util.List;
 
 import org.ng200.openolympus.Assertions;
-
 import org.ng200.openolympus.jooq.tables.pojos.Group;
-import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,31 +35,31 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 @RestController
 public class GroupGeneralInformationController {
 
 	@Autowired
 	private GroupService groupService;
-	
+
+	@RequestMapping(method = RequestMethod.GET, value = "/api/group")
+	public @ResponseBody Group getGroup(
+			@RequestParam(value = "id", required = false) final Long id,
+			@RequestParam(value = "name", required = false) final String name)
+					throws MissingServletRequestParameterException {
+		if (name != null) {
+			return this.groupService.getGroupByName(name);
+		}
+		if (id == null) {
+			throw new MissingServletRequestParameterException("id", "long");
+		}
+		return this.groupService.getGroupById(id);
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupCompletion")
 	public @ResponseBody List<Group> searchGroups(
 			@RequestParam(value = "term", defaultValue = "") final String name) {
 		Assertions.resourceExists(name);
 
 		return this.groupService.findAFewGroupsWithNameContaining(name);
-	}
-	
-	@RequestMapping(method = RequestMethod.GET, value = "/api/group")
-	public @ResponseBody Group getGroup(
-			@RequestParam(value = "id", required = false) final Long id,
-			@RequestParam(value = "name", required = false) final String name)
-					throws MissingServletRequestParameterException {
-		if (name != null)
-			return this.groupService.getGroupByName(name);
-		if (id == null)
-			throw new MissingServletRequestParameterException("id", "long");
-		return this.groupService.getGroupById(id);
 	}
 }

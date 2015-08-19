@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.services;
 
-import static org.jooq.impl.DSL.max;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,8 +71,6 @@ import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
@@ -102,133 +98,30 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private StorageService storageService;
+
+	public boolean canModifyTask(Task task, User user) {
+		return user.getSuperuser()
+				|| Routines.hasTaskPermission(this.dslContext.configuration(),
+						task.getId(), user.getId(), TaskPermissionType.modify);
+	}
+
 	public long countTasks() {
-		return taskDao.count();
-	}
-	public List<Task> findAFewTasksWithNameContaining(final String name) {
-		return dslContext.selectFrom(Tables.TASK)
-				.where(Tables.TASK.NAME.toString() + " % "
-						+ DSL.val(name, String.class))
-				.limit(LIMIT_TASKS_WITH_NAME_CONTAINING).fetchInto(Task.class);
-	}
-	public List<Task> findTasksNewestFirst(final int pageNumber,
-			final int pageSize) {
-		return dslContext.selectFrom(Tables.TASK).groupBy(Tables.TASK.ID)
-				.orderBy(Tables.TASK.CREATED_DATE.desc())
-				.limit(pageSize).offset((pageNumber - 1) * pageSize)
-				.fetchInto(Task.class);
-	}
-	public List<Task> findTasksNewestFirstAndAuthorized(Integer pageNumber,
-			int pageSize, Principal principal) {
-		if (this.securityService.isSuperuser(principal)) {
-			return this.findTasksNewestFirst(pageNumber, pageSize);
-		}
-		SelectConditionStep<Record1<Long>> userId = dslContext
-				.select(Tables.USER.ID)
-				.from(Tables.USER)
-				.where(Tables.USER.USERNAME
-						.eq(principal.getName()));
-		Condition taskPermissionAppliesToUser = Tables.TASK_PERMISSION.PRINCIPAL_ID
-				.in(
-						dslContext.select(Tables.GROUP_USERS.GROUP_ID)
-								.from(Tables.GROUP_USERS)
-								.where(Tables.GROUP_USERS.GROUP_ID.eq(userId)))
-				.or(Tables.TASK_PERMISSION.PRINCIPAL_ID.eq(userId));
-		return dslContext.select(Tables.TASK.fields())
-				.from(Tables.TASK)
-				.join(Tables.TASK_PERMISSION)
-				.on(Tables.TASK_PERMISSION.TASK_ID
-						.eq(Tables.TASK.ID))
-				.where(taskPermissionAppliesToUser
-						.and(Tables.TASK_PERMISSION.PERMISSION
-								.eq(TaskPermissionType.view)))
-				.groupBy(Tables.TASK.CREATED_DATE)
-				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
-				.offset((pageNumber - 1) * pageSize)
-				.fetchInto(Task.class);
-	}
-	public BigDecimal getMaximumScore(final Task task) {
-		return dslContext.select(max(Tables.SOLUTION.MAXIMUM_SCORE))
-				.from(Tables.SOLUTION)
-				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchOne()
-				.value1();
-	}
-	public BigDecimal getScore(final Task task, final User user) {
-		return dslContext.select(max(Tables.SOLUTION.SCORE))
-				.from(Tables.SOLUTION)
-				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())
-						.and(Tables.SOLUTION.USER_ID.eq(user.getId())))
-				.fetchOne().value1();
-	}
-	
-	public Task getTaskByName(final String taskName) {
-		return taskDao.fetchOneByName(taskName);
-	}
-	@Transactional
-	public void rejudgeTask(final Task task)
-			throws ExecutionException, IOException {
-		dslContext.delete(Tables.VERDICT).where(Tables.VERDICT.SOLUTION_ID
-				.in(dslContext.select(Tables.SOLUTION.ID)
-						.from(Tables.SOLUTION)
-						.where(Tables.SOLUTION.TASK_ID.eq(task.getId()))));
-		Cursor<SolutionRecord> solutions = dslContext
-				.selectFrom(Tables.SOLUTION)
-				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchLazy();
-		while (solutions.hasNext()) {
-			Solution solution = solutions.fetchOneInto(Solution.class);
-			testingService.testSolutionOnAllTests(solution);
-		}
-	}
-	public Task insertTask(Task task) {
-		return insert(task, Tables.TASK);
-	}
-
-	public Task getTaskFromVerdict(Verdict verdict) {
-		return dslContext.select(Tables.TASK.fields()).from(Tables.VERDICT)
-				.join(Tables.SOLUTION)
-				.on(Tables.SOLUTION.ID.eq(Tables.VERDICT.ID)).join(Tables.TASK)
-				.on(Tables.TASK.ID.eq(Tables.SOLUTION.TASK_ID))
-				.where(Tables.VERDICT.ID.eq(verdict.getId()))
-				.fetchOneInto(Task.class);
-	}
-
-	public Task getById(Integer id) {
-		return taskDao.findById(id);
-	}
-	public Task updateTask(Task task) {
-		return update(task, Tables.TASK);
-	}
-
-	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
-			Task task) {
-		return getTaskPermissionsAndPrincipalData(task.getId());
-	}
-
-	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
-			int taskId) {
-		return dslContext.select(Tables.TASK_PERMISSION.PERMISSION,
-				Tables.TASK_PERMISSION.PRINCIPAL_ID)
-				.from(Tables.TASK_PERMISSION)
-				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
-				.fetchGroups(Tables.TASK_PERMISSION.PERMISSION,
-						(record) -> Optional.<OlympusPrincipal> ofNullable(
-								dslContext.selectFrom(Tables.GROUP)
-										.where(Tables.GROUP.ID
-												.eq(record.value2()))
-										.fetchOneInto(Group.class))
-								.orElse(
-										dslContext.selectFrom(Tables.USER)
-												.where(Tables.USER.ID
-														.eq(record.value2()))
-												.fetchOneInto(User.class)));
+		return this.taskDao.count();
 	}
 
 	public void createDefaultTaskACL(Task task, User owner) {
-		TaskPermissionRecord permissionRecord = new TaskPermissionRecord(
+		final TaskPermissionRecord permissionRecord = new TaskPermissionRecord(
 				task.getId(), owner.getId(), TaskPermissionType.manage_acl);
-		permissionRecord.attach(dslContext.configuration());
+		permissionRecord.attach(this.dslContext.configuration());
 		permissionRecord.insert();
 	}
+
+	public boolean doesUserHaveTaskPermission(Task task, User user,
+			TaskPermissionType permission) {
+		return Routines.hasTaskPermission(this.dslContext.configuration(),
+				task.getId(), user.getId(), permission);
+	}
+
 	private void extractZipFile(final InputStream zipFile,
 			final Path destination) throws Exception {
 		try (ArchiveInputStream input = new ArchiveStreamFactory()
@@ -247,6 +140,165 @@ public class TaskService extends GenericCreateUpdateRepository {
 			}
 		}
 	}
+
+	public List<Task> findAFewTasksWithNameContaining(final String name) {
+		return this.dslContext.selectFrom(Tables.TASK)
+				.where(Tables.TASK.NAME.toString() + " % "
+						+ DSL.val(name, String.class))
+				.limit(TaskService.LIMIT_TASKS_WITH_NAME_CONTAINING)
+				.fetchInto(Task.class);
+	}
+
+	public List<Task> findTasksNewestFirst(final int pageNumber,
+			final int pageSize) {
+		return this.dslContext.selectFrom(Tables.TASK).groupBy(Tables.TASK.ID)
+				.orderBy(Tables.TASK.CREATED_DATE.desc())
+				.limit(pageSize).offset((pageNumber - 1) * pageSize)
+				.fetchInto(Task.class);
+	}
+
+	public List<Task> findTasksNewestFirstAndAuthorized(Integer pageNumber,
+			int pageSize, Principal principal) {
+		if (this.securityService.isSuperuser(principal)) {
+			return this.findTasksNewestFirst(pageNumber, pageSize);
+		}
+		final SelectConditionStep<Record1<Long>> userId = this.dslContext
+				.select(Tables.USER.ID)
+				.from(Tables.USER)
+				.where(Tables.USER.USERNAME
+						.eq(principal.getName()));
+		final Condition taskPermissionAppliesToUser = Tables.TASK_PERMISSION.PRINCIPAL_ID
+				.in(
+						this.dslContext.select(Tables.GROUP_USERS.GROUP_ID)
+								.from(Tables.GROUP_USERS)
+								.where(Tables.GROUP_USERS.GROUP_ID.eq(userId)))
+				.or(Tables.TASK_PERMISSION.PRINCIPAL_ID.eq(userId));
+		return this.dslContext.select(Tables.TASK.fields())
+				.from(Tables.TASK)
+				.join(Tables.TASK_PERMISSION)
+				.on(Tables.TASK_PERMISSION.TASK_ID
+						.eq(Tables.TASK.ID))
+				.where(taskPermissionAppliesToUser
+						.and(Tables.TASK_PERMISSION.PERMISSION
+								.eq(TaskPermissionType.view)))
+				.groupBy(Tables.TASK.CREATED_DATE)
+				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
+				.offset((pageNumber - 1) * pageSize)
+				.fetchInto(Task.class);
+	}
+
+	public Task getById(Integer id) {
+		return this.taskDao.findById(id);
+	}
+
+	public BigDecimal getMaximumScore(final Task task) {
+		return this.dslContext.select(DSL.max(Tables.SOLUTION.MAXIMUM_SCORE))
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchOne()
+				.value1();
+	}
+
+	public BigDecimal getScore(final Task task, final User user) {
+		return this.dslContext.select(DSL.max(Tables.SOLUTION.SCORE))
+				.from(Tables.SOLUTION)
+				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())
+						.and(Tables.SOLUTION.USER_ID.eq(user.getId())))
+				.fetchOne().value1();
+	}
+
+	public Task getTaskByName(final String taskName) {
+		return this.taskDao.fetchOneByName(taskName);
+	}
+
+	public Task getTaskFromVerdict(Verdict verdict) {
+		return this.dslContext.select(Tables.TASK.fields()).from(Tables.VERDICT)
+				.join(Tables.SOLUTION)
+				.on(Tables.SOLUTION.ID.eq(Tables.VERDICT.ID)).join(Tables.TASK)
+				.on(Tables.TASK.ID.eq(Tables.SOLUTION.TASK_ID))
+				.where(Tables.VERDICT.ID.eq(verdict.getId()))
+				.fetchOneInto(Task.class);
+	}
+
+	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
+			int taskId) {
+		return this.dslContext.select(Tables.TASK_PERMISSION.PERMISSION,
+				Tables.TASK_PERMISSION.PRINCIPAL_ID)
+				.from(Tables.TASK_PERMISSION)
+				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
+				.fetchGroups(Tables.TASK_PERMISSION.PERMISSION,
+						(record) -> Optional.<OlympusPrincipal> ofNullable(
+								this.dslContext.selectFrom(Tables.GROUP)
+										.where(Tables.GROUP.ID
+												.eq(record.value2()))
+										.fetchOneInto(Group.class))
+								.orElse(
+										this.dslContext.selectFrom(Tables.USER)
+												.where(Tables.USER.ID
+														.eq(record.value2()))
+												.fetchOneInto(User.class)));
+	}
+
+	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
+			Task task) {
+		return this.getTaskPermissionsAndPrincipalData(task.getId());
+	}
+
+	public Task insertTask(Task task) {
+		return this.insert(task, Tables.TASK);
+	}
+
+	@Transactional
+	public void patchTask(final Task task,
+			final TaskModificationDto taskModificationDto)
+					throws IOException, Exception {
+		task.setName(taskModificationDto.getName());
+
+		if (taskModificationDto.getJudgeFile() != null) {
+			this.uploadJudgeFile(task, taskModificationDto);
+		}
+
+		this.updateTask(task);
+		this.testingService.reloadTasks();
+	}
+
+	@Transactional
+	public void rejudgeTask(final Task task)
+			throws ExecutionException, IOException {
+		this.dslContext.delete(Tables.VERDICT).where(Tables.VERDICT.SOLUTION_ID
+				.in(this.dslContext.select(Tables.SOLUTION.ID)
+						.from(Tables.SOLUTION)
+						.where(Tables.SOLUTION.TASK_ID.eq(task.getId()))));
+		final Cursor<SolutionRecord> solutions = this.dslContext
+				.selectFrom(Tables.SOLUTION)
+				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchLazy();
+		while (solutions.hasNext()) {
+			final Solution solution = solutions.fetchOneInto(Solution.class);
+			this.testingService.testSolutionOnAllTests(solution);
+		}
+	}
+
+	@Transactional
+	public void setTaskPermissionsAndPrincipals(int taskId,
+			Map<TaskPermissionType, List<Long>> map) {
+		this.dslContext.delete(Tables.TASK_PERMISSION)
+				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId)).execute();
+		this.dslContext.batchInsert(
+				map.entrySet().stream().flatMap(e -> e.getValue().stream()
+						.map(id -> new Pair<>(e.getKey(), id)))
+						.map(p -> {
+							final TaskPermissionRecord record = new TaskPermissionRecord(
+									taskId,
+									p.getSecond(), p.getFirst());
+							record.attach(this.dslContext.configuration());
+							return record;
+						}).collect(Collectors.toList()))
+				.execute();
+	}
+
+	public Task updateTask(Task task) {
+		return this.update(task, Tables.TASK);
+	}
+
 	protected void uploadJudgeFile(final Task task,
 			final UploadableTask taskDto)
 					throws IOException, Exception {
@@ -298,49 +350,5 @@ public class TaskService extends GenericCreateUpdateRepository {
 			lock.unlock();
 		}
 		return task;
-	}
-
-	@Transactional
-	public void setTaskPermissionsAndPrincipals(int taskId,
-			Map<TaskPermissionType, List<Long>> map) {
-		dslContext.delete(Tables.TASK_PERMISSION)
-				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId)).execute();
-		dslContext.batchInsert(
-				map.entrySet().stream().flatMap(e -> e.getValue().stream()
-						.map(id -> new Pair<>(e.getKey(), id)))
-						.map(p -> {
-							TaskPermissionRecord record = new TaskPermissionRecord(
-									taskId,
-									p.getSecond(), p.getFirst());
-							record.attach(dslContext.configuration());
-							return record;
-						}).collect(Collectors.toList()))
-				.execute();
-	}
-
-	public boolean doesUserHaveTaskPermission(Task task, User user,
-			TaskPermissionType permission) {
-		return Routines.hasTaskPermission(dslContext.configuration(),
-				task.getId(), user.getId(), permission);
-	}
-
-	public boolean canModifyTask(Task task, User user) {
-		return user.getSuperuser()
-				|| Routines.hasTaskPermission(dslContext.configuration(),
-						task.getId(), user.getId(), TaskPermissionType.modify);
-	}
-
-	@Transactional
-	public void patchTask(final Task task,
-			final TaskModificationDto taskModificationDto)
-					throws IOException, Exception {
-		task.setName(taskModificationDto.getName());
-
-		if (taskModificationDto.getJudgeFile() != null) {
-			this.uploadJudgeFile(task, taskModificationDto);
-		}
-
-		this.updateTask(task);
-		this.testingService.reloadTasks();
 	}
 }

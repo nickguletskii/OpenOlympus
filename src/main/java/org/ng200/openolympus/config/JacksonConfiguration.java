@@ -42,8 +42,9 @@ import com.fasterxml.jackson.databind.ser.PropertyFilter;
 @Configuration
 public class JacksonConfiguration {
 	@Bean
-	public SecurityClearanceJacksonFilter securityClearanceJacksonFilter() {
-		return new SecurityClearanceJacksonFilter();
+	@Primary
+	public ObjectMapper jacksonObjectMapper() {
+		return this.jacksonObjectMapperBuilder().build();
 	}
 
 	@Bean
@@ -55,27 +56,29 @@ public class JacksonConfiguration {
 				.filters(new FilterProvider() {
 
 					@Override
-					public PropertyFilter findPropertyFilter(Object filterId,
-							Object valueToFilter) {
-						return securityClearanceJacksonFilter();
+					public BeanPropertyFilter findFilter(Object filterId) {
+						return JacksonConfiguration.this
+								.securityClearanceJacksonFilter();
 					}
 
 					@Override
-					public BeanPropertyFilter findFilter(Object filterId) {
-						return securityClearanceJacksonFilter();
+					public PropertyFilter findPropertyFilter(Object filterId,
+							Object valueToFilter) {
+						return JacksonConfiguration.this
+								.securityClearanceJacksonFilter();
 					}
 				})
 				.annotationIntrospector(new JacksonAnnotationIntrospector());
 	}
 
 	@Bean
-	@Primary
-	public ObjectMapper jacksonObjectMapper() {
-		return jacksonObjectMapperBuilder().build();
+	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+		return new MappingJackson2HttpMessageConverter(
+				this.jacksonObjectMapper());
 	}
 
 	@Bean
-	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-		return new MappingJackson2HttpMessageConverter(jacksonObjectMapper());
+	public SecurityClearanceJacksonFilter securityClearanceJacksonFilter() {
+		return new SecurityClearanceJacksonFilter();
 	}
 }

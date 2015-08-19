@@ -23,17 +23,12 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.security.Principal;
-import java.time.Duration;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.model.views.UnprivilegedView;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SecurityService;
 import org.ng200.openolympus.services.TaskService;
@@ -42,59 +37,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 @RestController
 public class ContestViewController {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(ContestViewController.class);
-	@Autowired
-	private SecurityService securityService;
-
-	@Autowired
-	private TaskService taskService;
-
-	@Autowired
-	private ContestService contestService;
-
-	@Autowired
-	private UserService userService;
 
 	public static class ContestDTO {
 		private String name;
 		private TimingDTO timings;
 		private List<Task> tasks;
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public TimingDTO getTimings() {
-			return timings;
-		}
-
-		public void setTimings(TimingDTO timings) {
-			this.timings = timings;
-		}
-
-		public List<Task> getTasks() {
-			return tasks;
-		}
-
-		public void setTasks(List<Task> tasks) {
-			this.tasks = tasks;
-		}
 
 		public ContestDTO(String name, TimingDTO timings, List<Task> tasks) {
 			super();
@@ -102,50 +56,36 @@ public class ContestViewController {
 			this.timings = timings;
 			this.tasks = tasks;
 		}
-	}
-	@Cacheable(value = "contests", key = "#contest.id", unless = "#result == null")
-	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
-	
-	public ContestDTO showContestHub(
-			@PathVariable(value = "contest") final Contest contest,
-			final Principal principal) {
-		User user = userService.getUserByUsername(principal.getName());
-		List<Task> tasks = contestService.getContestTasks(contest);
-		return new ContestDTO(contest.getName(), new TimingDTO(
-				contest.getStartTime(), Date.from(contest.getStartTime()
-						.toInstant().plus(contest.getDuration())),
-				contestService.getContestEndTimeForUser(contest, user)), tasks);
+
+		public String getName() {
+			return this.name;
+		}
+
+		public List<Task> getTasks() {
+			return this.tasks;
+		}
+
+		public TimingDTO getTimings() {
+			return this.timings;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public void setTasks(List<Task> tasks) {
+			this.tasks = tasks;
+		}
+
+		public void setTimings(TimingDTO timings) {
+			this.timings = timings;
+		}
 	}
 
 	public static class TimingDTO {
 		private Date startTime;
 		private Date endTime;
 		private Date endTimeIncludingTimeExtensions;
-
-		public Date getStartTime() {
-			return startTime;
-		}
-
-		public void setStartTime(Date startTime) {
-			this.startTime = startTime;
-		}
-
-		public Date getEndTime() {
-			return endTime;
-		}
-
-		public void setEndTime(Date endTime) {
-			this.endTime = endTime;
-		}
-
-		public Date getEndTimeIncludingTimeExtensions() {
-			return endTimeIncludingTimeExtensions;
-		}
-
-		public void setEndTimeIncludingTimeExtensions(
-				Date endTimeIncludingTimeExtensions) {
-			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
-		}
 
 		public TimingDTO(Date startTime, Date endTime,
 				Date endTimeIncludingTimeExtensions) {
@@ -154,6 +94,61 @@ public class ContestViewController {
 			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
 		}
 
+		public Date getEndTime() {
+			return this.endTime;
+		}
+
+		public Date getEndTimeIncludingTimeExtensions() {
+			return this.endTimeIncludingTimeExtensions;
+		}
+
+		public Date getStartTime() {
+			return this.startTime;
+		}
+
+		public void setEndTime(Date endTime) {
+			this.endTime = endTime;
+		}
+
+		public void setEndTimeIncludingTimeExtensions(
+				Date endTimeIncludingTimeExtensions) {
+			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
+		}
+
+		public void setStartTime(Date startTime) {
+			this.startTime = startTime;
+		}
+
+	}
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContestViewController.class);
+
+	@Autowired
+	private SecurityService securityService;
+
+	@Autowired
+	private TaskService taskService;
+
+	@Autowired
+	private ContestService contestService;
+	@Autowired
+	private UserService userService;
+
+	@Cacheable(value = "contests", key = "#contest.id", unless = "#result == null")
+	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
+
+	public ContestDTO showContestHub(
+			@PathVariable(value = "contest") final Contest contest,
+			final Principal principal) {
+		final User user = this.userService
+				.getUserByUsername(principal.getName());
+		final List<Task> tasks = this.contestService.getContestTasks(contest);
+		return new ContestDTO(contest.getName(), new TimingDTO(
+				contest.getStartTime(), Date.from(contest.getStartTime()
+						.toInstant().plus(contest.getDuration())),
+				this.contestService.getContestEndTimeForUser(contest, user)),
+				tasks);
 	}
 
 }

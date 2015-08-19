@@ -25,14 +25,12 @@ package org.ng200.openolympus.services;
 import java.util.List;
 
 import org.jooq.DSLContext;
-
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.GroupDao;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.GroupUsers;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,50 +41,45 @@ public class GroupService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private GroupDao groupDao;
+
+	public void addUserToGroup(User user, Group group,
+			boolean canAddOthersToGroup) {
+		this.insert(new GroupUsers(group.getId(), user.getId(),
+				canAddOthersToGroup),
+				Tables.GROUP_USERS);
+	}
+
+	public int countGroups() {
+		return this.dslContext.selectCount().from(Tables.GROUP).execute();
+	}
+
+	public int countParticipants(Group group) {
+		return this.dslContext.selectCount()
+				.from(Tables.GROUP_USERS)
+				.where(Tables.GROUP_USERS.USER_ID.eq(group.getId()))
+				.execute();
+	}
+
 	public List<Group> findAFewGroupsWithNameContaining(String name) {
 		// TODO: use something better for searching...
-		String pattern = "%" + name + "%";
-		return dslContext
+		final String pattern = "%" + name + "%";
+		return this.dslContext
 				.select(Tables.GROUP.fields())
 				.from(Tables.GROUP)
 				.where(Tables.GROUP.NAME.like(pattern)).limit(30)
 				.fetchInto(Group.class);
 	}
+
 	public Group getGroupById(final Long id) {
-		return groupDao.findById(id);
+		return this.groupDao.findById(id);
 	}
 
 	public Group getGroupByName(final String name) {
-		return groupDao.fetchOneByName(name);
-	}
-
-	public Group insertGroup(Group group) {
-		return insert(group, Tables.GROUP);
-	}
-
-	public Group updateGroup(Group group) {
-		return update(group, Tables.GROUP);
-	}
-
-	public void addUserToGroup(User user, Group group,
-			boolean canAddOthersToGroup) {
-		insert(new GroupUsers(group.getId(), user.getId(), canAddOthersToGroup),
-				Tables.GROUP_USERS);
-	}
-
-	public void removeUserFromGroup(User user, Group group) {
-		dslContext.delete(Tables.GROUP_USERS)
-				.where(Tables.GROUP_USERS.USER_ID.eq(user.getId())
-						.and(Tables.GROUP_USERS.GROUP_ID.eq(group.getId())))
-				.execute();
-	}
-
-	public int countGroups() {
-		return dslContext.selectCount().from(Tables.GROUP).execute();
+		return this.groupDao.fetchOneByName(name);
 	}
 
 	public List<Group> getGroups(Integer pageNumber, int pageSize) {
-		return dslContext.selectFrom(Tables.GROUP)
+		return this.dslContext.selectFrom(Tables.GROUP)
 				.groupBy(Tables.GROUP.ID)
 				.orderBy(Tables.GROUP.NAME)
 				.limit(pageSize)
@@ -94,16 +87,9 @@ public class GroupService extends GenericCreateUpdateRepository {
 				.fetchInto(Group.class);
 	}
 
-	public int countParticipants(Group group) {
-		return dslContext.selectCount()
-				.from(Tables.GROUP_USERS)
-				.where(Tables.GROUP_USERS.USER_ID.eq(group.getId()))
-				.execute();
-	}
-
 	public List<User> getParticipants(Group group, Integer pageNumber,
 			int pageSize) {
-		return dslContext.select(Tables.USER.fields())
+		return this.dslContext.select(Tables.USER.fields())
 				.from(Tables.GROUP_USERS)
 				.join(Tables.USER)
 				.on(Tables.GROUP_USERS.USER_ID.eq(Tables.USER.ID))
@@ -113,6 +99,21 @@ public class GroupService extends GenericCreateUpdateRepository {
 				.limit(pageSize)
 				.offset((pageNumber - 1) * pageSize)
 				.fetchInto(User.class);
+	}
+
+	public Group insertGroup(Group group) {
+		return this.insert(group, Tables.GROUP);
+	}
+
+	public void removeUserFromGroup(User user, Group group) {
+		this.dslContext.delete(Tables.GROUP_USERS)
+				.where(Tables.GROUP_USERS.USER_ID.eq(user.getId())
+						.and(Tables.GROUP_USERS.GROUP_ID.eq(group.getId())))
+				.execute();
+	}
+
+	public Group updateGroup(Group group) {
+		return this.update(group, Tables.GROUP);
 	}
 
 }

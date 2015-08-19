@@ -27,14 +27,12 @@ import java.util.concurrent.Callable;
 
 import javax.validation.Valid;
 
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.TaskModificationDto;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +48,7 @@ public class TaskModificationRestController extends
 
 	@Autowired
 	private TaskService taskService;
+
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
 			throws IOException {
@@ -58,6 +57,7 @@ public class TaskModificationRestController extends
 		taskModificationDto.setName(task.getName());
 		return taskModificationDto;
 	}
+
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.POST)
 	public Callable<BindingResponse> patchTask(
 			@PathVariable("task") final Task task,
@@ -73,7 +73,7 @@ public class TaskModificationRestController extends
 				throw new BindException(bindingResult);
 			}
 
-			taskService.patchTask(task, taskModificationDto);
+			this.taskService.patchTask(task, taskModificationDto);
 			return BindingResponse.OK;
 		};
 

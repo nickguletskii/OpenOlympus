@@ -56,32 +56,75 @@ public class DaoConfig {
 	private PasswordEncoder passwordEncoder;
 
 	@Bean
+	public ContestDao contestDao() {
+		return new ContestDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public ContestParticipationDao contestParticipationDao() {
+		return new ContestParticipationDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public ContestTasksDao contestTasksDao() {
+		return new ContestTasksDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public GroupDao groupDao() {
+		return new GroupDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public GroupUsersDao groupUsersDao() {
+		return new GroupUsersDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public PropertyDao propertyDao() {
+		return new PropertyDao(this.dslContext.configuration());
+	}
+
+	@Bean
 	public SolutionDao solutionDao() {
-		return new SolutionDao(dslContext.configuration());
+		return new SolutionDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public TaskDao taskDao() {
+		return new TaskDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public TimeExtensionDao timeExtensionDao() {
+		return new TimeExtensionDao(this.dslContext.configuration());
 	}
 
 	@Bean
 	public UserDao userDao() {
-		UserDao userDao = new UserDao(dslContext.configuration());
-		GroupDao groupDao = new GroupDao(dslContext.configuration());
+		final UserDao userDao = new UserDao(this.dslContext.configuration());
+		final GroupDao groupDao = new GroupDao(this.dslContext.configuration());
 
 		if (groupDao
 				.fetchOneByName(NameConstants.ALL_USERS_GROUP_NAME) == null) {
-			logger.info("The group of all users doesn't exist. Creating...");
+			DaoConfig.logger
+					.info("The group of all users doesn't exist. Creating...");
 			groupDao.insert(
 					new Group().setName(NameConstants.ALL_USERS_GROUP_NAME));
 		}
 
 		if (groupDao.fetchOneByName(
 				NameConstants.SUPERUSERS_GROUP_NAME) == null) {
-			logger.info("The group of all users doesn't exist. Creating...");
+			DaoConfig.logger
+					.info("The group of all users doesn't exist. Creating...");
 			groupDao.insert(new Group()
 					.setName(NameConstants.SUPERUSERS_GROUP_NAME));
 		}
 
 		if (userDao.fetchOneByUsername(
 				NameConstants.SYSTEM_ACCOUNT_NAME) == null) {
-			logger.info("The system account doesn't exist. Creating...");
+			DaoConfig.logger
+					.info("The system account doesn't exist. Creating...");
 			userDao.insert(
 					new User().setUsername(NameConstants.SYSTEM_ACCOUNT_NAME)
 							.setPassword(null)
@@ -92,11 +135,11 @@ public class DaoConfig {
 
 		if (userDao.fetchOneByUsername(
 				NameConstants.SUPERUSER_ACCOUNT_NAME) == null) {
-			logger.info(
+			DaoConfig.logger.info(
 					"The superuser account doesn't exist. Creating...");
 			userDao.insert(new User()
 					.setUsername(NameConstants.SUPERUSER_ACCOUNT_NAME)
-					.setPassword(passwordEncoder
+					.setPassword(this.passwordEncoder
 							.encode(NameConstants.SUPERUSER_ACCOUNT_NAME))
 					.setSuperuser(true).setEnabled(true).setApproved(true)
 					.setApprovalEmailSent(false));
@@ -106,47 +149,7 @@ public class DaoConfig {
 	}
 
 	@Bean
-	public TaskDao taskDao() {
-		return new TaskDao(dslContext.configuration());
-	}
-
-	@Bean
-	public ContestDao contestDao() {
-		return new ContestDao(dslContext.configuration());
-	}
-
-	@Bean
-	public ContestParticipationDao contestParticipationDao() {
-		return new ContestParticipationDao(dslContext.configuration());
-	}
-
-	@Bean
-	public ContestTasksDao contestTasksDao() {
-		return new ContestTasksDao(dslContext.configuration());
-	}
-
-	@Bean
-	public TimeExtensionDao timeExtensionDao() {
-		return new TimeExtensionDao(dslContext.configuration());
-	}
-
-	@Bean
-	public GroupDao groupDao() {
-		return new GroupDao(dslContext.configuration());
-	}
-
-	@Bean
-	public PropertyDao propertyDao() {
-		return new PropertyDao(dslContext.configuration());
-	}
-
-	@Bean
-	public GroupUsersDao groupUsersDao() {
-		return new GroupUsersDao(dslContext.configuration());
-	}
-
-	@Bean
 	public VerdictDao verdictDao() {
-		return new VerdictDao(dslContext.configuration());
+		return new VerdictDao(this.dslContext.configuration());
 	}
 }

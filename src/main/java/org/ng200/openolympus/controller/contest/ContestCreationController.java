@@ -24,13 +24,10 @@ package org.ng200.openolympus.controller.contest;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.HashSet;
 
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
-import org.jooq.impl.DSL;
-
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestDto;
@@ -38,7 +35,6 @@ import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,10 +51,11 @@ public class ContestCreationController {
 
 	@Autowired
 	private ContestService contestService;
+
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contests/create")
 	public BindingResponse createContest(@Valid final ContestDto contestDto,
 			final BindingResult bindingResult) throws IllegalStateException,
-			IOException, ArchiveException, BindException {
+					IOException, ArchiveException, BindException {
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
