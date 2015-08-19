@@ -48,8 +48,6 @@ public class AdministrativeChangePasswordController {
 
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/user/{user}/changePassword", method = RequestMethod.PATCH)
 	public BindingResponse changePassword(
 			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,

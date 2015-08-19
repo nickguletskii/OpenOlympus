@@ -45,8 +45,6 @@ public class GroupGeneralInformationController {
 
 	@Autowired
 	private GroupService groupService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupCompletion")
 	public @ResponseBody List<Group> searchGroups(
@@ -55,8 +53,6 @@ public class GroupGeneralInformationController {
 
 		return this.groupService.findAFewGroupsWithNameContaining(name);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/api/group")
 	public @ResponseBody Group getGroup(

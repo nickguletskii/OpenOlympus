@@ -103,13 +103,6 @@ public class ContestViewController {
 			this.tasks = tasks;
 		}
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.THIS_CONTEST_IN_PROGRESS_FOR_USER
-			+ ')')
 	@Cacheable(value = "contests", key = "#contest.id", unless = "#result == null")
 	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
 	

@@ -43,8 +43,6 @@ public class GroupService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private GroupDao groupDao;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Group> findAFewGroupsWithNameContaining(String name) {
 		// TODO: use something better for searching...
 		String pattern = "%" + name + "%";
@@ -54,8 +52,6 @@ public class GroupService extends GenericCreateUpdateRepository {
 				.where(Tables.GROUP.NAME.like(pattern)).limit(30)
 				.fetchInto(Group.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Group getGroupById(final Long id) {
 		return groupDao.findById(id);
 	}

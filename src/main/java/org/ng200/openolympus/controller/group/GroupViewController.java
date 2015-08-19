@@ -22,16 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupViewController {
 	@Autowired
 	private GroupService groupService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/group/{group}/memberCount")
 	@ResponseBody
 	public long groupCount(
 			@PathVariable(value = "group") final Group group) {
 		return this.groupService.countParticipants(group);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/group/{group}", method = RequestMethod.GET)
 	public List<User> getMembers(
 			@PathVariable(value = "group") final Group group,

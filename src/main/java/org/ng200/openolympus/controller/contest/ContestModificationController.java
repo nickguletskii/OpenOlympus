@@ -59,8 +59,6 @@ public class ContestModificationController {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	@Caching(evict = {
@@ -88,8 +86,6 @@ public class ContestModificationController {
 		contest = this.contestService.updateContest(contest);
 		return BindingResponse.OK;
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.GET)
 	public Contest showContestEditingForm(
 			@PathVariable("contest") final Contest contest) {

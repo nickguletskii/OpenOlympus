@@ -42,23 +42,11 @@ public class ArchiveUserRankListRestController {
 	private static final int PAGE_SIZE = 10;
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/rankCount", method = RequestMethod.GET)
 	
 	public Long countUsers() {
 		return this.userService.countUsers();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/rank", method = RequestMethod.GET)
 	
 	public List<UserRanking> getUsers(@RequestParam("page") Integer page) {

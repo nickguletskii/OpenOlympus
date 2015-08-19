@@ -104,14 +104,6 @@ public class TaskViewController {
 
 	@Autowired
 	private SolutionSubmissionService solutionSubmissionService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_PUBLISHED
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_IN_CONTEST + ')')
 	@ResponseBody
 	@RequestMapping(value = "/api/task/{btask}/name", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public String getTaskName(@PathVariable(value = "task") final Task task,
@@ -119,14 +111,6 @@ public class TaskViewController {
 		Assertions.resourceExists(task);
 		return task.getName();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_PUBLISHED
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_IN_CONTEST + ')')
 	@ResponseBody
 	@RequestMapping(value = "/api/task/{task}/data/**", method = RequestMethod.GET)
 	public FileSystemResource getTaskData(
@@ -162,14 +146,6 @@ public class TaskViewController {
 
 		return new FileSystemResource(path.toAbsolutePath().toFile());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_PUBLISHED
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_IN_CONTEST + ')')
 	@RequestMapping(value = "/api/task/{task}/submitSolution", method = RequestMethod.POST)
 	public BindingResponse submitSolution(
 			@PathVariable("task") final Task task, final Principal principal,

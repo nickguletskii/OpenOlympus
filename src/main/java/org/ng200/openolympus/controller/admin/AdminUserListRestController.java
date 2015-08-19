@@ -42,15 +42,11 @@ public class AdminUserListRestController {
 	private static final int PAGE_SIZE = 10;
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/usersCount", method = RequestMethod.GET)
 	
 	public long countUsers() {
 		return this.userService.countUsers();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/users", method = RequestMethod.GET)
 	
 	public List<User> getUsers(@RequestParam("page") Integer page) {

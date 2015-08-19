@@ -117,14 +117,6 @@ public class ContestResultsController {
 
 	@Autowired
 	private TaskService taskService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.CONTEST_OVER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/contest/{contest}/testingFinished", method = RequestMethod.GET)
 	public boolean hasContestTestingFinished(
 			@PathVariable(value = "contest") final Contest contest) {
@@ -133,8 +125,6 @@ public class ContestResultsController {
 
 		return this.contestService.hasContestTestingFinished(contest);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
 	
 	public List<ContestUserRankingDto> showCompleteResultsPage(
@@ -146,14 +136,6 @@ public class ContestResultsController {
 				.map(ranking -> new ContestUserRankingDto(contest, ranking))
 				.collect(Collectors.toList());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.CONTEST_OVER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/contest/{contest}/results", method = RequestMethod.GET)
 	
 	public List<ContestUserRankingDto> showResultsPage(

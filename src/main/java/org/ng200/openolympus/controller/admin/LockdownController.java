@@ -39,15 +39,11 @@ public class LockdownController {
 	private SecurityService securityService;
 	@Autowired
 	private PropertyService propertyService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/admin/lockdown/enabled", method = RequestMethod.POST)
 	public void endLockdown(
 			@RequestParam(value = "enabled", required = true) boolean enabled) {
 		// TODO: fix lockdowns
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/admin/lockdown/enabled", method = RequestMethod.GET)
 	public boolean isLockdownEnabled() {
 		return this.securityService.isOnLockdown();

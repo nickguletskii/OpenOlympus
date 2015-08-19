@@ -50,8 +50,6 @@ public class TaskModificationRestController extends
 
 	@Autowired
 	private TaskService taskService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
 			throws IOException {
@@ -60,8 +58,6 @@ public class TaskModificationRestController extends
 		taskModificationDto.setName(task.getName());
 		return taskModificationDto;
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.POST)
 	public Callable<BindingResponse> patchTask(
 			@PathVariable("task") final Task task,

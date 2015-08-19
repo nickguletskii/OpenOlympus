@@ -26,8 +26,6 @@ public class GroupModificationController {
 
 	@Autowired
 	private GroupService groupService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.POST)
 	public BindingResponse editGroup(
 			@PathVariable("group") Group group,
@@ -44,8 +42,6 @@ public class GroupModificationController {
 		group = this.groupService.updateGroup(group);
 		return BindingResponse.OK;
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.GET)
 	public Group showGroupEditingForm(
 			@PathVariable("group") final Group group) {

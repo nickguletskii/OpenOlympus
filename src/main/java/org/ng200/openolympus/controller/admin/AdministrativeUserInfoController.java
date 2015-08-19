@@ -42,8 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AdministrativeUserInfoController extends
 		AbstractUserInfoController {
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.PATCH)
 	public BindingResponse changePersonInfo(final Model model,
 			@Valid @RequestBody final UserInfoDto userInfoDto,
@@ -53,8 +51,6 @@ public class AdministrativeUserInfoController extends
 		super.copyDtoIntoDatabase(userInfoDto, bindingResult, user);
 		return BindingResponse.OK;
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(
 			@PathVariable(value = "user") final User user) {

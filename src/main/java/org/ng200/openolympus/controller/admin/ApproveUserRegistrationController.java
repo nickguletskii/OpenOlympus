@@ -80,8 +80,6 @@ public class ApproveUserRegistrationController {
 
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void approveUser(User user) throws MessagingException,
 			EmailException {
 		Assertions.resourceExists(user);
@@ -102,8 +100,6 @@ public class ApproveUserRegistrationController {
 			this.userService.updateUser(user);
 		}
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
 
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {

@@ -51,14 +51,6 @@ public class SolutionDownloadController {
 
 	@Autowired
 	private StorageService storageService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER
-			+ SecurityExpressionConstants.AND
-			+ "@oolsec.isSolutionInCurrentContest(#solution)" + ')')
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<FileSystemResource> solutionDownload(
 			final HttpServletRequest request, final Model model,

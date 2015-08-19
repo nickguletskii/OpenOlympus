@@ -60,14 +60,10 @@ public class SolutionListController {
 
 	@Autowired
 	private TaskService taskService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCount(final User user) {
 		return this.solutionService.getSolutionCount();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCountForUser(final Principal principal) {
 		final User user = this.userService.getUserByUsername(principal
@@ -80,8 +76,6 @@ public class SolutionListController {
 		return solutionService.countUserSolutionsInContest(user,
 				this.contestService.getRunningContest());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/solutions", method = RequestMethod.GET)
 	public List<SolutionDto> showAllSolutions(
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
@@ -93,8 +87,6 @@ public class SolutionListController {
 						.getById(solution.getTaskId())))
 				.collect(Collectors.toList());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
 
 	public List<SolutionDto> showUserSolutions(

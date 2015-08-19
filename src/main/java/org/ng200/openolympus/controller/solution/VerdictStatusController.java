@@ -165,19 +165,6 @@ public class VerdictStatusController {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR
-			+ '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ '('
-			+ "#verdict.solution.user"
-			+ SecurityExpressionConstants.IS_OWNER
-			+ ')'
-			+ SecurityExpressionConstants.AND
-			+ " @oolsec.isSolutionInCurrentContest(#verdict.solution) and @oolsec.canViewVerdictDuringContest(#verdict) "
-			+ ')')
 	@RequestMapping(value = "/api/verdict", method = RequestMethod.GET)
 	public @ResponseBody VerdictDto showVerdict(
 			@RequestParam(value = "id") final Verdict verdict,

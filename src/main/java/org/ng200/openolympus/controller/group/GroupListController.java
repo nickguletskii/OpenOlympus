@@ -44,15 +44,11 @@ public class GroupListController {
 
 	@Autowired
 	private GroupService groupService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupsCount")
 	@ResponseBody
 	public long groupCount() {
 		return this.groupService.countGroups();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groups")
 	@ResponseBody
 	public List<Group> groupList(

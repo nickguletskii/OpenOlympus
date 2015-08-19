@@ -66,11 +66,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ContestService extends GenericCreateUpdateRepository {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ContestService.class);
-	private static final int CONTEST_RESULTS_PAGE_LENGTH = 10;
-	private static final int CONTEST_PARTICIPANTS_PAGE_LENGTH = 10;
-
 	@Autowired
 	private ContestDao contestDao;
 	@Autowired
@@ -81,37 +76,25 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private DSLContext dslContext;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void addContestParticipant(final Contest contest, final User user) {
 		contestParticipationDao.insert(new ContestParticipation(null, null,
 				user.getId(), contest.getId()));
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public long countContests() {
 		return contestDao.count();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@Transactional
 	public void deleteContest(Contest contest) {
 		contestDao.delete(contest);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void extendTimeForUser(final Contest contest, final User user,
 			final Duration time) {
 		timeExtensionDao.insert(new TimeExtension(null, time, null, user
 				.getId(), contest.getId()));
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Contest getContestByName(final String name) {
 		return contestDao.fetchOneByName(name);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public Instant getContestEndIncludingAllTimeExtensions(
 			final Contest contest) {
 		GetContestEnd procedure = new GetContestEnd();
@@ -120,8 +103,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 		procedure.execute();
 		return procedure.getReturnValue().toInstant();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<UserRanking> getContestResults(Contest contest) {
 		return getContestResultsQuery(contest).fetchInto(UserRanking.class);
 	}
@@ -141,19 +122,11 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
 						.getId()));
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<UserRanking> getContestResultsPage(Contest contest, int page,
 			int pageSize) {
 		return getContestResultsQuery(contest).limit(pageSize)
 				.offset((page - 1) * pageSize).fetchInto(UserRanking.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
 			final int pageSize) {
 		return dslContext.selectFrom(Tables.CONTEST)
@@ -163,8 +136,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.offset((pageNumber - 1) * pageSize)
 				.fetchInto(Contest.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public List<Contest> getContestsThatIntersect(final Date startDate,
 			final Date endDate) {
 
@@ -174,8 +145,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 						Timestamp.from(endDate.toInstant())))
 				.fetchInto(Contest.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber,
 			int pageSize) {
 		return dslContext
@@ -196,12 +165,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 						DSL.field("LOCALTIMESTAMP", Timestamp.class)))
 				.fetchOneInto(Contest.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public BigDecimal getUserTaskScoreInContest(final Contest contest,
 			final User user, final Task task) {
 		return dslContext
@@ -227,12 +190,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 		}
 		return !contest.getStartTime().toInstant().isAfter(Instant.now());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@SuppressWarnings("unchecked")
 	public boolean hasContestTestingFinished(Contest contest) {
 		Param<Integer> contestF = DSL.val(contest.getId(),
@@ -281,8 +238,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.fetchOne()
 				.value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public boolean isContestInProgressForUser(final Contest contest,
 			final User user) {
 		if (Instant.now().isBefore(contest.getStartTime().toInstant())) {
@@ -291,8 +246,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return !this.getContestEndTimeForUser(contest, user).toInstant()
 				.isAfter(Instant.now());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public Date getContestEndTimeForUser(Contest contest, User user) {
 		GetContestEndForUser procedure = new GetContestEndForUser();
 		procedure.setContestId(contest.getId());
@@ -301,15 +254,11 @@ public class ContestService extends GenericCreateUpdateRepository {
 		procedure.execute();
 		return Date.from(procedure.getReturnValue().toInstant());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public boolean isContestOverIncludingAllTimeExtensions(
 			final Contest contest) {
 		return this.getContestEndIncludingAllTimeExtensions(contest).isBefore(
 				Instant.now());
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	public boolean isUserParticipatingIn(final User user,
 			final Contest contest) {
 		return dslContext
@@ -327,13 +276,9 @@ public class ContestService extends GenericCreateUpdateRepository {
 						.otherwise(false))
 				.fetchOne().value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Contest insertContest(Contest contest) {
 		return insert(contest, Tables.CONTEST);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Contest updateContest(Contest contest) {
 		return update(contest, Tables.CONTEST);
 	}

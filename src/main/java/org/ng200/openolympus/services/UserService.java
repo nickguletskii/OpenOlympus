@@ -65,35 +65,21 @@ public class UserService extends GenericCreateUpdateRepository {
 	public UserService() {
 
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public long countUnapprovedUsers() {
 		// TODO: Check
 		return dslContext.selectCount().from(Tables.USER)
 				.where(Tables.USER.APPROVED.eq(false)).execute();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public long countUsers() {
 		return userDao.count();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void deleteUser(final User user) {
 		userDao.delete(user);
 
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void deleteUsers(List<User> users) {
 		userDao.delete(users);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> findAFewUsersWithNameContaining(final String name) {
 		// TODO: use something better for searching...
 		String pattern = "%" + name + "%";
@@ -112,12 +98,6 @@ public class UserService extends GenericCreateUpdateRepository {
 
 		).limit(30).fetchInto(User.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<UserRanking> getArchiveRankPage(final int page,
 			final int pageSize) {
 
@@ -158,16 +138,12 @@ public class UserService extends GenericCreateUpdateRepository {
 				.groupBy(Tables.USER.ID).orderBy(user_score).limit(pageSize)
 				.offset(pageSize * (page - 1)).fetchInto(UserRanking.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> getPendingUsers(int pageNumber, int pageSize) {
 		return dslContext.selectFrom(Tables.USER)
 				.where(Tables.USER.APPROVAL_EMAIL_SENT.eq(false))
 				.limit(pageSize).offset((pageNumber - 1) * pageSize)
 				.fetchInto(User.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public User getUserById(final Long id) {
 		return userDao.findById(id);
 	}
@@ -175,8 +151,6 @@ public class UserService extends GenericCreateUpdateRepository {
 	public User getUserByUsername(final String username) {
 		return userDao.fetchOneByUsername(username);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<User> getUsersAlphabetically(final Integer pageNumber,
 			final int pageSize) {
 		return dslContext.selectFrom(Tables.USER)

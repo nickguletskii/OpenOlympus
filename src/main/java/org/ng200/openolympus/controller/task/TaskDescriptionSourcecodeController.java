@@ -47,8 +47,6 @@ public class TaskDescriptionSourcecodeController extends
 
 	@Autowired
 	private StorageService storageService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/taskSourcecode", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<String> getTaskSourcecode(
 			@RequestParam(value = "id") final Task task) throws IOException {

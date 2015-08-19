@@ -45,8 +45,6 @@ public class UserGeneralInformationController {
 
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/userCompletion")
 	public @ResponseBody List<User> searchUsers(
 			@RequestParam(value = "term", defaultValue = "") final String name) {
@@ -54,8 +52,6 @@ public class UserGeneralInformationController {
 
 		return this.userService.findAFewUsersWithNameContaining(name);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/user")
 	public @ResponseBody User getUser(
 			@RequestParam(value = "id", required = false) final Long id,

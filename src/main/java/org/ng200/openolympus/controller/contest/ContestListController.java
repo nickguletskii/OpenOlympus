@@ -44,15 +44,11 @@ public class ContestListController {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contestsCount")
 	@ResponseBody
 	public long contestCount() {
 		return this.contestService.countContests();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_USER)
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
 	@ResponseBody
 	public List<Contest> contestList(

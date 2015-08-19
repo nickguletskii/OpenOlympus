@@ -57,25 +57,11 @@ public class SolutionService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER + ')')
 	public int countUserSolutions(final User user) {
 		return dslContext.selectCount().from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId())).fetchOne()
 				.value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public int countUserSolutionsForTask(final User user, final Task task) {
 		return dslContext
 				.selectCount()
@@ -85,19 +71,11 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.fetchOne()
 				.value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public int getNumberOfPendingVerdicts() {
 		return dslContext.selectCount().from(Tables.VERDICT)
 				.where(Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting))
 				.fetchOne().value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND + "#solution.user"
-			+ SecurityExpressionConstants.IS_OWNER + ')')
 	public long getNumberOfPendingVerdicts(final Solution solution) {
 		return dslContext
 				.selectCount()
@@ -106,20 +84,12 @@ public class SolutionService extends GenericCreateUpdateRepository {
 						Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting)))
 				.fetchOne().value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Solution> getPage(final int pageNumber, final int pageSize) {
 		return dslContext.selectCount().from(Tables.SOLUTION)
 				.groupBy(Tables.SOLUTION.ID)
 				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER + ')')
 	public List<Solution> getPage(final User user, final Integer pageNumber,
 			final int pageSize, final Date startTime, final Date endTime) {
 		return dslContext
@@ -133,14 +103,6 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<Solution> getPageOutsideOfContest(final User user,
 			final Integer pageNumber, final int pageSize) {
 		return dslContext.selectFrom(Tables.SOLUTION)
@@ -149,8 +111,6 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Stream<Verdict> getPendingVerdicts() {
 		return StreamSupport.stream(
 				dslContext
@@ -160,8 +120,6 @@ public class SolutionService extends GenericCreateUpdateRepository {
 						.spliterator(),
 				false).map(record -> record.into(Verdict.class));
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public long getSolutionCount() {
 		return solutionDao.count();
 	}
@@ -171,12 +129,6 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.map((verdict) -> verdict.getMaximumScore())
 				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND + "#solution.user"
-			+ SecurityExpressionConstants.IS_OWNER + ')')
 	public BigDecimal getSolutionScore(final Solution solution) {
 		if (solution == null) {
 			return BigDecimal.ZERO;
@@ -185,12 +137,6 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.map((verdict) -> verdict.getScore())
 				.reduce((x, y) -> x.add(y)).orElse(BigDecimal.ZERO);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND + '(' + "#solution.user"
-			+ SecurityExpressionConstants.IS_OWNER + ')' + ')')
 	public List<Verdict> getVerdictsVisibleDuringContest(
 			final Solution solution) {
 		// TODO: show full tests during contest should be an option
@@ -201,12 +147,6 @@ public class SolutionService extends GenericCreateUpdateRepository {
 		}
 		return getVerdictsVisibleDuringContest(solution);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND + "#solution.user"
-			+ SecurityExpressionConstants.IS_OWNER + ')')
 	@Transactional
 	public Solution insertSolution(Solution solution) {
 		return insert(solution, Tables.SOLUTION);

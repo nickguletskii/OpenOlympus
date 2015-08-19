@@ -56,8 +56,6 @@ public class ContestTaskAdditionController {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@CacheEvict(value = "contests", key = "#contest.id")
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addTask")
 	public BindingResponse addTask(final Model model,

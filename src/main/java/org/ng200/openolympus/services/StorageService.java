@@ -58,8 +58,6 @@ public class StorageService implements Serializable {
 		FileAccess.createDirectories(dir);
 		return dir;
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Path createTaskDescriptionDirectory(Task task)
 			throws IOException {
 		final UUID uuid = UUID.randomUUID();
@@ -78,8 +76,6 @@ public class StorageService implements Serializable {
 					"Couldn't initialise task description directory: ", e);
 		}
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Path createTaskJudgeDirectory(Task task) throws IOException {
 		final UUID uuid = UUID.randomUUID();
 		final Path dir = FileSystems.getDefault().getPath(

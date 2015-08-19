@@ -45,8 +45,6 @@ public class DeleteUserController {
 
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/users/deleteUsers", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	@Transactional
@@ -57,8 +55,6 @@ public class DeleteUserController {
 		users.forEach(Assertions::resourceExists);
 		users.forEach(this.userService::deleteUser);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/users/deleteUser", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.OK)
 	@Transactional

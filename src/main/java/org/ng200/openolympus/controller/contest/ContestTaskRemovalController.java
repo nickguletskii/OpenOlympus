@@ -44,8 +44,6 @@ public class ContestTaskRemovalController {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@CacheEvict(value = "contests", key = "#contest.id")
 	@RequestMapping(value = "/api/contest/{contest}/removeTask", method = RequestMethod.DELETE)
 	public void removeTask(

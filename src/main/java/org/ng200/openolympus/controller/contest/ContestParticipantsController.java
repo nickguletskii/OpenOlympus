@@ -48,8 +48,6 @@ public class ContestParticipantsController {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
 	
 	public List<User> showParticipantsPage(

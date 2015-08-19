@@ -25,8 +25,6 @@ public class GroupCreationController {
 
 	@Autowired
 	private GroupService groupService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/groups/create")
 	public BindingResponse createContest(@Valid final Group groupDto,
 			final BindingResult bindingResult) throws BindException {

@@ -75,8 +75,6 @@ public class PropertyService {
 		}
 		return property;
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public void set(final String key, final Serializable value)
 			throws IOException {
 		Property property = get(key, value);

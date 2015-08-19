@@ -42,8 +42,6 @@ public class TaskSearchController {
 
 	@Autowired
 	private TaskService taskService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody List<String> searchTasks(
 			@RequestParam(value = "term") final String name) {

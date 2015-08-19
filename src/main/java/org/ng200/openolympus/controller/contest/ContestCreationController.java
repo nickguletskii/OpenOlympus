@@ -55,8 +55,6 @@ public class ContestCreationController {
 
 	@Autowired
 	private ContestService contestService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contests/create")
 	public BindingResponse createContest(@Valid final ContestDto contestDto,
 			final BindingResult bindingResult) throws IllegalStateException,

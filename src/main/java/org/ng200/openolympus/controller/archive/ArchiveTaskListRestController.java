@@ -84,23 +84,11 @@ public class ArchiveTaskListRestController {
 
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/tasksCount", method = RequestMethod.GET)
 
 	public Long countUsers() {
 		return this.taskService.countTasks();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
 
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,

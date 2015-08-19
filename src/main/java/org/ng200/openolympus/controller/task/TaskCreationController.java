@@ -59,8 +59,6 @@ public class TaskCreationController {
 
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 	private BindingResponse createTask(final TaskCreationDto taskCreationDto,
 			final BindingResult bindingResult, Principal principal)

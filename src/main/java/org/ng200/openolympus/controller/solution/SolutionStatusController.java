@@ -95,14 +95,6 @@ public class SolutionStatusController {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(SolutionStatusController.class);
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND + '(' + "#solution.user"
-			+ SecurityExpressionConstants.IS_OWNER + ')'
-			+ SecurityExpressionConstants.AND
-			+ " @oolsec.isSolutionInCurrentContest(#solution) " + ')')
 	@RequestMapping(method = RequestMethod.GET)
 	@Cacheable(value = "solutions", key = "#solution.id")
 	public @ResponseBody SolutionDto solutionApi(

@@ -42,15 +42,11 @@ public class PendingUserListRestController {
 	private static final int PAGE_SIZE = 10;
 	@Autowired
 	private UserService userService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/pendingUsersCount", method = RequestMethod.GET)
 	
 	public long getUsers() {
 		return this.userService.countUnapprovedUsers();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@RequestMapping(value = "/api/admin/pendingUsers", method = RequestMethod.GET)
 	
 	public List<User> getUsers(@RequestParam("page") Integer page) {

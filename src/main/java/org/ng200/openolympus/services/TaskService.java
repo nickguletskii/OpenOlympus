@@ -103,25 +103,15 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private StorageService storageService;
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public long countTasks() {
 		return taskDao.count();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Task> findAFewTasksWithNameContaining(final String name) {
 		return dslContext.selectFrom(Tables.TASK)
 				.where(Tables.TASK.NAME.toString() + " % "
 						+ DSL.val(name, String.class))
 				.limit(LIMIT_TASKS_WITH_NAME_CONTAINING).fetchInto(Task.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public List<Task> findTasksNewestFirst(final int pageNumber,
 			final int pageSize) {
 		return dslContext.selectFrom(Tables.TASK).groupBy(Tables.TASK.ID)
@@ -129,12 +119,6 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.limit(pageSize).offset((pageNumber - 1) * pageSize)
 				.fetchInto(Task.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	public List<Task> findTasksNewestFirstAndAuthorized(Integer pageNumber,
 			int pageSize, Principal principal) {
 		if (this.securityService.isSuperuser(principal)) {
@@ -164,30 +148,12 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.offset((pageNumber - 1) * pageSize)
 				.fetchInto(Task.class);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public BigDecimal getMaximumScore(final Task task) {
 		return dslContext.select(max(Tables.SOLUTION.MAXIMUM_SCORE))
 				.from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchOne()
 				.value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.USER_IS_OWNER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.TASK_PUBLISHED + ')')
 	public BigDecimal getScore(final Task task, final User user) {
 		return dslContext.select(max(Tables.SOLUTION.SCORE))
 				.from(Tables.SOLUTION)
@@ -195,19 +161,11 @@ public class TaskService extends GenericCreateUpdateRepository {
 						.and(Tables.SOLUTION.USER_ID.eq(user.getId())))
 				.fetchOne().value1();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER
-			+ SecurityExpressionConstants.OR + '('
-			+ SecurityExpressionConstants.IS_USER
-			+ SecurityExpressionConstants.AND
-			+ SecurityExpressionConstants.NO_CONTEST_CURRENTLY + ')')
 	@PostAuthorize(SecurityExpressionConstants.IS_SUPERUSER
 			+ SecurityExpressionConstants.OR + " #returnObject.published")
 	public Task getTaskByName(final String taskName) {
 		return taskDao.fetchOneByName(taskName);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	@Transactional
 	public void rejudgeTask(final Task task)
 			throws ExecutionException, IOException {
@@ -223,8 +181,6 @@ public class TaskService extends GenericCreateUpdateRepository {
 			testingService.testSolutionOnAllTests(solution);
 		}
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Task insertTask(Task task) {
 		return insert(task, Tables.TASK);
 	}
@@ -241,8 +197,6 @@ public class TaskService extends GenericCreateUpdateRepository {
 	public Task getById(Integer id) {
 		return taskDao.findById(id);
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	public Task updateTask(Task task) {
 		return update(task, Tables.TASK);
 	}
@@ -277,8 +231,6 @@ public class TaskService extends GenericCreateUpdateRepository {
 		permissionRecord.attach(dslContext.configuration());
 		permissionRecord.insert();
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	private void extractZipFile(final InputStream zipFile,
 			final Path destination) throws Exception {
 		try (ArchiveInputStream input = new ArchiveStreamFactory()
@@ -297,8 +249,6 @@ public class TaskService extends GenericCreateUpdateRepository {
 			}
 		}
 	}
-
-	@PreAuthorize(SecurityExpressionConstants.IS_SUPERUSER)
 	protected void uploadJudgeFile(final Task task,
 			final UploadableTask taskDto)
 					throws IOException, Exception {
