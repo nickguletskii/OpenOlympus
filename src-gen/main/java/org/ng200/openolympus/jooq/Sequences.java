@@ -50,11 +50,6 @@ public class Sequences {
 	public static final Sequence<Long> PRINCIPAL_SEQUENCE = new SequenceImpl<Long>("principal_sequence", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>public.resource_id_seq</code>
-	 */
-	public static final Sequence<Long> RESOURCE_ID_SEQ = new SequenceImpl<Long>("resource_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
 	 * The sequence <code>public.solution_id_seq</code>
 	 */
 	public static final Sequence<Long> SOLUTION_ID_SEQ = new SequenceImpl<Long>("solution_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

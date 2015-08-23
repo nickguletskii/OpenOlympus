@@ -43,10 +43,10 @@ public class GroupService extends GenericCreateUpdateRepository {
 	private GroupDao groupDao;
 
 	public void addUserToGroup(User user, Group group,
-			boolean canAddOthersToGroup) {
-		this.insert(new GroupUsers(group.getId(), user.getId(),
-				canAddOthersToGroup),
-				Tables.GROUP_USERS);
+	        boolean canAddOthersToGroup) {
+		this.insert(new GroupUsers(canAddOthersToGroup, group.getId(),
+		        user.getId()),
+		        Tables.GROUP_USERS);
 	}
 
 	public int countGroups() {
@@ -55,19 +55,19 @@ public class GroupService extends GenericCreateUpdateRepository {
 
 	public int countParticipants(Group group) {
 		return this.dslContext.selectCount()
-				.from(Tables.GROUP_USERS)
-				.where(Tables.GROUP_USERS.USER_ID.eq(group.getId()))
-				.execute();
+		        .from(Tables.GROUP_USERS)
+		        .where(Tables.GROUP_USERS.USER_ID.eq(group.getId()))
+		        .execute();
 	}
 
 	public List<Group> findAFewGroupsWithNameContaining(String name) {
 		// TODO: use something better for searching...
 		final String pattern = "%" + name + "%";
 		return this.dslContext
-				.select(Tables.GROUP.fields())
-				.from(Tables.GROUP)
-				.where(Tables.GROUP.NAME.like(pattern)).limit(30)
-				.fetchInto(Group.class);
+		        .select(Tables.GROUP.fields())
+		        .from(Tables.GROUP)
+		        .where(Tables.GROUP.NAME.like(pattern)).limit(30)
+		        .fetchInto(Group.class);
 	}
 
 	public Group getGroupById(final Long id) {
@@ -80,25 +80,25 @@ public class GroupService extends GenericCreateUpdateRepository {
 
 	public List<Group> getGroups(Integer pageNumber, int pageSize) {
 		return this.dslContext.selectFrom(Tables.GROUP)
-				.groupBy(Tables.GROUP.ID)
-				.orderBy(Tables.GROUP.NAME)
-				.limit(pageSize)
-				.offset((pageNumber - 1) * pageSize)
-				.fetchInto(Group.class);
+		        .groupBy(Tables.GROUP.ID)
+		        .orderBy(Tables.GROUP.NAME)
+		        .limit(pageSize)
+		        .offset((pageNumber - 1) * pageSize)
+		        .fetchInto(Group.class);
 	}
 
 	public List<User> getParticipants(Group group, Integer pageNumber,
-			int pageSize) {
+	        int pageSize) {
 		return this.dslContext.select(Tables.USER.fields())
-				.from(Tables.GROUP_USERS)
-				.join(Tables.USER)
-				.on(Tables.GROUP_USERS.USER_ID.eq(Tables.USER.ID))
-				.where(Tables.GROUP_USERS.GROUP_ID.eq(group.getId()))
-				.groupBy(Tables.USER.ID)
-				.orderBy(Tables.USER.USERNAME)
-				.limit(pageSize)
-				.offset((pageNumber - 1) * pageSize)
-				.fetchInto(User.class);
+		        .from(Tables.GROUP_USERS)
+		        .join(Tables.USER)
+		        .on(Tables.GROUP_USERS.USER_ID.eq(Tables.USER.ID))
+		        .where(Tables.GROUP_USERS.GROUP_ID.eq(group.getId()))
+		        .groupBy(Tables.USER.ID)
+		        .orderBy(Tables.USER.USERNAME)
+		        .limit(pageSize)
+		        .offset((pageNumber - 1) * pageSize)
+		        .fetchInto(User.class);
 	}
 
 	public Group insertGroup(Group group) {
@@ -107,9 +107,9 @@ public class GroupService extends GenericCreateUpdateRepository {
 
 	public void removeUserFromGroup(User user, Group group) {
 		this.dslContext.delete(Tables.GROUP_USERS)
-				.where(Tables.GROUP_USERS.USER_ID.eq(user.getId())
-						.and(Tables.GROUP_USERS.GROUP_ID.eq(group.getId())))
-				.execute();
+		        .where(Tables.GROUP_USERS.USER_ID.eq(user.getId())
+		                .and(Tables.GROUP_USERS.GROUP_ID.eq(group.getId())))
+		        .execute();
 	}
 
 	public Group updateGroup(Group group) {

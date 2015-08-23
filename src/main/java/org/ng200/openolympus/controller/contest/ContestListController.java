@@ -25,8 +25,12 @@ package org.ng200.openolympus.controller.contest;
 import java.security.Principal;
 import java.util.List;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +55,11 @@ public class ContestListController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
 	@ResponseBody
+	@SecurityOr({
+					@SecurityAnd({
+									@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
+			})
+	})
 	public List<Contest> contestList(
 			@RequestParam(value = "page", defaultValue = "1") Integer pageNumber,
 			Principal principal) {

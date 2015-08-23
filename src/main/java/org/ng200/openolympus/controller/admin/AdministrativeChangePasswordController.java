@@ -24,9 +24,13 @@ package org.ng200.openolympus.controller.admin;
 
 import javax.validation.Valid;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.PasswordChangeDto;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,19 +51,24 @@ public class AdministrativeChangePasswordController {
 	@Autowired
 	private UserService userService;
 
+	@SecurityOr({
+	              @SecurityAnd({
+	                             @SecurityLeaf(value = SecurityClearanceType.CHANGE_OTHER_USERS_PASSWORD)
+			})
+	})
 	@RequestMapping(value = "/api/admin/user/{user}/changePassword", method = RequestMethod.PATCH)
 	public BindingResponse changePassword(
-			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,
-			final BindingResult bindingResult,
-			@PathVariable(value = "user") final User user)
-					throws BindException {
+	        @Valid @RequestBody final PasswordChangeDto passwordChangeDto,
+	        final BindingResult bindingResult,
+	        @PathVariable(value = "user") final User user)
+	                throws BindException {
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 
-		user.setPassword(this.passwordEncoder.encode(passwordChangeDto
-				.getPassword()));
+		user.setPassword(
+		        this.passwordEncoder.encode(passwordChangeDto.getPassword()));
 		this.userService.updateUser(user);
 		return BindingResponse.OK;
 	}

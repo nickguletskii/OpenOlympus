@@ -32,54 +32,18 @@ import org.ng200.openolympus.jooq.tables.interfaces.IGroupUsers;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "group_users", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"group_id", "USER_id"})
+	@UniqueConstraint(columnNames = {"group_id", "user_id"})
 })
-public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> implements Record3<Long, Long, Boolean>, IGroupUsers {
+public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> implements Record3<Boolean, Long, Long>, IGroupUsers {
 
-	private static final long serialVersionUID = -2060630235;
-
-	/**
-	 * Setter for <code>public.group_users.group_id</code>.
-	 */
-	@Override
-	public GroupUsersRecord setGroupId(Long value) {
-		setValue(0, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.group_users.group_id</code>.
-	 */
-	@Column(name = "group_id", nullable = false, precision = 64)
-	@Override
-	public Long getGroupId() {
-		return (Long) getValue(0);
-	}
-
-	/**
-	 * Setter for <code>public.group_users.USER_id</code>.
-	 */
-	@Override
-	public GroupUsersRecord setUserId(Long value) {
-		setValue(1, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.group_users.USER_id</code>.
-	 */
-	@Column(name = "USER_id", nullable = false, precision = 64)
-	@Override
-	public Long getUserId() {
-		return (Long) getValue(1);
-	}
+	private static final long serialVersionUID = 1209819459;
 
 	/**
 	 * Setter for <code>public.group_users.can_add_others_to_group</code>.
 	 */
 	@Override
 	public GroupUsersRecord setCanAddOthersToGroup(Boolean value) {
-		setValue(2, value);
+		setValue(0, value);
 		return this;
 	}
 
@@ -89,7 +53,43 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	@Column(name = "can_add_others_to_group", nullable = false)
 	@Override
 	public Boolean getCanAddOthersToGroup() {
-		return (Boolean) getValue(2);
+		return (Boolean) getValue(0);
+	}
+
+	/**
+	 * Setter for <code>public.group_users.group_id</code>.
+	 */
+	@Override
+	public GroupUsersRecord setGroupId(Long value) {
+		setValue(1, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.group_users.group_id</code>.
+	 */
+	@Column(name = "group_id", nullable = false, precision = 64)
+	@Override
+	public Long getGroupId() {
+		return (Long) getValue(1);
+	}
+
+	/**
+	 * Setter for <code>public.group_users.user_id</code>.
+	 */
+	@Override
+	public GroupUsersRecord setUserId(Long value) {
+		setValue(2, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.group_users.user_id</code>.
+	 */
+	@Column(name = "user_id", nullable = false, precision = 64)
+	@Override
+	public Long getUserId() {
+		return (Long) getValue(2);
 	}
 
 	// -------------------------------------------------------------------------
@@ -112,7 +112,7 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, Long, Boolean> fieldsRow() {
+	public Row3<Boolean, Long, Long> fieldsRow() {
 		return (Row3) super.fieldsRow();
 	}
 
@@ -120,7 +120,7 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Long, Long, Boolean> valuesRow() {
+	public Row3<Boolean, Long, Long> valuesRow() {
 		return (Row3) super.valuesRow();
 	}
 
@@ -128,23 +128,7 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Field<Long> field1() {
-		return GroupUsers.GROUP_USERS.GROUP_ID;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Field<Long> field2() {
-		return GroupUsers.GROUP_USERS.USER_ID;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Field<Boolean> field3() {
+	public Field<Boolean> field1() {
 		return GroupUsers.GROUP_USERS.CAN_ADD_OTHERS_TO_GROUP;
 	}
 
@@ -152,23 +136,23 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Long value1() {
-		return getGroupId();
+	public Field<Long> field2() {
+		return GroupUsers.GROUP_USERS.GROUP_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Long value2() {
-		return getUserId();
+	public Field<Long> field3() {
+		return GroupUsers.GROUP_USERS.USER_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Boolean value3() {
+	public Boolean value1() {
 		return getCanAddOthersToGroup();
 	}
 
@@ -176,25 +160,23 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GroupUsersRecord value1(Long value) {
-		setGroupId(value);
-		return this;
+	public Long value2() {
+		return getGroupId();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GroupUsersRecord value2(Long value) {
-		setUserId(value);
-		return this;
+	public Long value3() {
+		return getUserId();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GroupUsersRecord value3(Boolean value) {
+	public GroupUsersRecord value1(Boolean value) {
 		setCanAddOthersToGroup(value);
 		return this;
 	}
@@ -203,7 +185,25 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GroupUsersRecord values(Long value1, Long value2, Boolean value3) {
+	public GroupUsersRecord value2(Long value) {
+		setGroupId(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GroupUsersRecord value3(Long value) {
+		setUserId(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GroupUsersRecord values(Boolean value1, Long value2, Long value3) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
@@ -219,9 +219,9 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	 */
 	@Override
 	public void from(IGroupUsers from) {
+		setCanAddOthersToGroup(from.getCanAddOthersToGroup());
 		setGroupId(from.getGroupId());
 		setUserId(from.getUserId());
-		setCanAddOthersToGroup(from.getCanAddOthersToGroup());
 	}
 
 	/**
@@ -247,11 +247,11 @@ public class GroupUsersRecord extends UpdatableRecordImpl<GroupUsersRecord> impl
 	/**
 	 * Create a detached, initialised GroupUsersRecord
 	 */
-	public GroupUsersRecord(Long groupId, Long userId, Boolean canAddOthersToGroup) {
+	public GroupUsersRecord(Boolean canAddOthersToGroup, Long groupId, Long userId) {
 		super(GroupUsers.GROUP_USERS);
 
-		setValue(0, groupId);
-		setValue(1, userId);
-		setValue(2, canAddOthersToGroup);
+		setValue(0, canAddOthersToGroup);
+		setValue(1, groupId);
+		setValue(2, userId);
 	}
 }

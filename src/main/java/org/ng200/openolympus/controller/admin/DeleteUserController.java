@@ -26,7 +26,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +43,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(value = SecurityClearanceType.DELETE_USER)
+		})
+})
 public class DeleteUserController {
 
 	@Autowired
@@ -49,8 +58,8 @@ public class DeleteUserController {
 	@Transactional
 	public void deleteUser(@RequestBody List<Long> userIds) {
 		final List<User> users = userIds.stream()
-				.map(this.userService::getUserById)
-				.collect(Collectors.toList());
+		        .map(this.userService::getUserById)
+		        .collect(Collectors.toList());
 		users.forEach(Assertions::resourceExists);
 		users.forEach(this.userService::deleteUser);
 	}

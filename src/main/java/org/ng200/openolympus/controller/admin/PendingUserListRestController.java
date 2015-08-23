@@ -24,7 +24,11 @@ package org.ng200.openolympus.controller.admin;
 
 import java.util.List;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +37,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(value = SecurityClearanceType.APPROVE_USER_REGISTRATIONS)
+		})
+})
 public class PendingUserListRestController {
 	private static final int PAGE_SIZE = 10;
 	@Autowired
@@ -48,7 +57,7 @@ public class PendingUserListRestController {
 
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getPendingUsers(page,
-				PendingUserListRestController.PAGE_SIZE);
+		        PendingUserListRestController.PAGE_SIZE);
 	}
 
 }

@@ -26,9 +26,20 @@ import javax.persistence.UniqueConstraint;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "group_users", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"group_id", "USER_id"})
+	@UniqueConstraint(columnNames = {"group_id", "user_id"})
 })
 public interface IGroupUsers extends Serializable {
+
+	/**
+	 * Setter for <code>public.group_users.can_add_others_to_group</code>.
+	 */
+	public IGroupUsers setCanAddOthersToGroup(Boolean value);
+
+	/**
+	 * Getter for <code>public.group_users.can_add_others_to_group</code>.
+	 */
+	@Column(name = "can_add_others_to_group", nullable = false)
+	public Boolean getCanAddOthersToGroup();
 
 	/**
 	 * Setter for <code>public.group_users.group_id</code>.
@@ -42,26 +53,15 @@ public interface IGroupUsers extends Serializable {
 	public Long getGroupId();
 
 	/**
-	 * Setter for <code>public.group_users.USER_id</code>.
+	 * Setter for <code>public.group_users.user_id</code>.
 	 */
 	public IGroupUsers setUserId(Long value);
 
 	/**
-	 * Getter for <code>public.group_users.USER_id</code>.
+	 * Getter for <code>public.group_users.user_id</code>.
 	 */
-	@Column(name = "USER_id", nullable = false, precision = 64)
+	@Column(name = "user_id", nullable = false, precision = 64)
 	public Long getUserId();
-
-	/**
-	 * Setter for <code>public.group_users.can_add_others_to_group</code>.
-	 */
-	public IGroupUsers setCanAddOthersToGroup(Boolean value);
-
-	/**
-	 * Getter for <code>public.group_users.can_add_others_to_group</code>.
-	 */
-	@Column(name = "can_add_others_to_group", nullable = false)
-	public Boolean getCanAddOthersToGroup();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

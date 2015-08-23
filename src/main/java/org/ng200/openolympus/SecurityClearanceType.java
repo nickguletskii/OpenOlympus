@@ -28,39 +28,51 @@ public enum SecurityClearanceType {
 	 * are not logged in.
 	 */
 	ANONYMOUS, /**
-				 * This security clearance type is granted to users who were
-				 * approved by the administrators.
-				 */
+	            * This security clearance type is granted to users who were
+	            * approved by the administrators.
+	            */
 	APPROVED_USER, /**
-					 * This security clearance type is granted to users who can
-					 * view and modify user details.
-					 */
+	                * This security clearance type is granted to users who can
+	                * view and modify user details.
+	                */
 	ADMINISTRATIVE_USER, /**
-							 * This security clearance type is granted to users
-							 * who can create contests.
-							 */
+	                      * This security clearance type is granted to users who
+	                      * can create contests.
+	                      */
 	CONTEST_ORGANIZER, /**
-						 * This security clearance type is granted to users who
-						 * can create contests.
-						 */
+	                    * This security clearance type is granted to users who
+	                    * can create contests.
+	                    */
 	TASK_SUPERVISOR, /**
-						 * This security clearance type is granted to users who
-						 * can create tasks.
-						 */
+	                  * This security clearance type is granted to users who can
+	                  * create tasks.
+	                  */
 	SUPERUSER, /**
-				 * This security clearance type is only granted to accounts used
-				 * by the internal OpenOlympus services.
-				 */
+	            * This security clearance type is only granted to accounts used
+	            * by the internal OpenOlympus services.
+	            */
 	INTERNAL, /**
-				 * This security clearance type requires the user to be logged
-				 * in, i.e. not anonymous.
-				 */
+	           * This security clearance type requires the user to be logged in,
+	           * i.e. not anonymous.
+	           */
 	LOGGED_IN, /**
-				 * Clearance should rarely, if ever, be denied to superusers.
-				 * However, in some cases this may prove to be more readable,
-				 * e.g. when there is no authorisation and the predicate
-				 * requests superuser access.
-				 */
-	DENIED
+	            * Clearance should rarely, if ever, be denied to superusers.
+	            * However, in some cases this may prove to be more readable,
+	            * e.g. when there is no authorisation and the predicate requests
+	            * superuser access.
+	            */
+	DENIED,
+
+	CHANGE_OTHER_USERS_PASSWORD,
+
+	VIEW_OTHER_USERS_PERSONAL_INFO,
+
+	CHANGE_OTHER_USERS_PERSONAL_INFO,
+
+	ENUMERATE_ALL_USERS,
+
+	APPROVE_USER_REGISTRATIONS,
+
+	DELETE_USER
 
 }

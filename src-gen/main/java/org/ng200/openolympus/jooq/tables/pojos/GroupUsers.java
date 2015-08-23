@@ -26,56 +26,32 @@ import org.ng200.openolympus.jooq.tables.interfaces.IGroupUsers;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "group_users", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"group_id", "USER_id"})
+	@UniqueConstraint(columnNames = {"group_id", "user_id"})
 })
 public class GroupUsers implements IGroupUsers {
 
-	private static final long serialVersionUID = 102897412;
+	private static final long serialVersionUID = -1239034282;
 
+	private Boolean canAddOthersToGroup;
 	private Long    groupId;
 	private Long    userId;
-	private Boolean canAddOthersToGroup;
 
 	public GroupUsers() {}
 
 	public GroupUsers(GroupUsers value) {
+		this.canAddOthersToGroup = value.canAddOthersToGroup;
 		this.groupId = value.groupId;
 		this.userId = value.userId;
-		this.canAddOthersToGroup = value.canAddOthersToGroup;
 	}
 
 	public GroupUsers(
+		Boolean canAddOthersToGroup,
 		Long    groupId,
-		Long    userId,
-		Boolean canAddOthersToGroup
+		Long    userId
 	) {
-		this.groupId = groupId;
-		this.userId = userId;
 		this.canAddOthersToGroup = canAddOthersToGroup;
-	}
-
-	@Column(name = "group_id", nullable = false, precision = 64)
-	@Override
-	public Long getGroupId() {
-		return this.groupId;
-	}
-
-	@Override
-	public GroupUsers setGroupId(Long groupId) {
 		this.groupId = groupId;
-		return this;
-	}
-
-	@Column(name = "USER_id", nullable = false, precision = 64)
-	@Override
-	public Long getUserId() {
-		return this.userId;
-	}
-
-	@Override
-	public GroupUsers setUserId(Long userId) {
 		this.userId = userId;
-		return this;
 	}
 
 	@Column(name = "can_add_others_to_group", nullable = false)
@@ -90,6 +66,30 @@ public class GroupUsers implements IGroupUsers {
 		return this;
 	}
 
+	@Column(name = "group_id", nullable = false, precision = 64)
+	@Override
+	public Long getGroupId() {
+		return this.groupId;
+	}
+
+	@Override
+	public GroupUsers setGroupId(Long groupId) {
+		this.groupId = groupId;
+		return this;
+	}
+
+	@Column(name = "user_id", nullable = false, precision = 64)
+	@Override
+	public Long getUserId() {
+		return this.userId;
+	}
+
+	@Override
+	public GroupUsers setUserId(Long userId) {
+		this.userId = userId;
+		return this;
+	}
+
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------
@@ -99,9 +99,9 @@ public class GroupUsers implements IGroupUsers {
 	 */
 	@Override
 	public void from(IGroupUsers from) {
+		setCanAddOthersToGroup(from.getCanAddOthersToGroup());
 		setGroupId(from.getGroupId());
 		setUserId(from.getUserId());
-		setCanAddOthersToGroup(from.getCanAddOthersToGroup());
 	}
 
 	/**

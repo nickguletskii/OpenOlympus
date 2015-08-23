@@ -27,8 +27,12 @@ import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
@@ -39,6 +43,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
+		})
+})
 public class ArchiveTaskListRestController {
 	public static class TaskDto extends Task {
 		/**
@@ -89,24 +98,24 @@ public class ArchiveTaskListRestController {
 	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
 
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,
-			Principal principal) {
+	        Principal principal) {
 
 		return this.taskService
-				.findTasksNewestFirstAndAuthorized(page,
-						ArchiveTaskListRestController.PAGE_SIZE, principal)
-				.stream()
-				.map(task -> {
-					BigDecimal score = null;
-					if (principal != null) {
-						final User user = this.userService
-								.getUserByUsername(principal.getName());
-						if (user != null) {
-							score = this.taskService.getScore(task, user);
-						}
-					}
-					return new TaskDto(task, score, this.taskService
-							.getMaximumScore(task));
-				}).collect(Collectors.toList());
+		        .findTasksNewestFirstAndAuthorized(page,
+		                ArchiveTaskListRestController.PAGE_SIZE, principal)
+		        .stream()
+		        .map(task -> {
+			        BigDecimal score = null;
+			        if (principal != null) {
+				        final User user = this.userService
+		                        .getUserByUsername(principal.getName());
+				        if (user != null) {
+					        score = this.taskService.getScore(task, user);
+				        }
+			        }
+			        return new TaskDto(task, score, this.taskService
+		                    .getMaximumScore(task));
+		        }).collect(Collectors.toList());
 	}
 
 }

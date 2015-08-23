@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="163,836" last-zoom="1"
+<dbmodel pgmodeler-ver="0.8.1" last-position="0,745" last-zoom="0.65"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -299,7 +299,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="contest_participation">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="133.469" y="1213.75"/>
+	<position x="0" y="1225.45"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
 	</column>
@@ -324,7 +324,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="contest_question">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="166.25" y="964.25"/>
+	<position x="3.63636" y="905.455"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
 	</column>
@@ -351,7 +351,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="persistent_logins">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="50" y="308.2"/>
+	<position x="60" y="300"/>
 	<column name="username" not-null="true">
 		<type name="character varying" length="64"/>
 	</column>
@@ -372,7 +372,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="property">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="366.438" y="308.2"/>
+	<position x="360" y="300"/>
 	<column name="id" not-null="true">
 		<type name="bigint"/>
 	</column>
@@ -396,7 +396,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="solution">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="1353.19" y="422.533"/>
+	<position x="1605.45" y="225.455"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
 	</column>
@@ -433,7 +433,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="time_extension">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="174.417" y="1367.32"/>
+	<position x="350.909" y="1607.27"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
 	</column>
@@ -461,7 +461,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="contest">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="752.944" y="1370.97"/>
+	<position x="893.835" y="1827.82"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
 	</column>
@@ -488,7 +488,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="task">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="1395.24" y="1007.84"/>
+	<position x="1806.62" y="915.188"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
 	</column>
@@ -523,12 +523,12 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="principal">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="691.667" y="1059.44"/>
+	<position x="1260.99" y="1120.28"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1"/>
+		<type name="public.general_permission_type" dimension="1" precision="32582"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -538,7 +538,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="USER">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="780.097" y="529.44"/>
+	<position x="780" y="520"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -631,7 +631,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="group">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="923.635" y="1170.99"/>
+	<position x="1446.36" y="1583.3"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -649,7 +649,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="contest_message">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="205.422" y="748.75"/>
+	<position x="243.636" y="610.909"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
 	</column>
@@ -680,7 +680,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 custom-color="#230ee5"
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.time_extension"
-	 src-required="true" dst-required="false"/>
+	 src-required="true" dst-required="false">
+	<line>
+		<position x="1143.64" y="929.091"/>
+	<position x="454.909" y="1205.79"/>
+	</line>
+</relationship>
 
 <relationship name="user_contest_messages" type="rel1n"
 	 src-col-pattern="user_id"
@@ -690,7 +695,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.contest_message"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="684.26" y="757.6"/>
+	<position x="591.765" y="757.647"/>
+	</line>
+</relationship>
 
 <relationship name="user_solutions" type="rel1n"
 	 src-col-pattern="user_id"
@@ -700,7 +710,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.solution"
 	 src-required="false" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="1399.92" y="757.6"/>
+	<position x="1399.92" y="302.055"/>
+	</line>
+</relationship>
 
 <index name="solution_by_user" table="public.solution"
 	 concurrent="false" unique="false" fast-update="false" buffering="false"
@@ -727,6 +742,10 @@ WHERE contest.id = contest_id ]]></definition>
 	 dst-table="public.contest_question"
 	 src-required="true" dst-required="false"
 	del-action="CASCADE">
+	<line>
+		<position x="1026.38" y="854.877"/>
+	<position x="102.136" y="854.877"/>
+	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
@@ -741,7 +760,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="verdict">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="833.333" y="342.639"/>
+	<position x="838.182" y="141.818"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
 	</column>
@@ -752,7 +771,7 @@ WHERE contest.id = contest_id ]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="2"/>
+		<type name="public.verdict_status_type" precision="32582"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -793,7 +812,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.solution"
 	 dst-table="public.verdict"
 	 src-required="false" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="1642.96" y="230.37"/>
+	<position x="1405.82" y="230.518"/>
+	</line>
+</relationship>
 
 <relationship name="contest_tasks" type="relnn"
 	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
@@ -804,7 +828,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.task"
 	 src-required="false" dst-required="false"
-	 table-name="contest_tasks"/>
+	 table-name="contest_tasks">
+	<line>
+		<position x="2320" y="1897.14"/>
+	<position x="2325.71" y="962.857"/>
+	</line>
+</relationship>
 
 <relationship name="contest_messages" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -814,7 +843,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.contest_message"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="737.427" y="1890.42"/>
+	<position x="737.427" y="657.609"/>
+	</line>
+</relationship>
 
 <relationship name="contest_questions" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -824,7 +858,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.contest_question"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="1132.72" y="1421.29"/>
+	<position x="102.136" y="1421.29"/>
+	</line>
+</relationship>
 
 <relationship name="contest_participations" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -834,7 +873,15 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.contest_participation"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="1132.72" y="1582.24"/>
+	<position x="202.883" y="1582.24"/>
+	</line>
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
 
 <relationship name="contest_time_extensions" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -844,7 +891,12 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.time_extension"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="1132.72" y="1772.2"/>
+	<position x="454.909" y="1772.2"/>
+	</line>
+</relationship>
 
 <relationship name="task_solutions" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -854,47 +906,14 @@ WHERE contest.id = contest_id ]]></definition>
 	 src-table="public.task"
 	 dst-table="public.solution"
 	 src-required="true" dst-required="false">
+	<line>
+		<position x="1964.12" y="636.421"/>
+	<position x="1773.45" y="636.421"/>
+	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
 </relationship>
-
-<table name="resource">
-	<schema name="public"/>
-	<role name="postgres"/>
-	<position x="1437.5" y="790"/>
-	<column name="id" not-null="true">
-		<type name="bigserial"/>
-	</column>
-	<column name="name" not-null="true">
-		<type name="text"/>
-	</column>
-	<column name="filename" not-null="true">
-		<type name="text"/>
-	</column>
-</table>
-
-<relationship name="user_uploads_resources" type="rel1n"
-	 src-col-pattern="{st}_{sc}"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#4cae12"
-	 src-table="public.&quot;USER&quot;"
-	 dst-table="public.resource"
-	 src-required="false" dst-required="false">
-	<label ref-type="name-label">
-		<position x="0" y="0"/>
-	</label>
-</relationship>
-
-<relationship name="task_resources" type="rel1n"
-	 src-col-pattern="{st}_{sc}"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#e193f9"
-	 src-table="public.task"
-	 dst-table="public.resource"
-	 src-required="false" dst-required="false"/>
 
 <usertype name="task_permission_type" configuration="enumeration">
 	<schema name="public"/>
@@ -911,7 +930,7 @@ WHERE contest.id = contest_id ]]></definition>
 <usertype name="contest_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="edit,view_tasks_before_contest_started,delete,add_user,add_task,list_tasks,extend_time,know_about,manage_acl"/>
+	<enumeration values="edit,view_tasks_before_contest_started,delete,add_user,add_task,list_tasks,extend_time,know_about,manage_acl,participate"/>
 </usertype>
 
 <function name="keep_user_as_principal"
@@ -954,28 +973,16 @@ END;]]></definition>
 	 table-name="task_permission"
 	upd-action="NO ACTION"
 	del-action="NO ACTION">
-	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32608"/>
-	</column>
-	<special-pk-cols indexes="0"/>
-</relationship>
-
-<relationship name="group_users" type="relnn"
-	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
-	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
-	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
-	 pk-col-pattern="id"
-	 custom-color="#db5217"
-	 src-table="public.&quot;group&quot;"
-	 dst-table="public.&quot;USER&quot;"
-	 src-required="false" dst-required="false"
-	 table-name="group_users">
-	<label ref-type="src-label">
+	<line>
+		<position x="1442.99" y="970.788"/>
+	</line>
+	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
-	<column name="can_add_others_to_group" not-null="true" default-value="false">
-		<type name="bool"/>
+	<column name="permission" not-null="true">
+		<type name="public.task_permission_type" precision="32582"/>
 	</column>
+	<special-pk-cols indexes="0"/>
 </relationship>
 
 <function name="keep_user_as_member_of_groups"
@@ -994,29 +1001,29 @@ END;]]></definition>
 	</return-type>
 	<definition><![CDATA[BEGIN
 	IF (TG_OP = 'UPDATE' AND NEW.superuser = TRUE AND OLD.superuser = FALSE) THEN
-		INSERT INTO group_users(group_id, "USER_id",can_add_others_to_group) VALUES
+		INSERT INTO group_users(group_id, "user_id",can_add_others_to_group) VALUES
 			((SELECT id FROM "group" WHERE name='#{superusers}'), NEW.id, FALSE);
 		RETURN NEW;
 	ELSIF (TG_OP = 'UPDATE' AND NEW.superuser = FALSE AND OLD.superuser = TRUE) THEN
 		DELETE FROM group_users
-			WHERE group_users.USER_id =NEW.id
+			WHERE group_users.user_id =NEW.id
 			AND group_users.group_id=(SELECT id FROM "group" WHERE name='#{superusers}');
 		RETURN NEW;
 	ELSIF (TG_OP = 'UPDATE') THEN
 		RETURN NEW;
 	ELSIF (TG_OP = 'INSERT') THEN
-		INSERT INTO group_users(group_id, "USER_id", can_add_others_to_group)
+		INSERT INTO group_users(group_id, "user_id", can_add_others_to_group)
 		VALUES ((SELECT id FROM "group" WHERE name='#{allUsers}'), NEW.id, FALSE);
 		IF(NEW.superuser=TRUE) THEN
 			INSERT INTO group_users(
-				group_id, "USER_id", can_add_others_to_group)
+				group_id, "user_id", can_add_others_to_group)
 			VALUES ((SELECT id FROM "group" WHERE name='#{superusers}'), NEW.id, FALSE);
 		END IF;
 		RETURN NEW;
 	ELSIF (TG_OP = 'DELETE') THEN
 		DELETE FROM group_users
 		WHERE (name='#{superusers}' OR name='#{allUsers}')
-		AND USER_id=OLD.id;
+		AND user_id=OLD.id;
 		RETURN OLD;
 	END IF;
 END;]]></definition>
@@ -1066,11 +1073,15 @@ END;]]></definition>
 	 dst-table="public.principal"
 	 src-required="false" dst-required="false"
 	 table-name="contest_permission">
+	<line>
+		<position x="1287.85" y="1890.42"/>
+	<position x="1287.85" y="1145.98"/>
+	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32765"/>
+		<type name="public.contest_permission_type" precision="32582"/>
 	</column>
 </relationship>
 
@@ -1101,7 +1112,7 @@ END;]]></definition>
 			principal.id = principal_id_p
 			OR
 			principal.id IN (SELECT group_id FROM group_users
-			WHERE group_users."USER_id"=principal_id_p)
+			WHERE group_users."user_id"=principal_id_p)
 		)
 		AND
 	 	principal.permissions @>
@@ -1212,7 +1223,7 @@ END;]]></definition>
 	<definition><![CDATA[BEGIN
 	RETURN permission_principal_id_p = principal_id_p OR
 	permission_principal_id_p IN (SELECT group_id FROM group_users
-			WHERE group_users."USER_id"=principal_id_p);
+			WHERE group_users."user_id"=principal_id_p);
 END;]]></definition>
 </function>
 
@@ -1295,7 +1306,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32765"/>
+	<type name="public.contest" precision="32766"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp"/>
@@ -1353,7 +1364,15 @@ END;]]></definition>
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.contest_participation"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE"/>
+	del-action="CASCADE">
+	<line>
+		<position x="1026.38" y="1015.83"/>
+	<position x="202.883" y="1015.83"/>
+	</line>
+	<label ref-type="dst-label">
+		<position x="55.517" y="6.89091"/>
+	</label>
+</relationship>
 
 <trigger name="keep_user_as_principal_trigger" firing-type="BEFORE" per-line="true" constraint="false"
 	 ins-event="true" del-event="true" upd-event="true" trunc-event="false"
@@ -1385,7 +1404,7 @@ END;]]></definition>
 <table name="group_permission">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="1445" y="1147"/>
+	<position x="1830.48" y="1330.96"/>
 	<column name="principal_id" not-null="true">
 		<type name="bigint"/>
 	</column>
@@ -1393,12 +1412,288 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type"/>
+		<type name="public.group_permission_type" precision="32582"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
 	</constraint>
 </table>
+
+<function name="get_participants_group_id_from_contest_id"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="bigint"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<definition><![CDATA[BEGIN
+    RETURN (
+        SELECT
+            participants_group
+        FROM
+            contest
+        WHERE
+            contest.id = contest_id_p);
+END;]]></definition>
+</function>
+
+<table name="group_users">
+	<schema name="public"/>
+	<position x="967.026" y="1276.27"/>
+	<column name="can_add_others_to_group" not-null="true" default-value="false">
+		<type name="bool"/>
+	</column>
+
+	<customidxs object-type="column">
+		<object name="group_id" index="1"/>
+		<object name="user_id" index="2"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="USER_fk" index="2"/>
+		<object name="group_fk" index="1"/>
+		<object name="group_users_pk" index="0"/>
+	</customidxs>
+</table>
+
+<relationship name="group_has_many_group_users" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.&quot;group&quot;"
+	 dst-table="public.group_users"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+<relationship name="USER_has_many_group_users" type="rel1n"
+	 src-col-pattern="user_id"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.&quot;USER&quot;"
+	 dst-table="public.group_users"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+<function name="user_immutable_columns"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+    PERFORM check_immutability('id', OLD.id, NEW.id);
+    RETURN NEW;
+END;]]></definition>
+</function>
+
+<trigger name="user_immutable_columns" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.&quot;USER&quot;">
+		<function signature="public.user_immutable_columns()"/>
+</trigger>
+
+<function name="group_immutable_columns"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+    PERFORM check_immutability('id', OLD.id, NEW.id);
+    RETURN NEW;
+END;]]></definition>
+</function>
+
+<trigger name="group_immutable_columns" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.&quot;group&quot;">
+		<function signature="public.group_immutable_columns()"/>
+</trigger>
+
+<function name="principal_immutable_columns"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+    PERFORM check_immutability('id', OLD.id, NEW.id);
+    RETURN NEW;
+END;]]></definition>
+</function>
+
+<function name="group_users_immutable_columns"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+    PERFORM check_immutability('user_id', OLD.user_id, NEW.user_id);
+    PERFORM check_immutability('group_id', OLD.group_id, NEW.group_id);
+    RETURN NEW;
+END;]]></definition>
+</function>
+
+<trigger name="group_users_immutable_columns" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.group_users">
+		<function signature="public.group_users_immutable_columns()"/>
+</trigger>
+
+<trigger name="principal_immutable_columns" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.principal">
+		<function signature="public.principal_immutable_columns()"/>
+</trigger>
+
+<function name="contest_participation_immutable_columns"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+    PERFORM check_immutability('id', OLD.id, NEW.id);
+    PERFORM check_immutability('user_id', OLD.user_id, NEW.user_id);
+    PERFORM check_immutability('group_id', OLD.group_id, NEW.group_id);
+    RETURN NEW;
+END;]]></definition>
+</function>
+
+<trigger name="contest_participation_immutable_columns" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.contest_participation">
+		<function signature="public.contest_participation_immutable_columns()"/>
+</trigger>
+
+<function name="check_immutability"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="name_v" in="true">
+		<type name="text"/>
+	</parameter>
+	<parameter name="old_v" in="true">
+		<type name="anyelement"/>
+	</parameter>
+	<parameter name="new_v" in="true">
+		<type name="anyelement"/>
+	</parameter>
+	<definition><![CDATA[BEGIN
+    IF new_v IS DISTINCT FROM old_v THEN
+        RAISE EXCEPTION 'Attempted to update immutable column %: Old: %, New: %', name_v, old_v, new_v;
+    END IF;
+END;]]></definition>
+</function>
+
+<function name="keep_group_member_in_contest_participations_list"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+   IF (TG_OP = 'INSERT')
+   THEN
+      INSERT INTO contest_participation (score, user_id, contest_id)
+         SELECT 0, NEW.user_id, contest_id
+           FROM "group"
+                INNER JOIN contest_permission
+                   ON contest_permission.principal_id = "group".id
+          WHERE     contest_permission.permission = "participate"
+                AND NOT EXISTS
+                       (SELECT 1
+                          FROM contest_participation cp
+                         WHERE     cp.user_id = NEW.user_id
+                               AND cp.contest_id =
+                                      contest_permission.contest_id);
+   END IF;
+   IF (TG_OP = 'DELETE')
+   THEN
+      DELETE FROM contest_participation
+	  WHERE contest_participation.user_id = OLD.user_id
+	  AND contest_participation.contest_id = OLD.contest_id
+	  AND NOT has_contest_permission(OLD.contest_id, OLD.user_id, 'participate');
+   END IF;
+END;]]></definition>
+</function>
+
+<trigger name="keep_group_member_in_contest_participants_list" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="true" upd-event="false" trunc-event="false"
+	 table="public.group_users">
+		<function signature="public.keep_group_member_in_contest_participations_list()"/>
+</trigger>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">
@@ -1427,12 +1722,20 @@ END;]]></definition>
 <relationship name="user_is_a_principal" type="relfk"
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.principal"
-	 src-required="false" dst-required="false"/>
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="1442.99" y="757.6"/>
+	</line>
+</relationship>
 
-<relationship name="rel_group_principal" type="relfk"
+<relationship name="group_is_a_principal" type="relfk"
 	 src-table="public.&quot;group&quot;"
 	 dst-table="public.principal"
 	 src-required="false" dst-required="false">
+	<line>
+		<position x="1612.75" y="1381.94"/>
+	<position x="1442.99" y="1381.94"/>
+	</line>
 	<label ref-type="src-label">
 		<position x="0" y="0"/>
 	</label>
@@ -1441,11 +1744,28 @@ END;]]></definition>
 <relationship name="rel_group_permission_principal" type="relfk"
 	 src-table="public.group_permission"
 	 dst-table="public.principal"
-	 src-required="false" dst-required="false"/>
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="2009.48" y="1145.98"/>
+	</line>
+	<label ref-type="dst-label">
+		<position x="9.54" y="-0.2"/>
+	</label>
+</relationship>
 
-<relationship name="rel_group_permission_group" type="relfk"
+<relationship name="group_permissions" type="relfk"
 	 src-table="public.group_permission"
 	 dst-table="public.&quot;group&quot;"
-	 src-required="false" dst-required="false"/>
+	 src-required="false" dst-required="false">
+	<line>
+		<position x="2008.89" y="1617.78"/>
+	</line>
+	<label ref-type="dst-label">
+		<position x="6.34824" y="9.36075"/>
+	</label>
+	<label ref-type="name-label">
+		<position x="81.3889" y="-4.48453"/>
+	</label>
+</relationship>
 
 </dbmodel>

@@ -25,10 +25,14 @@ package org.ng200.openolympus.controller.admin;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.user.AbstractUserInfoController;
 import org.ng200.openolympus.dto.UserInfoDto;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,13 +42,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(value = SecurityClearanceType.VIEW_OTHER_USERS_PERSONAL_INFO),
+                             @SecurityLeaf(value = SecurityClearanceType.CHANGE_OTHER_USERS_PERSONAL_INFO)
+		})
+})
 public class AdministrativeUserInfoController extends
-		AbstractUserInfoController {
+        AbstractUserInfoController {
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.PATCH)
 	public BindingResponse changePersonInfo(final Model model,
-			@Valid @RequestBody final UserInfoDto userInfoDto,
-			final BindingResult bindingResult,
-			@PathVariable(value = "user") final User user) {
+	        @Valid @RequestBody final UserInfoDto userInfoDto,
+	        final BindingResult bindingResult,
+	        @PathVariable(value = "user") final User user) {
 		Assertions.resourceExists(user);
 		super.copyDtoIntoDatabase(userInfoDto, bindingResult, user);
 		return BindingResponse.OK;
@@ -52,7 +62,7 @@ public class AdministrativeUserInfoController extends
 
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(
-			@PathVariable(value = "user") final User user) {
+	        @PathVariable(value = "user") final User user) {
 		final UserInfoDto userInfoDto = new UserInfoDto();
 		super.initialiseDTO(userInfoDto, user);
 		return userInfoDto;

@@ -25,14 +25,11 @@ package org.ng200.openolympus;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,10 +41,8 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 
-public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(SecurityClearanceJacksonFilter.class);
+public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter
+		implements SecurityContestHasClearanceAware {
 
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
@@ -64,25 +59,12 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 	protected boolean include(Object object, BeanPropertyWriter writer) {
 		final SecurityClearanceRequired requestedClearance = writer
 				.findAnnotation(SecurityClearanceRequired.class);
-		SecurityClearanceJacksonFilter.logger.debug(
-				"Voting on object: {}, property: {}, clearance: {}",
-				object,
-				writer.getFullName(),
-				requestedClearance);
-
 		return this.include(object, requestedClearance, writer.getFullName());
 	}
 
 	protected boolean include(Object object, PropertyWriter writer) {
-
 		final SecurityClearanceRequired requestedClearance = writer
 				.findAnnotation(SecurityClearanceRequired.class);
-		SecurityClearanceJacksonFilter.logger.debug(
-				"Voting on object: {}, property: {}, clearance: {}",
-				object,
-				writer.getFullName(),
-				requestedClearance);
-
 		return this.include(object, requestedClearance, writer.getFullName());
 	}
 
@@ -100,83 +82,15 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 			return true;
 		}
 
-		if (this.securityContextHasClearance(object,
-				requestedClearance.minimumClearance(),
-				propertyName) &&
+		return this.securityContextHasClearance(
+				requestedClearance.minimumClearance()) &&
 				Stream.of(requestedClearance.predicates())
 						.map(predicateClass -> this.getPredicate(predicateClass)
 								.getRequiredClearanceForObject(user, object))
 						.map(req -> req != SecurityClearanceType.DENIED
-								? this.securityContextHasClearance(object, req,
-										propertyName)
+								? this.securityContextHasClearance(req)
 								: false)
-						.reduce(true, (l, r) -> l && r)) {
-			SecurityClearanceJacksonFilter.logger.debug(
-					"Voted 'accept'  on object: {}, property: {}, clearance: {} because an unless predicate voted to allow access.",
-					object, propertyName,
-					requestedClearance);
-			return true;
-		}
-		return false;
-	}
-
-	private boolean securityContextHasClearance(Object object,
-			SecurityClearanceType requestedClearance,
-			PropertyName propertyName) {
-		// No clearance requested
-		if (requestedClearance == null
-				|| requestedClearance == SecurityClearanceType.ANONYMOUS) {
-			SecurityClearanceJacksonFilter.logger.debug(
-					"Voted 'accept'  on object: {}, property: {}, clearance: {} because anonymous access is allowed",
-					object, propertyName,
-					requestedClearance);
-			return true;
-		}
-		// Not authenticated, but anonymous access is not allowed as per
-		// previous step
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			SecurityClearanceJacksonFilter.logger.debug(
-					"Voted 'deny' on object: {}, property: {}, clearance: {} because there is no security context",
-					object, propertyName, requestedClearance);
-			return false;
-		}
-		// The user is logged in, therefore if the requested clearance is
-		// LOGGED_IN we give clearance.
-		if (requestedClearance == SecurityClearanceType.LOGGED_IN) {
-			SecurityClearanceJacksonFilter.logger.debug(
-					"Voted 'accept' on object: {}, clearance {} because any logged in user has access to this information",
-					object, propertyName, requestedClearance);
-
-			return true;
-		}
-		SecurityClearanceJacksonFilter.logger.debug("Olympus authorities: {}",
-				SecurityContextHolder.getContext().getAuthentication()
-						.getAuthorities());
-		SecurityClearanceJacksonFilter.logger.debug(
-				"Olympus authority clearances: {}",
-				SecurityContextHolder.getContext().getAuthentication()
-						.getAuthorities()
-						.stream()
-						.filter((
-								authority) -> authority instanceof Authorities.OlympusAuthority)
-						.map(authority -> ((Authorities.OlympusAuthority) authority)
-								.getClearanceType())
-						.collect(Collectors.toList()));
-		final boolean flag = SecurityContextHolder.getContext()
-				.getAuthentication()
-				.getAuthorities()
-				.stream()
-				.anyMatch(
-						(authority) -> authority instanceof Authorities.OlympusAuthority
-								&&
-								((Authorities.OlympusAuthority) authority)
-										.getClearanceType() == requestedClearance);
-
-		SecurityClearanceJacksonFilter.logger.debug(
-				"Voted {} on object: {}, property: {}, clearance: {} because of user's authorities",
-				flag,
-				object, propertyName, requestedClearance);
-		return flag;
+						.reduce(true, (l, r) -> l && r);
 	}
 
 	@Override

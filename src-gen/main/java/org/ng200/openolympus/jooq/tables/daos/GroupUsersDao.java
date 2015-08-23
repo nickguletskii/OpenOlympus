@@ -51,6 +51,13 @@ public class GroupUsersDao extends DAOImpl<GroupUsersRecord, org.ng200.openolymp
 	}
 
 	/**
+	 * Fetch records that have <code>can_add_others_to_group IN (values)</code>
+	 */
+	public List<org.ng200.openolympus.jooq.tables.pojos.GroupUsers> fetchByCanAddOthersToGroup(Boolean... values) {
+		return fetch(GroupUsers.GROUP_USERS.CAN_ADD_OTHERS_TO_GROUP, values);
+	}
+
+	/**
 	 * Fetch records that have <code>group_id IN (values)</code>
 	 */
 	public List<org.ng200.openolympus.jooq.tables.pojos.GroupUsers> fetchByGroupId(Long... values) {
@@ -58,16 +65,9 @@ public class GroupUsersDao extends DAOImpl<GroupUsersRecord, org.ng200.openolymp
 	}
 
 	/**
-	 * Fetch records that have <code>USER_id IN (values)</code>
+	 * Fetch records that have <code>user_id IN (values)</code>
 	 */
 	public List<org.ng200.openolympus.jooq.tables.pojos.GroupUsers> fetchByUserId(Long... values) {
 		return fetch(GroupUsers.GROUP_USERS.USER_ID, values);
-	}
-
-	/**
-	 * Fetch records that have <code>can_add_others_to_group IN (values)</code>
-	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.GroupUsers> fetchByCanAddOthersToGroup(Boolean... values) {
-		return fetch(GroupUsers.GROUP_USERS.CAN_ADD_OTHERS_TO_GROUP, values);
 	}
 }

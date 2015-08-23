@@ -53,7 +53,6 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -166,22 +165,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.userDetailsService(this.userSecurityService).and()
 				.authenticationProvider(this.rememberMeAuthenticationProvider())
 				.authorizeRequests()
-				.antMatchers(WebSecurityConfig.permittedAny).permitAll().and()
-				.authorizeRequests()
-				.antMatchers(WebSecurityConfig.authorisedAny)
-				.hasAuthority(Authorities.USER.getAuthority()).and()
-				.authorizeRequests()
-				.antMatchers(HttpMethod.POST, WebSecurityConfig.authorisedPost)
-				.hasAuthority(Authorities.USER.getAuthority()).and()
-				.authorizeRequests()
-				.antMatchers(HttpMethod.GET, WebSecurityConfig.authorisedGet)
-				.hasAuthority(Authorities.USER.getAuthority()).and()
-				.authorizeRequests()
-				.antMatchers(HttpMethod.GET, WebSecurityConfig.permittedGet)
-				.permitAll().and()
-				.authorizeRequests()
-				.antMatchers(WebSecurityConfig.administrativeAny)
-				.hasAuthority(Authorities.SUPERUSER.getAuthority()).and()
+				.anyRequest().permitAll().and()
 				.addFilterBefore(this.reCaptchaAuthenticationFilter(),
 						UsernamePasswordAuthenticationFilter.class)
 				.httpBasic();

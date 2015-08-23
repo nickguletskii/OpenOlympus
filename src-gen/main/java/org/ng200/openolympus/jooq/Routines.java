@@ -18,6 +18,7 @@ import org.ng200.openolympus.jooq.routines.GetContestEnd;
 import org.ng200.openolympus.jooq.routines.GetContestEndForUser;
 import org.ng200.openolympus.jooq.routines.GetContestStart;
 import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
+import org.ng200.openolympus.jooq.routines.GetParticipantsGroupIdFromContestId;
 import org.ng200.openolympus.jooq.routines.GetSolutionAuthor;
 import org.ng200.openolympus.jooq.routines.GetSolutionTimeAdded;
 import org.ng200.openolympus.jooq.routines.GinExtractQueryTrgm;
@@ -197,6 +198,37 @@ public class Routines {
 		GetContestStartForUser f = new GetContestStartForUser();
 		f.setContestId(contestId);
 		f.setUserId(userId);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.get_participants_group_id_from_contest_id</code>
+	 */
+	public static Long getParticipantsGroupIdFromContestId(Configuration configuration, Integer contestIdP) {
+		GetParticipantsGroupIdFromContestId f = new GetParticipantsGroupIdFromContestId();
+		f.setContestIdP(contestIdP);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.get_participants_group_id_from_contest_id</code> as a field
+	 */
+	public static Field<Long> getParticipantsGroupIdFromContestId(Integer contestIdP) {
+		GetParticipantsGroupIdFromContestId f = new GetParticipantsGroupIdFromContestId();
+		f.setContestIdP(contestIdP);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.get_participants_group_id_from_contest_id</code> as a field
+	 */
+	public static Field<Long> getParticipantsGroupIdFromContestId(Field<Integer> contestIdP) {
+		GetParticipantsGroupIdFromContestId f = new GetParticipantsGroupIdFromContestId();
+		f.setContestIdP(contestIdP);
 
 		return f.asField();
 	}

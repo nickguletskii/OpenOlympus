@@ -27,7 +27,6 @@ import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
 import org.ng200.openolympus.jooq.tables.Principal;
 import org.ng200.openolympus.jooq.tables.Property;
-import org.ng200.openolympus.jooq.tables.Resource;
 import org.ng200.openolympus.jooq.tables.Solution;
 import org.ng200.openolympus.jooq.tables.Task;
 import org.ng200.openolympus.jooq.tables.TaskPermission;
@@ -49,7 +48,7 @@ import org.ng200.openolympus.jooq.tables.Verdict;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = 1895929415;
+	private static final long serialVersionUID = -587092215;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -77,7 +76,6 @@ public class Public extends SchemaImpl {
 			Sequences.CONTEST_PARTICIPATION_ID_SEQ,
 			Sequences.CONTEST_QUESTION_ID_SEQ,
 			Sequences.PRINCIPAL_SEQUENCE,
-			Sequences.RESOURCE_ID_SEQ,
 			Sequences.SOLUTION_ID_SEQ,
 			Sequences.TASK_ID_SEQ,
 			Sequences.TIME_EXTENSION_ID_SEQ,
@@ -106,7 +104,6 @@ public class Public extends SchemaImpl {
 			PersistentLogins.PERSISTENT_LOGINS,
 			Principal.PRINCIPAL,
 			Property.PROPERTY,
-			Resource.RESOURCE,
 			Solution.SOLUTION,
 			Task.TASK,
 			TaskPermission.TASK_PERMISSION,

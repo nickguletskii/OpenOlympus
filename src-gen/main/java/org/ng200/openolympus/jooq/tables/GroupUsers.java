@@ -33,7 +33,7 @@ import org.ng200.openolympus.jooq.tables.records.GroupUsersRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GroupUsers extends TableImpl<GroupUsersRecord> {
 
-	private static final long serialVersionUID = 50140981;
+	private static final long serialVersionUID = 682318577;
 
 	/**
 	 * The reference instance of <code>public.group_users</code>
@@ -49,19 +49,19 @@ public class GroupUsers extends TableImpl<GroupUsersRecord> {
 	}
 
 	/**
+	 * The column <code>public.group_users.can_add_others_to_group</code>.
+	 */
+	public final TableField<GroupUsersRecord, Boolean> CAN_ADD_OTHERS_TO_GROUP = createField("can_add_others_to_group", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
+
+	/**
 	 * The column <code>public.group_users.group_id</code>.
 	 */
 	public final TableField<GroupUsersRecord, Long> GROUP_ID = createField("group_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.group_users.USER_id</code>.
+	 * The column <code>public.group_users.user_id</code>.
 	 */
-	public final TableField<GroupUsersRecord, Long> USER_ID = createField("USER_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
-
-	/**
-	 * The column <code>public.group_users.can_add_others_to_group</code>.
-	 */
-	public final TableField<GroupUsersRecord, Boolean> CAN_ADD_OTHERS_TO_GROUP = createField("can_add_others_to_group", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
+	public final TableField<GroupUsersRecord, Long> USER_ID = createField("user_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * Create a <code>public.group_users</code> table reference

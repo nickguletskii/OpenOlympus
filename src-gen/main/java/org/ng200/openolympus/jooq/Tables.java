@@ -22,7 +22,6 @@ import org.ng200.openolympus.jooq.tables.GroupUsers;
 import org.ng200.openolympus.jooq.tables.PersistentLogins;
 import org.ng200.openolympus.jooq.tables.Principal;
 import org.ng200.openolympus.jooq.tables.Property;
-import org.ng200.openolympus.jooq.tables.Resource;
 import org.ng200.openolympus.jooq.tables.Solution;
 import org.ng200.openolympus.jooq.tables.Task;
 import org.ng200.openolympus.jooq.tables.TaskPermission;
@@ -122,11 +121,6 @@ public class Tables {
 	 * The table public.property
 	 */
 	public static final Property PROPERTY = org.ng200.openolympus.jooq.tables.Property.PROPERTY;
-
-	/**
-	 * The table public.resource
-	 */
-	public static final Resource RESOURCE = org.ng200.openolympus.jooq.tables.Resource.RESOURCE;
 
 	/**
 	 * The table public.solution

@@ -29,8 +29,12 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.mail.EmailException;
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.auth.EmailConfirmationController;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.EmailService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
@@ -41,6 +45,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(value = SecurityClearanceType.APPROVE_USER_REGISTRATIONS)
+		})
+})
 public class ApproveUserRegistrationController {
 
 	public static class Result extends User {
@@ -66,8 +75,8 @@ public class ApproveUserRegistrationController {
 	}
 
 	private final boolean emailConfirmationEnabled = false;// TODO: reimplement
-															// email
-															// confirmation
+	                                                       // email
+	                                                       // confirmation
 
 	@Autowired
 	private EmailService emailService;
@@ -76,15 +85,15 @@ public class ApproveUserRegistrationController {
 	private UserService userService;
 
 	public void approveUser(User user) throws MessagingException,
-			EmailException {
+	        EmailException {
 		Assertions.resourceExists(user);
 
 		if (this.emailConfirmationEnabled) {
 
 			final String link = EmailConfirmationController.getUriBuilder()
-					.queryParam("user", user.getId())
-					.queryParam("token", user.getEmailConfirmationToken())
-					.build().encode().toUriString();
+			        .queryParam("user", user.getId())
+			        .queryParam("token", user.getEmailConfirmationToken())
+			        .build().encode().toUriString();
 
 			// TODO: reimplement email confirmation
 			user.setApprovalEmailSent(true);
@@ -97,16 +106,15 @@ public class ApproveUserRegistrationController {
 	}
 
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
-
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
-				.filter(user -> !user.getApprovalEmailSent()).map(u -> {
-					try {
-						this.approveUser(u);
-					} catch (MessagingException | EmailException e) {
-						return new Result(u, e.getMessage());
-					}
-					return new Result(u, "OK");
-				}).collect(Collectors.toList());
+		        .filter(user -> !user.getApprovalEmailSent()).map(u -> {
+			        try {
+				        this.approveUser(u);
+			        } catch (MessagingException | EmailException e) {
+				        return new Result(u, e.getMessage());
+			        }
+			        return new Result(u, "OK");
+		        }).collect(Collectors.toList());
 	}
 }

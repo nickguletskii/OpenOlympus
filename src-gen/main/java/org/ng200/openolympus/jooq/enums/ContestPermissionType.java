@@ -40,7 +40,9 @@ public enum ContestPermissionType implements EnumType {
 
 	know_about("know_about"),
 
-	manage_acl("manage_acl");
+	manage_acl("manage_acl"),
+
+	participate("participate");
 
 	private final String literal;
 

@@ -37,6 +37,7 @@ import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.ImmutableList;
