@@ -23,10 +23,14 @@
 
 -->
 <div class="panel panel-warning">
-	<div class="panel-heading">
-		<h3 class="panel-title">{{ localisationNamespace + '.heading' | translate }}</h3>
+	<div class="panel-heading"
+		ng-click="collapsed = !collapsed">
+		<h3 class="panel-title">{{ localisationNamespace + '.heading' | translate }}
+		<i class="fa pull-right"
+			ng-class="{'fa-plus-square': collapsed, 'fa-minus-square': !collapsed}"></i></h3>
 	</div>
-	<div class="panel-body">
+	<div class="panel-body"
+		collapse="collapsed">
 		<accordion>
 			<accordion-group class="panel panel-primary"
 				ng-repeat="permission in permissions">
@@ -115,7 +119,8 @@
 			</accordion-group>
 		</accordion>
 	</div>
-	<div class="panel-footer">
+	<div class="panel-footer"
+		collapse="collapsed">
 		<button type="button"
 			class="btn"
 			ng-click="commit()"

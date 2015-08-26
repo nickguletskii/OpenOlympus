@@ -53,6 +53,8 @@ angular.module("ool.directives")
 					);
 			}
 
+			$scope.collapsed = true;
+
 			$scope.refresh = () =>
 				ACLService.getACL($attributes.aclGetter).success((permissions) => {
 					$scope.permissions = _.map(permissions, perm => _.assign(perm, {
