@@ -25,6 +25,7 @@ package org.ng200.openolympus.controller;
 import org.opensaml.util.resource.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
@@ -38,6 +39,7 @@ import org.springframework.web.context.request.WebRequest;
 
 @Order(Ordered.LOWEST_PRECEDENCE - 10)
 @Controller
+@Profile("web")
 public class SinglepageController {
 
 	private static final Logger logger = LoggerFactory

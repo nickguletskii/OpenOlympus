@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="0,745" last-zoom="0.65"
+<dbmodel pgmodeler-ver="0.8.1" last-position="271,661" last-zoom="0.65"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -241,10 +241,19 @@ WHERE contest.id = contest_id ]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="_param1">
-		<type name="bigint"/>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
 	</parameter>
-	<definition><![CDATA[ UPDATE contest_participations SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id WHERE solutions.user_id=contest_participations.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id)) AND (SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participations.contest_id=$1 ]]></definition>
+	<definition><![CDATA[BEGIN
+ PERFORM purge_garbage_contest_participations(contest_id_p);
+ PERFORM insert_new_contest_participations(contest_id_p);
+
+   UPDATE contest_participations cp
+      SET score =
+             (SELECT get_user_total_score_in_contest (cp.contest_id,
+                                                      cp.user_id))
+    WHERE contest_participations.contest_id = contest_id_p;
+END;]]></definition>
 </function>
 
 <function name="update_solution"
@@ -261,10 +270,28 @@ WHERE contest.id = contest_id ]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="_param1">
+	<parameter name="solution_id_p" in="true">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participations SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id WHERE solutions.user_id=contest_participations.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id)) AND (SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participations.user_id=get_solution_author($1) AND contest_participations.contest_id IN (SELECT contest_at_for_user(get_solution_time_added($1), get_solution_author($1))) ]]></definition>
+	<definition><![CDATA[DECLARE
+   user_id_v   bigint;
+   task_id_v   integer;
+BEGIN
+   SELECT user_id_v, task_id_v
+     FROM solution s
+    WHERE s.id = solution_id_p
+     INTO user_id_v, task_id_v;
+
+
+   UPDATE contest_participation cp
+      SET score =
+             (SELECT get_user_total_score_in_contest (cp.contest_id,
+                                                      cp.user_id))
+    WHERE     cp.user_id = user_id_v
+          AND cp.contest_id IN (SELECT ct.contest_id
+                                  FROM contest_tasks ct
+                                 WHERE ct.task_id = task_id_v);
+END;]]></definition>
 </function>
 
 <function name="update_user_in_contest"
@@ -528,7 +555,7 @@ WHERE contest.id = contest_id ]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32582"/>
+		<type name="public.general_permission_type" dimension="1"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -631,7 +658,7 @@ WHERE contest.id = contest_id ]]></definition>
 <table name="group">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="1446.36" y="1583.3"/>
+	<position x="1550.8" y="1585.52"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -771,7 +798,7 @@ WHERE contest.id = contest_id ]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32582"/>
+		<type name="public.verdict_status_type" precision="2"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -833,6 +860,9 @@ WHERE contest.id = contest_id ]]></definition>
 		<position x="2320" y="1897.14"/>
 	<position x="2325.71" y="962.857"/>
 	</line>
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
 </relationship>
 
 <relationship name="contest_messages" type="rel1n"
@@ -974,13 +1004,13 @@ END;]]></definition>
 	upd-action="NO ACTION"
 	del-action="NO ACTION">
 	<line>
-		<position x="1442.99" y="970.788"/>
+		<position x="1571.3" y="970.435"/>
 	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32582"/>
+		<type name="public.task_permission_type" precision="32766"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1062,28 +1092,6 @@ END;]]></definition>
 	 table="public.&quot;group&quot;">
 		<function signature="public.keep_group_as_principal()"/>
 </trigger>
-
-<relationship name="contest_permission" type="relnn"
-	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
-	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
-	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
-	 pk-col-pattern="id"
-	 custom-color="#bec391"
-	 src-table="public.contest"
-	 dst-table="public.principal"
-	 src-required="false" dst-required="false"
-	 table-name="contest_permission">
-	<line>
-		<position x="1287.85" y="1890.42"/>
-	<position x="1287.85" y="1145.98"/>
-	</line>
-	<label ref-type="name-label">
-		<position x="0" y="0"/>
-	</label>
-	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32582"/>
-	</column>
-</relationship>
 
 <function name="has_general_permission"
 		window-func="false"
@@ -1412,7 +1420,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32582"/>
+		<type name="public.group_permission_type"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1474,7 +1482,11 @@ END;]]></definition>
 	 dst-table="public.group_users"
 	 src-required="true" dst-required="false"
 	 identifier="true"
-/>
+>
+	<line>
+		<position x="1181.41" y="1624.9"/>
+	</line>
+</relationship>
 
 <relationship name="USER_has_many_group_users" type="rel1n"
 	 src-col-pattern="user_id"
@@ -1667,11 +1679,13 @@ END;]]></definition>
    IF (TG_OP = 'INSERT')
    THEN
       INSERT INTO contest_participation (score, user_id, contest_id)
-         SELECT 0, NEW.user_id, contest_id
+         SELECT get_user_total_score_in_contest (contest_id, NEW.user_id),
+                NEW.user_id,
+                contest_id
            FROM "group"
                 INNER JOIN contest_permission
                    ON contest_permission.principal_id = "group".id
-          WHERE     contest_permission.permission = "participate"
+          WHERE     contest_permission.permission = 'participate'
                 AND NOT EXISTS
                        (SELECT 1
                           FROM contest_participation cp
@@ -1679,13 +1693,18 @@ END;]]></definition>
                                AND cp.contest_id =
                                       contest_permission.contest_id);
    END IF;
+
    IF (TG_OP = 'DELETE')
    THEN
       DELETE FROM contest_participation
-	  WHERE contest_participation.user_id = OLD.user_id
-	  AND contest_participation.contest_id = OLD.contest_id
-	  AND NOT has_contest_permission(OLD.contest_id, OLD.user_id, 'participate');
+            WHERE     contest_participation.user_id = OLD.user_id
+                  AND contest_participation.contest_id = OLD.contest_id
+                  AND NOT has_contest_permission (OLD.contest_id,
+                                                  OLD.user_id,
+                                                  'participate');
+      RETURN OLD;
    END IF;
+   RETURN NEW;
 END;]]></definition>
 </function>
 
@@ -1693,6 +1712,294 @@ END;]]></definition>
 	 ins-event="true" del-event="true" upd-event="false" trunc-event="false"
 	 table="public.group_users">
 		<function signature="public.keep_group_member_in_contest_participations_list()"/>
+</trigger>
+
+<function name="get_user_total_score_in_contest"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="numeric" length="19" precision="2"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<parameter name="user_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[BEGIN
+   RETURN (SELECT coalesce (sum (sols.score), 0)
+             FROM (  SELECT DISTINCT ON (s.task_id) s.score
+                       FROM contest_tasks ct
+                            INNER JOIN solution s
+                               ON     ct.task_id = s.task_id
+                                  AND ct.contest_id = contest_id_p
+                      WHERE     s.user_id = user_id_p
+                            AND (s.time_added BETWEEN (SELECT get_contest_start_for_user (
+                                                                 contest_id_p,
+                                                                 user_id_p))
+                                                  AND (SELECT get_contest_end_for_user (
+                                                                 contest_id_p,
+                                                                 user_id_p)))
+                   ORDER BY s.task_id ASC, s.time_added DESC) AS sols);
+END;]]></definition>
+</function>
+
+<function name="purge_gargabe_contest_participations"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<definition><![CDATA[BEGIN
+   DELETE FROM contest_participation cp
+         WHERE     cp.contest_id = contest_id_p
+               AND NOT has_contest_permission (contest_id_p, cp.user_id, 'participate');
+END;]]></definition>
+</function>
+
+<function name="insert_new_contest_participations"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<definition><![CDATA[BEGIN
+   INSERT INTO contest_participation (score, user_id, contest_id)
+      SELECT get_user_total_score_in_contest (contest_id_p, u.id),
+             u.id,
+             contest_id_p
+        FROM "USER" u
+       WHERE has_contest_permission (contest_id_p, u.id, 'participate');
+END;]]></definition>
+</function>
+
+<function name="trgr_verdict_update"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+   IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE'
+   THEN
+    PERFORM update_solution(NEW.solution_id);
+    RETURN NEW;
+   ELSIF TG_OP = 'DELETE'
+   THEN
+    PERFORM update_solution(OLD.solution_id);
+    RETURN OLD;
+   END IF;
+END;]]></definition>
+</function>
+
+<trigger name="trgr_verdict_maintain_totals" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="true" upd-event="true" trunc-event="false"
+	 table="public.verdict">
+		<function signature="public.trgr_verdict_update()"/>
+</trigger>
+
+<function name="trgr_solution_updated"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[DECLARE
+   user_id_v   bigint;
+   task_id_v   integer;
+BEGIN
+   SELECT user_id_v, task_id_v
+     FROM solution s
+    WHERE s.id = NEW.id
+     INTO user_id_v, task_id_v;
+
+   UPDATE contest_participation cp
+      SET score =
+             (SELECT get_user_total_score_in_contest (cp.contest_id,
+                                                      cp.user_id))
+    WHERE     cp.user_id = user_id_v
+          AND cp.contest_id IN (SELECT ct.contest_id
+                                  FROM contests_tasks ct
+                                 WHERE ct.task_id = task_id_v);
+    IF TG_OP='DELETE' THEN
+    	return OLD;
+    END IF;
+    RETURN NEW;
+END;]]></definition>
+</function>
+
+<trigger name="trgr_solution_updated" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.solution">
+		<function signature="public.trgr_solution_updated()"/>
+</trigger>
+
+<function name="trgr_contest_updated"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[BEGIN
+	PERFORM update_contest(NEW.id);
+	RETURN NEW;
+END;]]></definition>
+</function>
+
+<trigger name="trgr_contest_updated" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="false" del-event="false" upd-event="true" trunc-event="false"
+	 table="public.contest">
+		<function signature="public.trgr_contest_updated()"/>
+</trigger>
+
+<table name="contest_permission">
+	<schema name="public"/>
+	<position x="1145.1" y="1715.59"/>
+	<column name="permission" not-null="true">
+		<type name="public.contest_permission_type" precision="0"/>
+	</column>
+	<column name="contest_id" not-null="true">
+		<type name="integer"/>
+	</column>
+	<column name="principal_id" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<constraint name="contest_permission_pk" type="pk-constr" table="public.contest_permission">
+		<columns names="permission,contest_id,principal_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<function name="trgr_contest_permissions_changed"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="trigger"/>
+	</return-type>
+	<definition><![CDATA[DECLARE
+   is_group_v       bool;
+   principal_id_v   bigint;
+BEGIN
+   IF (TG_OP = 'INSERT')
+   THEN
+      principal_id_v := NEW.principal_id;
+   END IF;
+
+   IF (TG_OP = 'DELETE')
+   THEN
+      principal_id_v := OLD.principal_id;
+   END IF;
+
+   SELECT EXISTS
+             (SELECT 1
+                FROM "group"
+               WHERE "group".id = principal_id_v)
+     INTO is_group_v;
+
+   IF (TG_OP = 'DELETE') AND OLD.permission = 'participate'
+   THEN
+      IF is_group_v
+      THEN
+    PERFORM purge_gargabe_contest_participations(OLD.contest_id);
+      ELSE
+         DELETE FROM contest_participation cp
+               WHERE     cp.user_id = OLD.principal_id
+                     AND cp.contest_id = OLD.contest_id
+                     AND NOT has_contest_permission (OLD.contest_id,
+                                                     OLD.principal_id,
+                                                     'participate');
+      END IF;
+   ELSIF (TG_OP = 'INSERT') AND NEW.permission = 'participate'
+   THEN
+      IF is_group_v
+      THEN
+    PERFORM insert_new_contest_participations(NEW.contest_id);
+      ELSE
+         INSERT INTO contest_participation (score, user_id, contest_id)
+            SELECT get_user_total_score_in_contest (NEW.contest_id,
+                                                    NEW.principal_id),
+                   NEW.principal_id,
+                   NEW.contest_id
+              FROM "USER" u
+             WHERE NOT has_contest_permission (NEW.contest_id, u.id, 'participate');
+      END IF;
+   END IF;
+
+   IF TG_OP = 'DELETE'
+   THEN
+      RETURN OLD;
+   END IF;
+
+   RETURN NEW;
+END;
+]]></definition>
+</function>
+
+<trigger name="trgr_contest_permissions_changed" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="true" upd-event="false" trunc-event="false"
+	 table="public.contest_permission">
+		<function signature="public.trgr_contest_permissions_changed()"/>
 </trigger>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
@@ -1719,6 +2026,18 @@ END;]]></definition>
 	<columns names="id" ref-type="dst-columns"/>
 </constraint>
 
+<constraint name="contest_permission_contest_id_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.contest" table="public.contest_permission">
+	<columns names="contest_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="contest_permission_principal_id_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.principal" table="public.contest_permission">
+	<columns names="principal_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
 <relationship name="user_is_a_principal" type="relfk"
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.principal"
@@ -1726,6 +2045,9 @@ END;]]></definition>
 	<line>
 		<position x="1442.99" y="757.6"/>
 	</line>
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
 </relationship>
 
 <relationship name="group_is_a_principal" type="relfk"
@@ -1733,8 +2055,8 @@ END;]]></definition>
 	 dst-table="public.principal"
 	 src-required="false" dst-required="false">
 	<line>
-		<position x="1612.75" y="1381.94"/>
-	<position x="1442.99" y="1381.94"/>
+		<position x="1722.22" y="1384.44"/>
+	<position x="1501.82" y="1383.64"/>
 	</line>
 	<label ref-type="src-label">
 		<position x="0" y="0"/>
@@ -1767,5 +2089,15 @@ END;]]></definition>
 		<position x="81.3889" y="-4.48453"/>
 	</label>
 </relationship>
+
+<relationship name="rel_contest_permission_contest" type="relfk"
+	 src-table="public.contest_permission"
+	 dst-table="public.contest"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_contest_permission_principal" type="relfk"
+	 src-table="public.contest_permission"
+	 dst-table="public.principal"
+	 src-required="false" dst-required="false"/>
 
 </dbmodel>

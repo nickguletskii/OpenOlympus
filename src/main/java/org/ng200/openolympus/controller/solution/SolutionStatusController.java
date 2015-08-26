@@ -35,13 +35,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
+@Profile("web")
 @RequestMapping(value = "/api/solution/{id}")
 public class SolutionStatusController {
 
@@ -53,10 +56,10 @@ public class SolutionStatusController {
 		public SolutionDto(List<VerdictDto> verdicts) {
 			super();
 			this.score = verdicts.stream().map(verdict -> verdict.getScore())
-					.reduce((x, y) -> x.add(y)).orElse(null);
+			        .reduce((x, y) -> x.add(y)).orElse(null);
 			this.maximumScore = verdicts.stream()
-					.map(verdict -> verdict.getMaximumScore())
-					.reduce((x, y) -> x.add(y)).orElse(null);
+			        .map(verdict -> verdict.getMaximumScore())
+			        .reduce((x, y) -> x.add(y)).orElse(null);
 			this.verdicts = verdicts;
 		}
 
@@ -86,7 +89,7 @@ public class SolutionStatusController {
 	}
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(SolutionStatusController.class);
+	        .getLogger(SolutionStatusController.class);
 
 	@Autowired
 	private SolutionService solutionService;
@@ -97,17 +100,17 @@ public class SolutionStatusController {
 	@RequestMapping(method = RequestMethod.GET)
 	@Cacheable(value = "solutions", key = "#solution.id")
 	public @ResponseBody SolutionDto solutionApi(
-			@PathVariable(value = "id") final Solution solution,
-			final Locale locale) {
+	        @PathVariable(value = "id") final Solution solution,
+	        final Locale locale) {
 		final List<Verdict> verdicts = this.solutionService
-				.getVerdictsVisibleDuringContest(solution);
+		        .getVerdictsVisibleDuringContest(solution);
 
 		final SolutionDto dto = new SolutionDto(verdicts
-				.stream()
-				.sorted((l, r) -> Long.compare(l.getId(), r.getId()))
-				.map(verdict -> this.verdictJSONController.showVerdict(verdict,
-						locale))
-				.collect(Collectors.toList()));
+		        .stream()
+		        .sorted((l, r) -> Long.compare(l.getId(), r.getId()))
+		        .map(verdict -> this.verdictJSONController.showVerdict(verdict,
+		                locale))
+		        .collect(Collectors.toList()));
 		return dto;
 	}
 }

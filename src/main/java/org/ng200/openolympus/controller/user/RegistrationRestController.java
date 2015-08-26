@@ -50,10 +50,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Profile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @RestController
+@Profile("web")
 public class RegistrationRestController {
 
 	public static class RegistrationResponse {

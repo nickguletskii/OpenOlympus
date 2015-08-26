@@ -36,6 +36,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.ng200.openolympus.config.RecaptchaConfiguration;
 import org.ng200.openolympus.recaptcha.RecaptchaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -44,6 +45,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@Profile("web")
 public class CaptchaService {
 
 	private final CloseableHttpClient httpclient = HttpClients.createDefault();

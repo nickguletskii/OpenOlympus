@@ -56,11 +56,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.google.common.collect.ImmutableMap;
 
 @RestController
+@Profile("web")
 public class TaskViewController {
 
 	public static class TaskDescriptionView {

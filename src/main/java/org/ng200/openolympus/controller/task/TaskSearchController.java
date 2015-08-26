@@ -28,13 +28,15 @@ import java.util.stream.Collectors;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-@Controller
+import org.springframework.web.bind.annotation.RestController;
+@RestController
+@Profile("web")
 @RequestMapping(value = "/api/taskCompletion")
 public class TaskSearchController {
 

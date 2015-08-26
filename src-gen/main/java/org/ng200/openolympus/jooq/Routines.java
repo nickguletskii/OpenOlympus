@@ -4,6 +4,7 @@
 package org.ng200.openolympus.jooq;
 
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import javax.annotation.Generated;
@@ -14,6 +15,8 @@ import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.enums.GroupPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
+import org.ng200.openolympus.jooq.routines.CheckImmutability;
+import org.ng200.openolympus.jooq.routines.ContestParticipationImmutableColumns;
 import org.ng200.openolympus.jooq.routines.GetContestEnd;
 import org.ng200.openolympus.jooq.routines.GetContestEndForUser;
 import org.ng200.openolympus.jooq.routines.GetContestStart;
@@ -21,9 +24,12 @@ import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
 import org.ng200.openolympus.jooq.routines.GetParticipantsGroupIdFromContestId;
 import org.ng200.openolympus.jooq.routines.GetSolutionAuthor;
 import org.ng200.openolympus.jooq.routines.GetSolutionTimeAdded;
+import org.ng200.openolympus.jooq.routines.GetUserTotalScoreInContest;
 import org.ng200.openolympus.jooq.routines.GinExtractQueryTrgm;
 import org.ng200.openolympus.jooq.routines.GinExtractValueTrgm;
 import org.ng200.openolympus.jooq.routines.GinTrgmConsistent;
+import org.ng200.openolympus.jooq.routines.GroupImmutableColumns;
+import org.ng200.openolympus.jooq.routines.GroupUsersImmutableColumns;
 import org.ng200.openolympus.jooq.routines.GtrgmCompress;
 import org.ng200.openolympus.jooq.routines.GtrgmConsistent;
 import org.ng200.openolympus.jooq.routines.GtrgmDecompress;
@@ -38,7 +44,9 @@ import org.ng200.openolympus.jooq.routines.HasContestPermission;
 import org.ng200.openolympus.jooq.routines.HasGeneralPermission;
 import org.ng200.openolympus.jooq.routines.HasGroupPermission;
 import org.ng200.openolympus.jooq.routines.HasTaskPermission;
+import org.ng200.openolympus.jooq.routines.InsertNewContestParticipations;
 import org.ng200.openolympus.jooq.routines.KeepGroupAsPrincipal;
+import org.ng200.openolympus.jooq.routines.KeepGroupMemberInContestParticipationsList;
 import org.ng200.openolympus.jooq.routines.KeepUserAsMemberOfGroups;
 import org.ng200.openolympus.jooq.routines.KeepUserAsPrincipal;
 import org.ng200.openolympus.jooq.routines.MaintainContestRank;
@@ -46,6 +54,8 @@ import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTask;
 import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTimeExtensions;
 import org.ng200.openolympus.jooq.routines.MaintainSolutionScore;
 import org.ng200.openolympus.jooq.routines.PermissionAppliesToPrincipal;
+import org.ng200.openolympus.jooq.routines.PrincipalImmutableColumns;
+import org.ng200.openolympus.jooq.routines.PurgeGarbageContestParticipations;
 import org.ng200.openolympus.jooq.routines.RaiseContestIntersectsError;
 import org.ng200.openolympus.jooq.routines.SetLimit;
 import org.ng200.openolympus.jooq.routines.ShowLimit;
@@ -53,9 +63,14 @@ import org.ng200.openolympus.jooq.routines.ShowTrgm;
 import org.ng200.openolympus.jooq.routines.Similarity;
 import org.ng200.openolympus.jooq.routines.SimilarityDist;
 import org.ng200.openolympus.jooq.routines.SimilarityOp;
+import org.ng200.openolympus.jooq.routines.TrgrContestPermissionsChanged;
+import org.ng200.openolympus.jooq.routines.TrgrContestUpdated;
+import org.ng200.openolympus.jooq.routines.TrgrSolutionUpdated;
+import org.ng200.openolympus.jooq.routines.TrgrVerdictUpdate;
 import org.ng200.openolympus.jooq.routines.UpdateContest;
 import org.ng200.openolympus.jooq.routines.UpdateSolution;
 import org.ng200.openolympus.jooq.routines.UpdateUserInContest;
+import org.ng200.openolympus.jooq.routines.UserImmutableColumns;
 import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
 
 
@@ -71,6 +86,37 @@ import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Routines {
+
+	/**
+	 * Call <code>public.check_immutability</code>
+	 */
+	public static void checkImmutability(Configuration configuration, String nameV, Object oldV, Object newV) {
+		CheckImmutability p = new CheckImmutability();
+		p.setNameV(nameV);
+		p.setOldV(oldV);
+		p.setNewV(newV);
+
+		p.execute(configuration);
+	}
+
+	/**
+	 * Call <code>public.contest_participation_immutable_columns</code>
+	 */
+	public static Object contestParticipationImmutableColumns(Configuration configuration) {
+		ContestParticipationImmutableColumns f = new ContestParticipationImmutableColumns();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.contest_participation_immutable_columns</code> as a field
+	 */
+	public static Field<Object> contestParticipationImmutableColumns() {
+		ContestParticipationImmutableColumns f = new ContestParticipationImmutableColumns();
+
+		return f.asField();
+	}
 
 	/**
 	 * Call <code>public.get_contest_end</code>
@@ -296,6 +342,40 @@ public class Routines {
 	}
 
 	/**
+	 * Call <code>public.get_user_total_score_in_contest</code>
+	 */
+	public static BigDecimal getUserTotalScoreInContest(Configuration configuration, Integer contestIdP, Long userIdP) {
+		GetUserTotalScoreInContest f = new GetUserTotalScoreInContest();
+		f.setContestIdP(contestIdP);
+		f.setUserIdP(userIdP);
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.get_user_total_score_in_contest</code> as a field
+	 */
+	public static Field<BigDecimal> getUserTotalScoreInContest(Integer contestIdP, Long userIdP) {
+		GetUserTotalScoreInContest f = new GetUserTotalScoreInContest();
+		f.setContestIdP(contestIdP);
+		f.setUserIdP(userIdP);
+
+		return f.asField();
+	}
+
+	/**
+	 * Get <code>public.get_user_total_score_in_contest</code> as a field
+	 */
+	public static Field<BigDecimal> getUserTotalScoreInContest(Field<Integer> contestIdP, Field<Long> userIdP) {
+		GetUserTotalScoreInContest f = new GetUserTotalScoreInContest();
+		f.setContestIdP(contestIdP);
+		f.setUserIdP(userIdP);
+
+		return f.asField();
+	}
+
+	/**
 	 * Call <code>public.gin_extract_query_trgm</code>
 	 */
 	public static Object ginExtractQueryTrgm(Configuration configuration, String __1, Object __2, Short __3, Object __4, Object __5, Object __6, Object __7) {
@@ -426,6 +506,44 @@ public class Routines {
 		f.set__6(__6);
 		f.set__7(__7);
 		f.set__8(__8);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.group_immutable_columns</code>
+	 */
+	public static Object groupImmutableColumns(Configuration configuration) {
+		GroupImmutableColumns f = new GroupImmutableColumns();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.group_immutable_columns</code> as a field
+	 */
+	public static Field<Object> groupImmutableColumns() {
+		GroupImmutableColumns f = new GroupImmutableColumns();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.group_users_immutable_columns</code>
+	 */
+	public static Object groupUsersImmutableColumns(Configuration configuration) {
+		GroupUsersImmutableColumns f = new GroupUsersImmutableColumns();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.group_users_immutable_columns</code> as a field
+	 */
+	public static Field<Object> groupUsersImmutableColumns() {
+		GroupUsersImmutableColumns f = new GroupUsersImmutableColumns();
 
 		return f.asField();
 	}
@@ -925,6 +1043,16 @@ public class Routines {
 	}
 
 	/**
+	 * Call <code>public.insert_new_contest_participations</code>
+	 */
+	public static void insertNewContestParticipations(Configuration configuration, Integer contestIdP) {
+		InsertNewContestParticipations p = new InsertNewContestParticipations();
+		p.setContestIdP(contestIdP);
+
+		p.execute(configuration);
+	}
+
+	/**
 	 * Call <code>public.keep_group_as_principal</code>
 	 */
 	public static Object keepGroupAsPrincipal(Configuration configuration) {
@@ -939,6 +1067,25 @@ public class Routines {
 	 */
 	public static Field<Object> keepGroupAsPrincipal() {
 		KeepGroupAsPrincipal f = new KeepGroupAsPrincipal();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.keep_group_member_in_contest_participations_list</code>
+	 */
+	public static Object keepGroupMemberInContestParticipationsList(Configuration configuration) {
+		KeepGroupMemberInContestParticipationsList f = new KeepGroupMemberInContestParticipationsList();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.keep_group_member_in_contest_participations_list</code> as a field
+	 */
+	public static Field<Object> keepGroupMemberInContestParticipationsList() {
+		KeepGroupMemberInContestParticipationsList f = new KeepGroupMemberInContestParticipationsList();
 
 		return f.asField();
 	}
@@ -1087,6 +1234,44 @@ public class Routines {
 		PermissionAppliesToPrincipal f = new PermissionAppliesToPrincipal();
 		f.setPrincipalIdP(principalIdP);
 		f.setPermissionPrincipalIdP(permissionPrincipalIdP);
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.principal_immutable_columns</code>
+	 */
+	public static Object principalImmutableColumns(Configuration configuration) {
+		PrincipalImmutableColumns f = new PrincipalImmutableColumns();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.principal_immutable_columns</code> as a field
+	 */
+	public static Field<Object> principalImmutableColumns() {
+		PrincipalImmutableColumns f = new PrincipalImmutableColumns();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.purge_garbage_contest_participations</code>
+	 */
+	public static Short purgeGarbageContestParticipations(Configuration configuration) {
+		PurgeGarbageContestParticipations f = new PurgeGarbageContestParticipations();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.purge_garbage_contest_participations</code> as a field
+	 */
+	public static Field<Short> purgeGarbageContestParticipations() {
+		PurgeGarbageContestParticipations f = new PurgeGarbageContestParticipations();
 
 		return f.asField();
 	}
@@ -1294,11 +1479,87 @@ public class Routines {
 	}
 
 	/**
+	 * Call <code>public.trgr_contest_permissions_changed</code>
+	 */
+	public static Object trgrContestPermissionsChanged(Configuration configuration) {
+		TrgrContestPermissionsChanged f = new TrgrContestPermissionsChanged();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.trgr_contest_permissions_changed</code> as a field
+	 */
+	public static Field<Object> trgrContestPermissionsChanged() {
+		TrgrContestPermissionsChanged f = new TrgrContestPermissionsChanged();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.trgr_contest_updated</code>
+	 */
+	public static Object trgrContestUpdated(Configuration configuration) {
+		TrgrContestUpdated f = new TrgrContestUpdated();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.trgr_contest_updated</code> as a field
+	 */
+	public static Field<Object> trgrContestUpdated() {
+		TrgrContestUpdated f = new TrgrContestUpdated();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.trgr_solution_updated</code>
+	 */
+	public static Object trgrSolutionUpdated(Configuration configuration) {
+		TrgrSolutionUpdated f = new TrgrSolutionUpdated();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.trgr_solution_updated</code> as a field
+	 */
+	public static Field<Object> trgrSolutionUpdated() {
+		TrgrSolutionUpdated f = new TrgrSolutionUpdated();
+
+		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.trgr_verdict_update</code>
+	 */
+	public static Object trgrVerdictUpdate(Configuration configuration) {
+		TrgrVerdictUpdate f = new TrgrVerdictUpdate();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.trgr_verdict_update</code> as a field
+	 */
+	public static Field<Object> trgrVerdictUpdate() {
+		TrgrVerdictUpdate f = new TrgrVerdictUpdate();
+
+		return f.asField();
+	}
+
+	/**
 	 * Call <code>public.update_contest</code>
 	 */
-	public static void updateContest(Configuration configuration, Long _Param1) {
+	public static void updateContest(Configuration configuration, Integer contestIdP) {
 		UpdateContest p = new UpdateContest();
-		p.set_Param1(_Param1);
+		p.setContestIdP(contestIdP);
 
 		p.execute(configuration);
 	}
@@ -1306,9 +1567,9 @@ public class Routines {
 	/**
 	 * Call <code>public.update_solution</code>
 	 */
-	public static void updateSolution(Configuration configuration, Long _Param1) {
+	public static void updateSolution(Configuration configuration, Long solutionIdP) {
 		UpdateSolution p = new UpdateSolution();
-		p.set_Param1(_Param1);
+		p.setSolutionIdP(solutionIdP);
 
 		p.execute(configuration);
 	}
@@ -1322,6 +1583,25 @@ public class Routines {
 		p.set_Param2(_Param2);
 
 		p.execute(configuration);
+	}
+
+	/**
+	 * Call <code>public.user_immutable_columns</code>
+	 */
+	public static Object userImmutableColumns(Configuration configuration) {
+		UserImmutableColumns f = new UserImmutableColumns();
+
+		f.execute(configuration);
+		return f.getReturnValue();
+	}
+
+	/**
+	 * Get <code>public.user_immutable_columns</code> as a field
+	 */
+	public static Field<Object> userImmutableColumns() {
+		UserImmutableColumns f = new UserImmutableColumns();
+
+		return f.asField();
 	}
 
 	/**

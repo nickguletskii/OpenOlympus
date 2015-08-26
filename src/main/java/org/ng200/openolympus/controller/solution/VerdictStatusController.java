@@ -39,8 +39,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Profile;
 
 @RestController
+@Profile("web")
 public class VerdictStatusController {
 
 	public static class VerdictDto {
@@ -56,9 +58,9 @@ public class VerdictStatusController {
 		private String additionalInformation;
 
 		public VerdictDto(long id, BigDecimal score, BigDecimal maximumScore,
-				Duration cpuTime, Duration realTime, long memoryPeak,
-				String message, boolean tested, boolean success,
-				String additionalInformation) {
+		        Duration cpuTime, Duration realTime, long memoryPeak,
+		        String message, boolean tested, boolean success,
+		        String additionalInformation) {
 			super();
 			this.id = id;
 			this.score = score;
@@ -155,7 +157,7 @@ public class VerdictStatusController {
 	}
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(VerdictStatusController.class);
+	        .getLogger(VerdictStatusController.class);
 
 	@Autowired
 	private AbstractMessageSource messageSource;
@@ -165,16 +167,16 @@ public class VerdictStatusController {
 
 	@RequestMapping(value = "/api/verdict", method = RequestMethod.GET)
 	public @ResponseBody VerdictDto showVerdict(
-			@RequestParam(value = "id") final Verdict verdict,
-			final Locale locale) {
+	        @RequestParam(value = "id") final Verdict verdict,
+	        final Locale locale) {
 		Assertions.resourceExists(verdict);
 		return new VerdictDto(verdict.getId(), verdict.getScore(),
-				verdict.getMaximumScore(), verdict.getCpuTime(),
-				verdict.getRealTime(), verdict.getMemoryPeak(), verdict
-						.getStatus().toString(),
-				verdict.getStatus() != VerdictStatusType.waiting, verdict
-						.getScore().signum() > 0,
-				verdict.getAdditionalInformation());
+		        verdict.getMaximumScore(), verdict.getCpuTime(),
+		        verdict.getRealTime(), verdict.getMemoryPeak(), verdict
+		                .getStatus().toString(),
+		        verdict.getStatus() != VerdictStatusType.waiting, verdict
+		                .getScore().signum() > 0,
+		        verdict.getAdditionalInformation());
 
 	}
 }

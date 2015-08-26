@@ -28,20 +28,22 @@ import org.jooq.impl.UpdatableRecordImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import com.google.common.base.Throwables;
 
 public abstract class GenericCreateUpdateRepository {
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(GenericCreateUpdateRepository.class);
+	        .getLogger(GenericCreateUpdateRepository.class);
 
 	@Autowired
 	private DSLContext dslContext;
 
 	@SuppressWarnings("unchecked")
 	protected <T, R extends UpdatableRecordImpl<?>> T insert(T value,
-			TableImpl<R> table) {
+	        TableImpl<R> table) {
 		try {
 			R record;
 			record = table.getRecordType().newInstance();
@@ -56,7 +58,7 @@ public abstract class GenericCreateUpdateRepository {
 
 	@SuppressWarnings("unchecked")
 	protected <T, R extends UpdatableRecordImpl<?>> T update(T value,
-			TableImpl<R> table) {
+	        TableImpl<R> table) {
 		try {
 			R record;
 			record = table.getRecordType().newInstance();

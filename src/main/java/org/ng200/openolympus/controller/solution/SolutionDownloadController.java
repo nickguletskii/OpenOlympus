@@ -30,6 +30,7 @@ import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@Profile("web")
 @RequestMapping(value = "/solutionDownload")
 public class SolutionDownloadController {
 

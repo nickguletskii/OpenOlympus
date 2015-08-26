@@ -33,6 +33,17 @@ import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 public interface IContestPermission extends Serializable {
 
 	/**
+	 * Setter for <code>public.contest_permission.permission</code>.
+	 */
+	public IContestPermission setPermission(ContestPermissionType value);
+
+	/**
+	 * Getter for <code>public.contest_permission.permission</code>.
+	 */
+	@Column(name = "permission", nullable = false)
+	public ContestPermissionType getPermission();
+
+	/**
 	 * Setter for <code>public.contest_permission.contest_id</code>.
 	 */
 	public IContestPermission setContestId(Integer value);
@@ -53,17 +64,6 @@ public interface IContestPermission extends Serializable {
 	 */
 	@Column(name = "principal_id", nullable = false, precision = 64)
 	public Long getPrincipalId();
-
-	/**
-	 * Setter for <code>public.contest_permission.permission</code>.
-	 */
-	public IContestPermission setPermission(ContestPermissionType value);
-
-	/**
-	 * Getter for <code>public.contest_permission.permission</code>.
-	 */
-	@Column(name = "permission", nullable = false)
-	public ContestPermissionType getPermission();
 
 	// -------------------------------------------------------------------------
 	// FROM and INTO

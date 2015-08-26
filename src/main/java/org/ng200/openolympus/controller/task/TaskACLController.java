@@ -33,6 +33,7 @@ import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Profile("web")
 public class TaskACLController {
 	public static class ACLItem {
 		private List<OlympusPrincipal> principals;
@@ -55,7 +57,7 @@ public class TaskACLController {
 		}
 
 		public ACLItem(List<OlympusPrincipal> principals,
-				TaskPermissionType permission) {
+		        TaskPermissionType permission) {
 			this.principals = principals;
 			this.permission = permission;
 		}
@@ -83,26 +85,26 @@ public class TaskACLController {
 
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.PUT)
 	public void getTaskACL(
-			@PathVariable("task") int id,
-			@RequestBody Map<String, List<Long>> dto,
-			final BindingResult bindingResult, final Principal principal) {
+	        @PathVariable("task") int id,
+	        @RequestBody Map<String, List<Long>> dto,
+	        final BindingResult bindingResult, final Principal principal) {
 		this.taskService.setTaskPermissionsAndPrincipals(id,
-				dto.entrySet().stream().collect(
-						Collectors.toMap(
-								e -> TaskPermissionType.valueOf(e.getKey()),
-								e -> e.getValue())));
+		        dto.entrySet().stream().collect(
+		                Collectors.toMap(
+		                        e -> TaskPermissionType.valueOf(e.getKey()),
+		                        e -> e.getValue())));
 	}
 
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.GET)
 	public Map<TaskPermissionType, ACLItem> getTaskACL(
-			@PathVariable("task") int id, final Principal principal) {
+	        @PathVariable("task") int id, final Principal principal) {
 		final Map<TaskPermissionType, List<OlympusPrincipal>> taskPermissionsAndPrincipalData = this.taskService
-				.getTaskPermissionsAndPrincipalData(id);
+		        .getTaskPermissionsAndPrincipalData(id);
 		return Stream.of(TaskPermissionType.values())
-				.collect(Collectors.toMap(type -> type,
-						type -> new ACLItem(
-								taskPermissionsAndPrincipalData.get(type),
-								type)));
+		        .collect(Collectors.toMap(type -> type,
+		                type -> new ACLItem(
+		                        taskPermissionsAndPrincipalData.get(type),
+		                        type)));
 
 	}
 }

@@ -28,6 +28,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -53,7 +55,9 @@ import org.ng200.openolympus.jooq.tables.pojos.ContestParticipation;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.TimeExtension;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
+import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -352,4 +356,23 @@ public class ContestService extends GenericCreateUpdateRepository {
 		        ContestPermissionType.participate);
 	}
 
+	@Transactional
+	public void setContestPermissionsAndPrincipals(int contestId,
+	        Map<ContestPermissionType, List<Long>> map) {
+		this.dslContext.delete(Tables.CONTEST_PERMISSION)
+		        .where(Tables.CONTEST_PERMISSION.CONTEST_ID.eq(contestId))
+		        .execute();
+		this.dslContext.batchInsert(
+		        map.entrySet().stream().flatMap(e -> e.getValue().stream()
+		                .map(id -> new Pair<>(e.getKey(), id)))
+		                .map(p -> {
+			                final ContestPermissionRecord record = new ContestPermissionRecord(
+		                            p.getFirst(),
+		                            contestId,
+		                            p.getSecond());
+			                record.attach(this.dslContext.configuration());
+			                return record;
+		                }).collect(Collectors.toList()))
+		        .execute();
+	}
 }

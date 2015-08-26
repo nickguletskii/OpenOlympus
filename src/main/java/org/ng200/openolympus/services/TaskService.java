@@ -59,6 +59,7 @@ import org.ng200.openolympus.dto.UploadableTask;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
@@ -66,6 +67,7 @@ import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
+import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
 import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 import org.ng200.openolympus.model.OlympusPrincipal;
@@ -101,8 +103,8 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	public boolean canModifyTask(Task task, User user) {
 		return user.getSuperuser()
-				|| Routines.hasTaskPermission(this.dslContext.configuration(),
-						task.getId(), user.getId(), TaskPermissionType.modify);
+		        || Routines.hasTaskPermission(this.dslContext.configuration(),
+		                task.getId(), user.getId(), TaskPermissionType.modify);
 	}
 
 	public long countTasks() {
@@ -111,21 +113,21 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	public void createDefaultTaskACL(Task task, User owner) {
 		final TaskPermissionRecord permissionRecord = new TaskPermissionRecord(
-				task.getId(), owner.getId(), TaskPermissionType.manage_acl);
+		        task.getId(), owner.getId(), TaskPermissionType.manage_acl);
 		permissionRecord.attach(this.dslContext.configuration());
 		permissionRecord.insert();
 	}
 
 	public boolean doesUserHaveTaskPermission(Task task, User user,
-			TaskPermissionType permission) {
+	        TaskPermissionType permission) {
 		return Routines.hasTaskPermission(this.dslContext.configuration(),
-				task.getId(), user.getId(), permission);
+		        task.getId(), user.getId(), permission);
 	}
 
 	private void extractZipFile(final InputStream zipFile,
-			final Path destination) throws Exception {
+	        final Path destination) throws Exception {
 		try (ArchiveInputStream input = new ArchiveStreamFactory()
-				.createArchiveInputStream(new BufferedInputStream(zipFile))) {
+		        .createArchiveInputStream(new BufferedInputStream(zipFile))) {
 			ArchiveEntry entry;
 			while ((entry = input.getNextEntry()) != null) {
 				final Path dest = destination.resolve(entry.getName());
@@ -135,7 +137,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 					FileAccess.createDirectories(dest.getParent());
 					FileAccess.createFile(dest);
 					Files.copy(input, dest,
-							StandardCopyOption.REPLACE_EXISTING);
+					        StandardCopyOption.REPLACE_EXISTING);
 				}
 			}
 		}
@@ -143,48 +145,48 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	public List<Task> findAFewTasksWithNameContaining(final String name) {
 		return this.dslContext.selectFrom(Tables.TASK)
-				.where(Tables.TASK.NAME.toString() + " % "
-						+ DSL.val(name, String.class))
-				.limit(TaskService.LIMIT_TASKS_WITH_NAME_CONTAINING)
-				.fetchInto(Task.class);
+		        .where(Tables.TASK.NAME.toString() + " % "
+		                + DSL.val(name, String.class))
+		        .limit(TaskService.LIMIT_TASKS_WITH_NAME_CONTAINING)
+		        .fetchInto(Task.class);
 	}
 
 	public List<Task> findTasksNewestFirst(final int pageNumber,
-			final int pageSize) {
+	        final int pageSize) {
 		return this.dslContext.selectFrom(Tables.TASK).groupBy(Tables.TASK.ID)
-				.orderBy(Tables.TASK.CREATED_DATE.desc())
-				.limit(pageSize).offset((pageNumber - 1) * pageSize)
-				.fetchInto(Task.class);
+		        .orderBy(Tables.TASK.CREATED_DATE.desc())
+		        .limit(pageSize).offset((pageNumber - 1) * pageSize)
+		        .fetchInto(Task.class);
 	}
 
 	public List<Task> findTasksNewestFirstAndAuthorized(Integer pageNumber,
-			int pageSize, Principal principal) {
+	        int pageSize, Principal principal) {
 		if (this.securityService.isSuperuser(principal)) {
 			return this.findTasksNewestFirst(pageNumber, pageSize);
 		}
 		final SelectConditionStep<Record1<Long>> userId = this.dslContext
-				.select(Tables.USER.ID)
-				.from(Tables.USER)
-				.where(Tables.USER.USERNAME
-						.eq(principal.getName()));
+		        .select(Tables.USER.ID)
+		        .from(Tables.USER)
+		        .where(Tables.USER.USERNAME
+		                .eq(principal.getName()));
 		final Condition taskPermissionAppliesToUser = Tables.TASK_PERMISSION.PRINCIPAL_ID
-				.in(
-						this.dslContext.select(Tables.GROUP_USERS.GROUP_ID)
-								.from(Tables.GROUP_USERS)
-								.where(Tables.GROUP_USERS.GROUP_ID.eq(userId)))
-				.or(Tables.TASK_PERMISSION.PRINCIPAL_ID.eq(userId));
+		        .in(
+		                this.dslContext.select(Tables.GROUP_USERS.GROUP_ID)
+		                        .from(Tables.GROUP_USERS)
+		                        .where(Tables.GROUP_USERS.GROUP_ID.eq(userId)))
+		        .or(Tables.TASK_PERMISSION.PRINCIPAL_ID.eq(userId));
 		return this.dslContext.select(Tables.TASK.fields())
-				.from(Tables.TASK)
-				.join(Tables.TASK_PERMISSION)
-				.on(Tables.TASK_PERMISSION.TASK_ID
-						.eq(Tables.TASK.ID))
-				.where(taskPermissionAppliesToUser
-						.and(Tables.TASK_PERMISSION.PERMISSION
-								.eq(TaskPermissionType.view)))
-				.groupBy(Tables.TASK.CREATED_DATE)
-				.orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
-				.offset((pageNumber - 1) * pageSize)
-				.fetchInto(Task.class);
+		        .from(Tables.TASK)
+		        .join(Tables.TASK_PERMISSION)
+		        .on(Tables.TASK_PERMISSION.TASK_ID
+		                .eq(Tables.TASK.ID))
+		        .where(taskPermissionAppliesToUser
+		                .and(Tables.TASK_PERMISSION.PERMISSION
+		                        .eq(TaskPermissionType.view)))
+		        .groupBy(Tables.TASK.CREATED_DATE)
+		        .orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
+		        .offset((pageNumber - 1) * pageSize)
+		        .fetchInto(Task.class);
 	}
 
 	public Task getById(Integer id) {
@@ -193,17 +195,17 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	public BigDecimal getMaximumScore(final Task task) {
 		return this.dslContext.select(DSL.max(Tables.SOLUTION.MAXIMUM_SCORE))
-				.from(Tables.SOLUTION)
-				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchOne()
-				.value1();
+		        .from(Tables.SOLUTION)
+		        .where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchOne()
+		        .value1();
 	}
 
 	public BigDecimal getScore(final Task task, final User user) {
 		return this.dslContext.select(DSL.max(Tables.SOLUTION.SCORE))
-				.from(Tables.SOLUTION)
-				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())
-						.and(Tables.SOLUTION.USER_ID.eq(user.getId())))
-				.fetchOne().value1();
+		        .from(Tables.SOLUTION)
+		        .where(Tables.SOLUTION.TASK_ID.eq(task.getId())
+		                .and(Tables.SOLUTION.USER_ID.eq(user.getId())))
+		        .fetchOne().value1();
 	}
 
 	public Task getTaskByName(final String taskName) {
@@ -212,34 +214,34 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	public Task getTaskFromVerdict(Verdict verdict) {
 		return this.dslContext.select(Tables.TASK.fields()).from(Tables.VERDICT)
-				.join(Tables.SOLUTION)
-				.on(Tables.SOLUTION.ID.eq(Tables.VERDICT.ID)).join(Tables.TASK)
-				.on(Tables.TASK.ID.eq(Tables.SOLUTION.TASK_ID))
-				.where(Tables.VERDICT.ID.eq(verdict.getId()))
-				.fetchOneInto(Task.class);
+		        .join(Tables.SOLUTION)
+		        .on(Tables.SOLUTION.ID.eq(Tables.VERDICT.ID)).join(Tables.TASK)
+		        .on(Tables.TASK.ID.eq(Tables.SOLUTION.TASK_ID))
+		        .where(Tables.VERDICT.ID.eq(verdict.getId()))
+		        .fetchOneInto(Task.class);
 	}
 
 	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
-			int taskId) {
+	        int taskId) {
 		return this.dslContext.select(Tables.TASK_PERMISSION.PERMISSION,
-				Tables.TASK_PERMISSION.PRINCIPAL_ID)
-				.from(Tables.TASK_PERMISSION)
-				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
-				.fetchGroups(Tables.TASK_PERMISSION.PERMISSION,
-						(record) -> Optional.<OlympusPrincipal> ofNullable(
-								this.dslContext.selectFrom(Tables.GROUP)
-										.where(Tables.GROUP.ID
-												.eq(record.value2()))
-										.fetchOneInto(Group.class))
-								.orElse(
-										this.dslContext.selectFrom(Tables.USER)
-												.where(Tables.USER.ID
-														.eq(record.value2()))
-												.fetchOneInto(User.class)));
+		        Tables.TASK_PERMISSION.PRINCIPAL_ID)
+		        .from(Tables.TASK_PERMISSION)
+		        .where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
+		        .fetchGroups(Tables.TASK_PERMISSION.PERMISSION,
+		                (record) -> Optional.<OlympusPrincipal> ofNullable(
+		                        this.dslContext.selectFrom(Tables.GROUP)
+		                                .where(Tables.GROUP.ID
+		                                        .eq(record.value2()))
+		                                .fetchOneInto(Group.class))
+		                        .orElse(
+		                                this.dslContext.selectFrom(Tables.USER)
+		                                        .where(Tables.USER.ID
+		                                                .eq(record.value2()))
+		                                        .fetchOneInto(User.class)));
 	}
 
 	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(
-			Task task) {
+	        Task task) {
 		return this.getTaskPermissionsAndPrincipalData(task.getId());
 	}
 
@@ -249,8 +251,8 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	@Transactional
 	public void patchTask(final Task task,
-			final TaskModificationDto taskModificationDto)
-					throws IOException, Exception {
+	        final TaskModificationDto taskModificationDto)
+	                throws IOException, Exception {
 		task.setName(taskModificationDto.getName());
 
 		if (taskModificationDto.getJudgeFile() != null) {
@@ -263,14 +265,14 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	@Transactional
 	public void rejudgeTask(final Task task)
-			throws ExecutionException, IOException {
+	        throws ExecutionException, IOException {
 		this.dslContext.delete(Tables.VERDICT).where(Tables.VERDICT.SOLUTION_ID
-				.in(this.dslContext.select(Tables.SOLUTION.ID)
-						.from(Tables.SOLUTION)
-						.where(Tables.SOLUTION.TASK_ID.eq(task.getId()))));
+		        .in(this.dslContext.select(Tables.SOLUTION.ID)
+		                .from(Tables.SOLUTION)
+		                .where(Tables.SOLUTION.TASK_ID.eq(task.getId()))));
 		final Cursor<SolutionRecord> solutions = this.dslContext
-				.selectFrom(Tables.SOLUTION)
-				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchLazy();
+		        .selectFrom(Tables.SOLUTION)
+		        .where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchLazy();
 		while (solutions.hasNext()) {
 			final Solution solution = solutions.fetchOneInto(Solution.class);
 			this.testingService.testSolutionOnAllTests(solution);
@@ -279,20 +281,20 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	@Transactional
 	public void setTaskPermissionsAndPrincipals(int taskId,
-			Map<TaskPermissionType, List<Long>> map) {
+	        Map<TaskPermissionType, List<Long>> map) {
 		this.dslContext.delete(Tables.TASK_PERMISSION)
-				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId)).execute();
+		        .where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId)).execute();
 		this.dslContext.batchInsert(
-				map.entrySet().stream().flatMap(e -> e.getValue().stream()
-						.map(id -> new Pair<>(e.getKey(), id)))
-						.map(p -> {
-							final TaskPermissionRecord record = new TaskPermissionRecord(
-									taskId,
-									p.getSecond(), p.getFirst());
-							record.attach(this.dslContext.configuration());
-							return record;
-						}).collect(Collectors.toList()))
-				.execute();
+		        map.entrySet().stream().flatMap(e -> e.getValue().stream()
+		                .map(id -> new Pair<>(e.getKey(), id)))
+		                .map(p -> {
+			                final TaskPermissionRecord record = new TaskPermissionRecord(
+		                            taskId,
+		                            p.getSecond(), p.getFirst());
+			                record.attach(this.dslContext.configuration());
+			                return record;
+		                }).collect(Collectors.toList()))
+		        .execute();
 	}
 
 	public Task updateTask(Task task) {
@@ -300,8 +302,8 @@ public class TaskService extends GenericCreateUpdateRepository {
 	}
 
 	protected void uploadJudgeFile(final Task task,
-			final UploadableTask taskDto)
-					throws IOException, Exception {
+	        final UploadableTask taskDto)
+	                throws IOException, Exception {
 		final Path judgeFile = this.storageService.getTaskJudgeFile(task);
 		if (FileAccess.exists(judgeFile)) {
 			FileAccess.deleteDirectoryByWalking(judgeFile);
@@ -313,17 +315,17 @@ public class TaskService extends GenericCreateUpdateRepository {
 
 	@Transactional
 	public Task uploadTask(final TaskCreationDto taskCreationDto,
-			final BindingResult bindingResult, User owner)
-					throws IOException, BindException,
-					RefAlreadyExistsException, RefNotFoundException,
-					InvalidRefNameException, GitAPIException {
+	        final BindingResult bindingResult, User owner)
+	                throws IOException, BindException,
+	                RefAlreadyExistsException, RefNotFoundException,
+	                InvalidRefNameException, GitAPIException {
 		Task task = new Task().setName(taskCreationDto.getName())
-				.setCreatedDate(LocalDateTime.now());
+		        .setCreatedDate(LocalDateTime.now());
 
 		final Path localDescriptionFile = this.storageService
-				.createTaskDescriptionDirectory(task);
+		        .createTaskDescriptionDirectory(task);
 		final Path judgeDir = this.storageService
-				.createTaskJudgeDirectory(task);
+		        .createTaskJudgeDirectory(task);
 
 		task = this.insertTask(task);
 		this.createDefaultTaskACL(task, owner);
@@ -337,7 +339,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 			task = this.updateTask(task);
 		} catch (final ArchiveException e) {
 			bindingResult.rejectValue("judgeFile", "",
-					"task.add.form.errors.judgeArchive.invalid");
+			        "task.add.form.errors.judgeArchive.invalid");
 			throw new BindException(bindingResult);
 		} catch (final Exception e) {
 			try {

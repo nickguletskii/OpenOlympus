@@ -24,12 +24,12 @@ import org.ng200.openolympus.jooq.Public;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UpdateSolution extends AbstractRoutine<java.lang.Void> {
 
-	private static final long serialVersionUID = 816509548;
+	private static final long serialVersionUID = -1175875771;
 
 	/**
-	 * The parameter <code>public.update_solution._param1</code>.
+	 * The parameter <code>public.update_solution.solution_id_p</code>.
 	 */
-	public static final Parameter<Long> _PARAM1 = createParameter("_param1", org.jooq.impl.SQLDataType.BIGINT, false);
+	public static final Parameter<Long> SOLUTION_ID_P = createParameter("solution_id_p", org.jooq.impl.SQLDataType.BIGINT, false);
 
 	/**
 	 * Create a new routine call instance
@@ -37,13 +37,13 @@ public class UpdateSolution extends AbstractRoutine<java.lang.Void> {
 	public UpdateSolution() {
 		super("update_solution", Public.PUBLIC);
 
-		addInParameter(_PARAM1);
+		addInParameter(SOLUTION_ID_P);
 	}
 
 	/**
-	 * Set the <code>_param1</code> parameter IN value to the routine
+	 * Set the <code>solution_id_p</code> parameter IN value to the routine
 	 */
-	public void set_Param1(Long value) {
-		setValue(_PARAM1, value);
+	public void setSolutionIdP(Long value) {
+		setValue(SOLUTION_ID_P, value);
 	}
 }

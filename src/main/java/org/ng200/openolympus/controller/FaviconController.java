@@ -22,6 +22,7 @@
  */
 package org.ng200.openolympus.controller;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@Profile("web")
 public class FaviconController {
 	private final ClassPathResource ico = new ClassPathResource(
 			"public/favicon.ico");

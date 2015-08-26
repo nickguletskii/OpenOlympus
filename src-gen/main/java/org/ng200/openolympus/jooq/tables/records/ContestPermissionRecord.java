@@ -35,52 +35,16 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
 @Table(name = "contest_permission", schema = "public", uniqueConstraints = {
 	@UniqueConstraint(columnNames = {"contest_id", "principal_id"})
 })
-public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissionRecord> implements Record3<Integer, Long, ContestPermissionType>, IContestPermission {
+public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissionRecord> implements Record3<ContestPermissionType, Integer, Long>, IContestPermission {
 
-	private static final long serialVersionUID = 1436480219;
-
-	/**
-	 * Setter for <code>public.contest_permission.contest_id</code>.
-	 */
-	@Override
-	public ContestPermissionRecord setContestId(Integer value) {
-		setValue(0, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.contest_permission.contest_id</code>.
-	 */
-	@Column(name = "contest_id", nullable = false, precision = 32)
-	@Override
-	public Integer getContestId() {
-		return (Integer) getValue(0);
-	}
-
-	/**
-	 * Setter for <code>public.contest_permission.principal_id</code>.
-	 */
-	@Override
-	public ContestPermissionRecord setPrincipalId(Long value) {
-		setValue(1, value);
-		return this;
-	}
-
-	/**
-	 * Getter for <code>public.contest_permission.principal_id</code>.
-	 */
-	@Column(name = "principal_id", nullable = false, precision = 64)
-	@Override
-	public Long getPrincipalId() {
-		return (Long) getValue(1);
-	}
+	private static final long serialVersionUID = -1938115689;
 
 	/**
 	 * Setter for <code>public.contest_permission.permission</code>.
 	 */
 	@Override
 	public ContestPermissionRecord setPermission(ContestPermissionType value) {
-		setValue(2, value);
+		setValue(0, value);
 		return this;
 	}
 
@@ -90,7 +54,43 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	@Column(name = "permission", nullable = false)
 	@Override
 	public ContestPermissionType getPermission() {
-		return (ContestPermissionType) getValue(2);
+		return (ContestPermissionType) getValue(0);
+	}
+
+	/**
+	 * Setter for <code>public.contest_permission.contest_id</code>.
+	 */
+	@Override
+	public ContestPermissionRecord setContestId(Integer value) {
+		setValue(1, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.contest_permission.contest_id</code>.
+	 */
+	@Column(name = "contest_id", nullable = false, precision = 32)
+	@Override
+	public Integer getContestId() {
+		return (Integer) getValue(1);
+	}
+
+	/**
+	 * Setter for <code>public.contest_permission.principal_id</code>.
+	 */
+	@Override
+	public ContestPermissionRecord setPrincipalId(Long value) {
+		setValue(2, value);
+		return this;
+	}
+
+	/**
+	 * Getter for <code>public.contest_permission.principal_id</code>.
+	 */
+	@Column(name = "principal_id", nullable = false, precision = 64)
+	@Override
+	public Long getPrincipalId() {
+		return (Long) getValue(2);
 	}
 
 	// -------------------------------------------------------------------------
@@ -113,7 +113,7 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Integer, Long, ContestPermissionType> fieldsRow() {
+	public Row3<ContestPermissionType, Integer, Long> fieldsRow() {
 		return (Row3) super.fieldsRow();
 	}
 
@@ -121,7 +121,7 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Row3<Integer, Long, ContestPermissionType> valuesRow() {
+	public Row3<ContestPermissionType, Integer, Long> valuesRow() {
 		return (Row3) super.valuesRow();
 	}
 
@@ -129,23 +129,7 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Field<Integer> field1() {
-		return ContestPermission.CONTEST_PERMISSION.CONTEST_ID;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Field<Long> field2() {
-		return ContestPermission.CONTEST_PERMISSION.PRINCIPAL_ID;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Field<ContestPermissionType> field3() {
+	public Field<ContestPermissionType> field1() {
 		return ContestPermission.CONTEST_PERMISSION.PERMISSION;
 	}
 
@@ -153,23 +137,23 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Integer value1() {
-		return getContestId();
+	public Field<Integer> field2() {
+		return ContestPermission.CONTEST_PERMISSION.CONTEST_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Long value2() {
-		return getPrincipalId();
+	public Field<Long> field3() {
+		return ContestPermission.CONTEST_PERMISSION.PRINCIPAL_ID;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionType value3() {
+	public ContestPermissionType value1() {
 		return getPermission();
 	}
 
@@ -177,25 +161,23 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionRecord value1(Integer value) {
-		setContestId(value);
-		return this;
+	public Integer value2() {
+		return getContestId();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionRecord value2(Long value) {
-		setPrincipalId(value);
-		return this;
+	public Long value3() {
+		return getPrincipalId();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionRecord value3(ContestPermissionType value) {
+	public ContestPermissionRecord value1(ContestPermissionType value) {
 		setPermission(value);
 		return this;
 	}
@@ -204,7 +186,25 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContestPermissionRecord values(Integer value1, Long value2, ContestPermissionType value3) {
+	public ContestPermissionRecord value2(Integer value) {
+		setContestId(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ContestPermissionRecord value3(Long value) {
+		setPrincipalId(value);
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ContestPermissionRecord values(ContestPermissionType value1, Integer value2, Long value3) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
@@ -220,9 +220,9 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 */
 	@Override
 	public void from(IContestPermission from) {
+		setPermission(from.getPermission());
 		setContestId(from.getContestId());
 		setPrincipalId(from.getPrincipalId());
-		setPermission(from.getPermission());
 	}
 
 	/**
@@ -248,11 +248,11 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	/**
 	 * Create a detached, initialised ContestPermissionRecord
 	 */
-	public ContestPermissionRecord(Integer contestId, Long principalId, ContestPermissionType permission) {
+	public ContestPermissionRecord(ContestPermissionType permission, Integer contestId, Long principalId) {
 		super(ContestPermission.CONTEST_PERMISSION);
 
-		setValue(0, contestId);
-		setValue(1, principalId);
-		setValue(2, permission);
+		setValue(0, permission);
+		setValue(1, contestId);
+		setValue(2, principalId);
 	}
 }

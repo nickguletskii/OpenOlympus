@@ -27,6 +27,7 @@ import org.ng200.openolympus.SecurityClearanceJacksonFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -72,6 +73,7 @@ public class JacksonConfiguration {
 	}
 
 	@Bean
+	@Profile("web")
 	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
 		return new MappingJackson2HttpMessageConverter(
 				this.jacksonObjectMapper());

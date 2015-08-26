@@ -25,6 +25,7 @@ package org.ng200.openolympus.controller.auth;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +35,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 //TODO: Fix confirmation emails
 @Controller
+@Profile("web")
 @RequestMapping(value = "/confirmEmail")
 public class EmailConfirmationController {
 

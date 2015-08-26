@@ -31,28 +31,40 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
 })
 public class ContestPermission implements IContestPermission {
 
-	private static final long serialVersionUID = 663047894;
+	private static final long serialVersionUID = 75010052;
 
+	private ContestPermissionType permission;
 	private Integer               contestId;
 	private Long                  principalId;
-	private ContestPermissionType permission;
 
 	public ContestPermission() {}
 
 	public ContestPermission(ContestPermission value) {
+		this.permission = value.permission;
 		this.contestId = value.contestId;
 		this.principalId = value.principalId;
-		this.permission = value.permission;
 	}
 
 	public ContestPermission(
+		ContestPermissionType permission,
 		Integer               contestId,
-		Long                  principalId,
-		ContestPermissionType permission
+		Long                  principalId
 	) {
+		this.permission = permission;
 		this.contestId = contestId;
 		this.principalId = principalId;
+	}
+
+	@Column(name = "permission", nullable = false)
+	@Override
+	public ContestPermissionType getPermission() {
+		return this.permission;
+	}
+
+	@Override
+	public ContestPermission setPermission(ContestPermissionType permission) {
 		this.permission = permission;
+		return this;
 	}
 
 	@Column(name = "contest_id", nullable = false, precision = 32)
@@ -79,18 +91,6 @@ public class ContestPermission implements IContestPermission {
 		return this;
 	}
 
-	@Column(name = "permission", nullable = false)
-	@Override
-	public ContestPermissionType getPermission() {
-		return this.permission;
-	}
-
-	@Override
-	public ContestPermission setPermission(ContestPermissionType permission) {
-		this.permission = permission;
-		return this;
-	}
-
 	// -------------------------------------------------------------------------
 	// FROM and INTO
 	// -------------------------------------------------------------------------
@@ -100,9 +100,9 @@ public class ContestPermission implements IContestPermission {
 	 */
 	@Override
 	public void from(IContestPermission from) {
+		setPermission(from.getPermission());
 		setContestId(from.getContestId());
 		setPrincipalId(from.getPrincipalId());
-		setPermission(from.getPermission());
 	}
 
 	/**

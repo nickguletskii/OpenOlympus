@@ -24,12 +24,12 @@ import org.ng200.openolympus.jooq.Public;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UpdateContest extends AbstractRoutine<java.lang.Void> {
 
-	private static final long serialVersionUID = -1976184622;
+	private static final long serialVersionUID = -487807897;
 
 	/**
-	 * The parameter <code>public.update_contest._param1</code>.
+	 * The parameter <code>public.update_contest.contest_id_p</code>.
 	 */
-	public static final Parameter<Long> _PARAM1 = createParameter("_param1", org.jooq.impl.SQLDataType.BIGINT, false);
+	public static final Parameter<Integer> CONTEST_ID_P = createParameter("contest_id_p", org.jooq.impl.SQLDataType.INTEGER, false);
 
 	/**
 	 * Create a new routine call instance
@@ -37,13 +37,13 @@ public class UpdateContest extends AbstractRoutine<java.lang.Void> {
 	public UpdateContest() {
 		super("update_contest", Public.PUBLIC);
 
-		addInParameter(_PARAM1);
+		addInParameter(CONTEST_ID_P);
 	}
 
 	/**
-	 * Set the <code>_param1</code> parameter IN value to the routine
+	 * Set the <code>contest_id_p</code> parameter IN value to the routine
 	 */
-	public void set_Param1(Long value) {
-		setValue(_PARAM1, value);
+	public void setContestIdP(Integer value) {
+		setValue(CONTEST_ID_P, value);
 	}
 }

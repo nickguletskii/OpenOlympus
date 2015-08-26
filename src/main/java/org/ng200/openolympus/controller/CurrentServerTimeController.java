@@ -27,8 +27,10 @@ import java.util.Date;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Profile;
 
 @RestController
+@Profile("web")
 public class CurrentServerTimeController {
 
 	@RequestMapping(value = "/api/time")

@@ -52,6 +52,13 @@ public class ContestPermissionDao extends DAOImpl<ContestPermissionRecord, org.n
 	}
 
 	/**
+	 * Fetch records that have <code>permission IN (values)</code>
+	 */
+	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByPermission(ContestPermissionType... values) {
+		return fetch(ContestPermission.CONTEST_PERMISSION.PERMISSION, values);
+	}
+
+	/**
 	 * Fetch records that have <code>contest_id IN (values)</code>
 	 */
 	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByContestId(Integer... values) {
@@ -63,12 +70,5 @@ public class ContestPermissionDao extends DAOImpl<ContestPermissionRecord, org.n
 	 */
 	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByPrincipalId(Long... values) {
 		return fetch(ContestPermission.CONTEST_PERMISSION.PRINCIPAL_ID, values);
-	}
-
-	/**
-	 * Fetch records that have <code>permission IN (values)</code>
-	 */
-	public List<org.ng200.openolympus.jooq.tables.pojos.ContestPermission> fetchByPermission(ContestPermissionType... values) {
-		return fetch(ContestPermission.CONTEST_PERMISSION.PERMISSION, values);
 	}
 }

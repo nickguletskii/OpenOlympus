@@ -26,6 +26,7 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration.WebMvc
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -34,6 +35,7 @@ import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 @Configuration
 @EnableWebMvc
+@Profile("web")
 public class MvcConfig extends WebMvcAutoConfigurationAdapter {
 
 	@Override

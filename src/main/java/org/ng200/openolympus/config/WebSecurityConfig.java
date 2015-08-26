@@ -34,6 +34,7 @@ import org.ng200.openolympus.services.UserSecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -54,58 +55,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@Profile("web")
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private static final String REMEMBERME_COOKIE_NAME = "openolympus-rememberme";
-	private static String[] permittedAny = {
-												"/",
-												"/translation",
-												"/resources/**",
-												"/api/user/register/",
-												"/errors/**"
-	};
-	private static String[] authorisedAny = {
-												"/api/archive/rank",
-												"/api/archive/rankCount",
-												"/api/archive/tasks",
-												"/api/archive/taskCount",
-												"/api/contests",
-												"/api/contestsCount",
-												"/api/contest/*",
-												"/api/contest/*/results",
-												"/api/verdict",
-												"/api/user/solutions",
-												"/api/user/solutionsCount",
-												"/api/user/solutionsCount",
-												"/api/task/*",
-												"/api/task/*/name"
-	};
-
-	private static String[] authorisedPost = {
-												"/user/**",
-												"/api/task/*/submitSolution"
-	};
-	private static String[] authorisedGet = {};
-
-	private static String[] permittedGet = {};
-
-	private static String[] administrativeAny = {
-													"/api/admin/**",
-													"/api/task/create",
-													"/api/taskSourcecode",
-													"/api/task/*/edit",
-													"/api/task/*/rejudgeTask",
-													"/api/contests/create",
-													"/api/contest/*/edit",
-													"/api/contest/*/participants",
-													"/api/contest/*/remove",
-													"/api/contest/*/completeResults",
-													"/api/contest/*/addTask",
-													"/api/contest/*/addUser",
-													"/api/contest/*/addUserTime",
-													"/api/contest/*/removeTask/*",
-													"/api/taskSourcecode"
-	};
 
 	@Autowired
 	private UserSecurityService userSecurityService;
@@ -128,55 +81,55 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(final AuthenticationManagerBuilder auth)
-			throws Exception {
+	        throws Exception {
 		auth.userDetailsService(this.userSecurityService).passwordEncoder(
-				this.passwordEncoder);
+		        this.passwordEncoder);
 	}
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
 
 		http
-				.csrf().disable()
-				.headers()
-				.xssProtection().disable()
-				.and()
-				.exceptionHandling()
-				.accessDeniedHandler(new AccessDeniedHandlerImpl())
-				.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
-				.and()
-				.formLogin()
-				.loginPage("/login")
-				.failureHandler(this.authenticationFailureHandler())
-				.successHandler(this.authenticationSuccessHandler())
-				.loginProcessingUrl("/login")
-				.usernameParameter("username")
-				.passwordParameter("password")
-				.permitAll().and()
-				.logout()
-				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-				.logoutSuccessUrl("/")
-				.permitAll().and()
-				.rememberMe()
-				.rememberMeServices(this.rememberMeServices())
-				.tokenRepository(this.persistentTokenRepository())
-				.key(this.persistentTokenConfiguration.getPersistentTokenKey())
-				.tokenValiditySeconds(60 * 60 * 24 * 14)
-				.userDetailsService(this.userSecurityService).and()
-				.authenticationProvider(this.rememberMeAuthenticationProvider())
-				.authorizeRequests()
-				.anyRequest().permitAll().and()
-				.addFilterBefore(this.reCaptchaAuthenticationFilter(),
-						UsernamePasswordAuthenticationFilter.class)
-				.httpBasic();
+		        .csrf().disable()
+		        .headers()
+		        .xssProtection().disable()
+		        .and()
+		        .exceptionHandling()
+		        .accessDeniedHandler(new AccessDeniedHandlerImpl())
+		        .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+		        .and()
+		        .formLogin()
+		        .loginPage("/login")
+		        .failureHandler(this.authenticationFailureHandler())
+		        .successHandler(this.authenticationSuccessHandler())
+		        .loginProcessingUrl("/login")
+		        .usernameParameter("username")
+		        .passwordParameter("password")
+		        .permitAll().and()
+		        .logout()
+		        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+		        .logoutSuccessUrl("/")
+		        .permitAll().and()
+		        .rememberMe()
+		        .rememberMeServices(this.rememberMeServices())
+		        .tokenRepository(this.persistentTokenRepository())
+		        .key(this.persistentTokenConfiguration.getPersistentTokenKey())
+		        .tokenValiditySeconds(60 * 60 * 24 * 14)
+		        .userDetailsService(this.userSecurityService).and()
+		        .authenticationProvider(this.rememberMeAuthenticationProvider())
+		        .authorizeRequests()
+		        .anyRequest().permitAll().and()
+		        .addFilterBefore(this.reCaptchaAuthenticationFilter(),
+		                UsernamePasswordAuthenticationFilter.class)
+		        .httpBasic();
 		//@formatter:on
 	}
 
 	public BasicAuthenticationFilter getBasicAuthenticationFilter()
-			throws Exception {
+	        throws Exception {
 
 		final BasicAuthenticationFilter filter = new BasicAuthenticationFilter(
-				this.authenticationManager());
+		        this.authenticationManager());
 		return filter;
 	}
 
@@ -187,9 +140,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			@Override
 			protected void initDao() {
 				this.getJdbcTemplate()
-						.execute(
-								"create table if not exists persistent_logins (username varchar(64) not null, series varchar(64) primary key, "
-										+ "token varchar(64) not null, last_used timestamp not null)");
+		                .execute(
+		                        "create table if not exists persistent_logins (username varchar(64) not null, series varchar(64) primary key, "
+		                                + "token varchar(64) not null, last_used timestamp not null)");
 			}
 
 		};
@@ -205,20 +158,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
 		final RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider(
-				this.persistentTokenConfiguration.getPersistentTokenKey());
+		        this.persistentTokenConfiguration.getPersistentTokenKey());
 		return rememberMeAuthenticationProvider;
 	}
 
 	@Bean
 	public RememberMeServices rememberMeServices() {
 		final PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-				this.persistentTokenConfiguration.getPersistentTokenKey(),
-				this.userSecurityService,
-				this.persistentTokenRepository()) {
+		        this.persistentTokenConfiguration.getPersistentTokenKey(),
+		        this.userSecurityService,
+		        this.persistentTokenRepository()) {
 
 			@Override
 			protected String extractRememberMeCookie(
-					HttpServletRequest request) {
+		            HttpServletRequest request) {
 				if (request.getHeader("X-Auth-Token") != null) {
 					return request.getHeader("X-Auth-Token");
 				}
@@ -230,7 +183,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 				for (final Cookie cookie : cookies) {
 					if (WebSecurityConfig.REMEMBERME_COOKIE_NAME.equals(cookie
-							.getName())) {
+		                    .getName())) {
 						return cookie.getValue();
 					}
 				}
@@ -240,7 +193,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		};
 		rememberMeServices
-				.setCookieName(WebSecurityConfig.REMEMBERME_COOKIE_NAME);
+		        .setCookieName(WebSecurityConfig.REMEMBERME_COOKIE_NAME);
 		rememberMeServices.setAlwaysRemember(true);
 		return rememberMeServices;
 	}
