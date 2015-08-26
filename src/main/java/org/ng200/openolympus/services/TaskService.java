@@ -101,6 +101,9 @@ public class TaskService extends GenericCreateUpdateRepository {
 	@Autowired
 	private StorageService storageService;
 
+	@Autowired
+	private AclService aclService;
+
 	public boolean canModifyTask(Task task, User user) {
 		return user.getSuperuser()
 		        || Routines.hasTaskPermission(this.dslContext.configuration(),
@@ -228,16 +231,8 @@ public class TaskService extends GenericCreateUpdateRepository {
 		        .from(Tables.TASK_PERMISSION)
 		        .where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
 		        .fetchGroups(Tables.TASK_PERMISSION.PERMISSION,
-		                (record) -> Optional.<OlympusPrincipal> ofNullable(
-		                        this.dslContext.selectFrom(Tables.GROUP)
-		                                .where(Tables.GROUP.ID
-		                                        .eq(record.value2()))
-		                                .fetchOneInto(Group.class))
-		                        .orElse(
-		                                this.dslContext.selectFrom(Tables.USER)
-		                                        .where(Tables.USER.ID
-		                                                .eq(record.value2()))
-		                                        .fetchOneInto(User.class)));
+		                (record) -> aclService
+		                        .extractPrincipal(record.value2()));
 	}
 
 	public Map<TaskPermissionType, List<OlympusPrincipal>> getTaskPermissionsAndPrincipalData(

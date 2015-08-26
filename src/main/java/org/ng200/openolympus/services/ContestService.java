@@ -57,6 +57,7 @@ import org.ng200.openolympus.jooq.tables.pojos.TimeExtension;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
+import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,9 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private DSLContext dslContext;
+
+	@Autowired
+	private AclService aclService;
 
 	public void addContestParticipant(final Contest contest, final User user) {
 		this.contestParticipationDao.insert(new ContestParticipation(null, null,
@@ -375,4 +379,16 @@ public class ContestService extends GenericCreateUpdateRepository {
 		                }).collect(Collectors.toList()))
 		        .execute();
 	}
+
+	public Map<ContestPermissionType, List<OlympusPrincipal>> getContestPermissionsAndPrincipalData(
+	        int contestId) {
+		return this.dslContext.select(Tables.CONTEST_PERMISSION.PERMISSION,
+		        Tables.CONTEST_PERMISSION.PRINCIPAL_ID)
+		        .from(Tables.CONTEST_PERMISSION)
+		        .where(Tables.CONTEST_PERMISSION.CONTEST_ID.eq(contestId))
+		        .fetchGroups(Tables.CONTEST_PERMISSION.PERMISSION,
+		                (record) -> aclService
+		                        .extractPrincipal(record.value2()));
+	}
+
 }
