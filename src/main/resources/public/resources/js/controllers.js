@@ -90,7 +90,6 @@ var modalStateList = [{
 		"backdrop": true
 	},
 	require("controllers/archive/tasks/rejudgeWorker"),
-	require("controllers/contests/contest/addUser"),
 	require("controllers/contests/contest/addTask"),
 	require("controllers/contests/contest/addUserTime")
 ];
