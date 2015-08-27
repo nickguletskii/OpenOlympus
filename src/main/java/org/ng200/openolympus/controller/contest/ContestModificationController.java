@@ -29,9 +29,16 @@ import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestDto;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +56,14 @@ import org.springframework.context.annotation.Profile;
 @RestController
 @Profile("web")
 @RequestMapping("/api/contest/{contest}/edit")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasContestPermission.class)
+		})
+})
+@ContestPermissionRequired(ContestPermissionType.edit)
 public class ContestModificationController {
 
 	@Autowired
@@ -60,14 +75,14 @@ public class ContestModificationController {
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	@Caching(evict = {
-						@CacheEvict(value = "contests", key = "#contest.id"),
-						@CacheEvict(value = "solutions", allEntries = true)
+	                   @CacheEvict(value = "contests", key = "#contest.id"),
+	                   @CacheEvict(value = "solutions", allEntries = true)
 	})
 	public BindingResponse editContest(
-			@PathVariable("contest") Contest contest,
-			@Valid final ContestDto contestDto,
-			final BindingResult bindingResult) throws IllegalStateException,
-					IOException, ArchiveException, BindException {
+	        @PathVariable("contest") Contest contest,
+	        @Valid final ContestDto contestDto,
+	        final BindingResult bindingResult) throws IllegalStateException,
+	                IOException, ArchiveException, BindException {
 		Assertions.resourceExists(contest);
 
 		this.contestDtoValidator.validate(contestDto, contest, bindingResult);
@@ -78,16 +93,16 @@ public class ContestModificationController {
 		contest.setName(contestDto.getName());
 		contest.setDuration(contestDto.getDuration());
 		contest.setStartTime(
-				new Timestamp(contestDto.getStartTime().getTime()));
+		        new Timestamp(contestDto.getStartTime().getTime()));
 		contest.setShowFullTestsDuringContest(contestDto
-				.isShowFullTestsDuringContest());
+		        .isShowFullTestsDuringContest());
 		contest = this.contestService.updateContest(contest);
 		return BindingResponse.OK;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public Contest showContestEditingForm(
-			@PathVariable("contest") final Contest contest) {
+	        @PathVariable("contest") final Contest contest) {
 		return contest;
 	}
 }

@@ -55,7 +55,7 @@ import org.ng200.openolympus.jooq.routines.MaintainContestRankWithTimeExtensions
 import org.ng200.openolympus.jooq.routines.MaintainSolutionScore;
 import org.ng200.openolympus.jooq.routines.PermissionAppliesToPrincipal;
 import org.ng200.openolympus.jooq.routines.PrincipalImmutableColumns;
-import org.ng200.openolympus.jooq.routines.PurgeGarbageContestParticipations;
+import org.ng200.openolympus.jooq.routines.PurgeGargabeContestParticipations;
 import org.ng200.openolympus.jooq.routines.RaiseContestIntersectsError;
 import org.ng200.openolympus.jooq.routines.SetLimit;
 import org.ng200.openolympus.jooq.routines.ShowLimit;
@@ -1258,22 +1258,13 @@ public class Routines {
 	}
 
 	/**
-	 * Call <code>public.purge_garbage_contest_participations</code>
+	 * Call <code>public.purge_gargabe_contest_participations</code>
 	 */
-	public static Short purgeGarbageContestParticipations(Configuration configuration) {
-		PurgeGarbageContestParticipations f = new PurgeGarbageContestParticipations();
+	public static void purgeGargabeContestParticipations(Configuration configuration, Integer contestIdP) {
+		PurgeGargabeContestParticipations p = new PurgeGargabeContestParticipations();
+		p.setContestIdP(contestIdP);
 
-		f.execute(configuration);
-		return f.getReturnValue();
-	}
-
-	/**
-	 * Get <code>public.purge_garbage_contest_participations</code> as a field
-	 */
-	public static Field<Short> purgeGarbageContestParticipations() {
-		PurgeGarbageContestParticipations f = new PurgeGarbageContestParticipations();
-
-		return f.asField();
+		p.execute(configuration);
 	}
 
 	/**

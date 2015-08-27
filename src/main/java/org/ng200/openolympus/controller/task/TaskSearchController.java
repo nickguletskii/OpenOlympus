@@ -26,6 +26,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.TaskPermissionRequired;
+import org.ng200.openolympus.security.UserHasTaskPermission;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -35,9 +42,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @Profile("web")
 @RequestMapping(value = "/api/taskCompletion")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER)
+		})
+})
 public class TaskSearchController {
 
 	@Autowired
@@ -45,10 +59,10 @@ public class TaskSearchController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody List<String> searchTasks(
-			@RequestParam(value = "term") final String name) {
+	        @RequestParam(value = "term") final String name) {
 		Assertions.resourceExists(name);
 
 		return this.taskService.findAFewTasksWithNameContaining(name).stream()
-				.map((t) -> t.getName()).collect(Collectors.toList());
+		        .map((t) -> t.getName()).collect(Collectors.toList());
 	}
 }

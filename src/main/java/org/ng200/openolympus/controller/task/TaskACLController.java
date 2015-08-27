@@ -29,8 +29,17 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.model.OlympusPrincipal;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.TaskPermissionRequired;
+import org.ng200.openolympus.security.UserHasContestPermission;
+import org.ng200.openolympus.security.UserHasTaskPermission;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -43,6 +52,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasTaskPermission.class)
+		})
+})
+@TaskPermissionRequired(TaskPermissionType.manage_acl)
 public class TaskACLController {
 	public static class ACLItem {
 		private List<OlympusPrincipal> principals;

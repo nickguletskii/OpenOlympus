@@ -23,8 +23,15 @@
 package org.ng200.openolympus.controller.contest;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,16 +45,25 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasContestPermission.class)
+		})
+})
+@ContestPermissionRequired(ContestPermissionType.remove_task)
 public class ContestTaskRemovalController {
 
 	@Autowired
 	private ContestService contestService;
 
 	@CacheEvict(value = "contests", key = "#contest.id")
-	@RequestMapping(value = "/api/contest/{contest}/removeTask", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/api/contest/{contest}/removeTask",
+	        method = RequestMethod.DELETE)
 	public void removeTask(
-			@PathVariable(value = "contest") final Contest contest,
-			@RequestParam(value = "task") final Task task, final Model model) {
+	        @PathVariable(value = "contest") final Contest contest,
+	        @RequestParam(value = "task") final Task task, final Model model) {
 		Assertions.resourceExists(contest);
 		Assertions.resourceExists(task);
 

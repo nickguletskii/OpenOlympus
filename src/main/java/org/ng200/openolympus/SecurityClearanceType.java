@@ -23,6 +23,7 @@
 package org.ng200.openolympus;
 
 public enum SecurityClearanceType {
+
 	/**
 	 * This security clearance type is granted to everyone, including users who
 	 * are not logged in.
@@ -39,7 +40,7 @@ public enum SecurityClearanceType {
 	                      * This security clearance type is granted to users who
 	                      * can create contests.
 	                      */
-	CONTEST_ORGANIZER, /**
+	CONTEST_ORGANISER, /**
 	                    * This security clearance type is granted to users who
 	                    * can create contests.
 	                    */
@@ -73,6 +74,12 @@ public enum SecurityClearanceType {
 
 	APPROVE_USER_REGISTRATIONS,
 
-	DELETE_USER
+	DELETE_USER,
+
+	CREATE_GROUP,
+
+	LIST_GROUPS,
+
+	VIEW_ALL_SOLUTIONS;
 
 }

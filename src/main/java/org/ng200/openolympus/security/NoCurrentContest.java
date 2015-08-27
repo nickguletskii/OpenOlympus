@@ -32,6 +32,6 @@ public class NoCurrentContest {
 			return SecurityClearanceType.DENIED;
 		}
 
-		return SecurityClearanceType.ANONYMOUS;
+		return SecurityClearanceType.SUPERUSER;
 	}
 }

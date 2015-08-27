@@ -27,9 +27,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.solution.VerdictStatusController.VerdictDto;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.SolutionIsInContestModeratedByCurrentUserSecurityPredicate;
+import org.ng200.openolympus.security.UserIsOwnerOfSolutionSecurityPredicate;
 import org.ng200.openolympus.services.SolutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +52,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @RequestMapping(value = "/api/solution/{id}")
+@SecurityOr({
+    @SecurityAnd({
+                   @SecurityLeaf(
+                           value = SecurityClearanceType.APPROVED_USER,
+                           predicates = UserIsOwnerOfSolutionSecurityPredicate.class)
+}),
+
+    @SecurityAnd({
+                   @SecurityLeaf(
+                           value = SecurityClearanceType.ANONYMOUS,
+                           predicates = SolutionIsInContestModeratedByCurrentUserSecurityPredicate.class)
+}),
+
+    @SecurityAnd({
+                   @SecurityLeaf(
+                           value = SecurityClearanceType.VIEW_ALL_SOLUTIONS)
+})
+
+})
 public class SolutionStatusController {
 
 	public static class SolutionDto {

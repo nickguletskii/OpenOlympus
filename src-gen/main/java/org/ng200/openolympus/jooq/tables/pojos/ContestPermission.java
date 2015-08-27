@@ -27,11 +27,11 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest_permission", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"contest_id", "principal_id"})
+	@UniqueConstraint(columnNames = {"permission", "contest_id", "principal_id"})
 })
 public class ContestPermission implements IContestPermission {
 
-	private static final long serialVersionUID = 75010052;
+	private static final long serialVersionUID = 750448649;
 
 	private ContestPermissionType permission;
 	private Integer               contestId;

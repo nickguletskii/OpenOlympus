@@ -23,7 +23,14 @@
 package org.ng200.openolympus.controller.contest;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,15 +38,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasContestPermission.class)
+		})
+})
+@ContestPermissionRequired(ContestPermissionType.delete)
 public class ContestRemovalController {
 
 	@Autowired
 	private ContestService contestService;
 
 	@CacheEvict(value = "contest", key = "#contest.id")
-	@RequestMapping(value = "/api/contest/{contest}/remove", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/contest/{contest}/remove",
+	        method = RequestMethod.POST)
 	public void removeContest(
-			@PathVariable(value = "contest") Contest contest) {
+	        @PathVariable(value = "contest") Contest contest) {
 		Assertions.resourceExists(contest);
 		this.contestService.deleteContest(contest);
 		return;

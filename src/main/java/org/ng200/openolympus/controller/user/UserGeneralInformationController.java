@@ -25,7 +25,11 @@ package org.ng200.openolympus.controller.user;
 import java.util.List;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -38,6 +42,12 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.LOGGED_IN)
+		})
+})
 public class UserGeneralInformationController {
 
 	@Autowired
@@ -45,9 +55,10 @@ public class UserGeneralInformationController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/user")
 	public @ResponseBody User getUser(
-			@RequestParam(value = "id", required = false) final Long id,
-			@RequestParam(value = "username", required = false) final String name)
-					throws MissingServletRequestParameterException {
+	        @RequestParam(value = "id", required = false) final Long id,
+	        @RequestParam(value = "username",
+	                required = false) final String name)
+	                        throws MissingServletRequestParameterException {
 		if (name != null) {
 			return this.userService.getUserByUsername(name);
 		}
@@ -59,7 +70,8 @@ public class UserGeneralInformationController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/userCompletion")
 	public @ResponseBody List<User> searchUsers(
-			@RequestParam(value = "term", defaultValue = "") final String name) {
+	        @RequestParam(value = "term",
+	                defaultValue = "") final String name) {
 		Assertions.resourceExists(name);
 
 		return this.userService.findAFewUsersWithNameContaining(name);

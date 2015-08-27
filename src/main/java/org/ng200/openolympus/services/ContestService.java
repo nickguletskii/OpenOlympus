@@ -361,10 +361,10 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	@Transactional
-	public void setContestPermissionsAndPrincipals(int contestId,
+	public void setContestPermissionsAndPrincipals(Contest contest,
 	        Map<ContestPermissionType, List<Long>> map) {
 		this.dslContext.delete(Tables.CONTEST_PERMISSION)
-		        .where(Tables.CONTEST_PERMISSION.CONTEST_ID.eq(contestId))
+		        .where(Tables.CONTEST_PERMISSION.CONTEST_ID.eq(contest.getId()))
 		        .execute();
 		this.dslContext.batchInsert(
 		        map.entrySet().stream().flatMap(e -> e.getValue().stream()
@@ -372,7 +372,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 		                .map(p -> {
 			                final ContestPermissionRecord record = new ContestPermissionRecord(
 		                            p.getFirst(),
-		                            contestId,
+		                            contest.getId(),
 		                            p.getSecond());
 			                record.attach(this.dslContext.configuration());
 			                return record;
@@ -381,11 +381,11 @@ public class ContestService extends GenericCreateUpdateRepository {
 	}
 
 	public Map<ContestPermissionType, List<OlympusPrincipal>> getContestPermissionsAndPrincipalData(
-	        int contestId) {
+	        Contest contest) {
 		return this.dslContext.select(Tables.CONTEST_PERMISSION.PERMISSION,
 		        Tables.CONTEST_PERMISSION.PRINCIPAL_ID)
 		        .from(Tables.CONTEST_PERMISSION)
-		        .where(Tables.CONTEST_PERMISSION.CONTEST_ID.eq(contestId))
+		        .where(Tables.CONTEST_PERMISSION.CONTEST_ID.eq(contest.getId()))
 		        .fetchGroups(Tables.CONTEST_PERMISSION.PERMISSION,
 		                (record) -> aclService
 		                        .extractPrincipal(record.value2()));

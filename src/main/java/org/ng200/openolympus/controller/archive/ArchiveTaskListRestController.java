@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.NoCurrentContest;
 import org.ng200.openolympus.security.SecurityAnd;
 import org.ng200.openolympus.security.SecurityLeaf;
 import org.ng200.openolympus.security.SecurityOr;
@@ -47,7 +48,7 @@ import org.springframework.context.annotation.Profile;
 @Profile("web")
 @SecurityOr({
               @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
+                             @SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = NoCurrentContest.class)
 		})
 })
 public class ArchiveTaskListRestController {

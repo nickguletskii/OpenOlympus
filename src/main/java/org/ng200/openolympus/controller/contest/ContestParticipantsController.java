@@ -26,9 +26,16 @@ import java.security.Principal;
 import java.util.List;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -41,17 +48,28 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasContestPermission.class)
+		})
+})
+@ContestPermissionRequired(ContestPermissionType.view_participants)
 public class ContestParticipantsController {
 
 	@Autowired
 	private ContestService contestService;
 
-	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/contest/{contest}/participants",
+	        method = RequestMethod.GET)
 
 	public List<User> showParticipantsPage(
-			@PathVariable(value = "contest") final Contest contest,
-			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
-			final Model model, final Principal principal) {
+	        @PathVariable(value = "contest") final Contest contest,
+	        @RequestParam(value = "page",
+	                defaultValue = "1") final Integer pageNumber,
+	        final Model model, final Principal principal) {
 		Assertions.resourceExists(contest);
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
@@ -60,6 +78,7 @@ public class ContestParticipantsController {
 		Assertions.resourceExists(contest);
 
 		return this.contestService
-				.getPariticipantsPage(contest, pageNumber, 10);
+		        .getPariticipantsPage(contest, pageNumber, 10);
 	}
+
 }

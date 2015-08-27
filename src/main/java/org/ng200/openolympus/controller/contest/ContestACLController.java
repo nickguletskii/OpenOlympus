@@ -29,8 +29,15 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.model.OlympusPrincipal;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -43,6 +50,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasContestPermission.class)
+		})
+})
+@ContestPermissionRequired(ContestPermissionType.manage_acl)
 public class ContestACLController {
 	public static class ACLItem {
 		private List<OlympusPrincipal> principals;
@@ -83,23 +98,26 @@ public class ContestACLController {
 	@Autowired
 	private ContestService contestService;
 
-	@RequestMapping(value = "/api/contest/{contest}/acl", method = RequestMethod.PUT)
+	@RequestMapping(value = "/api/contest/{contest}/acl",
+	        method = RequestMethod.PUT)
 	public void getContestACL(
-	        @PathVariable("contest") int id,
+	        @PathVariable("contest") Contest contest,
 	        @RequestBody Map<String, List<Long>> dto,
 	        final BindingResult bindingResult, final Principal principal) {
-		this.contestService.setContestPermissionsAndPrincipals(id,
+		this.contestService.setContestPermissionsAndPrincipals(contest,
 		        dto.entrySet().stream().collect(
 		                Collectors.toMap(
 		                        e -> ContestPermissionType.valueOf(e.getKey()),
 		                        e -> e.getValue())));
 	}
 
-	@RequestMapping(value = "/api/contest/{contest}/acl", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/contest/{contest}/acl",
+	        method = RequestMethod.GET)
 	public Map<ContestPermissionType, ACLItem> getContestACL(
-	        @PathVariable("contest") int id, final Principal principal) {
+	        @PathVariable("contest") Contest contest,
+	        final Principal principal) {
 		final Map<ContestPermissionType, List<OlympusPrincipal>> contestPermissionsAndPrincipalData = this.contestService
-		        .getContestPermissionsAndPrincipalData(id);
+		        .getContestPermissionsAndPrincipalData(contest);
 		return Stream.of(ContestPermissionType.values())
 		        .collect(Collectors.toMap(type -> type,
 		                type -> new ACLItem(
@@ -107,4 +125,5 @@ public class ContestACLController {
 		                        type)));
 
 	}
+
 }

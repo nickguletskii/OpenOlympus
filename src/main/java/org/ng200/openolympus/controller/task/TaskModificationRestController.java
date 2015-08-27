@@ -43,8 +43,7 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
-public class TaskModificationRestController extends
-		TaskFilesystemManipulatingController {
+public class TaskModificationRestController {
 	@Autowired
 	private TaskValidator taskValidator;
 
@@ -53,24 +52,25 @@ public class TaskModificationRestController extends
 
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
-			throws IOException {
+	        throws IOException {
 
 		final TaskModificationDto taskModificationDto = new TaskModificationDto();
 		taskModificationDto.setName(task.getName());
 		return taskModificationDto;
 	}
 
-	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/task/{task}/edit",
+	        method = RequestMethod.POST)
 	public Callable<BindingResponse> patchTask(
-			@PathVariable("task") final Task task,
-			@Valid final TaskModificationDto taskModificationDto,
-			final BindingResult bindingResult) {
+	        @PathVariable("task") final Task task,
+	        @Valid final TaskModificationDto taskModificationDto,
+	        final BindingResult bindingResult) {
 		return () -> {
 			if (bindingResult.hasErrors()) {
 				throw new BindException(bindingResult);
 			}
 			this.taskValidator.validate(taskModificationDto, bindingResult,
-					task.getName(), true);
+		            task.getName(), true);
 			if (bindingResult.hasErrors()) {
 				throw new BindException(bindingResult);
 			}

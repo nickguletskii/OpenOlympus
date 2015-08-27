@@ -43,6 +43,7 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+
 public class VerdictStatusController {
 
 	public static class VerdictDto {
@@ -165,7 +166,6 @@ public class VerdictStatusController {
 	@Autowired
 	private ContestService contestService;
 
-	@RequestMapping(value = "/api/verdict", method = RequestMethod.GET)
 	public @ResponseBody VerdictDto showVerdict(
 	        @RequestParam(value = "id") final Verdict verdict,
 	        final Locale locale) {

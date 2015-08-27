@@ -25,7 +25,14 @@ package org.ng200.openolympus.controller.group;
 import java.util.List;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -36,6 +43,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Profile;
 
+//TODO: only show groups that the current user knows about
 @RestController
 @Profile("web")
 public class GroupGeneralInformationController {
@@ -43,11 +51,17 @@ public class GroupGeneralInformationController {
 	@Autowired
 	private GroupService groupService;
 
+	@SecurityOr({
+	              @SecurityAnd({
+	                             @SecurityLeaf(
+	                                     value = SecurityClearanceType.LIST_GROUPS)
+			})
+	})
 	@RequestMapping(method = RequestMethod.GET, value = "/api/group")
 	public @ResponseBody Group getGroup(
-			@RequestParam(value = "id", required = false) final Long id,
-			@RequestParam(value = "name", required = false) final String name)
-					throws MissingServletRequestParameterException {
+	        @RequestParam(value = "id", required = false) final Long id,
+	        @RequestParam(value = "name", required = false) final String name)
+	                throws MissingServletRequestParameterException {
 		if (name != null) {
 			return this.groupService.getGroupByName(name);
 		}
@@ -57,9 +71,16 @@ public class GroupGeneralInformationController {
 		return this.groupService.getGroupById(id);
 	}
 
+	@SecurityOr({
+	              @SecurityAnd({
+	                             @SecurityLeaf(
+	                                     value = SecurityClearanceType.LIST_GROUPS)
+			})
+	})
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupCompletion")
 	public @ResponseBody List<Group> searchGroups(
-			@RequestParam(value = "term", defaultValue = "") final String name) {
+	        @RequestParam(value = "term",
+	                defaultValue = "") final String name) {
 		Assertions.resourceExists(name);
 
 		return this.groupService.findAFewGroupsWithNameContaining(name);

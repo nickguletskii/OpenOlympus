@@ -25,9 +25,16 @@ package org.ng200.openolympus.controller.contest;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.ContestUserTimeAdditionDto;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.ContestUserTimeAdditionDtoValidator;
@@ -43,6 +50,14 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasContestPermission.class)
+		})
+})
+@ContestPermissionRequired(ContestPermissionType.extend_time)
 public class ContestUserTimeAdditionController {
 
 	@Autowired
@@ -54,21 +69,22 @@ public class ContestUserTimeAdditionController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/contest/{contest}/addUserTime", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/contest/{contest}/addUserTime",
+	        method = RequestMethod.POST)
 	public BindingResponse addUserTime(final Model model,
-			@PathVariable(value = "contest") final Contest contest,
-			@Valid final ContestUserTimeAdditionDto contestUserTimeAdditionDto,
-			final BindingResult bindingResult) throws BindException {
+	        @PathVariable(value = "contest") final Contest contest,
+	        @Valid final ContestUserTimeAdditionDto contestUserTimeAdditionDto,
+	        final BindingResult bindingResult) throws BindException {
 		Assertions.resourceExists(contest);
 
 		this.contestUserTimeAdditionDtoValidator.validate(contest,
-				contestUserTimeAdditionDto, bindingResult);
+		        contestUserTimeAdditionDto, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 		this.contestService.extendTimeForUser(contest,
-				contestUserTimeAdditionDto.getUser(),
-				contestUserTimeAdditionDto.getTime());
+		        contestUserTimeAdditionDto.getUser(),
+		        contestUserTimeAdditionDto.getTime());
 		return BindingResponse.OK;
 	}
 

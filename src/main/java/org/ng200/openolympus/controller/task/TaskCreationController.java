@@ -29,11 +29,18 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.TaskCreationDto;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.TaskPermissionRequired;
+import org.ng200.openolympus.security.UserHasTaskPermission;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.TaskValidator;
@@ -49,6 +56,12 @@ import com.google.common.collect.ImmutableMap;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.TASK_SUPERVISOR)
+		})
+})
 public class TaskCreationController {
 
 	@Autowired
@@ -62,26 +75,26 @@ public class TaskCreationController {
 
 	@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 	private BindingResponse createTask(final TaskCreationDto taskCreationDto,
-			final BindingResult bindingResult, Principal principal)
-					throws IOException, BindException,
-					RefAlreadyExistsException, RefNotFoundException,
-					InvalidRefNameException, GitAPIException {
+	        final BindingResult bindingResult, Principal principal)
+	                throws IOException, BindException,
+	                RefAlreadyExistsException, RefNotFoundException,
+	                InvalidRefNameException, GitAPIException {
 		this.taskValidator.validate(taskCreationDto, bindingResult, null,
-				false);
+		        false);
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 		final User owner = this.userService
-				.getUserByUsername(principal.getName());
+		        .getUserByUsername(principal.getName());
 
 		final Task task = this.taskService.uploadTask(taskCreationDto,
-				bindingResult,
-				owner);
+		        bindingResult,
+		        owner);
 
 		return new BindingResponse(Status.OK,
-				null, ImmutableMap.<String, Object> builder()
-						.put("taskId", task.getId()).build());
+		        null, ImmutableMap.<String, Object> builder()
+		                .put("taskId", task.getId()).build());
 	}
 
 }

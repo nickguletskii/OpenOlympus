@@ -26,9 +26,17 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.ContestPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserContestViewSecurityPredicate;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SecurityService;
 import org.ng200.openolympus.services.TaskService;
@@ -45,6 +53,15 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserContestViewSecurityPredicate.class)
+		})
+})
+@ContestPermissionRequired(ContestPermissionType.participate)
 public class ContestViewController {
 
 	public static class ContestDTO {
@@ -90,7 +107,7 @@ public class ContestViewController {
 		private Date endTimeIncludingTimeExtensions;
 
 		public TimingDTO(Date startTime, Date endTime,
-				Date endTimeIncludingTimeExtensions) {
+		        Date endTimeIncludingTimeExtensions) {
 			this.startTime = startTime;
 			this.endTime = endTime;
 			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
@@ -113,7 +130,7 @@ public class ContestViewController {
 		}
 
 		public void setEndTimeIncludingTimeExtensions(
-				Date endTimeIncludingTimeExtensions) {
+		        Date endTimeIncludingTimeExtensions) {
 			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
 		}
 
@@ -124,7 +141,7 @@ public class ContestViewController {
 	}
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(ContestViewController.class);
+	        .getLogger(ContestViewController.class);
 
 	@Autowired
 	private SecurityService securityService;
@@ -137,20 +154,23 @@ public class ContestViewController {
 	@Autowired
 	private UserService userService;
 
-	@Cacheable(value = "contests", key = "#contest.id", unless = "#result == null")
-	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
+	@Cacheable(value = "contests",
+	        key = "#contest.id",
+	        unless = "#result == null")
+	@RequestMapping(value = "/api/contest/{contest}",
+	        method = RequestMethod.GET)
 
 	public ContestDTO showContestHub(
-			@PathVariable(value = "contest") final Contest contest,
-			final Principal principal) {
+	        @PathVariable(value = "contest") final Contest contest,
+	        final Principal principal) {
 		final User user = this.userService
-				.getUserByUsername(principal.getName());
+		        .getUserByUsername(principal.getName());
 		final List<Task> tasks = this.contestService.getContestTasks(contest);
 		return new ContestDTO(contest.getName(), new TimingDTO(
-				contest.getStartTime(), Date.from(contest.getStartTime()
-						.toInstant().plus(contest.getDuration())),
-				this.contestService.getContestEndTimeForUser(contest, user)),
-				tasks);
+		        contest.getStartTime(), Date.from(contest.getStartTime()
+		                .toInstant().plus(contest.getDuration())),
+		        this.contestService.getContestEndTimeForUser(contest, user)),
+		        tasks);
 	}
 
 }

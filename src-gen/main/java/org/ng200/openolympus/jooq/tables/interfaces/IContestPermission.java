@@ -28,7 +28,7 @@ import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest_permission", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"contest_id", "principal_id"})
+	@UniqueConstraint(columnNames = {"permission", "contest_id", "principal_id"})
 })
 public interface IContestPermission extends Serializable {
 

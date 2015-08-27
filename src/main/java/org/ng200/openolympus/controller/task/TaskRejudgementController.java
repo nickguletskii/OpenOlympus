@@ -26,7 +26,14 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.TaskPermissionRequired;
+import org.ng200.openolympus.security.UserHasTaskPermission;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,15 +47,24 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserHasTaskPermission.class)
+		})
+})
+@TaskPermissionRequired(TaskPermissionType.rejudge)
 public class TaskRejudgementController {
 
 	@Autowired
 	private TaskService taskService;
 
-	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/task/{task}/rejudgeTask",
+	        method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void rejudgeTask(@PathVariable(value = "task") final Task task,
-			final Model model) throws ExecutionException, IOException {
+	        final Model model) throws ExecutionException, IOException {
 		Assertions.resourceExists(task);
 
 		this.taskService.rejudgeTask(task);

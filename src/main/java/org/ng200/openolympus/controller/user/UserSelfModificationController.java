@@ -26,9 +26,13 @@ import java.security.Principal;
 
 import javax.validation.Valid;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.UserInfoDto;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
@@ -40,25 +44,33 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.LOGGED_IN)
+		})
+})
 public class UserSelfModificationController extends AbstractUserInfoController {
 
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/user/personalInfo",
+	        method = RequestMethod.POST)
 	public BindingResponse changePersonInfo(
-			@Valid final UserInfoDto userInfoDto,
-			final BindingResult bindingResult, final Principal principal)
-					throws BindException {
+	        @Valid final UserInfoDto userInfoDto,
+	        final BindingResult bindingResult, final Principal principal)
+	                throws BindException {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 		super.copyDtoIntoDatabase(userInfoDto, bindingResult,
-				this.userService.getUserByUsername(principal.getName()));
+		        this.userService.getUserByUsername(principal.getName()));
 		return BindingResponse.OK;
 	}
 
-	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/user/personalInfo",
+	        method = RequestMethod.GET)
 	public User showUserDetailsForm(final Principal principal) {
 		return this.userService.getUserByUsername(principal.getName());
 	}

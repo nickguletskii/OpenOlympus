@@ -11,7 +11,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.jooq.Field;
-import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -33,11 +32,11 @@ import org.ng200.openolympus.jooq.tables.interfaces.IContestPermission;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "contest_permission", schema = "public", uniqueConstraints = {
-	@UniqueConstraint(columnNames = {"contest_id", "principal_id"})
+	@UniqueConstraint(columnNames = {"permission", "contest_id", "principal_id"})
 })
 public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissionRecord> implements Record3<ContestPermissionType, Integer, Long>, IContestPermission {
 
-	private static final long serialVersionUID = -1938115689;
+	private static final long serialVersionUID = -1957940605;
 
 	/**
 	 * Setter for <code>public.contest_permission.permission</code>.
@@ -101,8 +100,8 @@ public class ContestPermissionRecord extends UpdatableRecordImpl<ContestPermissi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Record2<Integer, Long> key() {
-		return (Record2) super.key();
+	public Record3<ContestPermissionType, Integer, Long> key() {
+		return (Record3) super.key();
 	}
 
 	// -------------------------------------------------------------------------

@@ -118,8 +118,8 @@ public class Keys {
 	public static final ForeignKey<ContestMessageRecord, ContestRecord> CONTEST_MESSAGE__CONTEST_FK = ForeignKeys0.CONTEST_MESSAGE__CONTEST_FK;
 	public static final ForeignKey<ContestParticipationRecord, UserRecord> CONTEST_PARTICIPATION__USER_FK = ForeignKeys0.CONTEST_PARTICIPATION__USER_FK;
 	public static final ForeignKey<ContestParticipationRecord, ContestRecord> CONTEST_PARTICIPATION__CONTEST_FK = ForeignKeys0.CONTEST_PARTICIPATION__CONTEST_FK;
-	public static final ForeignKey<ContestPermissionRecord, ContestRecord> CONTEST_PERMISSION__CONTEST_FK = ForeignKeys0.CONTEST_PERMISSION__CONTEST_FK;
-	public static final ForeignKey<ContestPermissionRecord, PrincipalRecord> CONTEST_PERMISSION__PRINCIPAL_FK = ForeignKeys0.CONTEST_PERMISSION__PRINCIPAL_FK;
+	public static final ForeignKey<ContestPermissionRecord, ContestRecord> CONTEST_PERMISSION__CONTEST_PERMISSION_CONTEST_ID_FK = ForeignKeys0.CONTEST_PERMISSION__CONTEST_PERMISSION_CONTEST_ID_FK;
+	public static final ForeignKey<ContestPermissionRecord, PrincipalRecord> CONTEST_PERMISSION__CONTEST_PERMISSION_PRINCIPAL_ID_FK = ForeignKeys0.CONTEST_PERMISSION__CONTEST_PERMISSION_PRINCIPAL_ID_FK;
 	public static final ForeignKey<ContestQuestionRecord, UserRecord> CONTEST_QUESTION__USER_FK = ForeignKeys0.CONTEST_QUESTION__USER_FK;
 	public static final ForeignKey<ContestQuestionRecord, ContestRecord> CONTEST_QUESTION__CONTEST_FK = ForeignKeys0.CONTEST_QUESTION__CONTEST_FK;
 	public static final ForeignKey<ContestTasksRecord, ContestRecord> CONTEST_TASKS__CONTEST_FK = ForeignKeys0.CONTEST_TASKS__CONTEST_FK;
@@ -162,7 +162,7 @@ public class Keys {
 		public static final UniqueKey<ContestRecord> CONTEST_NAME_UNIQUE = createUniqueKey(Contest.CONTEST, Contest.CONTEST.NAME);
 		public static final UniqueKey<ContestMessageRecord> CONTEST_MESSAGES_PKEY = createUniqueKey(ContestMessage.CONTEST_MESSAGE, ContestMessage.CONTEST_MESSAGE.ID);
 		public static final UniqueKey<ContestParticipationRecord> CONTEST_PARTICIPATION_PKEY = createUniqueKey(ContestParticipation.CONTEST_PARTICIPATION, ContestParticipation.CONTEST_PARTICIPATION.ID);
-		public static final UniqueKey<ContestPermissionRecord> CONTEST_PERMISSION_PK = createUniqueKey(ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.CONTEST_ID, ContestPermission.CONTEST_PERMISSION.PRINCIPAL_ID);
+		public static final UniqueKey<ContestPermissionRecord> CONTEST_PERMISSION_PK = createUniqueKey(ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.PERMISSION, ContestPermission.CONTEST_PERMISSION.CONTEST_ID, ContestPermission.CONTEST_PERMISSION.PRINCIPAL_ID);
 		public static final UniqueKey<ContestQuestionRecord> CONTEST_QUESTION_PKEY = createUniqueKey(ContestQuestion.CONTEST_QUESTION, ContestQuestion.CONTEST_QUESTION.ID);
 		public static final UniqueKey<ContestTasksRecord> CONTEST_TASKS_PK = createUniqueKey(ContestTasks.CONTEST_TASKS, ContestTasks.CONTEST_TASKS.CONTEST_ID, ContestTasks.CONTEST_TASKS.TASK_ID);
 		public static final UniqueKey<GroupRecord> GROUP_PK = createUniqueKey(Group.GROUP, Group.GROUP.ID);
@@ -189,8 +189,8 @@ public class Keys {
 		public static final ForeignKey<ContestMessageRecord, ContestRecord> CONTEST_MESSAGE__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestMessage.CONTEST_MESSAGE, ContestMessage.CONTEST_MESSAGE.CONTEST_ID);
 		public static final ForeignKey<ContestParticipationRecord, UserRecord> CONTEST_PARTICIPATION__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, ContestParticipation.CONTEST_PARTICIPATION, ContestParticipation.CONTEST_PARTICIPATION.USER_ID);
 		public static final ForeignKey<ContestParticipationRecord, ContestRecord> CONTEST_PARTICIPATION__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestParticipation.CONTEST_PARTICIPATION, ContestParticipation.CONTEST_PARTICIPATION.CONTEST_ID);
-		public static final ForeignKey<ContestPermissionRecord, ContestRecord> CONTEST_PERMISSION__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.CONTEST_ID);
-		public static final ForeignKey<ContestPermissionRecord, PrincipalRecord> CONTEST_PERMISSION__PRINCIPAL_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.PRINCIPAL_PK, ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.PRINCIPAL_ID);
+		public static final ForeignKey<ContestPermissionRecord, ContestRecord> CONTEST_PERMISSION__CONTEST_PERMISSION_CONTEST_ID_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.CONTEST_ID);
+		public static final ForeignKey<ContestPermissionRecord, PrincipalRecord> CONTEST_PERMISSION__CONTEST_PERMISSION_PRINCIPAL_ID_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.PRINCIPAL_PK, ContestPermission.CONTEST_PERMISSION, ContestPermission.CONTEST_PERMISSION.PRINCIPAL_ID);
 		public static final ForeignKey<ContestQuestionRecord, UserRecord> CONTEST_QUESTION__USER_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.USER_PK, ContestQuestion.CONTEST_QUESTION, ContestQuestion.CONTEST_QUESTION.USER_ID);
 		public static final ForeignKey<ContestQuestionRecord, ContestRecord> CONTEST_QUESTION__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestQuestion.CONTEST_QUESTION, ContestQuestion.CONTEST_QUESTION.CONTEST_ID);
 		public static final ForeignKey<ContestTasksRecord, ContestRecord> CONTEST_TASKS__CONTEST_FK = createForeignKey(org.ng200.openolympus.jooq.Keys.CONTEST_PKEY, ContestTasks.CONTEST_TASKS, ContestTasks.CONTEST_TASKS.CONTEST_ID);

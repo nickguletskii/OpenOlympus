@@ -27,7 +27,14 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.SolutionIsInContestModeratedByCurrentUserSecurityPredicate;
+import org.ng200.openolympus.security.UserHasGroupPermission;
+import org.ng200.openolympus.security.UserIsOwnerOfSolutionSecurityPredicate;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -42,6 +49,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER,
+                                     predicates = UserIsOwnerOfSolutionSecurityPredicate.class)
+		}),
+
+		      @SecurityAnd({
+		                     @SecurityLeaf(
+		                             value = SecurityClearanceType.ANONYMOUS,
+		                             predicates = SolutionIsInContestModeratedByCurrentUserSecurityPredicate.class)
+		}),
+
+		      @SecurityAnd({
+		                     @SecurityLeaf(
+		                             value = SecurityClearanceType.VIEW_ALL_SOLUTIONS)
+		})
+
+})
 @Controller
 @Profile("web")
 @RequestMapping(value = "/solutionDownload")
@@ -52,16 +78,16 @@ public class SolutionDownloadController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<FileSystemResource> solutionDownload(
-			final HttpServletRequest request, final Model model,
-			@RequestParam(value = "id") final Solution solution,
-			final Principal principal) {
+	        final HttpServletRequest request, final Model model,
+	        @RequestParam(value = "id") final Solution solution,
+	        final Principal principal) {
 		Assertions.resourceExists(solution);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.setContentDispositionFormData("attachment", this.storageService
-				.getSolutionFile(solution).getFileName().toString());
+		        .getSolutionFile(solution).getFileName().toString());
 		return new ResponseEntity<FileSystemResource>(new FileSystemResource(
-				this.storageService.getSolutionFile(solution).toFile()),
-				headers, HttpStatus.OK);
+		        this.storageService.getSolutionFile(solution).toFile()),
+		        headers, HttpStatus.OK);
 	}
 }

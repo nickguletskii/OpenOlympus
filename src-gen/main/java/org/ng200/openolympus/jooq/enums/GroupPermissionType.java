@@ -30,7 +30,9 @@ public enum GroupPermissionType implements EnumType {
 
 	remove_member("remove_member"),
 
-	know_about("know_about");
+	know_about("know_about"),
+
+	edit("edit");
 
 	private final String literal;
 

@@ -34,7 +34,7 @@ import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ContestPermission extends TableImpl<ContestPermissionRecord> {
 
-	private static final long serialVersionUID = 658415223;
+	private static final long serialVersionUID = 2082831267;
 
 	/**
 	 * The reference instance of <code>public.contest_permission</code>
@@ -107,7 +107,7 @@ public class ContestPermission extends TableImpl<ContestPermissionRecord> {
 	 */
 	@Override
 	public List<ForeignKey<ContestPermissionRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<ContestPermissionRecord, ?>>asList(Keys.CONTEST_PERMISSION__CONTEST_FK, Keys.CONTEST_PERMISSION__PRINCIPAL_FK);
+		return Arrays.<ForeignKey<ContestPermissionRecord, ?>>asList(Keys.CONTEST_PERMISSION__CONTEST_PERMISSION_CONTEST_ID_FK, Keys.CONTEST_PERMISSION__CONTEST_PERMISSION_PRINCIPAL_ID_FK);
 	}
 
 	/**

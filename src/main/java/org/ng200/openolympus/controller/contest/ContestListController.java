@@ -31,6 +31,7 @@ import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.security.SecurityAnd;
 import org.ng200.openolympus.security.SecurityLeaf;
 import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,12 @@ import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.APPROVED_USER)
+		})
+})
 public class ContestListController {
 
 	private static final int PAGE_SIZE = 10;
@@ -58,18 +65,20 @@ public class ContestListController {
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
 	@ResponseBody
 	@SecurityOr({
-					@SecurityAnd({
-									@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
+	              @SecurityAnd({
+	                             @SecurityLeaf(
+	                                     value = SecurityClearanceType.APPROVED_USER)
 			})
 	})
 	public List<Contest> contestList(
-			@RequestParam(value = "page", defaultValue = "1") Integer pageNumber,
-			Principal principal) {
+	        @RequestParam(value = "page",
+	                defaultValue = "1") Integer pageNumber,
+	        Principal principal) {
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
 		}
 		return this.contestService.getContestsOrderedByTime(pageNumber,
-				ContestListController.PAGE_SIZE);
+		        ContestListController.PAGE_SIZE);
 	}
 
 }

@@ -28,10 +28,15 @@ import java.sql.Timestamp;
 import javax.validation.Valid;
 
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.controller.BindingResponse.Status;
 import org.ng200.openolympus.dto.ContestDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,13 @@ import com.google.common.collect.ImmutableMap;
 
 @RestController
 @Profile("web")
+
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.CONTEST_ORGANISER)
+		})
+})
 public class ContestCreationController {
 
 	@Autowired
@@ -56,8 +68,8 @@ public class ContestCreationController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contests/create")
 	public BindingResponse createContest(@Valid final ContestDto contestDto,
-			final BindingResult bindingResult) throws IllegalStateException,
-					IOException, ArchiveException, BindException {
+	        final BindingResult bindingResult) throws IllegalStateException,
+	                IOException, ArchiveException, BindException {
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
@@ -69,16 +81,16 @@ public class ContestCreationController {
 			throw new BindException(bindingResult);
 		}
 		Contest contest = new Contest()
-				.setDuration(contestDto.getDuration())
-				.setName(contestDto.getName())
-				.setShowFullTestsDuringContest(
-						contestDto.isShowFullTestsDuringContest())
-				.setStartTime(
-						Timestamp.from(contestDto.getStartTime().toInstant()));
+		        .setDuration(contestDto.getDuration())
+		        .setName(contestDto.getName())
+		        .setShowFullTestsDuringContest(
+		                contestDto.isShowFullTestsDuringContest())
+		        .setStartTime(
+		                Timestamp.from(contestDto.getStartTime().toInstant()));
 		contest = this.contestService.insertContest(contest);
 		return new BindingResponse(Status.OK, null,
-				new ImmutableMap.Builder<String, Object>().put("id",
-						contest.getId()).build());
+		        new ImmutableMap.Builder<String, Object>().put("id",
+		                contest.getId()).build());
 	}
 
 }

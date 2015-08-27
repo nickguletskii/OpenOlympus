@@ -25,8 +25,15 @@ package org.ng200.openolympus.controller.group;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
+import org.ng200.openolympus.jooq.enums.GroupPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
+import org.ng200.openolympus.security.GroupPermissionRequired;
+import org.ng200.openolympus.security.SecurityAnd;
+import org.ng200.openolympus.security.SecurityLeaf;
+import org.ng200.openolympus.security.SecurityOr;
+import org.ng200.openolympus.security.UserHasGroupPermission;
 import org.ng200.openolympus.services.GroupService;
 import org.ng200.openolympus.validation.GroupDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +48,15 @@ import org.springframework.context.annotation.Profile;
 @RestController
 @Profile("web")
 @RequestMapping("/api/group/{group}/edit")
+
+@SecurityOr({
+              @SecurityAnd({
+                             @SecurityLeaf(
+                                     value = SecurityClearanceType.LIST_GROUPS,
+                                     predicates = UserHasGroupPermission.class)
+		})
+})
+@GroupPermissionRequired(GroupPermissionType.edit)
 public class GroupModificationController {
 
 	@Autowired
@@ -51,9 +67,9 @@ public class GroupModificationController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public BindingResponse editGroup(
-			@PathVariable("group") Group group,
-			@Valid final Group groupDto,
-			final BindingResult bindingResult) throws BindException {
+	        @PathVariable("group") Group group,
+	        @Valid final Group groupDto,
+	        final BindingResult bindingResult) throws BindException {
 		Assertions.resourceExists(group);
 
 		this.groupDtoValidator.validate(groupDto, group, bindingResult);
@@ -68,7 +84,7 @@ public class GroupModificationController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public Group showGroupEditingForm(
-			@PathVariable("group") final Group group) {
+	        @PathVariable("group") final Group group) {
 		return group;
 	}
 }

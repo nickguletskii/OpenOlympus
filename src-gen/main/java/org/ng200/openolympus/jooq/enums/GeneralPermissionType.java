@@ -36,7 +36,23 @@ public enum GeneralPermissionType implements EnumType {
 
 	modify_others_user_details("modify_others_user_details"),
 
-	remove_user("remove_user");
+	remove_user("remove_user"),
+
+	approve_user_registrations("approve_user_registrations"),
+
+	change_other_users_password("change_other_users_password"),
+
+	change_other_users_personal_info("change_other_users_personal_info"),
+
+	contest_organiser("contest_organiser"),
+
+	delete_user("delete_user"),
+
+	enumerate_all_users("enumerate_all_users"),
+
+	task_supervisor("task_supervisor"),
+
+	view_other_users_personal_info("view_other_users_personal_info");
 
 	private final String literal;
 
