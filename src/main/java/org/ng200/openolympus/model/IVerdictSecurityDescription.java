@@ -29,7 +29,7 @@ import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.interfaces.IVerdict;
-import org.ng200.openolympus.security.VerdictSecurityPredicate;
+import org.ng200.openolympus.security.predicates.VerdictSecurityPredicate;
 
 public interface IVerdictSecurityDescription extends IVerdict {
 

@@ -23,15 +23,26 @@
 package org.ng200.openolympus.security;
 
 import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.services.ContestService;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class SolutionSecurityPredicate implements SecurityClearancePredicate {
+public class UserKnowsAboutContestSecurityPredicate implements SecurityClearancePredicate {
+
+	@Autowired
+	private ContestService contestService;
 
 	@Override
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
-		// TODO Auto-generated method stub
-		return SecurityClearanceType.APPROVED_USER;
+		final Contest contest = (Contest) obj;
+		if (this.contestService.userKnowsAboutContest(user, contest,
+				ContestPermissionType.know_about)) {
+			return SecurityClearanceType.APPROVED_USER;
+		}
+		return SecurityClearanceType.ADMINISTRATIVE_USER;
 	}
 
 }

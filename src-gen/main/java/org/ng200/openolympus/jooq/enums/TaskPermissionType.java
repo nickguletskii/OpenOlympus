@@ -30,7 +30,9 @@ public enum TaskPermissionType implements EnumType {
 
 	modify("modify"),
 
-	manage_acl("manage_acl");
+	manage_acl("manage_acl"),
+
+	rejudge("rejudge");
 
 	private final String literal;
 

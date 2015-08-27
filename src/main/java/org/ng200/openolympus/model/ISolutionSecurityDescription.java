@@ -28,8 +28,8 @@ import java.sql.Timestamp;
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.interfaces.ISolution;
-import org.ng200.openolympus.security.SolutionScoreSecurityPredicate;
-import org.ng200.openolympus.security.SolutionSecurityPredicate;
+import org.ng200.openolympus.security.predicates.SolutionScoreSecurityPredicate;
+import org.ng200.openolympus.security.predicates.SolutionSecurityPredicate;
 
 @SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionSecurityPredicate.class)
 public interface ISolutionSecurityDescription extends ISolution {

@@ -948,7 +948,7 @@ END;]]></definition>
 <usertype name="task_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="view,view_during_contest,modify,manage_acl"/>
+	<enumeration values="view,view_during_contest,modify,manage_acl,rejudge"/>
 </usertype>
 
 <usertype name="acl_permission_type" configuration="enumeration">

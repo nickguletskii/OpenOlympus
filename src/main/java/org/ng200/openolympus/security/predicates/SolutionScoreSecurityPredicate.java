@@ -20,10 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.security;
+package org.ng200.openolympus.security.predicates;
 
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.security.SecurityClearancePredicate;
 
 public class SolutionScoreSecurityPredicate
 		implements SecurityClearancePredicate {

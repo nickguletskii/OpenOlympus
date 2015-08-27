@@ -28,9 +28,9 @@ import java.time.Duration;
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.interfaces.IContest;
-import org.ng200.openolympus.security.UserKnowsAboutContest;
+import org.ng200.openolympus.security.UserKnowsAboutContestSecurityPredicate;
 
-@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = UserKnowsAboutContest.class)
+@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = UserKnowsAboutContestSecurityPredicate.class)
 public interface IContestSecurityDescription extends IContest {
 
 	@Override
