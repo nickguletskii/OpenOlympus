@@ -20,25 +20,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+"use strict";
+
 var angular = require("angular");
 var _ = require("lodash");
-angular.module("ool.services")
-	.service("ACLService", /*@ngInject*/ function($http) {
-		this.cannonicalPermissionForm = (permissions) => {
-			var data = {};
-			_.forEach(permissions, (p) => {
-				data[p.permission] = _(p.principals).sortBy("id").map("id").values();
-			});
-			return data;
-		};
-		this.getACL = (url) => $http.get(url, {});
-		this.setACL = (url, permissions) => {
-			return $http.put(url, this.cannonicalPermissionForm(permissions));
-		};
-		this.getGeneralPermissions = function(prinicpalId) {
-			return $http.get("/api/admin/principal/" + prinicpalId + "/generalPermissions", {});
-		};
-		this.setGeneralPermissions = function(prinicpalId, permissions) {
-			return $http.put("/api/admin/principal/" + prinicpalId + "/generalPermissions", permissions);
+
+angular.module("ool.directives")
+	.directive("principalPermissionsEditor", /*@ngInject*/ function(ACLService) {
+
+		function link($scope, $element, $attributes) {
+			function updateStatus() {
+				$scope.changesCommitted =
+					_.isEqual(
+						ACLService.cannonicalPermissionForm($scope.permissions),
+						$scope.origPermissions
+					);
+			}
+
+			$scope.collapsed = true;
+
+			$scope.refresh = () =>
+				ACLService.getGeneralPermissions($attributes.principalId).success((permissions) => {
+					$scope.generalPermissions = permissions;
+					$scope.origPermissions = _.cloneDeep($scope.generalPermissions);
+					updateStatus();
+				});
+
+			$scope.commit = () => {
+				$scope.committing = true;
+				ACLService.setGeneralPermissions($attributes.principalId, $scope.generalPermissions).success(() => {
+					$scope.refresh();
+					$scope.committing = false;
+				});
+			};
+
+			$scope.refresh();
+		}
+
+		return {
+			restrict: "E",
+			template: require("ng-cache!directives/principalPermissions/principalPermissions.html"),
+			scope: {
+				aclGetter: "@",
+				aclSetter: "@"
+			},
+			link: link
 		};
 	});

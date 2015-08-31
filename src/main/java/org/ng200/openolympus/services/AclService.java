@@ -1,23 +1,31 @@
 package org.ng200.openolympus.services;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
+import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.enums.GroupPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
+import org.ng200.openolympus.jooq.tables.pojos.Principal;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.ImmutableSet;
+
 @Service
-public class AclService {
+public class AclService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private DSLContext dslContext;
@@ -52,5 +60,30 @@ public class AclService {
 	        GroupPermissionType value) {
 		return dslContext.select(Routines.hasGroupPermission(group.getId(),
 		        user.getId(), value)).fetchOne().value1();
+	}
+
+	public Principal setPrincipalGeneralPermissions(Principal principal,
+	        Map<GeneralPermissionType, Boolean> generalPermissions) {
+		principal
+		        .setPermissions((GeneralPermissionType[]) generalPermissions
+		                .entrySet().stream()
+		                .filter(entry -> Boolean.TRUE
+		                        .equals(entry.getValue()))
+		                .map(entry -> entry
+		                        .getKey())
+		                .toArray());
+
+		return update(principal, Tables.PRINCIPAL);
+	}
+
+	public Map<GeneralPermissionType, Boolean> getPrincipalGeneralPermissions(
+	        Principal principal) {
+		Set<GeneralPermissionType> permissionTypes = ImmutableSet
+		        .copyOf(principal.getPermissions());
+		return Stream.of(GeneralPermissionType.values()).collect(
+		        Collectors
+		                .<GeneralPermissionType, GeneralPermissionType, Boolean> toMap(
+		                        (type) -> type,
+		                        (type) -> permissionTypes.contains(type)));
 	}
 }

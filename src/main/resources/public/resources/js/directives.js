@@ -39,3 +39,4 @@ require("directives/fileInput/fileInput");
 require("directives/fileInput/fileNgModel");
 require("directives/typeahead/typeahead");
 require("directives/form/defaultFormDirectives");
+require("directives/principalPermissions/principalPermissions");

@@ -1,0 +1,49 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<div class="panel panel-warning">
+	<div class="panel-heading"
+		ng-click="collapsed = !collapsed">
+		<h3 class="panel-title">{{ 'principal.generalPermissions.editor.heading' | translate }}
+		<i class="fa pull-right"
+			ng-class="{'fa-plus-square': collapsed, 'fa-minus-square': !collapsed}"></i></h3>
+	</div>
+	<div class="panel-body"
+		collapse="collapsed">
+		<form>
+			<checkbox-field ng-for="(permission, value) in generalPermissions"
+				attribute="value"
+				label="{{'principal.generalPermissions.editor.permission.'+permission | translate}}"></checkbox-field>
+		</form>
+	</div>
+	<div class="panel-footer"
+		collapse="collapsed">
+		<button type="button"
+			class="btn"
+			ng-click="commit()"
+			ng-class="{'btn-success':changesCommitted && !committing, 'btn-warning': !changesCommitted && !committing }"><i class="fa fa-fw"
+				ng-class="{ 'fa-upload': !changesCommitted && !committing,'fa-check': changesCommitted && !committing, 'fa-refresh': committing, 'fa-spin': committing }"
+				disabled="committing"></i>{{ ( 'principal.generalPermissions.editor.body.commitButton') | translate }}</button>
+	</div>
+</div>

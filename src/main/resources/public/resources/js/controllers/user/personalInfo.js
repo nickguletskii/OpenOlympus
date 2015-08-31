@@ -22,10 +22,7 @@
  */
 "use strict";
 
-var Util = require("oolutil");
-var _ = require("lodash");
-
-const controller = /*@ngInject*/ function($scope, FormDefaultHelperService, ValidationService, personalInfoPatchUrl, requireExistingPassword, existingPersonalInfo, passwordPatchUrl) {
+module.exports = /*@ngInject*/ function($scope, FormDefaultHelperService, ValidationService, personalInfoPatchUrl, requireExistingPassword, existingPersonalInfo, passwordPatchUrl) {
 	$scope.requireExistingPassword = requireExistingPassword;
 
 	const personalInfoValidationRules = require("controllers/user/userInfoValidation");
@@ -84,26 +81,4 @@ const controller = /*@ngInject*/ function($scope, FormDefaultHelperService, Vali
 	}
 
 	$scope.passwordForm = new PasswordForm();
-};
-
-module.exports = {
-	"name": "personalInfoModificationView",
-	"url": "/user/personalInfo",
-	"templateUrl": "/partials/user/personalInfo.html",
-	"controller": controller,
-	"customWidth": "narrow",
-	"resolve": {
-		existingPersonalInfo: function(UserService) {
-			return UserService.getCurrentUser();
-		},
-		personalInfoPatchUrl: function() {
-			return "/api/user/personalInfo";
-		},
-		passwordPatchUrl: function() {
-			return "/api/user/changePassword";
-		},
-		requireExistingPassword: function() {
-			return true;
-		}
-	}
 };
