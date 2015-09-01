@@ -1,8 +1,8 @@
 module.exports = {
 	"name": "personalInfoModificationView",
-	"url": "/user/personalInfo",
-	"templateUrl": "/partials/user/personalInfo.html",
-	"controller": require("controllers/user/personalInfo"),
+	"url": "/user/profile",
+	"templateUrl": "/partials/user/profile.html",
+	"controller": require("controllers/user/profile"),
 	"customWidth": "narrow",
 	"resolve": {
 		existingPersonalInfo: function(UserService) {
@@ -16,6 +16,7 @@ module.exports = {
 		},
 		requireExistingPassword: function() {
 			return true;
-		}
+		},
+		enablePermissionsEditor: () => false
 	}
 };

@@ -95,7 +95,7 @@ angular.module("ool")
 				$rootScope.showErrorModal = true;
 			}, 1);
 			console.error(exception);
-			throw exception;
+		//	throw exception;
 		};
 	})
 	.run( /*@ngInject*/ function($rootScope, AuthenticationProvider) {

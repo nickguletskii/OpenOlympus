@@ -29,29 +29,36 @@ angular.module("ool.directives")
 	.directive("principalPermissionsEditor", /*@ngInject*/ function(ACLService) {
 
 		function link($scope, $element, $attributes) {
+			$scope.permissions = {};
+
+			const trueElseFalse = (obj) => _.mapValues(obj, (val) => val === true);
+
 			function updateStatus() {
 				$scope.changesCommitted =
 					_.isEqual(
-						ACLService.cannonicalPermissionForm($scope.permissions),
+						trueElseFalse($scope.permissions),
 						$scope.origPermissions
 					);
 			}
 
 			$scope.collapsed = true;
 
+			$scope.$watchCollection(() => $scope.permissions, updateStatus);
+			$scope.$watchCollection(() => $scope.origPermissions, updateStatus);
+
 			$scope.refresh = () =>
 				ACLService.getGeneralPermissions($attributes.principalId).success((permissions) => {
-					$scope.generalPermissions = permissions;
-					$scope.origPermissions = _.cloneDeep($scope.generalPermissions);
-					updateStatus();
+					$scope.permissions = _.clone(permissions);
+					$scope.origPermissions = _.clone(permissions);
 				});
 
 			$scope.commit = () => {
 				$scope.committing = true;
-				ACLService.setGeneralPermissions($attributes.principalId, $scope.generalPermissions).success(() => {
-					$scope.refresh();
-					$scope.committing = false;
-				});
+				ACLService.setGeneralPermissions($attributes.principalId, trueElseFalse($scope.permissions))
+					.success(() => {
+						$scope.refresh();
+						$scope.committing = false;
+					});
 			};
 
 			$scope.refresh();

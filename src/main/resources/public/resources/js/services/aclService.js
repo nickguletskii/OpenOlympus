@@ -35,10 +35,10 @@ angular.module("ool.services")
 		this.setACL = (url, permissions) => {
 			return $http.put(url, this.cannonicalPermissionForm(permissions));
 		};
-		this.getGeneralPermissions = function(prinicpalId) {
+		this.getGeneralPermissions = (prinicpalId) => {
 			return $http.get("/api/admin/principal/" + prinicpalId + "/generalPermissions", {});
 		};
-		this.setGeneralPermissions = function(prinicpalId, permissions) {
+		this.setGeneralPermissions = (prinicpalId, permissions) => {
 			return $http.put("/api/admin/principal/" + prinicpalId + "/generalPermissions", permissions);
 		};
 	});

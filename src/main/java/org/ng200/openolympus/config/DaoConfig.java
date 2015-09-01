@@ -29,6 +29,7 @@ import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
 import org.ng200.openolympus.jooq.tables.daos.ContestTasksDao;
 import org.ng200.openolympus.jooq.tables.daos.GroupDao;
 import org.ng200.openolympus.jooq.tables.daos.GroupUsersDao;
+import org.ng200.openolympus.jooq.tables.daos.PrincipalDao;
 import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
 import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
@@ -40,8 +41,6 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,7 +49,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class DaoConfig {
 
 	private static final Logger logger = LoggerFactory
-	        .getLogger(DaoConfig.class);
+			.getLogger(DaoConfig.class);
 	@Autowired
 	private DSLContext dslContext;
 
@@ -103,48 +102,53 @@ public class DaoConfig {
 	}
 
 	@Bean
+	public PrincipalDao principalDao() {
+		return new PrincipalDao(this.dslContext.configuration());
+	}
+
+	@Bean
 	public UserDao userDao() {
 		final UserDao userDao = new UserDao(this.dslContext.configuration());
 		final GroupDao groupDao = new GroupDao(this.dslContext.configuration());
 
 		if (groupDao
-		        .fetchOneByName(NameConstants.ALL_USERS_GROUP_NAME) == null) {
+				.fetchOneByName(NameConstants.ALL_USERS_GROUP_NAME) == null) {
 			DaoConfig.logger
-			        .info("The group of all users doesn't exist. Creating...");
+					.info("The group of all users doesn't exist. Creating...");
 			groupDao.insert(
-			        new Group().setName(NameConstants.ALL_USERS_GROUP_NAME));
+					new Group().setName(NameConstants.ALL_USERS_GROUP_NAME));
 		}
 
 		if (groupDao.fetchOneByName(
-		        NameConstants.SUPERUSERS_GROUP_NAME) == null) {
+				NameConstants.SUPERUSERS_GROUP_NAME) == null) {
 			DaoConfig.logger
-			        .info("The group of all users doesn't exist. Creating...");
+					.info("The group of all users doesn't exist. Creating...");
 			groupDao.insert(new Group()
-			        .setName(NameConstants.SUPERUSERS_GROUP_NAME));
+					.setName(NameConstants.SUPERUSERS_GROUP_NAME));
 		}
 
 		if (userDao.fetchOneByUsername(
-		        NameConstants.SYSTEM_ACCOUNT_NAME) == null) {
+				NameConstants.SYSTEM_ACCOUNT_NAME) == null) {
 			DaoConfig.logger
-			        .info("The system account doesn't exist. Creating...");
+					.info("The system account doesn't exist. Creating...");
 			userDao.insert(
-			        new User().setUsername(NameConstants.SYSTEM_ACCOUNT_NAME)
-			                .setPassword(null)
-			                .setSuperuser(true).setEnabled(true)
-			                .setApproved(true)
-			                .setApprovalEmailSent(false));
+					new User().setUsername(NameConstants.SYSTEM_ACCOUNT_NAME)
+							.setPassword(null)
+							.setSuperuser(true).setEnabled(true)
+							.setApproved(true)
+							.setApprovalEmailSent(false));
 		}
 
 		if (userDao.fetchOneByUsername(
-		        NameConstants.SUPERUSER_ACCOUNT_NAME) == null) {
+				NameConstants.SUPERUSER_ACCOUNT_NAME) == null) {
 			DaoConfig.logger.info(
-			        "The superuser account doesn't exist. Creating...");
+					"The superuser account doesn't exist. Creating...");
 			userDao.insert(new User()
-			        .setUsername(NameConstants.SUPERUSER_ACCOUNT_NAME)
-			        .setPassword(this.passwordEncoder
-			                .encode(NameConstants.SUPERUSER_ACCOUNT_NAME))
-			        .setSuperuser(true).setEnabled(true).setApproved(true)
-			        .setApprovalEmailSent(false));
+					.setUsername(NameConstants.SUPERUSER_ACCOUNT_NAME)
+					.setPassword(this.passwordEncoder
+							.encode(NameConstants.SUPERUSER_ACCOUNT_NAME))
+					.setSuperuser(true).setEnabled(true).setApproved(true)
+					.setApprovalEmailSent(false));
 		}
 
 		return userDao;

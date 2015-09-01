@@ -44,6 +44,8 @@ import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.util.Beans;
 import org.ng200.openolympus.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,6 +70,8 @@ import org.springframework.context.annotation.Profile;
 })
 public class ContestResultsController {
 
+private static final Logger logger = LoggerFactory
+		.getLogger(ContestResultsController.class);
 	public class ContestUserRankingDto extends UserRanking {
 
 		/**
@@ -79,7 +83,7 @@ public class ContestResultsController {
 
 		public ContestUserRankingDto(Contest contest, UserRanking ranking) {
 			Beans.copy(ranking, this);
-			// TODO: fix contest ranking DTO
+			logger.info("RANKING {} {}", ranking.getRank(), this.getRank());
 		}
 
 		public List<Pair<Task, BigDecimal>> getTaskScores() {

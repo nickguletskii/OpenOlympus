@@ -1,0 +1,114 @@
+<!--
+
+    The MIT License
+    Copyright (c) 2014-2015 Nick Guletskii
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<div class="row">
+	<h1>{{ 'user.profile.heading' | translate: security }}</h1>
+</div>
+<div class="row" ng-if="enablePermissionsEditor">
+    <principal-permissions-editor principal-id="1"></principal-permissions-editor>
+</div>
+<div class="row">
+    <h1>{{ 'user.changePasswordForm.heading' | translate }}</h1>
+    <form form-autoconfig="passwordForm"
+        novalidate>
+        <text-field label-translate="user.changePasswordForm.labels.existingPassword"
+            ng-if="requireExistingPassword"
+            type="password"
+            attribute="existingPassword"></text-field>
+        <text-field label-translate="user.changePasswordForm.labels.password"
+            type="password"
+            attribute="password"></text-field>
+        <text-field label-translate="user.changePasswordForm.labels.passwordConfirmation"
+            type="password"
+            attribute="passwordConfirmation"></text-field>
+        <submit-button label="{{passwordForm.submitButtonText | translate}}"
+            button-class="{{passwordForm.submitButtonClass}}"
+            icon="{{passwordForm.submitButtonIcon}}"></submit-button>
+    </form>
+</div>
+<div class="row">
+    <h1>{{ 'user.personalInfoForm.heading' | translate }}</h1>
+    <form form-autoconfig="personalInfoForm"
+        novalidate>
+        <text-field label-translate="user.personalInfoForm.labels.emailAddress"
+            type="email"
+            attribute="emailAddress"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.firstNameMain"
+            type="text"
+            attribute="firstNameMain"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.middleNameMain"
+            type="text"
+            attribute="middleNameMain"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.lastNameMain"
+            type="text"
+            attribute="lastNameMain"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.firstNameLocalised"
+            type="text"
+            attribute="firstNameLocalised"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.middleNameLocalised"
+            type="text"
+            attribute="middleNameLocalised"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.lastNameLocalised"
+            type="text"
+            attribute="lastNameLocalised"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.teacherFirstName"
+            type="text"
+            attribute="teacherFirstName"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.teacherMiddleName"
+            type="text"
+            attribute="teacherMiddleName"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.teacherLastName"
+            type="text"
+            attribute="teacherLastName"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.addressLine1"
+            type="text"
+            attribute="addressLine1"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.addressLine2"
+            type="text"
+            attribute="addressLine2"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.addressCity"
+            type="text"
+            attribute="addressCity"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.addressState"
+            type="text"
+            attribute="addressState"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.addressCountry"
+            type="text"
+            attribute="addressCountry"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.landline"
+            type="text"
+            attribute="landline"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.mobile"
+            type="text"
+            attribute="mobile"></text-field>
+        <text-field label-translate="user.personalInfoForm.labels.school"
+            type="text"
+            attribute="school"></text-field>
+        <datepicker-field label-translate="user.personalInfoForm.labels.dateOfBirth"
+            attribute="dateOfBirth"></datepicker-field>
+        <submit-button label="{{ personalInfoForm.submitButtonText | translate}}"
+            button-class="{{personalInfoForm.submitButtonClass}}"
+            icon="{{personalInfoForm.submitButtonIcon}}"></submit-button>
+    </form>
+</div>

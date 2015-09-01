@@ -25,7 +25,7 @@ public class AdministrativePrincipalACLController {
 
 	@RequestMapping(
 	        value = "/api/admin/principal/{principal}/generalPermissions",
-	        method = RequestMethod.PATCH)
+	        method = RequestMethod.PUT)
 	public BindingResponse setGeneralPermissions(
 	        @PathVariable(value = "principal") Principal principal,
 	        @Valid @RequestBody final Map<GeneralPermissionType, Boolean> generalPermissions,

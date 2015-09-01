@@ -31,59 +31,59 @@ public class AclService extends GenericCreateUpdateRepository {
 	private DSLContext dslContext;
 
 	public OlympusPrincipal extractPrincipal(
-	        Long id) {
+			Long id) {
 		return Optional.<OlympusPrincipal> ofNullable(
-		        this.dslContext.selectFrom(Tables.GROUP)
-		                .where(Tables.GROUP.ID
-		                        .eq(id))
-		                .fetchOneInto(Group.class))
-		        .orElse(
-		                this.dslContext.selectFrom(Tables.USER)
-		                        .where(Tables.USER.ID
-		                                .eq(id))
-		                        .fetchOneInto(User.class));
+				this.dslContext.selectFrom(Tables.GROUP)
+						.where(Tables.GROUP.ID
+								.eq(id))
+						.fetchOneInto(Group.class))
+				.orElse(
+						this.dslContext.selectFrom(Tables.USER)
+								.where(Tables.USER.ID
+										.eq(id))
+								.fetchOneInto(User.class));
 	}
 
 	public boolean hasContestPermission(Contest contest, User user,
-	        ContestPermissionType value) {
+			ContestPermissionType value) {
 		return dslContext.select(Routines.hasContestPermission(contest.getId(),
-		        user.getId(), value)).fetchOne().value1();
+				user.getId(), value)).fetchOne().value1();
 	}
 
 	public boolean hasTaskPermission(Task task, User user,
-	        TaskPermissionType value) {
+			TaskPermissionType value) {
 		return dslContext.select(Routines.hasTaskPermission(task.getId(),
-		        user.getId(), value)).fetchOne().value1();
+				user.getId(), value)).fetchOne().value1();
 	}
 
 	public boolean hasGroupPermission(Group group, User user,
-	        GroupPermissionType value) {
+			GroupPermissionType value) {
 		return dslContext.select(Routines.hasGroupPermission(group.getId(),
-		        user.getId(), value)).fetchOne().value1();
+				user.getId(), value)).fetchOne().value1();
 	}
 
 	public Principal setPrincipalGeneralPermissions(Principal principal,
-	        Map<GeneralPermissionType, Boolean> generalPermissions) {
+			Map<GeneralPermissionType, Boolean> generalPermissions) {
 		principal
-		        .setPermissions((GeneralPermissionType[]) generalPermissions
-		                .entrySet().stream()
-		                .filter(entry -> Boolean.TRUE
-		                        .equals(entry.getValue()))
-		                .map(entry -> entry
-		                        .getKey())
-		                .toArray());
+				.setPermissions(generalPermissions
+						.entrySet().stream()
+						.filter(entry -> Boolean.TRUE
+								.equals(entry.getValue()))
+						.map(entry -> (GeneralPermissionType) entry
+								.getKey())
+						.toArray(size-> new GeneralPermissionType[size]));
 
 		return update(principal, Tables.PRINCIPAL);
 	}
 
 	public Map<GeneralPermissionType, Boolean> getPrincipalGeneralPermissions(
-	        Principal principal) {
+			Principal principal) {
 		Set<GeneralPermissionType> permissionTypes = ImmutableSet
-		        .copyOf(principal.getPermissions());
+				.copyOf(principal.getPermissions());
 		return Stream.of(GeneralPermissionType.values()).collect(
-		        Collectors
-		                .<GeneralPermissionType, GeneralPermissionType, Boolean> toMap(
-		                        (type) -> type,
-		                        (type) -> permissionTypes.contains(type)));
+				Collectors
+						.<GeneralPermissionType, GeneralPermissionType, Boolean> toMap(
+								(type) -> type,
+								(type) -> permissionTypes.contains(type)));
 	}
 }

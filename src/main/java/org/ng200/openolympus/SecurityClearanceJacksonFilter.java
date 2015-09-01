@@ -30,6 +30,9 @@ import java.util.stream.Stream;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
+import org.ng200.openolympus.services.SecurityClearanceVerificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,11 +44,15 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 
-public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter
-		implements SecurityContestHasClearanceAware {
+public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(SecurityClearanceJacksonFilter.class);
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
+
+	@Autowired
+	private SecurityClearanceVerificationService securityClearanceVerificationService;
 
 	private final Map<Class<? extends SecurityClearancePredicate>, SecurityClearancePredicate> predicateBeans = new HashMap<>();
 
@@ -82,13 +89,17 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter
 			return true;
 		}
 
-		return this.securityContextHasClearance(
-				requestedClearance.minimumClearance()) &&
+		return securityClearanceVerificationService
+				.doesCurrentSecurityContextHaveClearance(
+						requestedClearance.minimumClearance())
+				&&
 				Stream.of(requestedClearance.predicates())
 						.map(predicateClass -> this.getPredicate(predicateClass)
 								.getRequiredClearanceForObject(user, object))
 						.map(req -> req != SecurityClearanceType.DENIED
-								? this.securityContextHasClearance(req)
+								? securityClearanceVerificationService
+										.doesCurrentSecurityContextHaveClearance(
+												req)
 								: false)
 						.reduce(true, (l, r) -> l && r);
 	}

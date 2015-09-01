@@ -17,12 +17,12 @@ public class SecurityClearanceVerificationService {
 	public boolean doesCurrentSecurityContextHaveClearance(
 	        SecurityClearanceType securityClearanceType) {
 		switch (securityClearanceType) {
+		case ANONYMOUS:
+			return true;
 		case ADMINISTRATIVE_USER:
 			return defaultSecurity()
 			        .matches(user -> user.getSuperuser())
 			        .isAllowed();
-		case ANONYMOUS:
-			return true;
 		case APPROVED_USER:
 			return defaultSecurity()
 			        .matches(user -> user.getApproved())

@@ -2,9 +2,9 @@
 
 module.exports = {
 	"name": "administrativePersonalInfoModificationView",
-	"url": "/admin/user/{userId:[0-9]+}/personalInfo",
-	"templateUrl": "/partials/user/personalInfo.html",
-	"controller": require("controllers/user/personalInfo"),
+	"url": "/admin/user/{userId:[0-9]+}/profile",
+	"templateUrl": "/partials/user/profile.html",
+	"controller": require("controllers/user/profile"),
 	"customWidth": "narrow",
 	"resolve": {
 		existingPersonalInfo: function($http, $stateParams) {
@@ -18,6 +18,7 @@ module.exports = {
 		},
 		requireExistingPassword: function() {
 			return false;
-		}
+		},
+		enablePermissionsEditor: () => true
 	}
 };
