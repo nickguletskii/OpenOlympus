@@ -24,10 +24,10 @@ package org.ng200.openolympus.dto;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Timestamp;
+
+import javax.persistence.Column;
 
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.util.Beans;
 
 public class UserRanking extends User {
 
@@ -43,50 +43,42 @@ public class UserRanking extends User {
 	public UserRanking() {
 	}
 
-	public UserRanking(BigInteger rank, User user, BigDecimal score) {
-		this.rank = rank;
-		this.score = score;
-
-		Beans.copy(user, this);
-	}
-
-	public UserRanking(Long id, String username, String firstNameMain,
-			String addressCity, String addressCountry, String addressLine1,
-			String addressLine2, String addressState,
-			Boolean approvalEmailSent, Timestamp birthDate,
-			String emailAddress, String emailConfirmationToken,
-			Boolean enabled, String firstNameLocalised, String landline,
-			String lastNameLocalised, String lastNameMain,
-			String middleNameLocalised, String middleNameMain, String mobile,
-			String password, String school, String teacherFirstName,
-			String teacherLastName, String teacherMiddleName,
-			Boolean superuser, Boolean approved, BigDecimal score,
-			BigInteger rank) {
-		super(id, username, firstNameMain, addressCity, addressCountry,
-				addressLine1, addressLine2, addressState, approvalEmailSent,
-				birthDate, emailAddress, emailConfirmationToken, enabled,
-				firstNameLocalised, landline, lastNameLocalised, lastNameMain,
-				middleNameLocalised, middleNameMain, mobile, password, school,
-				teacherFirstName, teacherLastName, teacherMiddleName,
-				superuser, approved);
-		this.score = score;
-		this.rank = rank;
-	}
-
+	@Column(name="rank")
 	public BigInteger getRank() {
 		return this.rank;
 	}
 
+	@Column(name="score")
 	public BigDecimal getScore() {
 		return this.score;
 	}
-
-	public void setRank(BigInteger rank) {
+	
+	@Column(name="rank")
+	public UserRanking setRank(BigInteger rank) {
 		this.rank = rank;
+		return this;
 	}
 
-	public void setScore(BigDecimal score) {
+	@Column(name="score")
+	public UserRanking setScore(BigDecimal score) {
 		this.score = score;
+		return this;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"UserRanking [score=%s, rank=%s, getId()=%s, getUsername()=%s, getFirstNameMain()=%s, getAddressCity()=%s, getAddressCountry()=%s, getAddressLine1()=%s, getAddressLine2()=%s, getAddressState()=%s, getApprovalEmailSent()=%s, getBirthDate()=%s, getEmailAddress()=%s, getEmailConfirmationToken()=%s, getEnabled()=%s, getFirstNameLocalised()=%s, getLandline()=%s, getLastNameLocalised()=%s, getLastNameMain()=%s, getMiddleNameLocalised()=%s, getMiddleNameMain()=%s, getMobile()=%s, getPassword()=%s, getSchool()=%s, getTeacherFirstName()=%s, getTeacherLastName()=%s, getTeacherMiddleName()=%s, getSuperuser()=%s, getApproved()=%s]",
+				score, rank, getId(), getUsername(), getFirstNameMain(),
+				getAddressCity(), getAddressCountry(), getAddressLine1(),
+				getAddressLine2(), getAddressState(), getApprovalEmailSent(),
+				getBirthDate(), getEmailAddress(), getEmailConfirmationToken(),
+				getEnabled(), getFirstNameLocalised(), getLandline(),
+				getLastNameLocalised(), getLastNameMain(),
+				getMiddleNameLocalised(), getMiddleNameMain(), getMobile(),
+				getPassword(), getSchool(), getTeacherFirstName(),
+				getTeacherLastName(), getTeacherMiddleName(), getSuperuser(),
+				getApproved());
 	}
 
 }

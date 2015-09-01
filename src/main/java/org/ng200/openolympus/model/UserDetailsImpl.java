@@ -32,6 +32,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 
@@ -40,6 +41,7 @@ public interface UserDetailsImpl extends IUser, UserDetails {
 
 	static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);
 
+	@JsonIgnore
 	@Override
 	public default Collection<? extends GrantedAuthority> getAuthorities() {
 		final Builder<GrantedAuthority> builder = ImmutableList
