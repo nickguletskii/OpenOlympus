@@ -48,6 +48,8 @@ import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.routines.GetContestEnd;
 import org.ng200.openolympus.jooq.routines.GetContestEndForUser;
+import org.ng200.openolympus.jooq.routines.GetContestStart;
+import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
 import org.ng200.openolympus.jooq.tables.daos.ContestDao;
 import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
 import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
@@ -130,6 +132,24 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 	public Date getContestEndTimeForUser(Contest contest, User user) {
 		final GetContestEndForUser procedure = new GetContestEndForUser();
+		procedure.setContestId(contest.getId());
+		procedure.setUserId(user.getId());
+		procedure.attach(this.dslContext.configuration());
+		procedure.execute();
+		return Date.from(procedure.getReturnValue().toInstant());
+	}
+
+	public Instant getContestStartIncludingAllTimeExtensions(
+			final Contest contest) {
+		final GetContestStart procedure = new GetContestStart();
+		procedure.setContestId(contest.getId());
+		procedure.attach(this.dslContext.configuration());
+		procedure.execute();
+		return procedure.getReturnValue().toInstant();
+	}
+
+	public Date getContestStartTimeForUser(Contest contest, User user) {
+		final GetContestStartForUser procedure = new GetContestStartForUser();
 		procedure.setContestId(contest.getId());
 		procedure.setUserId(user.getId());
 		procedure.attach(this.dslContext.configuration());
@@ -247,13 +267,6 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.groupBy(Tables.SOLUTION.ID)
 				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(1).fetchOne()
 				.value1();
-	}
-
-	public boolean hasContestStarted(final Contest contest) {
-		if (contest == null) {
-			return false;
-		}
-		return !contest.getStartTime().toInstant().isAfter(Instant.now());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -410,6 +423,18 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.fetchGroups(Tables.CONTEST_PERMISSION.PERMISSION,
 						(record) -> aclService
 								.extractPrincipal(record.value2()));
+	}
+
+	public boolean isTaskInContest(Task task, Contest contest) {
+		return this.dslContext
+				.select(DSL.field(DSL.exists(
+						dslContext.select()
+								.from(Tables.CONTEST_TASKS)
+								.where(Tables.CONTEST_TASKS.TASK_ID
+										.eq(task.getId())
+										.and(Tables.CONTEST_TASKS.CONTEST_ID
+												.eq(contest.getId()))))))
+				.fetchOne().value1();
 	}
 
 }

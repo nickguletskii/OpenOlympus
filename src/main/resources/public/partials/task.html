@@ -23,7 +23,6 @@
 
 -->
 <button type="button"
-	ng-if="security.isAdmin()"
 	th:attr="tooltip= #{task.editButton}"
 	class="hidden-print btn btn-primary fa fa-pencil"
 	ui-sref="taskModificationView({taskId: taskId})">

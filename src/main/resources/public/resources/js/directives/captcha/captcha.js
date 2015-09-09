@@ -40,21 +40,24 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 			$scope.setWidgetId = function(widgetId) {
 				$scope.widgetId = widgetId;
 			};
-
 			$http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
 				if (_.isEmpty(recaptchaPublicKey)) {
 					$element.remove();
 					return;
 				}
+				FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
 				$scope.recaptchaPublicKey = recaptchaPublicKey;
 				$.getScript("//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit");
+
 				$($element[0]).find(".captchaLoading").replaceWith($compile("<div vc-recaptcha key=\"recaptchaPublicKey\" ng-model=\"model.bindable\" on-create=\"setWidgetId(widgetId)\"></div>")($scope));
 			});
 
 			if ($attributes.resetOn) {
 				$scope.$parent.$on($attributes.resetOn, () => {
-					vcRecaptchaService.reload($scope.widgetId);
-				});
+					if ($scope.recaptchaPublicKey){
+						vcRecaptchaService.reload($scope.widgetId);
+					}});
+
 			}
 		}
 	};

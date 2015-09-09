@@ -186,7 +186,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 		        .where(taskPermissionAppliesToUser
 		                .and(Tables.TASK_PERMISSION.PERMISSION
 		                        .eq(TaskPermissionType.view)))
-		        .groupBy(Tables.TASK.CREATED_DATE)
+		        .groupBy(Tables.TASK.ID)
 		        .orderBy(Tables.TASK.CREATED_DATE.desc()).limit(pageSize)
 		        .offset((pageNumber - 1) * pageSize)
 		        .fetchInto(Task.class);

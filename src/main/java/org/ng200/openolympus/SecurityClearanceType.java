@@ -80,6 +80,8 @@ public enum SecurityClearanceType {
 
 	LIST_GROUPS,
 
-	VIEW_ALL_SOLUTIONS;
+	VIEW_ALL_SOLUTIONS,
+	
+	MANAGE_PRINCIPAL_PERMISSIONS;
 
 }

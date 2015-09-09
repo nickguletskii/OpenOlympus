@@ -23,15 +23,61 @@
 package org.ng200.openolympus.security.predicates;
 
 import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
+import org.ng200.openolympus.services.AclService;
+import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.SolutionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VerdictSecurityPredicate implements SecurityClearancePredicate {
 
-	@Override
+	@Autowired
+	private AclService aclService;
+
+	@Autowired
+	private ContestService contestService;
+
+	@Autowired
+	private SolutionService solutionService;
+
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
-		// TODO Auto-generated method stub
+		Verdict verdict = (Verdict) obj;
+
+		Contest runningContest = contestService.getRunningContest();
+
+		if (runningContest == null) {
+			if (solutionService.getSolutionById(verdict.getSolutionId())
+					.getUserId() == user.getId())
+				return SecurityClearanceType.APPROVED_USER;
+			return SecurityClearanceType.VIEW_ALL_SOLUTIONS;
+		}
+		boolean canViewAllSolutions = aclService.hasContestPermission(
+				runningContest,
+				user, ContestPermissionType.view_all_solutions);
+		boolean canViewSolutionsDuringContest = aclService.hasContestPermission(
+				runningContest, user,
+				ContestPermissionType.view_results_during_contest);
+
+		if ((verdict.getViewableDuringContest()
+				|| canViewSolutionsDuringContest)
+				&& canViewAllSolutions) {
+			return SecurityClearanceType.APPROVED_USER;
+		}
+
+		if (solutionService.getSolutionById(verdict.getSolutionId())
+				.getUserId() == user.getId()
+				&& (verdict.getViewableDuringContest()
+						|| canViewSolutionsDuringContest)) {
+			return SecurityClearanceType.APPROVED_USER;
+		}
+
 		return SecurityClearanceType.APPROVED_USER;
 	}
 

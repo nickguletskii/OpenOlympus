@@ -75,6 +75,7 @@ angular.module("ool")
 
 					if (status === 403) {
 						$location.path("/forbidden");
+						$rootScope.forbidden = true;
 						return $q.reject(response);
 					} else if (response.status === 401) {
 						$location.path("/login");
@@ -91,11 +92,13 @@ angular.module("ool")
 		return function(exception) {
 			var $rootScope = $injector.get("$rootScope");
 			var $timeout = $injector.get("$timeout");
-			$timeout(function() {
-				$rootScope.showErrorModal = true;
-			}, 1);
+			if (!$rootScope.forbidden) {
+				$timeout(function() {
+					$rootScope.showErrorModal = true;
+				}, 1);
+			}
 			console.error(exception);
-		//	throw exception;
+			//	throw exception;
 		};
 	})
 	.run( /*@ngInject*/ function($rootScope, AuthenticationProvider) {

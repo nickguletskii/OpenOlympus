@@ -22,8 +22,8 @@ public class SecurityPredicatePipeline {
 	private SecurityPredicatePipeline(DSLContext dslContext) {
 		this.dslContext = dslContext;
 		user = (User) Optional.ofNullable(SecurityContextHolder.getContext())
-		        .map(c -> c.getAuthentication()).map(a -> a.getPrincipal())
-		        .orElse(null);
+				.map(c -> c.getAuthentication()).map(a -> a.getPrincipal())
+				.orElse(null);
 	}
 
 	public SecurityPredicatePipeline defaultSecurity() {
@@ -37,7 +37,7 @@ public class SecurityPredicatePipeline {
 	}
 
 	public SecurityPredicatePipeline matches(
-	        Function<User, Boolean> predicate) {
+			Function<User, Boolean> predicate) {
 		if (decision != Decision.NO_DECISION || user == null)
 			return this;
 
@@ -49,7 +49,7 @@ public class SecurityPredicatePipeline {
 	}
 
 	public SecurityPredicatePipeline notMatches(
-	        Function<User, Boolean> predicate) {
+			Function<User, Boolean> predicate) {
 		if (decision != Decision.NO_DECISION || user == null)
 			return this;
 
@@ -61,14 +61,18 @@ public class SecurityPredicatePipeline {
 	}
 
 	public SecurityPredicatePipeline hasPermission(
-	        GeneralPermissionType generalPermissionType) {
+			GeneralPermissionType generalPermissionType) {
 		if (decision != Decision.NO_DECISION || user == null)
 			return this;
 
-		if (dslContext.select(DSL.field(Tables.PRINCIPAL.PERMISSIONS
-		        .contains(new GeneralPermissionType[] {
-		                                                generalPermissionType
-		}))).where(Tables.PRINCIPAL.ID.eq(user.getId())).fetchOne().value1()) {
+		if (dslContext.select(
+				DSL.field(Tables.PRINCIPAL.PERMISSIONS
+						.contains(new GeneralPermissionType[] {
+																generalPermissionType
+		})))
+				.from(Tables.PRINCIPAL)
+				.where(Tables.PRINCIPAL.ID.eq(user.getId()))
+				.fetchOne().value1()) {
 			decision = Decision.ACCEPT;
 		}
 
@@ -76,12 +80,12 @@ public class SecurityPredicatePipeline {
 	}
 
 	public static SecurityPredicatePipeline defaultPipeline(
-	        DSLContext dslContext) {
+			DSLContext dslContext) {
 		return new SecurityPredicatePipeline(dslContext).defaultSecurity();
 	}
 
 	public static SecurityPredicatePipeline emptyPipeline(
-	        DSLContext dslContext) {
+			DSLContext dslContext) {
 		return new SecurityPredicatePipeline(dslContext);
 	}
 

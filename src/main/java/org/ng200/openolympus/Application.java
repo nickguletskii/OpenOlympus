@@ -38,7 +38,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -51,14 +50,13 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 @ComponentScan(basePackages = "org.ng200.openolympus")
 @EnableAutoConfiguration
 @PropertySource(value = {
-                          "classpath:openolympus.properties",
-                          "file:openolympus.properties",
-                          "classpath:application.properties",
-                          "file:application.properties",
-                          "classpath:secret.properties",
-                          "file:secret.properties"
+							"classpath:openolympus.properties",
+							"file:openolympus.properties",
+							"classpath:application.properties",
+							"file:application.properties",
+							"classpath:secret.properties",
+							"file:secret.properties"
 }, ignoreResourceNotFound = true)
-@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableCaching
 @EnableTransactionManagement
 public class Application {
@@ -66,7 +64,7 @@ public class Application {
 
 	public static void main(final String[] args) throws SQLException {
 		SpringApplication.run(
-		        Application.class, args);
+				Application.class, args);
 	}
 
 	@Bean

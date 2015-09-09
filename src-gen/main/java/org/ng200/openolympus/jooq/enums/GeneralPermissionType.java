@@ -52,7 +52,15 @@ public enum GeneralPermissionType implements EnumType {
 
 	task_supervisor("task_supervisor"),
 
-	view_other_users_personal_info("view_other_users_personal_info");
+	view_other_users_personal_info("view_other_users_personal_info"),
+
+	create_groups("create_groups"),
+
+	list_groups("list_groups"),
+
+	manage_principal_permissions("manage_principal_permissions"),
+
+	view_all_solutions("view_all_solutions");
 
 	private final String literal;
 

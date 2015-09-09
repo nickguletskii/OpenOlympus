@@ -182,4 +182,8 @@ public class SolutionService extends GenericCreateUpdateRepository {
 	public synchronized Verdict updateVerdict(Verdict verdict) {
 		return this.update(verdict, Tables.VERDICT);
 	}
+
+	public Solution getSolutionById(long solutionId) {
+		return solutionDao.fetchOneById(solutionId);
+	}
 }

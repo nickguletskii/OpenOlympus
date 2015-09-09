@@ -23,16 +23,45 @@
 package org.ng200.openolympus.security.predicates;
 
 import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.jooq.enums.ContestPermissionType;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
+import org.ng200.openolympus.services.AclService;
+import org.ng200.openolympus.services.ContestService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SolutionSecurityPredicate implements SecurityClearancePredicate {
+
+	@Autowired
+	private ContestService contestService;
+
+	@Autowired
+	private AclService aclService;
 
 	@Override
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
-		// TODO Auto-generated method stub
-		return SecurityClearanceType.APPROVED_USER;
+		Solution solution = (Solution) obj;
+		Contest runningContest = contestService.getRunningContest();
+
+		if (solution.getUserId() == user.getId()) {
+			return SecurityClearanceType.APPROVED_USER;
+		}
+
+		if (runningContest == null) {
+			return SecurityClearanceType.VIEW_ALL_SOLUTIONS;
+		}
+
+		if (aclService.hasContestPermission(runningContest, user,
+				ContestPermissionType.view_all_solutions)) {
+			return SecurityClearanceType.APPROVED_USER;
+		}
+
+		return SecurityClearanceType.SUPERUSER;
 	}
 
 }

@@ -31,14 +31,13 @@ import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.interfaces.IVerdict;
 import org.ng200.openolympus.security.predicates.VerdictSecurityPredicate;
 
+@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 public interface IVerdictSecurityDescription extends IVerdict {
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 	public String getAdditionalInformation();
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 	public Duration getCpuTime();
 
 	@Override
@@ -46,11 +45,9 @@ public interface IVerdictSecurityDescription extends IVerdict {
 	public Long getId();
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 	public BigDecimal getMaximumScore();
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 	public Long getMemoryPeak();
 
 	@Override
@@ -58,11 +55,9 @@ public interface IVerdictSecurityDescription extends IVerdict {
 	public String getPath();
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 	public Duration getRealTime();
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 	public BigDecimal getScore();
 
 	@Override
@@ -70,11 +65,10 @@ public interface IVerdictSecurityDescription extends IVerdict {
 	public Long getSolutionId();
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
 	public VerdictStatusType getStatus();
 
 	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = VerdictSecurityPredicate.class)
+
 	public Boolean getViewableDuringContest();
 
 }

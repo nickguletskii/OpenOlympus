@@ -3,7 +3,6 @@ package org.ng200.openolympus.security;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.security.Principal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +20,8 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.services.SecurityClearanceVerificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -35,6 +36,8 @@ import org.springframework.stereotype.Component;
 public class OpenOlympusRootDecisionVoter
 		implements AccessDecisionVoter<Object> {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(OpenOlympusRootDecisionVoter.class);
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
@@ -52,18 +55,33 @@ public class OpenOlympusRootDecisionVoter
 	@Override
 	public int vote(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) {
-		if (!(object instanceof MethodInvocation))
-			return ACCESS_ABSTAIN;
-		MethodInvocation invocation = (MethodInvocation) object;
-		SecurityOr securityOr = AnnotationUtils.findAnnotation(
-				invocation.getMethod(),
-				SecurityOr.class);
+		try {
+			if (!(object instanceof MethodInvocation))
+				return ACCESS_ABSTAIN;
+			MethodInvocation invocation = (MethodInvocation) object;
 
-		if (securityOr == null) {
-			return ACCESS_GRANTED;
+			int vote1 = Optional.ofNullable(AnnotationUtils.findAnnotation(
+					invocation.getMethod().getDeclaringClass(),
+					SecurityOr.class))
+					.map(x -> (Integer) processSecurityOr(x, invocation))
+					.orElse(ACCESS_ABSTAIN);
+
+			int vote2 = Optional.ofNullable(AnnotationUtils.findAnnotation(
+					invocation.getMethod(),
+					SecurityOr.class))
+					.map(x -> (Integer) processSecurityOr(x, invocation))
+					.orElse(ACCESS_ABSTAIN);
+
+			if (vote1 == ACCESS_DENIED || vote2 == ACCESS_DENIED)
+				return ACCESS_DENIED;
+
+			if (vote1 == ACCESS_GRANTED || vote2 == ACCESS_GRANTED)
+				return ACCESS_GRANTED;
+		} catch (Exception e) {
+			logger.error("SECURITY SYSTEM FAILURE: {}", e);
+			return ACCESS_DENIED;
 		}
-
-		return processSecurityOr(securityOr, invocation);
+		return ACCESS_DENIED;
 	}
 
 	private int processSecurityOr(SecurityOr securityOr,
@@ -84,7 +102,6 @@ public class OpenOlympusRootDecisionVoter
 
 	private int processSecurityAnd(SecurityAnd securityAnd,
 			MethodInvocation invocation) {
-
 		for (SecurityLeaf securityLeaf : securityAnd.value()) {
 			if (processSecurityLeaf(securityLeaf, invocation) == ACCESS_DENIED)
 				return ACCESS_DENIED;

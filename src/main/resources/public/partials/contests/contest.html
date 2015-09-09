@@ -27,17 +27,17 @@
 <acl-editor acl-getter="/api/contest/{{contestId}}/acl"
 	acl-setter="/api/contest/{{contestId}}/acl"
 	localisation-namespace="contest.permissions"></acl-editor>
-<a ng-if="security.isAdmin()"
+<a 
 	translate="contest.edit"
 	class="hidden-print btn btn-primary btn-sm"
 	ui-sref="editContest({contestId: contestId})"></a>
 <button type="button"
-	ng-if="security.isAdmin()"
+	
 	translate="contest.addTaskButton"
 	class="hidden-print btn btn-primary btn-sm"
 	ui-sref=".addTask"></button>
 <button type="button"
-	ng-if="security.isAdmin()"
+	
 	translate="contest.participantsButton"
 	class="hidden-print btn btn-primary btn-sm"
 	ui-sref="contestParticipantsList({contestId:contestId})"></button>
@@ -58,13 +58,13 @@
 			<td>
 				<a ui-sref="taskView({taskId: task.id, contestId: contestId})">{{task.name}}</a>
 				<button type="button"
-					ng-if="security.isAdmin()"
+					
 					tooltip="{{ 'contest.task.editButton' | translate }}"
 					class="hidden-print pull-right btn btn-primary btn-xs fa fa-pencil"
 					ui-sref="taskModificationView({taskId: task.id, contestId: contestId})">
 				</button>
 				<button type="button"
-					ng-if="security.isAdmin()"
+					
 					tooltip="{{ 'contest.task.rejudgeButton' | translate }}"
 					class=" hidden-print pull-right btn btn-warning btn-xs fa fa-refresh "
 					ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">

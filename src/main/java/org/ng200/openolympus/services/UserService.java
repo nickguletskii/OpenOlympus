@@ -65,7 +65,6 @@ public class UserService extends GenericCreateUpdateRepository {
 	}
 
 	public long countUnapprovedUsers() {
-		// TODO: Check
 		return this.dslContext.selectCount().from(Tables.USER)
 				.where(Tables.USER.APPROVED.eq(false)).execute();
 	}
@@ -145,7 +144,7 @@ public class UserService extends GenericCreateUpdateRepository {
 
 	public List<User> getPendingUsers(int pageNumber, int pageSize) {
 		return this.dslContext.selectFrom(Tables.USER)
-				.where(Tables.USER.APPROVAL_EMAIL_SENT.eq(false))
+				.where(Tables.USER.APPROVED.eq(false))
 				.limit(pageSize).offset((pageNumber - 1) * pageSize)
 				.fetchInto(User.class);
 	}

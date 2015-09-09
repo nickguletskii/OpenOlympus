@@ -32,10 +32,6 @@ const WIDTH_CLASS_MAP = {
 };
 
 var stateList = [{
-		"name": "forbidden",
-		"url": "/forbidden",
-		"templateUrl": "/partials/forbidden.html"
-	}, {
 		"name": "eula",
 		"url": "/eula",
 		"templateUrl": "/partials/eula.html"
@@ -48,6 +44,7 @@ var stateList = [{
 		"url": "/admin",
 		"templateUrl": "/partials/admin.html"
 	},
+	require("controllers/forbidden"),
 	require("controllers/task"),
 	require("controllers/task/edit"),
 	require("controllers/archive/tasks"),

@@ -47,7 +47,6 @@ public class SinglepageController {
 
 	@RequestMapping(value = "/**", produces = MediaType.TEXT_HTML_VALUE)
 	@ResponseBody
-	@PreAuthorize(value = "true")
 	public Resource singlepage(WebRequest requst) throws ResourceException {
 		SinglepageController.logger.debug(
 				"Singlepage controller called for URI: {}",

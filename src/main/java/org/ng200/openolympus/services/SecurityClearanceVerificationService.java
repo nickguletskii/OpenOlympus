@@ -60,9 +60,20 @@ public class SecurityClearanceVerificationService {
 		case VIEW_OTHER_USERS_PERSONAL_INFO:
 			return generalPermission(
 			        GeneralPermissionType.view_other_users_personal_info);
-		default:
-			throw new IllegalArgumentException("Unsupported permission type!");
+		case CREATE_GROUP:
+			return generalPermission(
+			        GeneralPermissionType.create_groups);
+		case LIST_GROUPS:
+			return generalPermission(
+			        GeneralPermissionType.list_groups);
+		case MANAGE_PRINCIPAL_PERMISSIONS:
+			return generalPermission(
+			        GeneralPermissionType.manage_principal_permissions);
+		case VIEW_ALL_SOLUTIONS:
+			return generalPermission(
+			        GeneralPermissionType.view_all_solutions);
 		}
+		throw new UnsupportedOperationException("An unsupported security clearance was encountered.");
 	}
 
 	private SecurityPredicatePipeline defaultSecurity() {

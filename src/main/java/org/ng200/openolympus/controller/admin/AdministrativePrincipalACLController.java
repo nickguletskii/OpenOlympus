@@ -5,9 +5,13 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.ng200.openolympus.Assertions;
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Principal;
+import org.ng200.openolympus.security.annotations.SecurityAnd;
+import org.ng200.openolympus.security.annotations.SecurityLeaf;
+import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.services.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -18,31 +22,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityOr({
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.MANAGE_PRINCIPAL_PERMISSIONS)
+		})
+})
 public class AdministrativePrincipalACLController {
 
 	@Autowired
 	private AclService aclService;
 
-	@RequestMapping(
-	        value = "/api/admin/principal/{principal}/generalPermissions",
-	        method = RequestMethod.PUT)
+	@RequestMapping(value = "/api/admin/principal/{principal}/generalPermissions", method = RequestMethod.PUT)
 	public BindingResponse setGeneralPermissions(
-	        @PathVariable(value = "principal") Principal principal,
-	        @Valid @RequestBody final Map<GeneralPermissionType, Boolean> generalPermissions,
-	        final BindingResult bindingResult) {
+			@PathVariable(value = "principal") Principal principal,
+			@Valid @RequestBody final Map<GeneralPermissionType, Boolean> generalPermissions,
+			final BindingResult bindingResult) {
 		Assertions.resourceExists(principal);
 
 		principal = aclService.setPrincipalGeneralPermissions(principal,
-		        generalPermissions);
+				generalPermissions);
 
 		return BindingResponse.OK;
 	}
 
-	@RequestMapping(
-	        value = "/api/admin/principal/{principal}/generalPermissions",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/admin/principal/{principal}/generalPermissions", method = RequestMethod.GET)
 	public Map<GeneralPermissionType, Boolean> getGeneralPermissions(
-	        @PathVariable(value = "principal") final Principal principal) {
+			@PathVariable(value = "principal") final Principal principal) {
 		Assertions.resourceExists(principal);
 
 		return aclService.getPrincipalGeneralPermissions(principal);

@@ -46,7 +46,15 @@ public enum ContestPermissionType implements EnumType {
 
 	view_participants("view_participants"),
 
-	remove_task("remove_task");
+	remove_task("remove_task"),
+
+	view_results_during_contest("view_results_during_contest"),
+
+	view_results_after_contest("view_results_after_contest"),
+
+	view_all_solutions("view_all_solutions"),
+
+	view_tasks_after_contest_started("view_tasks_after_contest_started");
 
 	private final String literal;
 
