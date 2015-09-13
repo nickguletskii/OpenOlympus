@@ -29,10 +29,10 @@ import java.util.Map.Entry;
 
 import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.context.request.WebRequest;
 
 @RestController

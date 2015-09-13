@@ -25,7 +25,6 @@ package org.ng200.openolympus.validation;
 import org.ng200.openolympus.dto.ContestUserTimeAdditionDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.services.ContestService;
-import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -35,9 +34,6 @@ public class ContestUserTimeAdditionDtoValidator {
 
 	@Autowired
 	private ContestService contestService;
-
-	@Autowired
-	private UserService userService;
 
 	public void validate(final Contest contest,
 			final ContestUserTimeAdditionDto contestTimeAddition,

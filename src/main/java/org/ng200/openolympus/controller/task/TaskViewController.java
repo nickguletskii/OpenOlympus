@@ -48,12 +48,12 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
 import org.ng200.openolympus.security.predicates.TaskViewSecurityPredicate;
-import org.ng200.openolympus.security.predicates.UserHasTaskPermission;
 import org.ng200.openolympus.services.SolutionSubmissionService;
 import org.ng200.openolympus.services.StorageService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.SolutionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.util.AntPathMatcher;
@@ -64,7 +64,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.google.common.collect.ImmutableMap;
@@ -190,7 +189,7 @@ public class TaskViewController {
 			throw new BindException(bindingResult);
 		}
 
-		final Solution solution = this.solutionSubmissionService.submitTask(
+		final Solution solution = this.solutionSubmissionService.submitSolution(
 		        task,
 		        solutionDto, user);
 

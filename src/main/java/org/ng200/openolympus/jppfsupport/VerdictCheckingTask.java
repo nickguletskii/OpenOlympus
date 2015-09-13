@@ -42,11 +42,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 })
 public class VerdictCheckingTask implements
 		ExceptionalProducer<Pair<SolutionJudge, SolutionResult>> {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 7829416558485210184L;
-
 	private boolean isUserTest;
 	private SolutionJudge judge;
 	private List<Path> testFiles;

@@ -43,7 +43,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.jooq.DSLContext;
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
 import org.jppf.scheduling.JPPFSchedule;
@@ -80,7 +79,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -151,9 +149,6 @@ public class TestingService {
 
 	@Autowired
 	private VerdictDao verdictDao;
-
-	@Autowired
-	private DSLContext dslContext;
 
 	@Autowired
 	private TaskService taskService;
@@ -252,7 +247,7 @@ public class TestingService {
 				throw jppfTask.getThrowable();
 			}
 
-			final ObjectMapper objectMapper = JacksonSerializationFactory
+			JacksonSerializationFactory
 					.createObjectMapper();
 
 			final JsonTaskExecutionResult<Pair<SolutionJudge, SolutionResult>> checkingResult = ((JacksonSerializationDelegatingTask<Pair<SolutionJudge, SolutionResult>, VerdictCheckingTask>) job

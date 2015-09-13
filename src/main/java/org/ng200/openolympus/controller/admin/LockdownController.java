@@ -22,14 +22,13 @@
  */
 package org.ng200.openolympus.controller.admin;
 
-import org.ng200.openolympus.services.PropertyService;
 import org.ng200.openolympus.services.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
@@ -37,9 +36,6 @@ public class LockdownController {
 
 	@Autowired
 	private SecurityService securityService;
-	@Autowired
-	private PropertyService propertyService;
-
 	@RequestMapping(value = "/admin/lockdown/enabled", method = RequestMethod.POST)
 	public void endLockdown(
 			@RequestParam(value = "enabled", required = true) boolean enabled) {

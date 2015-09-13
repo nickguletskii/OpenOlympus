@@ -13,7 +13,6 @@ import javax.annotation.Generated;
 import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
-import org.ng200.openolympus.jooq.Sequences;
 import org.ng200.openolympus.jooq.tables.Contest;
 import org.ng200.openolympus.jooq.tables.ContestMessage;
 import org.ng200.openolympus.jooq.tables.ContestParticipation;

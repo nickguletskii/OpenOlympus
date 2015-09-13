@@ -22,8 +22,6 @@
  */
 package org.ng200.openolympus.controller.errors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -40,9 +38,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Profile("web")
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class AccessDeniedExceptionHandler {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(AccessDeniedExceptionHandler.class);
 
 	@ResponseStatus(value = HttpStatus.FORBIDDEN)
 	@ExceptionHandler({

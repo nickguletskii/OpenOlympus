@@ -31,14 +31,11 @@ import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Tables;
-import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
-import org.ng200.openolympus.jooq.tables.daos.GroupDao;
-import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableList;
 
@@ -47,16 +44,7 @@ public class UserService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private UserDao userDao;
-
-	@Autowired
-	private ContestParticipationDao contestParticipationDao;
-
-	@Autowired
-	private TimeExtensionDao timeExtensionDao;
-
-	@Autowired
-	private GroupDao groupDao;
-
+	
 	@Autowired
 	private DSLContext dslContext;
 
@@ -73,11 +61,13 @@ public class UserService extends GenericCreateUpdateRepository {
 		return this.userDao.count();
 	}
 
+	@Transactional
 	public void deleteUser(final User user) {
 		this.userDao.delete(user);
 
 	}
 
+	@Transactional
 	public void deleteUsers(List<User> users) {
 		this.userDao.delete(users);
 	}
@@ -165,10 +155,12 @@ public class UserService extends GenericCreateUpdateRepository {
 				.offset(pageSize * (pageNumber - 1)).fetchInto(User.class);
 	}
 
+	@Transactional
 	public User insertUser(User user) {
 		return this.insert(user, Tables.USER);
 	}
 
+	@Transactional
 	public User updateUser(User user) {
 		return this.update(user, Tables.USER);
 	}

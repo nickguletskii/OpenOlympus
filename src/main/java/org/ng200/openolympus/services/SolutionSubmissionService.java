@@ -33,6 +33,7 @@ import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SolutionSubmissionService {
@@ -46,7 +47,8 @@ public class SolutionSubmissionService {
 	@Autowired
 	private TestingService testingService;
 
-	public Solution submitTask(final Task task,
+	@Transactional
+	public Solution submitSolution(final Task task,
 			final SolutionSubmissionDto solutionDto, final User user)
 					throws IOException {
 		final Path solutionFile = this.storageService.createSolutionDirectory()

@@ -33,15 +33,14 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
@@ -57,18 +56,16 @@ public class DeleteUserController {
 
 	@RequestMapping(value = "/api/admin/users/deleteUsers", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
-	@Transactional
 	public void deleteUser(@RequestBody List<Long> userIds) {
 		final List<User> users = userIds.stream()
 		        .map(this.userService::getUserById)
 		        .collect(Collectors.toList());
 		users.forEach(Assertions::resourceExists);
-		users.forEach(this.userService::deleteUser);
+		this.userService.deleteUsers(users);
 	}
 
 	@RequestMapping(value = "/api/admin/users/deleteUser", method = RequestMethod.DELETE)
 	@ResponseStatus(value = HttpStatus.OK)
-	@Transactional
 	public void deleteUser(@RequestParam(value = "user") final User user) {
 		Assertions.resourceExists(user);
 		this.userService.deleteUser(user);

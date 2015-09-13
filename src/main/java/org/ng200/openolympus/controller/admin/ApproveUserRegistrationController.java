@@ -35,15 +35,14 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.services.EmailService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
@@ -79,9 +78,6 @@ public class ApproveUserRegistrationController {
 	private final boolean emailConfirmationEnabled = false;// TODO: reimplement
 	                                                       // email
 	                                                       // confirmation
-
-	@Autowired
-	private EmailService emailService;
 
 	@Autowired
 	private UserService userService;

@@ -29,17 +29,10 @@ import java.util.Locale;
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
-import org.ng200.openolympus.services.ContestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.AbstractMessageSource;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
@@ -156,15 +149,6 @@ public class VerdictStatusController {
 		}
 
 	}
-
-	private static final Logger logger = LoggerFactory
-	        .getLogger(VerdictStatusController.class);
-
-	@Autowired
-	private AbstractMessageSource messageSource;
-
-	@Autowired
-	private ContestService contestService;
 
 	public @ResponseBody VerdictDto showVerdict(
 	        @RequestParam(value = "id") final Verdict verdict,

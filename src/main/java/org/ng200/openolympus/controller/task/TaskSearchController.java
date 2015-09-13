@@ -27,16 +27,12 @@ import java.util.stream.Collectors;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
-import org.ng200.openolympus.security.predicates.UserHasTaskPermission;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;

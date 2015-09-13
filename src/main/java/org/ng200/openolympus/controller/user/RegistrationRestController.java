@@ -38,6 +38,7 @@ import org.ng200.openolympus.services.CaptchaService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.UserDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
@@ -50,7 +51,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

@@ -34,16 +34,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.services.CaptchaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
 public class RecaptchaAuthenticationFilter extends GenericFilterBean {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(RecaptchaAuthenticationFilter.class);
 
 	private final AntPathRequestMatcher LOGIN_REQUEST_MATCHER = new AntPathRequestMatcher(
 			"/login", "POST");

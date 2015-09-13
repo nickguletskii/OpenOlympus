@@ -30,15 +30,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.model.OlympusPrincipal;
-import org.ng200.openolympus.security.annotations.ContestPermissionRequired;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
-import org.ng200.openolympus.security.predicates.UserHasContestPermission;
 import org.ng200.openolympus.security.predicates.UserHasTaskPermission;
 import org.ng200.openolympus.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;

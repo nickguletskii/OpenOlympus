@@ -31,8 +31,6 @@ import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
 import org.ng200.openolympus.services.SecurityClearanceVerificationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,8 +44,6 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 
 public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SecurityClearanceJacksonFilter.class);
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
 

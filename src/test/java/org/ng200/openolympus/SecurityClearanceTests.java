@@ -32,8 +32,6 @@ import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.config.JacksonConfiguration;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.PropertySource;
@@ -118,9 +116,6 @@ public class SecurityClearanceTests {
 		}
 
 	}
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(SecurityClearanceTests.class);
 
 	@Autowired
 	private ObjectMapper jacksonObjectMapper;

@@ -8,7 +8,6 @@ import org.jooq.impl.DSL;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityPredicatePipeline {

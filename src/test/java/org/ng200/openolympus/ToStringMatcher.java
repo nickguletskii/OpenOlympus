@@ -28,13 +28,8 @@ import java.util.function.Function;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ToStringMatcher<T> extends BaseMatcher<Object> {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(ToStringMatcher.class);
 
 	public static ToStringMatcher<BigDecimal> compareBigDecimals(
 			BigDecimal decimal) {

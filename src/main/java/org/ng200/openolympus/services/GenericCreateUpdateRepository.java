@@ -25,19 +25,12 @@ package org.ng200.openolympus.services;
 import org.jooq.DSLContext;
 import org.jooq.impl.TableImpl;
 import org.jooq.impl.UpdatableRecordImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.google.common.base.Throwables;
 
 public abstract class GenericCreateUpdateRepository {
-
-	private static final Logger logger = LoggerFactory
-	        .getLogger(GenericCreateUpdateRepository.class);
-
+	
 	@Autowired
 	private DSLContext dslContext;
 

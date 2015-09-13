@@ -23,6 +23,7 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -70,6 +71,7 @@ public class AclService extends GenericCreateUpdateRepository {
 				.fetchOne().value1());
 	}
 
+	@Transactional
 	public Principal setPrincipalGeneralPermissions(Principal principal,
 			Map<GeneralPermissionType, Boolean> generalPermissions) {
 		principal

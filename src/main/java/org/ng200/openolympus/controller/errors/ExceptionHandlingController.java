@@ -25,7 +25,6 @@ package org.ng200.openolympus.controller.errors;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -35,7 +34,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @ControllerAdvice
 @Profile("web")
@@ -44,9 +42,6 @@ public class ExceptionHandlingController {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ExceptionHandlingController.class);
-	@Autowired
-	private HandlerExceptionResolver handlerExceptionResolver;
-
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)

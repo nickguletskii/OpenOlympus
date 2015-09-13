@@ -44,14 +44,13 @@ import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Profile;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 @RestController
 @Profile("web")
@@ -73,7 +72,6 @@ public class ContestModificationController {
 	private ContestService contestService;
 
 	@RequestMapping(method = RequestMethod.POST)
-	@Transactional
 	@Caching(evict = {
 	                   @CacheEvict(value = "contests", key = "#contest.id"),
 	                   @CacheEvict(value = "solutions", allEntries = true)

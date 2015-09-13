@@ -32,6 +32,7 @@ import org.ng200.openolympus.jooq.tables.pojos.GroupUsers;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GroupService extends GenericCreateUpdateRepository {
@@ -42,6 +43,7 @@ public class GroupService extends GenericCreateUpdateRepository {
 	@Autowired
 	private GroupDao groupDao;
 
+	@Transactional
 	public void addUserToGroup(User user, Group group,
 	        boolean canAddOthersToGroup) {
 		this.insert(new GroupUsers(canAddOthersToGroup, group.getId(),
@@ -101,10 +103,12 @@ public class GroupService extends GenericCreateUpdateRepository {
 		        .fetchInto(User.class);
 	}
 
+	@Transactional
 	public Group insertGroup(Group group) {
 		return this.insert(group, Tables.GROUP);
 	}
 
+	@Transactional
 	public void removeUserFromGroup(User user, Group group) {
 		this.dslContext.delete(Tables.GROUP_USERS)
 		        .where(Tables.GROUP_USERS.USER_ID.eq(user.getId())
@@ -112,6 +116,7 @@ public class GroupService extends GenericCreateUpdateRepository {
 		        .execute();
 	}
 
+	@Transactional
 	public Group updateGroup(Group group) {
 		return this.update(group, Tables.GROUP);
 	}

@@ -36,7 +36,6 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Param;
 import org.jooq.Record;
-import org.jooq.Record3;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -89,11 +88,13 @@ public class ContestService extends GenericCreateUpdateRepository {
 	@Autowired
 	private AclService aclService;
 
+	@Transactional
 	public void addContestParticipant(final Contest contest, final User user) {
 		this.contestParticipationDao.insert(new ContestParticipation(null, null,
 				user.getId(), contest.getId()));
 	}
 
+	@Transactional
 	public void addContestTask(Contest contest, Task taskByName) {
 		final ContestTasksRecord record = new ContestTasksRecord(
 				contest.getId(),
@@ -111,6 +112,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 		this.contestDao.delete(contest);
 	}
 
+	@Transactional
 	public void extendTimeForUser(final Contest contest, final User user,
 			final Duration time) {
 		this.timeExtensionDao.insert(new TimeExtension(null, time, null, user
@@ -318,6 +320,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.value1();
 	}
 
+	@Transactional
 	public Contest insertContest(Contest contest) {
 		return this.insert(contest, Tables.CONTEST);
 	}
@@ -355,6 +358,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.fetchOne().value1();
 	}
 
+	@Transactional
 	public void removeTaskFromContest(Task task, Contest contest) {
 		this.dslContext.delete(Tables.CONTEST_TASKS).where(
 				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId())
@@ -372,6 +376,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.execute();
 	}
 
+	@Transactional
 	public Contest updateContest(Contest contest) {
 		return this.update(contest, Tables.CONTEST);
 	}

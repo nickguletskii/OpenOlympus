@@ -33,7 +33,6 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.SolutionIsInContestModeratedByCurrentUserSecurityPredicate;
-import org.ng200.openolympus.security.predicates.UserHasGroupPermission;
 import org.ng200.openolympus.security.predicates.UserIsOwnerOfSolutionSecurityPredicate;
 import org.ng200.openolympus.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;

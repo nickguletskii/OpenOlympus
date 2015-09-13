@@ -51,12 +51,6 @@ public class SecurityService {
 	private ContestService contestService;
 
 	@Autowired
-	private TaskService taskService;
-
-	@Autowired
-	private PropertyService propertyService;
-
-	@Autowired
 	private ContestTasksDao contestTasksDao;
 	@Autowired
 	private UserDao userDao;

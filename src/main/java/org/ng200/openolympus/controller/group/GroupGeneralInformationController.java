@@ -26,22 +26,19 @@ import java.util.List;
 
 import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
-import org.ng200.openolympus.security.annotations.ContestPermissionRequired;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.security.predicates.UserHasContestPermission;
 import org.ng200.openolympus.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 //TODO: only show groups that the current user knows about
 @RestController

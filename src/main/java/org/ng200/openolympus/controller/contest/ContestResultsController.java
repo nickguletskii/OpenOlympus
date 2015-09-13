@@ -31,29 +31,23 @@ import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
-import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.ContestResultsPermissionPredicate;
-import org.ng200.openolympus.security.predicates.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
-import org.ng200.openolympus.services.SolutionService;
-import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.util.Beans;
 import org.ng200.openolympus.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.context.annotation.Profile;
 
 //TODO: Port contest results to new API
 @RestController
@@ -70,8 +64,6 @@ import org.springframework.context.annotation.Profile;
 })
 public class ContestResultsController {
 
-private static final Logger logger = LoggerFactory
-		.getLogger(ContestResultsController.class);
 	public class ContestUserRankingDto extends UserRanking {
 
 		/**
@@ -128,12 +120,6 @@ private static final Logger logger = LoggerFactory
 
 	@Autowired
 	private ContestService contestService;
-
-	@Autowired
-	private SolutionService solutionService;
-
-	@Autowired
-	private TaskService taskService;
 
 	@RequestMapping(value = "/api/contest/{contest}/testingFinished",
 	        method = RequestMethod.GET)

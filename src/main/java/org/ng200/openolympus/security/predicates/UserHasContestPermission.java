@@ -1,6 +1,5 @@
 package org.ng200.openolympus.security.predicates;
 
-import org.jooq.DSLContext;
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;

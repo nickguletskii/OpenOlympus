@@ -33,7 +33,6 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
@@ -59,15 +58,12 @@ import org.ng200.openolympus.dto.UploadableTask;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
-import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
-import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
-import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 import org.ng200.openolympus.jooq.tables.records.SolutionRecord;
 import org.ng200.openolympus.jooq.tables.records.TaskPermissionRecord;
 import org.ng200.openolympus.model.OlympusPrincipal;
@@ -240,6 +236,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 		return this.getTaskPermissionsAndPrincipalData(task.getId());
 	}
 
+	@Transactional
 	public Task insertTask(Task task) {
 		return this.insert(task, Tables.TASK);
 	}
@@ -292,6 +289,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 		        .execute();
 	}
 
+	@Transactional
 	public Task updateTask(Task task) {
 		return this.update(task, Tables.TASK);
 	}

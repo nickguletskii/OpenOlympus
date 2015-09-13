@@ -1,7 +1,6 @@
 package org.ng200.openolympus;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -16,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
-import org.ng200.openolympus.jooq.tables.pojos.ContestParticipation;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.records.ContestParticipationRecord;
@@ -24,8 +22,6 @@ import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.GroupService;
 import org.ng200.openolympus.services.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.annotation.Rollback;
@@ -46,9 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @TransactionConfiguration
 public class ContestParticipantDatabaseTest {
-
-	private static final Logger logger = LoggerFactory
-	        .getLogger(ContestParticipantDatabaseTest.class);
 
 	@Autowired
 	private DSLContext dslContext;

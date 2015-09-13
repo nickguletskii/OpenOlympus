@@ -8,7 +8,6 @@ import javax.annotation.Generated;
 
 import org.jooq.Sequence;
 import org.jooq.impl.SequenceImpl;
-import org.ng200.openolympus.jooq.Public;
 
 
 /**
