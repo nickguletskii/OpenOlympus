@@ -24,8 +24,8 @@
 
 var _ = require("lodash");
 
-const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $state, AuthenticationProvider, $translate) {
-	AuthenticationProvider.update();
+const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $state, SecurityService, $translate) {
+	SecurityService.update();
 	$scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === "true");
 
 	$http.get("/api/security/userStatus").success(function(data) {
@@ -49,11 +49,11 @@ const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $stat
 
 	$scope.login = function(user) {
 		var deferred = $q.defer();
-		AuthenticationProvider.login(user.username, user.password, user.recaptchaResponse)
+		SecurityService.login(user.username, user.password, user.recaptchaResponse)
 			.success(function(data) {
 				if (data.auth === "succeded") {
 					deferred.resolve();
-					AuthenticationProvider.update();
+					SecurityService.update();
 					$state.go("home");
 					return;
 				} else if (data.auth === "failed") {

@@ -34,8 +34,6 @@ public enum GeneralPermissionType implements EnumType {
 
 	view_others_user_details("view_others_user_details"),
 
-	modify_others_user_details("modify_others_user_details"),
-
 	remove_user("remove_user"),
 
 	approve_user_registrations("approve_user_registrations"),
@@ -45,8 +43,6 @@ public enum GeneralPermissionType implements EnumType {
 	change_other_users_personal_info("change_other_users_personal_info"),
 
 	contest_organiser("contest_organiser"),
-
-	delete_user("delete_user"),
 
 	enumerate_all_users("enumerate_all_users"),
 
@@ -60,7 +56,9 @@ public enum GeneralPermissionType implements EnumType {
 
 	manage_principal_permissions("manage_principal_permissions"),
 
-	view_all_solutions("view_all_solutions");
+	view_all_solutions("view_all_solutions"),
+
+	view_archive_during_contest("view_archive_during_contest");
 
 	private final String literal;
 

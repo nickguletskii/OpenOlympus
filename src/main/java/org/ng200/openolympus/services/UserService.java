@@ -23,16 +23,20 @@
 package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Table;
+import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.model.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +48,7 @@ public class UserService extends GenericCreateUpdateRepository {
 
 	@Autowired
 	private UserDao userDao;
-	
+
 	@Autowired
 	private DSLContext dslContext;
 
@@ -163,5 +167,27 @@ public class UserService extends GenericCreateUpdateRepository {
 	@Transactional
 	public User updateUser(User user) {
 		return this.update(user, Tables.USER);
+	}
+
+	private static final Field<?>[] USER_PRINCIPAL_FIELDS = Stream
+			.concat(Arrays.stream(Tables.USER.fields()),
+					Stream.of(Tables.PRINCIPAL.PERMISSIONS))
+			.toArray(Field<?>[]::new);
+
+	public UserPrincipal getUserAsPrincipalByUsername(String name) {
+		System.out.println(dslContext
+				.select(USER_PRINCIPAL_FIELDS)
+				.from(Tables.USER)
+				.leftOuterJoin(Tables.PRINCIPAL)
+				.on(Tables.USER.ID.eq(Tables.PRINCIPAL.ID))
+				.where(Tables.USER.USERNAME.eq(name))
+				.getSQL(ParamType.INLINED));
+		return dslContext
+				.select(USER_PRINCIPAL_FIELDS)
+				.from(Tables.USER)
+				.leftOuterJoin(Tables.PRINCIPAL)
+				.on(Tables.USER.ID.eq(Tables.PRINCIPAL.ID))
+				.where(Tables.USER.USERNAME.eq(name))
+				.fetchOneInto(UserPrincipal.class);
 	}
 }

@@ -26,7 +26,7 @@ var angular = require("angular");
 
 angular.module("ool.services", []);
 
-require("services/authenticationProvider");
+require("services/securityService");
 require("services/serversideFormErrorReporter");
 require("services/validationService");
 require("services/modalState");

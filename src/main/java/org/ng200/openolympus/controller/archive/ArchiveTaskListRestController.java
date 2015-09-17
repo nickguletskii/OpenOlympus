@@ -47,8 +47,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = NoCurrentContestSecurityPredicate.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = NoCurrentContestSecurityPredicate.class)
+		}),
+
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.VIEW_ARCHIVE_DURING_CONTEST)
 		})
 })
 public class ArchiveTaskListRestController {
@@ -101,24 +105,24 @@ public class ArchiveTaskListRestController {
 	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
 
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,
-	        Principal principal) {
+			Principal principal) {
 
 		return this.taskService
-		        .findTasksNewestFirstAndAuthorized(page,
-		                ArchiveTaskListRestController.PAGE_SIZE, principal)
-		        .stream()
-		        .map(task -> {
-			        BigDecimal score = null;
-			        if (principal != null) {
-				        final User user = this.userService
-		                        .getUserByUsername(principal.getName());
-				        if (user != null) {
-					        score = this.taskService.getScore(task, user);
-				        }
-			        }
-			        return new TaskDto(task, score, this.taskService
-		                    .getMaximumScore(task));
-		        }).collect(Collectors.toList());
+				.findTasksNewestFirstAndAuthorized(page,
+						ArchiveTaskListRestController.PAGE_SIZE, principal)
+				.stream()
+				.map(task -> {
+					BigDecimal score = null;
+					if (principal != null) {
+						final User user = this.userService
+								.getUserByUsername(principal.getName());
+						if (user != null) {
+							score = this.taskService.getScore(task, user);
+						}
+					}
+					return new TaskDto(task, score, this.taskService
+							.getMaximumScore(task));
+				}).collect(Collectors.toList());
 	}
 
 }

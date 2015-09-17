@@ -46,7 +46,7 @@ angular.module("ool")
 			$rootScope.hideResourcesLoading = true;
 		}, 0);
 	})
-	.run( /*@ngInject*/ function($rootScope, $stateParams, AuthenticationProvider, $location, $timeout, $state, $http, $translate, $window, FormForConfiguration) {
+	.run( /*@ngInject*/ function($rootScope, $stateParams, SecurityService, $location, $timeout, $state, $http, $translate, $window, FormForConfiguration) {
 		// Make state parameters easily accessible
 		$rootScope.stateParams = $stateParams;
 

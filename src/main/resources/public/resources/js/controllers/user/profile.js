@@ -22,7 +22,8 @@
  */
 "use strict";
 
-module.exports = /*@ngInject*/ function($scope, FormDefaultHelperService, ValidationService, personalInfoPatchUrl, requireExistingPassword, existingPersonalInfo, passwordPatchUrl, enablePermissionsEditor) {
+module.exports = /*@ngInject*/ function($scope, FormDefaultHelperService, ValidationService, personalInfoPatchUrl, requireExistingPassword, existingPersonalInfo, passwordPatchUrl, enablePermissionsEditor, principalId) {
+	$scope.principalId = principalId;
 	$scope.requireExistingPassword = requireExistingPassword;
 	$scope.enablePermissionsEditor = enablePermissionsEditor;
 

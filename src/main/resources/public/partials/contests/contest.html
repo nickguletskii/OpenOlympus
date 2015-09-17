@@ -42,7 +42,7 @@
 	class="hidden-print btn btn-primary btn-sm"
 	ui-sref="contestParticipantsList({contestId:contestId})"></button>
 <button type="button"
-	ng-if="security.isAdmin() || security.isContestOver(contestId)"
+	ng-if="security.isContestOver(contestId)"
 	translate="contest.results"
 	class="hidden-print btn btn-primary btn-sm"
 	ui-sref="contestResults({contestId:contestId})"></button>

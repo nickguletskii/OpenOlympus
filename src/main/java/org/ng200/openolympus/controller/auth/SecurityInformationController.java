@@ -24,7 +24,9 @@ package org.ng200.openolympus.controller.auth;
 
 import java.security.Principal;
 
-import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.model.UserPrincipal;
+import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -34,19 +36,55 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile("web")
-public class AuthenticationInformationController {
+public class SecurityInformationController {
+
+	public static class SecurityInformation {
+
+		private UserPrincipal currentPrincipal;
+
+		private Contest currentContest;
+
+		public UserPrincipal getCurrentPrincipal() {
+			return currentPrincipal;
+		}
+
+		public void setCurrentPrincipal(UserPrincipal currentPrincipal) {
+			this.currentPrincipal = currentPrincipal;
+		}
+
+		public Contest getCurrentContest() {
+			return currentContest;
+		}
+
+		public void setCurrentContest(Contest currentContest) {
+			this.currentContest = currentContest;
+		}
+
+		public SecurityInformation(UserPrincipal currentPrincipal,
+				Contest currentContest) {
+			super();
+			this.currentPrincipal = currentPrincipal;
+			this.currentContest = currentContest;
+		}
+
+	}
 
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/security/userStatus", method = RequestMethod.GET)
-	public User userStatus(Principal principal) {
-		if (principal == null) {
-			return null;
+	@Autowired
+	private ContestService contestService;
+
+	@RequestMapping(value = "/api/security/status", method = RequestMethod.GET)
+	public SecurityInformation securityStatys(Principal principal) {
+		UserPrincipal currentPrincipal = null;
+		if (principal != null) {
+			currentPrincipal = this.userService
+					.getUserAsPrincipalByUsername(principal
+							.getName());
 		}
-		final User user = this.userService.getUserByUsername(principal
-				.getName());
-		return user;
+		return new SecurityInformation(currentPrincipal,
+				contestService.getRunningContest());
 	}
 
 }

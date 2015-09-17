@@ -41,8 +41,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = NoCurrentContestSecurityPredicate.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = NoCurrentContestSecurityPredicate.class)
+		}),
+
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.VIEW_ARCHIVE_DURING_CONTEST)
 		})
 })
 public class ArchiveUserRankListRestController {
@@ -60,7 +64,7 @@ public class ArchiveUserRankListRestController {
 
 	public List<UserRanking> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getArchiveRankPage(page,
-		        ArchiveUserRankListRestController.PAGE_SIZE);
+				ArchiveUserRankListRestController.PAGE_SIZE);
 	}
 
 }

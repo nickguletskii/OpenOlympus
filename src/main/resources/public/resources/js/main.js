@@ -101,11 +101,11 @@ angular.module("ool")
 			//	throw exception;
 		};
 	})
-	.run( /*@ngInject*/ function($rootScope, AuthenticationProvider) {
-		$rootScope.security = AuthenticationProvider;
+	.run( /*@ngInject*/ function($rootScope, SecurityService) {
+		$rootScope.security = SecurityService;
 
 		$rootScope.$on("securityInfoChanged", function() {
-			$rootScope.security = AuthenticationProvider;
+			$rootScope.security = SecurityService;
 		});
 	});
 require("ui-setup");

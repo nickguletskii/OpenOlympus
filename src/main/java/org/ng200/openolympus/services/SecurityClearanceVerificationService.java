@@ -41,7 +41,7 @@ public class SecurityClearanceVerificationService {
 			        GeneralPermissionType.contest_organiser);
 		case DELETE_USER:
 			return generalPermission(
-			        GeneralPermissionType.delete_user);
+			        GeneralPermissionType.remove_user);
 		case DENIED:
 			return false;
 		case ENUMERATE_ALL_USERS:
@@ -72,6 +72,9 @@ public class SecurityClearanceVerificationService {
 		case VIEW_ALL_SOLUTIONS:
 			return generalPermission(
 			        GeneralPermissionType.view_all_solutions);
+		case VIEW_ARCHIVE_DURING_CONTEST:
+			return generalPermission(
+			        GeneralPermissionType.view_archive_during_contest);
 		}
 		throw new UnsupportedOperationException("An unsupported security clearance was encountered.");
 	}

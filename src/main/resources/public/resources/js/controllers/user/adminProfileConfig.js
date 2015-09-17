@@ -19,6 +19,9 @@ module.exports = {
 		requireExistingPassword: function() {
 			return false;
 		},
+		principalId: function($stateParams) {
+			return $stateParams.userId;
+		},
 		enablePermissionsEditor: () => true
 	}
 };

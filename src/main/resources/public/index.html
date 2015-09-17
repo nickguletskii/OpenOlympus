@@ -23,69 +23,131 @@
 
 -->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type"
+        content="text/html; charset=UTF-8" />
     <title>OpenOlympus</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="stylesheet" href="/resources/bundled/bundle.css">
+    <link rel="icon"
+        type="image/png"
+        href="/favicon.png" />
+    <link rel="stylesheet"
+        href="/resources/bundled/bundle.css">
     <base href="/" />
 </head>
 
-<body ui-sref-opts="reload" ng-class="{fullScreen: fullScreen}">
-    <div ng-show="!hideResourcesLoading" class="loadingResourcesOverlay">
+<body ui-sref-opts="reload"
+    ng-class="{fullScreen: fullScreen}">
+    <div ng-show="!hideResourcesLoading"
+        class="loadingResourcesOverlay">
         <div class="loadingResourcesOverlayMid text-center">
             <h1 class="bg-primary"><i class="fa fa-cog fa-5x loadingResourcesOverlaySpinning"></i></h1>
             <h1 class="bg-primary">OpenOlympus</h1>
             <h3 class="bg-primary">Loading...</h3>
         </div>
     </div>
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-if="!showErrorModal">
-        <div class="container-fluid" ng-cloak="">
+    <nav class="navbar navbar-default navbar-fixed-top"
+        role="navigation"
+        ng-if="!showErrorModal">
+        <div class="container-fluid"
+            ng-cloak="">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" ng-init="navCollapsed=true" ng-click="navCollapsed=!navCollapsed">
+                <button type="button"
+                    class="navbar-toggle collapsed"
+                    ng-init="navCollapsed=true"
+                    ng-click="navCollapsed=!navCollapsed">
                     <!--  -->
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/"> <img alt="{{'topbar.openolympus' | translate}}" src="/favicon.png"> {{'topbar.openolympus' | translate}} </a>
+                <a class="navbar-brand"
+                    href="/"> <img alt="{{'topbar.openolympus' | translate}}"
+                        src="/favicon.png"> {{'topbar.openolympus' | translate}} </a>
             </div>
-            <div class="collapse navbar-collapse" ng-class="!navCollapsed &amp;&amp; 'in'" ng-click="navCollapsed=true">
+            <div class="collapse navbar-collapse"
+                ng-class="!navCollapsed &amp;&amp; 'in'"
+                ng-click="navCollapsed=true">
                 <ul class="nav navbar-nav">
-                    <li ng-if="!!runningContest">
-                        <a ui-sref="contestView({contestId: runningContest.id })" translate="topbar.navigation.currentContest" id="headerCurrentContestLink"></a>
+                    <li ng-if="!!runningContest && security.isUser()">
+                        <a ui-sref="contestView({contestId: runningContest.id })"
+                            translate="topbar.navigation.currentContest"
+                            id="headerCurrentContestLink"></a>
                     </li>
-                    <li>
-                        <a ui-sref="contestList" id="headerContestsLink">
+                    <li ng-if="security.isUser()">
+                        <a ui-sref="contestList"
+                            id="headerContestsLink">
                             <span translate="topbar.navigation.contests"></span>
                         </a>
                     </li>
-                    <li class="dropdown" dropdown="">
-                        <a class="dropdown-toggle" dropdown-toggle="">
+                    <li class="dropdown"
+                        ng-if="(security.isUser() &amp;&amp; security.noCurrentContest()) ||
+                                    security.hasAnyPermission('view_archive_during_contest')"
+                        dropdown="">
+                        <a class="dropdown-toggle"
+                            dropdown-toggle="">
                             <span translate="topbar.navigation.archive"></span>
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a ui-sref="archiveTaskList" translate="topbar.navigation.archive.tasks"></a>
+                                <a ui-sref="archiveTaskList"
+                                    translate="topbar.navigation.archive.tasks"></a>
                             </li>
                             <li>
-                                <a ui-sref="archiveRank" translate="topbar.navigation.archive.ranking"></a>
+                                <a ui-sref="archiveRank"
+                                    translate="topbar.navigation.archive.ranking"></a>
                             </li>
                         </ul>
                     </li>
                     <li ng-if="security.isUser()">
-                        <a href="/user/solutions" translate="user.solutions" id="headerSolutionsLink"></a>
+                        <a href="/user/solutions"
+                            translate="user.solutions"
+                            id="headerSolutionsLink"></a>
                     </li>
-                    <li>
-                        <a ui-sref="administrationHub" translate="topbar.navigation.admin" id="headerAdminLink"></a>
+                    <li class="dropdown"
+                        dropdown=""
+                        ng-if="security.hasAnyPermission('view_others_user_details',
+                              'remove_user',
+                              'approve_user_registrations',
+                              'change_other_users_password',
+                              'change_other_users_personal_info',
+                              'enumerate_all_users',
+                              'view_other_users_personal_info',
+                              'create_groups',
+                              'list_groups',
+                              'manage_principal_permissions',
+                              'view_all_solutions')">
+                        <a class="dropdown-toggle"
+                            dropdown-toggle="">
+                            <span translate="topbar.navigation.admin"></span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-if="security.hasAnyPermission('approve_user_registrations')">
+                                <a ui-sref="pendingUsersList"
+                                    translate="topbar.navigation.admin.pendingUsersList"></a>
+                            </li>
+                            <li ng-if="security.hasAnyPermission('change_other_users_password',
+                                    'change_other_users_personal_info',
+                                    'enumerate_all_users',
+                                    'manage_principal_permissions',
+                                    'remove_user',
+                                    'view_other_users_personal_info',
+                                    'view_others_user_details')">
+                                <a ui-sref="adminUsersList"
+                                    translate="topbar.navigation.admin.adminUsersList"></a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Right Nav Section -->
-                    <li class="dropdown" dropdown="">
+                    <li class="dropdown"
+                        dropdown="">
                         <a dropdown-toggle="">
                             <span translate="header.languageMenu"></span>
                             <span class="caret"></span>
@@ -97,27 +159,39 @@
                         </ul>
                     </li>
                     <li ng-if="security.isLoggedIn() &amp;&amp; !security.isUser()">
-                        <button type="button" class="btn btn-warning navbar-btn" tooltip-placement="bottom" tooltip="{{'login.administratorApprovalRequired.body' | translate}}"><span class="fa fa-exclamation-triangle"></span></button>
+                        <button type="button"
+                            class="btn btn-warning navbar-btn"
+                            tooltip-placement="bottom"
+                            tooltip="{{'login.administratorApprovalRequired.body' | translate}}"><span class="fa fa-exclamation-triangle"></span></button>
                     </li>
                     <li ng-if="security.isLoggedIn()">
-                        <a ui-sref="personalInfoModificationView" id="headerUserInfoLink">{{security.getUsername()}}</a>
+                        <a ui-sref="personalInfoModificationView"
+                            id="headerUserInfoLink">{{security.getUsername()}}</a>
                     </li>
                     <li ng-if="security.isLoggedIn()">
-                        <a ng-click="security.logout()" translate="header.logout" id="headerLogoutLink"></a>
+                        <a ng-click="security.logout()"
+                            translate="header.logout"
+                            id="headerLogoutLink"></a>
                     </li>
                     <li ng-if="!security.isLoggedIn()">
-                        <a ui-sref="login" translate="header.login"> </a>
+                        <a ui-sref="login"
+                            translate="header.login"> </a>
                     </li>
                     <li ng-if="!security.isLoggedIn()">
-                        <a ui-sref="register" translate="header.register" id="headerRegisterLink"></a>
+                        <a ui-sref="register"
+                            translate="header.register"
+                            id="headerRegisterLink"></a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-    <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'" ng-show="!showErrorModal" ng-cloak="">
+    <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'"
+        ng-show="!showErrorModal"
+        ng-cloak="">
         <div class="row">
-            <div ng-class="stateConfig.customWidth ? stateConfig.customWidth : 'col-md-10 col-md-offset-1'" ui-view=""></div>
+            <div ng-class="stateConfig.customWidth ? stateConfig.customWidth : 'col-md-10 col-md-offset-1'"
+                ui-view=""></div>
         </div>
         <footer>
             <div class="row">
@@ -131,21 +205,26 @@
                     </div>
                     <div class="col-lg-6">
                         <p class="pull-right">
-                            <a ui-sref="eula" translate="footer.eula"></a>
+                            <a ui-sref="eula"
+                                translate="footer.eula"></a>
                         </p>
                     </div>
                 </div>
             </div>
         </footer>
     </div>
-    <div class="container text-center" ng-if="showErrorModal" ng-cloak="">
+    <div class="container text-center"
+        ng-if="showErrorModal"
+        ng-cloak="">
         <div class="row">
-            <span class="fa fa-exclamation-triangle text-danger" style="font-size: 20em"></span>
+            <span class="fa fa-exclamation-triangle text-danger"
+                style="font-size: 20em"></span>
         </div>
         <div class="row">
             <h1>{{'error.title' | translate}}</h1>
             <p>{{'error.body' | translate}}</p>
-            <button class="btn btn-danger" on-click="window.location.reload()">{{'error.reloadPage' | translate}}</button>
+            <button class="btn btn-danger"
+                on-click="window.location.reload()">{{'error.reloadPage' | translate}}</button>
         </div>
     </div>
     <script src="/resources/bundled/js/vendor.bundle.js"></script>

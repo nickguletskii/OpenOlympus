@@ -17,6 +17,9 @@ module.exports = {
 		requireExistingPassword: function() {
 			return true;
 		},
+		principalId: function(SecurityService) {
+			return SecurityService.getUser().id;
+		},
 		enablePermissionsEditor: () => false
 	}
 };

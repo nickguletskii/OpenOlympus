@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="0,727" last-zoom="0.65"
+<dbmodel pgmodeler-ver="0.8.1" last-position="0,358" last-zoom="0.65"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -320,7 +320,7 @@ END;]]></definition>
 <usertype name="general_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="create_contests,remove_contests,create_tasks,remove_tasks,view_others_user_details,modify_others_user_details,remove_user,approve_user_registrations,change_other_users_password,change_other_users_personal_info,contest_organiser,delete_user,enumerate_all_users,task_supervisor,view_other_users_personal_info,create_groups,list_groups,manage_principal_permissions,view_all_solutions"/>
+	<enumeration values="create_contests,remove_contests,create_tasks,remove_tasks,view_others_user_details,remove_user,approve_user_registrations,change_other_users_password,change_other_users_personal_info,contest_organiser,enumerate_all_users,task_supervisor,view_other_users_personal_info,create_groups,list_groups,manage_principal_permissions,view_all_solutions,view_archive_during_contest"/>
 </usertype>
 
 <table name="contest_participation">
@@ -1010,7 +1010,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32765"/>
+		<type name="public.task_permission_type" precision="32766"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1314,7 +1314,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32765"/>
+	<type name="public.contest" precision="32766"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp"/>
