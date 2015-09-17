@@ -175,13 +175,6 @@ public class UserService extends GenericCreateUpdateRepository {
 			.toArray(Field<?>[]::new);
 
 	public UserPrincipal getUserAsPrincipalByUsername(String name) {
-		System.out.println(dslContext
-				.select(USER_PRINCIPAL_FIELDS)
-				.from(Tables.USER)
-				.leftOuterJoin(Tables.PRINCIPAL)
-				.on(Tables.USER.ID.eq(Tables.PRINCIPAL.ID))
-				.where(Tables.USER.USERNAME.eq(name))
-				.getSQL(ParamType.INLINED));
 		return dslContext
 				.select(USER_PRINCIPAL_FIELDS)
 				.from(Tables.USER)
