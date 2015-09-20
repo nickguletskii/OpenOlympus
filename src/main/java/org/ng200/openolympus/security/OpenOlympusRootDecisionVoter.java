@@ -20,6 +20,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.services.SecurityClearanceVerificationService;
+import org.ng200.openolympus.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ import org.springframework.security.access.prepost.PreInvocationAttribute;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
 public class OpenOlympusRootDecisionVoter
@@ -43,6 +46,9 @@ public class OpenOlympusRootDecisionVoter
 
 	@Autowired
 	private SecurityClearanceVerificationService securityClearanceVerificationService;
+
+	@Autowired
+	private UserService userService;
 
 	public boolean supports(ConfigAttribute attribute) {
 		return attribute instanceof PreInvocationAttribute;
@@ -94,8 +100,9 @@ public class OpenOlympusRootDecisionVoter
 		}
 
 		for (SecurityAnd securityAnd : securityOr.value()) {
-			if (processSecurityAnd(securityAnd, invocation) == ACCESS_GRANTED)
+			if (processSecurityAnd(securityAnd, invocation) == ACCESS_GRANTED) {
 				return ACCESS_GRANTED;
+			}
 		}
 		return ACCESS_DENIED;
 	}
@@ -150,7 +157,8 @@ public class OpenOlympusRootDecisionVoter
 					} catch (IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException e) {
 						throw new GeneralNestedRuntimeException(
-								"Couldn't execute @MethodSecurityPredicate annotated method!",
+								"Couldn't execute @MethodSecurityPredicate annotated method! Method: "
+										+ method,
 								e);
 					}
 				}
@@ -161,10 +169,11 @@ public class OpenOlympusRootDecisionVoter
 
 	private Object[] computeArguments(Method method,
 			MethodInvocation invocation) {
-		return Stream.<Parameter> of(method.getParameters())
+		Object[] objs = Stream.<Parameter> of(method.getParameters())
 				.map(parameter -> getObjectForParameter(invocation,
 						parameter))
 				.toArray();
+		return objs;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -178,8 +187,17 @@ public class OpenOlympusRootDecisionVoter
 		if (parameter.isAnnotationPresent(CurrentUser.class)) {
 			return (User) Optional
 					.ofNullable(SecurityContextHolder.getContext())
-					.map(c -> c.getAuthentication()).map(a -> a.getPrincipal())
+					.map(c -> c.getAuthentication())
+					.map(a -> userService.getUserByUsername(a.getName()))
 					.orElse(null);
+		}
+		if (parameter.isAnnotationPresent(
+				org.ng200.openolympus.security.annotations.Parameter.class)) {
+			return getObjectForParameterName(invocation,
+					AnnotationUtils.findAnnotation(
+							parameter,
+							org.ng200.openolympus.security.annotations.Parameter.class)
+							.value());
 		}
 		return getObjectForParameterName(invocation, parameter.getName());
 	}
@@ -193,7 +211,7 @@ public class OpenOlympusRootDecisionVoter
 
 					Map<String, Integer> map = new HashMap<>();
 					for (int i = 0; i < invokedMethodParameters.length; i++) {
-						map.put(invokedMethodParameters[i].getName(), i);
+						map.put(getName(invokedMethodParameters[i]), i);
 					}
 
 					return map;
@@ -206,6 +224,21 @@ public class OpenOlympusRootDecisionVoter
 					"An argument that isn't present in the invoked method was requested");
 		}
 		return invocation.getArguments()[idx];
+	}
+
+	private String getName(Parameter parameter) {
+		if (parameter.isAnnotationPresent(RequestParam.class)) {
+			RequestParam requestParam = AnnotationUtils.findAnnotation(
+					parameter, RequestParam.class);
+			return requestParam.value() == null
+					? requestParam.name()
+					: requestParam.value();
+		}
+		if (parameter.isAnnotationPresent(PathVariable.class)) {
+			return AnnotationUtils.findAnnotation(
+					parameter, PathVariable.class).value();
+		}
+		return parameter.getName();
 	}
 
 }

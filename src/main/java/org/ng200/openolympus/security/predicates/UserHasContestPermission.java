@@ -8,6 +8,7 @@ import org.ng200.openolympus.security.annotations.ContestPermissionRequired;
 import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.FindAnnotation;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
+import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.services.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class UserHasContestPermission implements DynamicSecurityPredicate {
 	@MethodSecurityPredicate
 	public SecurityClearanceType vote(
 	        @FindAnnotation ContestPermissionRequired contestPermissionRequired,
-	        Contest contest,
+	        @Parameter("contest")   Contest contest,
 	        @CurrentUser User user) {
 
 		return aclService.hasContestPermission(contest, user,

@@ -63,12 +63,6 @@ public class ContestListController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
 	@ResponseBody
-	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(
-	                                     value = SecurityClearanceType.APPROVED_USER)
-			})
-	})
 	public List<Contest> contestList(
 	        @RequestParam(value = "page",
 	                defaultValue = "1") Integer pageNumber,

@@ -6,6 +6,7 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.DynamicSecurityPredicate;
 import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
+import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.security.annotations.PredicateDocumentation;
 import org.ng200.openolympus.services.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class SolutionIsInContestModeratedByCurrentUserSecurityPredicate
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
-			Solution solution) {
+			@Parameter("solution") Solution solution) {
 		if (aclService.solutionIsModeratedByUser(solution, user))
 			return SecurityClearanceType.ANONYMOUS;
 		return SecurityClearanceType.DENIED;

@@ -7,6 +7,7 @@ import org.ng200.openolympus.security.DynamicSecurityPredicate;
 import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.FindAnnotation;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
+import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
 import org.ng200.openolympus.services.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,13 @@ public class UserHasTaskPermission implements DynamicSecurityPredicate {
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType vote(
-	        @FindAnnotation TaskPermissionRequired taskPermissionRequired,
-	        Task task,
-	        @CurrentUser User user) {
+			@FindAnnotation TaskPermissionRequired taskPermissionRequired,
+			@Parameter("task") Task task,
+			@CurrentUser User user) {
 
 		return aclService.hasTaskPermission(task, user,
-		        taskPermissionRequired.value())
-		                ? SecurityClearanceType.ANONYMOUS
-		                : SecurityClearanceType.DENIED;
+				taskPermissionRequired.value())
+						? SecurityClearanceType.ANONYMOUS
+						: SecurityClearanceType.DENIED;
 	}
 }

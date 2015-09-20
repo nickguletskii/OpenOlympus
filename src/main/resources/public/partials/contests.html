@@ -22,22 +22,33 @@
     THE SOFTWARE.
 
 -->
-<button type="button"  tooltip="{{'contests.add' | translate}}" class="hidden-print btn btn-primary btn-sm fa fa-plus" ui-sref="createContest()"></button>
-<table class="table table-striped table-bordered table-hover" id="contestsTable">
-	<thead>
-		<tr>
-			<th width="50">{{'contests.contest.startTime' | translate}}</th>
-			<th>{{ 'contests.contest.contestName' | translate}}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-repeat="contest in contests">
-			<td>{{contest.startTime | asDate | date:'yyyy-MM-dd hh:mm:ss'}}</td>
-			<td>
-				<a ui-sref="contestView({contestId: contest.id})">{{contest.name}}</a>
-			</td>
-		</tr>
-	</tbody>
+<button type="button"
+    tooltip="{{'contests.add' | translate}}"
+    class="hidden-print btn btn-primary btn-sm fa fa-plus"
+    ui-sref="createContest()"
+    ng-if="security.hasAnyPermission('create_contests')"></button>
+<table class="table table-striped table-bordered table-hover"
+    id="contestsTable">
+    <thead>
+        <tr>
+            <th width="50">{{'contests.contest.startTime' | translate}}</th>
+            <th>{{ 'contests.contest.contestName' | translate}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="contest in contests">
+            <td>{{contest.startTime | asDate | date:'yyyy-MM-dd hh:mm:ss'}}</td>
+            <td>
+                <a ui-sref="contestView({contestId: contest.id})">{{contest.name}}</a>
+            </td>
+        </tr>
+    </tbody>
 </table>
-<pagination total-items="contestsCount" ng-model="page" previous-text="&lsaquo;" next-text="&rsaquo; " first-text="&laquo; " last-text="&raquo; " direction-links="true " boundary-links="true "></pagination>
-
+<pagination total-items="contestsCount"
+    ng-model="page"
+    previous-text="&lsaquo;"
+    next-text="&rsaquo; "
+    first-text="&laquo; "
+    last-text="&raquo; "
+    direction-links="true "
+    boundary-links="true "></pagination>

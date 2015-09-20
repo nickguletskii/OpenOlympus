@@ -7,6 +7,7 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.DynamicSecurityPredicate;
 import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
+import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.security.annotations.PredicateDocumentation;
 import org.ng200.openolympus.services.AclService;
 import org.ng200.openolympus.services.ContestService;
@@ -29,7 +30,7 @@ public class ContestResultsPermissionPredicate
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
-			Contest contest) {
+			@Parameter("contest") Contest contest) {
 		if (aclService.hasContestPermission(contest, user,
 				ContestPermissionType.view_results_during_contest))
 			return SecurityClearanceType.ANONYMOUS;

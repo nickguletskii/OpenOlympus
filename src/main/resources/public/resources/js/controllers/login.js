@@ -28,8 +28,8 @@ const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $stat
 	SecurityService.update();
 	$scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === "true");
 
-	$http.get("/api/security/userStatus").success(function(data) {
-		if (data) {
+	$http.get("/api/security/status").success(function(data) {
+		if (data.currentPrincipal) {
 			$state.go("home");
 		} else {
 			$scope.logInFormVisible = true;

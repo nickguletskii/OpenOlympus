@@ -49,26 +49,41 @@ public class AclService extends GenericCreateUpdateRepository {
 
 	public boolean hasContestPermission(Contest contest, User user,
 			ContestPermissionType... values) {
+		return hasContestPermission(contest, user.getId(), values);
+	}
+
+	public boolean hasContestPermission(Contest contest, Long user,
+			ContestPermissionType... values) {
 		return Stream.of(values).anyMatch(value -> dslContext
 				.select(Routines.hasContestPermission(contest.getId(),
-						user.getId(), value))
+						user, value))
+				.fetchOne().value1());
+	}
+
+	public boolean hasTaskPermission(Task task, Long principal,
+			TaskPermissionType... values) {
+		return Stream.of(values).anyMatch(value -> dslContext
+				.select(Routines.hasTaskPermission(task.getId(),
+						principal, value))
 				.fetchOne().value1());
 	}
 
 	public boolean hasTaskPermission(Task task, User user,
 			TaskPermissionType... values) {
+		return hasTaskPermission(task, user.getId(), values);
+	}
+
+	public boolean hasGroupPermission(Group group, Long principal,
+			GroupPermissionType... values) {
 		return Stream.of(values).anyMatch(value -> dslContext
-				.select(Routines.hasTaskPermission(task.getId(),
-						user.getId(), value))
+				.select(Routines.hasGroupPermission(group.getId(),
+						principal, value))
 				.fetchOne().value1());
 	}
 
 	public boolean hasGroupPermission(Group group, User user,
 			GroupPermissionType... values) {
-		return Stream.of(values).anyMatch(value -> dslContext
-				.select(Routines.hasGroupPermission(group.getId(),
-						user.getId(), value))
-				.fetchOne().value1());
+		return hasGroupPermission(group, user.getId(), values);
 	}
 
 	@Transactional
@@ -116,4 +131,5 @@ public class AclService extends GenericCreateUpdateRepository {
 																.eq(user.getId())))))))
 				.fetchOne().value1();
 	}
+
 }

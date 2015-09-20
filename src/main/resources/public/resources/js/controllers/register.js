@@ -26,8 +26,8 @@ var _ = require("lodash");
 
 const controller = /*@ngInject*/ function($q, $translate, $scope, $http, $state, ServersideFormErrorReporter, ValidationService) {
 
-	$http.get("/api/security/userStatus").success(function(response) {
-		if (response) {
+	$http.get("/api/security/status").success(function(response) {
+		if (response.currentPrincipal) {
 			$state.go("home");
 		} else {
 			$scope.logInFormVisible = true;

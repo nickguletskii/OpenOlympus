@@ -6,6 +6,7 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.DynamicSecurityPredicate;
 import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
+import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.security.annotations.PredicateDocumentation;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class UserIsOwnerOfSolutionSecurityPredicate
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
-			Solution solution) {
+			@Parameter("solution") Solution solution) {
 		if (solution.getUserId() == user.getId())
 			return SecurityClearanceType.ANONYMOUS;
 		return SecurityClearanceType.DENIED;

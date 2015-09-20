@@ -141,6 +141,10 @@
                                 <a ui-sref="adminUsersList"
                                     translate="topbar.navigation.admin.adminUsersList"></a>
                             </li>
+                            <li ng-if="security.hasAnyPermission('view_all_solutions')">
+                                <a ui-sref="adminSolutionList"
+                                    translate="topbar.navigation.admin.adminSolutionList"></a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
