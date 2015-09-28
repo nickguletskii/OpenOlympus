@@ -42,8 +42,6 @@ public enum GeneralPermissionType implements EnumType {
 
 	change_other_users_personal_info("change_other_users_personal_info"),
 
-	contest_organiser("contest_organiser"),
-
 	enumerate_all_users("enumerate_all_users"),
 
 	task_supervisor("task_supervisor"),

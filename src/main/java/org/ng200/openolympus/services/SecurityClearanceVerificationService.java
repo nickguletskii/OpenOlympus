@@ -36,9 +36,9 @@ public class SecurityClearanceVerificationService {
 		case CHANGE_OTHER_USERS_PERSONAL_INFO:
 			return generalPermission(
 			        GeneralPermissionType.change_other_users_personal_info);
-		case CONTEST_ORGANISER:
+		case CONTEST_CREATOR:
 			return generalPermission(
-			        GeneralPermissionType.contest_organiser);
+			        GeneralPermissionType.create_contests);
 		case DELETE_USER:
 			return generalPermission(
 			        GeneralPermissionType.remove_user);

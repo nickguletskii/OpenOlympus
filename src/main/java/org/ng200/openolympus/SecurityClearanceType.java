@@ -40,7 +40,7 @@ public enum SecurityClearanceType {
 	                      * This security clearance type is granted to users who
 	                      * can create contests.
 	                      */
-	CONTEST_ORGANISER, /**
+	CONTEST_CREATOR, /**
 	                    * This security clearance type is granted to users who
 	                    * can create contests.
 	                    */

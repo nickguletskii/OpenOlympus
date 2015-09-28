@@ -54,7 +54,7 @@ import com.google.common.collect.ImmutableMap;
 @SecurityOr({
               @SecurityAnd({
                              @SecurityLeaf(
-                                     value = SecurityClearanceType.CONTEST_ORGANISER)
+                                     value = SecurityClearanceType.CONTEST_CREATOR)
 		})
 })
 public class ContestCreationController {
