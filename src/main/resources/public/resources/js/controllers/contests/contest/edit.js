@@ -75,5 +75,10 @@ module.exports = {
 		"contest": function(ContestService, $stateParams) {
 			return ContestService.getContestEditData($stateParams.contestId);
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function($refStateParams, SecurityService){
+			return SecurityService.hasContestPermission($refStateParams.contestId, "edit");
+		}
 	}
 };

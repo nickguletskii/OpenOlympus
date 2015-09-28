@@ -46,7 +46,7 @@ angular.module("ool")
 			$rootScope.hideResourcesLoading = true;
 		}, 0);
 	})
-	.run( /*@ngInject*/ function($rootScope, $stateParams, SecurityService, $location, $timeout, $state, $http, $translate, $window, FormForConfiguration) {
+	.run( /*@ngInject*/ function($rootScope, $stateParams, SecurityService, $location, $timeout, $state, $http, $translate, $window, FormForConfiguration, $injector) {
 		// Make state parameters easily accessible
 		$rootScope.stateParams = $stateParams;
 
@@ -79,6 +79,22 @@ angular.module("ool")
 					});
 				} else {
 					$rootScope.stateParams = toParams; // Make state parameters easily accessible
+				}
+			});
+		$rootScope.$on("$stateChangeStart",
+			function(event, toState, toParams) {
+				let allowed = !angular.isObject(toState.data) || !(toState.data.canAccess) || $injector.invoke(toState.data.canAccess, null, {
+					"$refStateParams": toParams
+				});
+				if (!allowed) {
+					event.preventDefault();
+					$location.path("/forbidden");
+				} else if (allowed.then) {
+					allowed.then(function(val) {
+						if (!val) {
+							$location.path("/forbidden");
+						}
+					});
 				}
 			});
 		$rootScope.$on("$stateChangeSuccess",

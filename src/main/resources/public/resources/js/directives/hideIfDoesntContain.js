@@ -23,19 +23,19 @@
 "use strict";
 
 var angular = require("angular");
+var $ = require("jquery");
 
-angular.module("ool.services", []);
-
-require("services/securityService");
-require("services/serversideFormErrorReporter");
-require("services/validationService");
-require("services/modalState");
-require("services/userService");
-require("services/solutionService");
-require("services/taskService");
-require("services/contestService");
-require("services/timeService");
-require("services/aclService");
-require("services/formDefaultHelperService");
-require("services/groupService");
-require("services/promiseService");
+angular.module("ool.directives").directive("hideIfDoesntContain", /*@ngInject*/ function() {
+	return {
+		restrict: "A",
+		link: function($scope, $element, $attr) {
+			$scope.$watch(() => $($element[0]).find($attr.hideIfDoesntContain).length, function(val) {
+				if (val === 0) {
+					$element.addClass("hideIfDoesntContain");
+				} else {
+					$element.removeClass("hideIfDoesntContain");
+				}
+			});
+		}
+	};
+});

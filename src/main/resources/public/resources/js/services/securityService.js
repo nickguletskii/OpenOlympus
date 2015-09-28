@@ -25,7 +25,7 @@
 var angular = require("angular");
 var _ = require("lodash");
 var $ = require("jquery");
-angular.module("ool.services").factory("SecurityService", /*@ngInject*/ function($rootScope, $http, $timeout, $state) {
+angular.module("ool.services").factory("SecurityService", /*@ngInject*/ function($rootScope, $http, $timeout, $state, $q) {
 	var data = null;
 	var poller = function() {
 		$http.get("/api/security/status").then(function(r) {
@@ -48,6 +48,20 @@ angular.module("ool.services").factory("SecurityService", /*@ngInject*/ function
 		});
 	};
 
+	function permissionFunc(url, permission) {
+		if (!data || !(data.currentPrincipal)) {
+			return $q.when(false);
+		}
+		if (data.currentPrincipal.superuser) {
+			return $q.when(true);
+		}
+		return $http.get(url, {
+			params: {
+				"permission": permission
+			}
+		}).then(_.property("data"));
+	}
+
 	return {
 		data: data,
 		isLoggedIn: function() {
@@ -66,7 +80,17 @@ angular.module("ool.services").factory("SecurityService", /*@ngInject*/ function
 			return data && data.currentPrincipal && data.currentPrincipal.approved;
 		},
 		hasPermission: function(permission) {
-			if (!data.currentPrincipal) {
+			return $http
+				.get("/api/security/status")
+				.then(_.property("data"))
+				.then(function(data) {
+					return data && data.currentPrincipal &&
+						(data.currentPrincipal.superuser || (data.currentPrincipal.permissions &&
+							data.currentPrincipal.permissions[permission]));
+				});
+		},
+		hasPermissionImmediate: function(permission) {
+			if (!data || !data.currentPrincipal) {
 				return false;
 			}
 			if (data.currentPrincipal.superuser) {
@@ -74,7 +98,7 @@ angular.module("ool.services").factory("SecurityService", /*@ngInject*/ function
 			}
 			return _.includes(data.currentPrincipal.permissions, permission);
 		},
-		hasAnyPermission: function() {
+		hasAnyPermissionImmediate: function() {
 			if (!data || !data.currentPrincipal) {
 				return false;
 			}
@@ -117,6 +141,15 @@ angular.module("ool.services").factory("SecurityService", /*@ngInject*/ function
 				});
 				update();
 			});
+		},
+		hasContestPermission: function(contestId, permission) {
+			return permissionFunc("/api/contest/" + contestId + "/hasContestPermission/" + data.currentPrincipal.id, permission);
+		},
+		hasTaskPermission: function(taskId, permission) {
+			return permissionFunc("/api/task/" + taskId + "/hasTaskPermission/" + data.currentPrincipal.id, permission);
+		},
+		hasGroupPermission: function(groupId, permission) {
+			return permissionFunc("/api/group/" + groupId + "/hasGroupPermission/" + data.currentPrincipal.id, permission);
 		}
 	};
 });

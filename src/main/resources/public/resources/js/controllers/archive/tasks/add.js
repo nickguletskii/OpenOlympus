@@ -60,5 +60,10 @@ module.exports = {
 	"name": "createTask",
 	"url": "/archive/tasks/add",
 	"templateUrl": "/partials/archive/tasks/add.html",
-	"controller": controller
+	"controller": controller,
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.hasPermission("task_supervisor");
+		}
+	}
 };

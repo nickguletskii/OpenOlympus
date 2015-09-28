@@ -112,5 +112,10 @@ module.exports = {
 		"userCount": function(UserService) {
 			return UserService.countPendingUsers();
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.hasPermission("approve_user_registrations");
+		}
 	}
 };

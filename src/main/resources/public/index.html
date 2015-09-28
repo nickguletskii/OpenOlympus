@@ -72,20 +72,21 @@
                 ng-class="!navCollapsed &amp;&amp; 'in'"
                 ng-click="navCollapsed=true">
                 <ul class="nav navbar-nav">
-                    <li ng-if="!!runningContest && security.isUser()">
-                        <a ui-sref="contestView({contestId: runningContest.id })"
+                    <li hide-if-doesnt-contain="[ui-sref]" ng-if="runningContest">
+                        <a secref
+                            ui-sref="contestView({contestId: runningContest.id })"
                             translate="topbar.navigation.currentContest"
                             id="headerCurrentContestLink"></a>
                     </li>
-                    <li ng-if="security.isUser()">
-                        <a ui-sref="contestList"
+                    <li hide-if-doesnt-contain="[ui-sref]">
+                        <a secref
+                            ui-sref="contestList"
                             id="headerContestsLink">
                             <span translate="topbar.navigation.contests"></span>
                         </a>
                     </li>
                     <li class="dropdown"
-                        ng-if="(security.isUser() &amp;&amp; security.noCurrentContest()) ||
-                                    security.hasAnyPermission('view_archive_during_contest')"
+                        hide-if-doesnt-contain="[ui-sref]"
                         dropdown="">
                         <a class="dropdown-toggle"
                             dropdown-toggle="">
@@ -93,56 +94,46 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a ui-sref="archiveTaskList"
+                            <li hide-if-doesnt-contain="[ui-sref]">
+                                <a secref
+                                    ui-sref="archiveTaskList"
                                     translate="topbar.navigation.archive.tasks"></a>
                             </li>
-                            <li>
-                                <a ui-sref="archiveRank"
+                            <li hide-if-doesnt-contain="[ui-sref]">
+                                <a secref
+                                    ui-sref="archiveRank"
                                     translate="topbar.navigation.archive.ranking"></a>
                             </li>
                         </ul>
                     </li>
-                    <li ng-if="security.isUser()">
-                        <a href="/user/solutions"
+                    <li hide-if-doesnt-contain="[ui-sref]">
+                        <a secref
+                            ui-sref="userSolutionList"
                             translate="user.solutions"
                             id="headerSolutionsLink"></a>
                     </li>
                     <li class="dropdown"
                         dropdown=""
-                        ng-if="security.hasAnyPermission('view_others_user_details',
-                              'remove_user',
-                              'approve_user_registrations',
-                              'change_other_users_password',
-                              'change_other_users_personal_info',
-                              'enumerate_all_users',
-                              'view_other_users_personal_info',
-                              'create_groups',
-                              'list_groups',
-                              'manage_principal_permissions',
-                              'view_all_solutions')">
+                        hide-if-doesnt-contain="[ui-sref]">
                         <a class="dropdown-toggle"
                             dropdown-toggle="">
                             <span translate="topbar.navigation.admin"></span>
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li ng-if="security.hasAnyPermission('approve_user_registrations')">
+                            <li hide-if-doesnt-contain="[ui-sref]">
                                 <a ui-sref="pendingUsersList"
+                                    secref
                                     translate="topbar.navigation.admin.pendingUsersList"></a>
                             </li>
-                            <li ng-if="security.hasAnyPermission('change_other_users_password',
-                                    'change_other_users_personal_info',
-                                    'enumerate_all_users',
-                                    'manage_principal_permissions',
-                                    'remove_user',
-                                    'view_other_users_personal_info',
-                                    'view_others_user_details')">
+                            <li hide-if-doesnt-contain="[ui-sref]">
                                 <a ui-sref="adminUsersList"
+                                    secref
                                     translate="topbar.navigation.admin.adminUsersList"></a>
                             </li>
-                            <li ng-if="security.hasAnyPermission('view_all_solutions')">
+                            <li hide-if-doesnt-contain="[ui-sref]">
                                 <a ui-sref="adminSolutionList"
+                                    secref
                                     translate="topbar.navigation.admin.adminSolutionList"></a>
                             </li>
                         </ul>

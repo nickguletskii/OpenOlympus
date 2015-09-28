@@ -20,22 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
-
+var _ = require("lodash");
 var angular = require("angular");
-
-angular.module("ool.services", []);
-
-require("services/securityService");
-require("services/serversideFormErrorReporter");
-require("services/validationService");
-require("services/modalState");
-require("services/userService");
-require("services/solutionService");
-require("services/taskService");
-require("services/contestService");
-require("services/timeService");
-require("services/aclService");
-require("services/formDefaultHelperService");
-require("services/groupService");
-require("services/promiseService");
+angular.module("ool.services").factory("PromiseUtils", /*@ngInject*/ function($q) {
+	return {
+		and: function() {
+			return $q.all(
+					_.map(arguments, arg => $q.when(arg)))
+				.then(all =>
+					_.reduce(all, (flattened, other) => flattened && other,
+						true));
+		},
+		or: function() {
+			return $q.all(
+					_.map(arguments, arg => $q.when(arg)))
+				.then(all =>
+					_.reduce(all, (flattened, other) => flattened || other,
+						false));
+		}
+	};
+});

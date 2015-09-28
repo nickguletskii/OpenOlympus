@@ -75,5 +75,10 @@ module.exports = {
 	"name": "createContest",
 	"url": "/contests/add",
 	"templateUrl": "/partials/contests/add.html",
-	"controller": controller
+	"controller": controller,
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.hasPermission("create_contests");
+		}
+	}
 };

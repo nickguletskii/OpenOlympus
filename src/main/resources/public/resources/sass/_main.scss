@@ -84,3 +84,10 @@ body {
 .collapsing {
 	transition-duration: 0.15s !important;
 }
+
+.hideIfDoesntContain {
+	display: none !important;
+}
+.hideIfDoesntContain {
+	display: none !important 1000000;
+}

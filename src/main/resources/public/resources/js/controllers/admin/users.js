@@ -60,5 +60,10 @@ module.exports = {
 		"userCount": function(UserService) {
 			return UserService.countUsers();
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.hasPermission("enumerate_all_users");
+		}
 	}
 };

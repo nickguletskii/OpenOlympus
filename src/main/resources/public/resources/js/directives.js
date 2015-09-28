@@ -40,3 +40,5 @@ require("directives/fileInput/fileNgModel");
 require("directives/typeahead/typeahead");
 require("directives/form/defaultFormDirectives");
 require("directives/principalPermissions/principalPermissions");
+require("directives/oolsref");
+require("directives/hideIfDoesntContain");
