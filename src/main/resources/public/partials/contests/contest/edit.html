@@ -24,33 +24,34 @@
 -->
 <h1>{{'contest.editForm.labels.heading'|translate}}</h1>
 <form form-autoconfig="form"
-	novalidate>
-	<div class="panel panel-default">
-		<div class="panel-body">
-			<text-field label-translate="contest.editForm.labels.name"
-				type="text"
-				attribute="name"></text-field>
-			<text-field label-translate="contest.editForm.labels.startTime"
-				type="datetime"
-				attribute="startTime"></text-field>
-			<text-field label-translate="contest.editForm.labels.duration"
-				type="number"
-				attribute="duration"></text-field>
-			<checkbox-field attribute="showFullTestsDuringContest"
-				label-translate="contest.editForm.labels.showFullTestsDuringContest"></checkbox-field>
-			<submit-button label="{{ form.submitButtonText | translate}}"
-				button-class="{{form.submitButtonClass}}"
-				icon="{{form.submitButtonIcon}}"></submit-button>
-		</div>
-	</div>
-	<div class="panel panel-success"
-		ng-show="form.justSubmitted">
-		<div class="panel-heading">{{'contest.editForm.labels.uploaded.heading'|translate}}</div>
-		<div class="panel-body">{{'contest.editForm.labels.uploaded.body'|translate}}
-			<button class="btn btn-success"
-				ui-sref="contestView({contestId: contestId})">{{'contest.editForm.labels.goToContestButton'|translate}}</button>
-		</div>
-	</div>
-	<form-progress-panel form="form"
-		localisation-namespace="contest.editForm" />
+    novalidate>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <text-field label-translate="contest.editForm.labels.name"
+                type="text"
+                attribute="name"></text-field>
+            <text-field label-translate="contest.editForm.labels.startTime"
+                type="datetime"
+                attribute="startTime"></text-field>
+            <text-field label-translate="contest.editForm.labels.duration"
+                type="number"
+                attribute="duration"></text-field>
+            <checkbox-field attribute="showFullTestsDuringContest"
+                label-translate="contest.editForm.labels.showFullTestsDuringContest"></checkbox-field>
+            <submit-button label="{{ form.submitButtonText | translate}}"
+                button-class="{{form.submitButtonClass}}"
+                icon="{{form.submitButtonIcon}}"></submit-button>
+        </div>
+    </div>
+    <div class="panel panel-success"
+        ng-show="form.justSubmitted">
+        <div class="panel-heading">{{'contest.editForm.labels.uploaded.heading'|translate}}</div>
+        <div class="panel-body">{{'contest.editForm.labels.uploaded.body'|translate}}
+            <button class="btn btn-success"
+                secref
+                ui-sref="contestView({contestId: contestId})">{{'contest.editForm.labels.goToContestButton'|translate}}</button>
+        </div>
+    </div>
+    <form-progress-panel form="form"
+        localisation-namespace="contest.editForm" />
 </form>

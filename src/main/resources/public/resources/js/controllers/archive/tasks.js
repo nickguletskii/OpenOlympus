@@ -45,5 +45,11 @@ module.exports = {
 		"taskCount": function(TaskService) {
 			return TaskService.countArchiveTasks();
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
+			return PromiseUtils.or(SecurityService.hasPermission("view_archive_during_contest"),
+				PromiseUtils.and(SecurityService.hasPermission("approved"), SecurityService.isUserInCurrentContestOrNoContest()));
+		}
 	}
 };

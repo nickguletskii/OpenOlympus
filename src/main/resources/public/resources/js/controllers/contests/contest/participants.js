@@ -57,5 +57,12 @@ module.exports = {
 		"userCount": function(ContestService, $stateParams) {
 			return ContestService.countContestParticipants($stateParams.contestId);
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("approved"),
+				SecurityService.hasContestPermission($refStateParams.contestId, "view_participants"));
+		}
 	}
 };

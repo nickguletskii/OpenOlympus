@@ -18,8 +18,13 @@ module.exports = {
 			return true;
 		},
 		principalId: function(SecurityService) {
-			return SecurityService.getUser().id;
+			return SecurityService.user.id;
 		},
 		enablePermissionsEditor: () => false
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.isLoggedIn;
+		}
 	}
 };

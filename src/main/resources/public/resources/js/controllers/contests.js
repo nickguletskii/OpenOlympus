@@ -45,5 +45,10 @@ module.exports = {
 		"contestsCount": function(ContestService) {
 			return ContestService.countContests();
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.hasPermission("approved");
+		}
 	}
 };

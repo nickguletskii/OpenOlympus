@@ -40,7 +40,8 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 			$scope.setWidgetId = function(widgetId) {
 				$scope.widgetId = widgetId;
 			};
-			$http.get("/api/recaptchaPublicKey").success(function(recaptchaPublicKey) {
+			$http.get("/api/recaptchaPublicKey").then(function(response) {
+				let recaptchaPublicKey = response.data;
 				if (_.isEmpty(recaptchaPublicKey)) {
 					$element.remove();
 					return;
@@ -54,9 +55,10 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 
 			if ($attributes.resetOn) {
 				$scope.$parent.$on($attributes.resetOn, () => {
-					if ($scope.recaptchaPublicKey){
+					if ($scope.recaptchaPublicKey) {
 						vcRecaptchaService.reload($scope.widgetId);
-					}});
+					}
+				});
 
 			}
 		}

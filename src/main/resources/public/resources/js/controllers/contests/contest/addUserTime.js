@@ -67,5 +67,12 @@ module.exports = {
 	"name": "contestParticipantsList.addUserTime",
 	"templateUrl": "/partials/contests/contest/addUserTime.html",
 	"controller": controller,
-	"backdrop": true
+	"backdrop": true,
+	"data": {
+		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("approved"),
+				SecurityService.hasContestPermission($refStateParams.contestId, "extend_time"));
+		}
+	}
 };

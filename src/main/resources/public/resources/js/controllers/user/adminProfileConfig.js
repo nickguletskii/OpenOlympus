@@ -23,5 +23,15 @@ module.exports = {
 			return $stateParams.userId;
 		},
 		enablePermissionsEditor: () => true
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("view_other_users_personal_info"),
+				PromiseUtils.or(
+					SecurityService.hasPermission("change_other_users_personal_info"),
+					SecurityService.hasPermission("change_other_users_password")
+				));
+		}
 	}
 };

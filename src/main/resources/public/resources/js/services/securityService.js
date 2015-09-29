@@ -23,133 +23,211 @@
 "use strict";
 
 var angular = require("angular");
+var moment = require("moment");
 var _ = require("lodash");
 var $ = require("jquery");
-angular.module("ool.services").factory("SecurityService", /*@ngInject*/ function($rootScope, $http, $timeout, $state, $q) {
-	var data = null;
-	var poller = function() {
-		$http.get("/api/security/status").then(function(r) {
-			data = r.data;
-			console.log(data);
-			$rootScope.$broadcast("securityInfoChanged");
-			$timeout(poller, 60000);
-		});
-	};
-	poller();
 
-	var transform = function(data) {
-		return $.param(data);
-	};
 
-	var update = function() {
-		$http.get("/api/security/status").then(function(r) {
-			data = r.data;
-			$rootScope.$broadcast("securityInfoChanged");
-		});
-	};
+let dataInternal = null;
+let lastUpdate = null;
+let forceUpdate = false;
 
-	function permissionFunc(url, permission) {
-		if (!data || !(data.currentPrincipal)) {
-			return $q.when(false);
+function paramTransform(data) {
+	return $.param(data);
+}
+
+class SecurityService {
+	constructor($rootScope, $http, $timeout, $state, $q, $cacheFactory) {
+		this.$rootScope = $rootScope;
+		this.$http = $http;
+		this.$timeout = $timeout;
+		this.$state = $state;
+		this.$q = $q;
+		this.$cacheFactory = $cacheFactory;
+		this.securityStatusCache = this.$cacheFactory("securityStatusCache");
+	}
+
+	permissionFunc(url, permission) {
+		if (!this.hasPrincipal) {
+			return this.$q.when(false);
 		}
-		if (data.currentPrincipal.superuser) {
-			return $q.when(true);
+		if (this.isSuperUserImmediate) {
+			return this.$q.when(true);
 		}
-		return $http.get(url, {
+		return this.$http.get(url, {
 			params: {
 				"permission": permission
 			}
 		}).then(_.property("data"));
 	}
 
-	return {
-		data: data,
-		isLoggedIn: function() {
-			return data && data.currentPrincipal;
-		},
-		getUsername: function() {
-			if (!data || !data.currentPrincipal) {
-				return null;
-			}
-			return data.currentPrincipal.username;
-		},
-		getUser: function() {
-			return data && data.currentPrincipal;
-		},
-		isUser: function() {
-			return data && data.currentPrincipal && data.currentPrincipal.approved;
-		},
-		hasPermission: function(permission) {
-			return $http
-				.get("/api/security/status")
-				.then(_.property("data"))
-				.then(function(data) {
-					return data && data.currentPrincipal &&
-						(data.currentPrincipal.superuser || (data.currentPrincipal.permissions &&
-							data.currentPrincipal.permissions[permission]));
-				});
-		},
-		hasPermissionImmediate: function(permission) {
-			if (!data || !data.currentPrincipal) {
-				return false;
-			}
-			if (data.currentPrincipal.superuser) {
-				return true;
-			}
-			return _.includes(data.currentPrincipal.permissions, permission);
-		},
-		hasAnyPermissionImmediate: function() {
-			if (!data || !data.currentPrincipal) {
-				return false;
-			}
-			if (data.currentPrincipal.superuser) {
-				return true;
-			}
-			return _.some(arguments, (permission) => _.includes(data.currentPrincipal.permissions, permission));
-		},
-		noCurrentContest: function() {
-			return !data || !data.currentContest;
-		},
-		update: update,
-		login: function(username, password, recaptchaResponse) {
-			return $http({
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-				},
-				method: "POST",
-				url: "/login",
-				transformRequest: transform,
-				data: {
-					"username": username,
-					"password": password,
-					"recaptchaResponse": recaptchaResponse
-				}
-			});
-		},
-		logout: function() {
-			$http({
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-				},
-				method: "POST",
-				url: "/logout",
-				transformRequest: transform,
-				data: {}
-			}).then(function() {
-				$state.go("home", {}, {
-					reload: true
-				});
-				update();
-			});
-		},
-		hasContestPermission: function(contestId, permission) {
-			return permissionFunc("/api/contest/" + contestId + "/hasContestPermission/" + data.currentPrincipal.id, permission);
-		},
-		hasTaskPermission: function(taskId, permission) {
-			return permissionFunc("/api/task/" + taskId + "/hasTaskPermission/" + data.currentPrincipal.id, permission);
-		},
-		hasGroupPermission: function(groupId, permission) {
-			return permissionFunc("/api/group/" + groupId + "/hasGroupPermission/" + data.currentPrincipal.id, permission);
+
+	get data() {
+		return dataInternal;
+	}
+
+	get hasPrincipal() {
+		return this.data && this.data.currentPrincipal;
+	}
+
+	get isLoggedIn() {
+		return this.hasPrincipal;
+	}
+
+	get username() {
+		if (!this.hasPrincipal) {
+			return null;
 		}
-	};
-});
+		return this.user.username;
+	}
+
+	get user() {
+		if (!this.hasPrincipal) {
+			return null;
+		}
+		return this.data.currentPrincipal;
+	}
+
+	get isSuperUserImmediate() {
+		if (!this.hasPrincipal) {
+			return false;
+		}
+		return this.user.superuser;
+	}
+
+	hasContestPermission(contestId, permission) {
+		return this.permissionFunc((principalId) => "/api/contest/" + contestId + "/hasContestPermission/" + principalId, permission);
+	}
+
+	hasTaskPermission(taskId, permission) {
+		return this.permissionFunc((principalId) => "/api/task/" + taskId + "/hasTaskPermission/" + principalId, permission);
+	}
+
+	hasGroupPermission(groupId, permission) {
+		return this.permissionFunc((principalId) => "/api/group/" + groupId + "/hasGroupPermission/" + principalId, permission);
+	}
+
+	isUserInCurrentContestOrNoContest() {
+		return this.update().then(function(data) {
+			// TODO: implement
+			return true;
+		});
+	}
+
+	hasPermission(permission) {
+		return this.update().then(() => this.hasPermissionImmediate(permission));
+	}
+
+	hasPermissionImmediate(permission) {
+		if (permission === "approved") {
+			return this.hasPrincipal;
+		}
+
+		if (!this.hasPrincipal) {
+			return false;
+		}
+
+		if (this.isSuperUserImmediate) {
+			return true;
+		}
+		return _.includes(this.user.permissions, permission);
+	}
+
+	hasAnyPermissionImmediate() {
+		return _.some(arguments, (permission) => this.hasPermissionImmediate(permission));
+	}
+
+
+	noCurrentContest() {
+		let This = this;
+		return this.update().then(() => This.noCurrentContestImmediate);
+	}
+
+	noCurrentContestImmediate() {
+		return !this.data || !this.data.currentContest;
+	}
+
+	isContestOver(contestId) {
+		// TODO: implement
+		return this.$q.when(false);
+	}
+
+
+	update() {
+		let This = this;
+
+		if (forceUpdate ||
+			(lastUpdate && lastUpdate.isBefore(moment().subtract(5, "seconds")))) {
+			this.securityStatusCache.removeAll();
+		}
+
+		forceUpdate = false;
+
+		if(this.securityStatusCache.get("data")){
+			return this.$q.when(dataInternal);
+		}
+
+		return this.$http.get("/api/security/status").then(function(r) {
+			dataInternal = r.data;
+			This.securityStatusCache.put("data", dataInternal);
+			lastUpdate = moment();
+			This.$rootScope.$broadcast("securityInfoChanged");
+			return dataInternal;
+		});
+	}
+
+	login(username, password, recaptchaResponse) {
+		let This = this;
+
+		return this.$http({
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+			},
+			method: "POST",
+			url: "/login",
+			transformRequest: paramTransform,
+			data: {
+				"username": username,
+				"password": password,
+				"recaptchaResponse": recaptchaResponse
+			}
+		}).then(function(x) {
+			forceUpdate = true;
+			This.update();
+			return x;
+		});
+	}
+
+	logout() {
+		let This = this;
+
+		this.$http({
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+			},
+			method: "POST",
+			url: "/logout",
+			transformRequest: paramTransform,
+			data: {}
+		}).then(function() {
+			forceUpdate = true;
+			This.$state.go("home", {}, {
+				reload: true
+			});
+			This.update();
+		});
+	}
+
+}
+SecurityService.$inject = ["$rootScope", "$http", "$timeout", "$state", "$q", "$cacheFactory"];
+
+angular.module("ool.services")
+	.service("SecurityService", SecurityService)
+	.run( /* @ngInject */ function(SecurityService, $timeout) {
+		function poller() {
+			SecurityService.update().then(function() {
+				$timeout(poller, 60000);
+			});
+		}
+		poller();
+	});

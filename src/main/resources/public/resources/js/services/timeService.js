@@ -26,9 +26,9 @@ angular.module("ool.services").factory("datetime", /*@ngInject*/ function($timeo
 
 	var offset = 0;
 
-	$http.get("/api/time").success(
-		function(time) {
-			offset = moment(time).diff(moment());
+	$http.get("/api/time").then(
+		function(response) {
+			offset = moment(response.data).diff(moment());
 		}
 	);
 

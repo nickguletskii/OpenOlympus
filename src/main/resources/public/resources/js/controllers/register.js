@@ -24,10 +24,10 @@
 
 var _ = require("lodash");
 
-const controller = /*@ngInject*/ function($q, $translate, $scope, $http, $state, ServersideFormErrorReporter, ValidationService) {
+const controller = /*@ngInject*/ function($q, $translate, $scope, $http, $state, ServersideFormErrorReporter, ValidationService, SecurityService) {
 
-	$http.get("/api/security/status").success(function(response) {
-		if (response.currentPrincipal) {
+	SecurityService.update().then(function() {
+		if (SecurityService.isLoggedIn) {
 			$state.go("home");
 		} else {
 			$scope.logInFormVisible = true;
@@ -60,7 +60,9 @@ const controller = /*@ngInject*/ function($q, $translate, $scope, $http, $state,
 			method: "POST",
 			url: "/api/user/register",
 			data: user
-		}).success(function(data) {
+		}).then(function(response) {
+			let data = response.data;
+			
 			if (data.status === "BINDING_ERROR") {
 				ValidationService.transformBindingResultsIntoFormForMap(data.fieldErrors).then(function(msg) {
 					deferred.reject(

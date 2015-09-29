@@ -72,7 +72,8 @@
                 ng-class="!navCollapsed &amp;&amp; 'in'"
                 ng-click="navCollapsed=true">
                 <ul class="nav navbar-nav">
-                    <li hide-if-doesnt-contain="[ui-sref]" ng-if="runningContest">
+                    <li hide-if-doesnt-contain="[ui-sref]"
+                        ng-if="runningContest">
                         <a secref
                             ui-sref="contestView({contestId: runningContest.id })"
                             translate="topbar.navigation.currentContest"
@@ -153,26 +154,27 @@
                             </li>
                         </ul>
                     </li>
-                    <li ng-if="security.isLoggedIn() &amp;&amp; !security.isUser()">
+                    <li ng-if="security.isLoggedIn &amp;&amp; !security.hasPermissionImmediate('approved')">
                         <button type="button"
                             class="btn btn-warning navbar-btn"
                             tooltip-placement="bottom"
                             tooltip="{{'login.administratorApprovalRequired.body' | translate}}"><span class="fa fa-exclamation-triangle"></span></button>
                     </li>
-                    <li ng-if="security.isLoggedIn()">
-                        <a ui-sref="personalInfoModificationView"
-                            id="headerUserInfoLink">{{security.getUsername()}}</a>
+                    <li hide-if-doesnt-contain="[ui-sref]">
+                        <a secref
+                            ui-sref="personalInfoModificationView"
+                            id="headerUserInfoLink">{{security.username}}</a>
                     </li>
-                    <li ng-if="security.isLoggedIn()">
+                    <li ng-if="security.isLoggedIn">
                         <a ng-click="security.logout()"
                             translate="header.logout"
                             id="headerLogoutLink"></a>
                     </li>
-                    <li ng-if="!security.isLoggedIn()">
+                    <li ng-if="!security.isLoggedIn">
                         <a ui-sref="login"
                             translate="header.login"> </a>
                     </li>
-                    <li ng-if="!security.isLoggedIn()">
+                    <li ng-if="!security.isLoggedIn">
                         <a ui-sref="register"
                             translate="header.register"
                             id="headerRegisterLink"></a>

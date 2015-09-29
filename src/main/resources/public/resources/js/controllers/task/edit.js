@@ -61,5 +61,13 @@ module.exports = {
 		"editTaskData": function(TaskService, $stateParams) {
 			return TaskService.getTaskEditData($stateParams.taskId);
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService, $refStateParams) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("approved"),
+				SecurityService.hasGroupPermission($refStateParams.groupId, "modify")
+			);
+		}
 	}
 };

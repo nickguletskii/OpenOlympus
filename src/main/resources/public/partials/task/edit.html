@@ -24,34 +24,35 @@
 -->
 <h1>{{'task.editForm.labels.heading'|translate}}</h1>
 <form form-autoconfig="form"
-	novalidate>
-	<div class="panel panel-default">
-		<div class="panel-body">
-			<text-field label-translate="task.editForm.labels.name"
-				type="text"
-				attribute="name"></text-field>
-			<file-input label-translate="task.editForm.labels.descriptionFile"
-				type="text"
-				attribute="descriptionFile"
-				multiple="true"></file-input>
-			<file-input label-translate="task.editForm.labels.judgeFile"
-				type="text"
-				attribute="judgeFile"></file-input>
-			<checkbox-field attribute="published"
-				label-translate="task.editForm.labels.published"></checkbox-field>
-			<submit-button label="{{ form.submitButtonText | translate}}"
-				button-class="{{form.submitButtonClass}}"
-				icon="{{form.submitButtonIcon}}"></submit-button>
-		</div>
-	</div>
-	<div class="panel panel-success"
-		ng-show="form.justSubmitted">
-		<div class="panel-heading">{{'task.editForm.labels.uploaded.heading'|translate}}</div>
-		<div class="panel-body">{{'task.editForm.labels.uploaded.body'|translate}}
-			<button class="btn btn-success"
-				ui-sref="taskView({taskId: taskId})">{{'task.editForm.labels.goToTaskButton'|translate}}</button>
-		</div>
-	</div>
-	<form-progress-panel form="form"
-		localisation-namespace="contest.editForm" />
+    novalidate>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <text-field label-translate="task.editForm.labels.name"
+                type="text"
+                attribute="name"></text-field>
+            <file-input label-translate="task.editForm.labels.descriptionFile"
+                type="text"
+                attribute="descriptionFile"
+                multiple="true"></file-input>
+            <file-input label-translate="task.editForm.labels.judgeFile"
+                type="text"
+                attribute="judgeFile"></file-input>
+            <checkbox-field attribute="published"
+                label-translate="task.editForm.labels.published"></checkbox-field>
+            <submit-button label="{{ form.submitButtonText | translate}}"
+                button-class="{{form.submitButtonClass}}"
+                icon="{{form.submitButtonIcon}}"></submit-button>
+        </div>
+    </div>
+    <div class="panel panel-success"
+        ng-show="form.justSubmitted">
+        <div class="panel-heading">{{'task.editForm.labels.uploaded.heading'|translate}}</div>
+        <div class="panel-body">{{'task.editForm.labels.uploaded.body'|translate}}
+            <button class="btn btn-success"
+                secref
+                ui-sref="taskView({taskId: taskId})">{{'task.editForm.labels.goToTaskButton'|translate}}</button>
+        </div>
+    </div>
+    <form-progress-panel form="form"
+        localisation-namespace="contest.editForm" />
 </form>

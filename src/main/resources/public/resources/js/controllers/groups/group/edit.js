@@ -58,5 +58,13 @@ module.exports = {
 		"group": function(GroupService, $stateParams) {
 			return GroupService.getGroupEditData($stateParams.groupId);
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService, $refStateParams) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("list_groups"),
+				SecurityService.hasGroupPermission($refStateParams.groupId, "edit")
+			);
+		}
 	}
 };

@@ -61,5 +61,12 @@ module.exports = {
 	"name": "contestView.addTask",
 	"templateUrl": "/partials/contests/contest/addTask.html",
 	"controller": controller,
-	"backdrop": true
+	"backdrop": true,
+	"data": {
+		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("approved"),
+				SecurityService.hasContestPermission($refStateParams.contestId, "add_task"));
+		}
+	}
 };

@@ -45,5 +45,13 @@ module.exports = {
 		"membersCount": function(GroupService, $stateParams) {
 			return GroupService.countMembers($stateParams.groupId);
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService, $refStateParams) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("list_groups"),
+				SecurityService.hasGroupPermission($refStateParams.groupId, "view_members")
+			);
+		}
 	}
 };

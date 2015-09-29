@@ -23,7 +23,7 @@
 "use strict";
 
 const controller = /*@ngInject*/ function($http, $stateParams, $state) {
-	$http.post("/api/task/" + $stateParams.taskId + "/rejudgeTask").success(() => {
+	$http.post("/api/task/" + $stateParams.taskId + "/rejudgeTask").then(() => {
 		$state.go("^.rejudgeTaskSuccess", {
 			taskId: $stateParams.taskId
 		});
@@ -34,5 +34,10 @@ module.exports = {
 	"name": "archiveTaskList.rejudgeTaskWorking",
 	"templateUrl": "/partials/archive/tasks/rejudgeTask/working.html",
 	"controller": controller,
-	"backdrop": true
+	"backdrop": true,
+	"data": {
+		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
+			return SecurityService.hasTaskPermission($refStateParams.taskId, "rejudge");
+		}
+	}
 };

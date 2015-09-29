@@ -44,5 +44,10 @@ module.exports = {
 		"solutionCount": function(SolutionService) {
 			return SolutionService.countUserSolutions();
 		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.hasPermission("approved");
+		}
 	}
 };

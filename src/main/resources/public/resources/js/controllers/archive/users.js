@@ -32,12 +32,13 @@ const controller = /*@ngInject*/ function($scope, $http, $stateParams) {
 		params: {
 			page: page
 		}
-	}).success(function(users) {
-		$scope.users = users;
+	}).then(function(users) {
+		$scope.users = users.data;
 	});
-	$http.get("api/archive/rankCount").success(function(count) {
-		$scope.userCount = count;
-	});
+	$http.get("api/archive/rankCount")
+		.then(function(response) {
+			$scope.userCount = response.data;
+		});
 };
 module.exports = {
 	"name": "archiveRank",
@@ -53,6 +54,12 @@ module.exports = {
 		},
 		"userCount": function(UserService) {
 			return UserService.countArchiveUsers();
+		}
+	},
+	"data": {
+		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
+			return PromiseUtils.or(SecurityService.hasPermission("view_archive_during_contest"),
+				PromiseUtils.and(SecurityService.hasPermission("approved"), SecurityService.isUserInCurrentContestOrNoContest()));
 		}
 	}
 };

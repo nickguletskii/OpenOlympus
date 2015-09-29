@@ -25,6 +25,7 @@
 <button type="button"
 	th:attr="tooltip= #{task.editButton}"
 	class="hidden-print btn btn-primary fa fa-pencil"
+	secref
 	ui-sref="taskModificationView({taskId: taskId})">
 </button>
 <h2>{{name}}</h2>

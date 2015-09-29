@@ -55,7 +55,7 @@ angular.module("ool.directives")
 			$scope.commit = () => {
 				$scope.committing = true;
 				ACLService.setGeneralPermissions($attributes.principalId, trueElseFalse($scope.permissions))
-					.success(() => {
+					.then(() => {
 						$scope.refresh();
 						$scope.committing = false;
 					});

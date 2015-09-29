@@ -77,8 +77,10 @@ module.exports = {
 		}
 	},
 	"data": {
-		canAccess: /*@ngInject*/ function($refStateParams, SecurityService){
-			return SecurityService.hasContestPermission($refStateParams.contestId, "edit");
+		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
+			return PromiseUtils.and(
+				SecurityService.hasPermission("approved"),
+				SecurityService.hasContestPermission($refStateParams.contestId, "edit"));
 		}
 	}
 };

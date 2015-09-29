@@ -28,8 +28,8 @@ const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $stat
 	SecurityService.update();
 	$scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === "true");
 
-	$http.get("/api/security/status").success(function(data) {
-		if (data.currentPrincipal) {
+	SecurityService.update().then(function() {
+		if (SecurityService.isLoggedIn) {
 			$state.go("home");
 		} else {
 			$scope.logInFormVisible = true;
@@ -50,7 +50,8 @@ const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $stat
 	$scope.login = function(user) {
 		var deferred = $q.defer();
 		SecurityService.login(user.username, user.password, user.recaptchaResponse)
-			.success(function(data) {
+			.then(function(response) {
+				let data = response.data;
 				if (data.auth === "succeded") {
 					deferred.resolve();
 					SecurityService.update();

@@ -99,6 +99,7 @@ angular.module("ool")
 			}
 			console.error(exception);
 			//	throw exception;
+			$rootScope.$destroy();
 		};
 	})
 	.run( /*@ngInject*/ function($rootScope, SecurityService) {

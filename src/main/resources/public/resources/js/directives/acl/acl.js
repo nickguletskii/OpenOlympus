@@ -56,7 +56,8 @@ angular.module("ool.directives")
 			$scope.collapsed = true;
 
 			$scope.refresh = () =>
-				ACLService.getACL($attributes.aclGetter).success((permissions) => {
+				ACLService.getACL($attributes.aclGetter).then((data) => {
+					let permissions = data.permissions;
 					$scope.permissions = _.map(permissions, perm => _.assign(perm, {
 						user: {}, // Form data object for adding users
 						group: {} // Form data object for adding groups
@@ -67,7 +68,7 @@ angular.module("ool.directives")
 
 			$scope.commit = () => {
 				$scope.committing = true;
-				ACLService.setACL($attributes.aclSetter, $scope.permissions).success(() => {
+				ACLService.setACL($attributes.aclSetter, $scope.permissions).then(() => {
 					$scope.refresh();
 					$scope.committing = false;
 				});

@@ -66,12 +66,8 @@
                 <button type="button"
                     tooltip="{{ 'admin.users.list.user.editButton' | translate }}"
                     class="hidden-print pull-right btn btn-primary btn-xs fa fa-pencil"
-                    ui-sref="administrativePersonalInfoModificationView({userId: user.id})"
-                    ng-if="security.hasAnyPermission('view_others_user_details',
-                              'change_other_users_password',
-                              'change_other_users_personal_info',
-                              'view_other_users_personal_info',
-                              'manage_principal_permissions')">
+                    secref
+                    ui-sref="administrativePersonalInfoModificationView({userId: user.id})">
                 </button>
             </td>
         </tr>

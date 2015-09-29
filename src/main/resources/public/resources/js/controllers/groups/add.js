@@ -54,5 +54,10 @@ module.exports = {
 	"name": "createGroup",
 	"url": "/groups/add",
 	"templateUrl": "/partials/groups/add.html",
-	"controller": controller
+	"controller": controller,
+	"data": {
+		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService) {
+			return SecurityService.hasPermission("create_group");
+		}
+	}
 };
