@@ -158,7 +158,7 @@ public class TaskViewController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/api/task/{btask}/name",
+	@RequestMapping(value = "/api/task/{task}/name",
 	        method = RequestMethod.GET,
 	        produces = MediaType.TEXT_PLAIN_VALUE)
 	public String getTaskName(@PathVariable(value = "task") final Task task,
