@@ -27,9 +27,16 @@ import java.util.concurrent.Callable;
 
 import javax.validation.Valid;
 
+import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.controller.BindingResponse;
 import org.ng200.openolympus.dto.TaskModificationDto;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.security.annotations.SecurityAnd;
+import org.ng200.openolympus.security.annotations.SecurityLeaf;
+import org.ng200.openolympus.security.annotations.SecurityOr;
+import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
+import org.ng200.openolympus.security.predicates.UserHasTaskPermission;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +50,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile("web")
+@SecurityOr({
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasTaskPermission.class)
+		})
+})
+@TaskPermissionRequired(TaskPermissionType.modify)
+@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 public class TaskModificationRestController {
 	@Autowired
 	private TaskValidator taskValidator;
@@ -52,25 +66,24 @@ public class TaskModificationRestController {
 
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
-	        throws IOException {
+			throws IOException {
 
 		final TaskModificationDto taskModificationDto = new TaskModificationDto();
 		taskModificationDto.setName(task.getName());
 		return taskModificationDto;
 	}
 
-	@RequestMapping(value = "/api/task/{task}/edit",
-	        method = RequestMethod.POST)
+	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.POST)
 	public Callable<BindingResponse> patchTask(
-	        @PathVariable("task") final Task task,
-	        @Valid final TaskModificationDto taskModificationDto,
-	        final BindingResult bindingResult) {
+			@PathVariable("task") final Task task,
+			@Valid final TaskModificationDto taskModificationDto,
+			final BindingResult bindingResult) {
 		return () -> {
 			if (bindingResult.hasErrors()) {
 				throw new BindException(bindingResult);
 			}
 			this.taskValidator.validate(taskModificationDto, bindingResult,
-		            task.getName(), true);
+					task.getName(), true);
 			if (bindingResult.hasErrors()) {
 				throw new BindException(bindingResult);
 			}

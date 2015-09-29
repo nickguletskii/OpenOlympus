@@ -34,7 +34,8 @@ public class ContestResultsPermissionPredicate
 		if (aclService.hasContestPermission(contest, user,
 				ContestPermissionType.view_results_during_contest))
 			return SecurityClearanceType.ANONYMOUS;
-		if (contestService.isContestOverIncludingAllTimeExtensions(contest)
+		if (contestService.getRunningContest() == null && contestService
+				.isContestOverIncludingAllTimeExtensions(contest)
 				&& aclService.hasContestPermission(contest, user,
 						ContestPermissionType.view_results_after_contest))
 			return SecurityClearanceType.ANONYMOUS;
