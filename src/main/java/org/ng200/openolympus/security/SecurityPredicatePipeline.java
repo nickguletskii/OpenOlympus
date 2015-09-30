@@ -22,6 +22,7 @@ public class SecurityPredicatePipeline {
 		this.dslContext = dslContext;
 		user = (User) Optional.ofNullable(SecurityContextHolder.getContext())
 				.map(c -> c.getAuthentication()).map(a -> a.getPrincipal())
+				.filter(p -> p instanceof User)
 				.orElse(null);
 	}
 
