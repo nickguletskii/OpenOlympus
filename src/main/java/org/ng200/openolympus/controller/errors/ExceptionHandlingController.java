@@ -61,6 +61,7 @@ public class ExceptionHandlingController {
 	}
 
 	@ExceptionHandler(GeneralNestedRuntimeException.class)
+	@ResponseBody
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public String handleNestedException(GeneralNestedRuntimeException ex)
 			throws Throwable {
