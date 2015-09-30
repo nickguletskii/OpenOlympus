@@ -61,12 +61,12 @@
         <tr ng-repeat="user in users">
             <td>
                 <button type="button"
-                    tooltip="{{user.error}}"
+                    tooltip="{{getTooltipForUser(user)}}"
                     class="btn btn-xs"
-                    ng-class="{'btn-default':!user.checked, 'btn-success':user.checked &amp;&amp; !user.error, 'btn-danger':!!user.error}"
+                    ng-class="getButtonClassForUser(user)"
                     ng-click="user.checked=!user.checked">
                     <i class="fa"
-                        ng-class="{'fa-square-o':!user.checked, 'fa-check-square':user.checked}"></i>
+                        ng-class="getButtonIconClassForUser(user)"></i>
                 </button>
             </td>
             <td>{{user.username}}</td>

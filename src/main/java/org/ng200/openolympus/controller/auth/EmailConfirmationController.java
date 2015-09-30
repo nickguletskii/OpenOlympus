@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-//TODO: Fix confirmation emails
 @Controller
 @Profile("web")
 @RequestMapping(value = "/confirmEmail")

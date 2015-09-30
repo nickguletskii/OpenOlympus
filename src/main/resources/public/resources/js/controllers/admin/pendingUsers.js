@@ -24,7 +24,7 @@
 
 var _ = require("lodash");
 
-const controller = /*@ngInject*/ function($scope, $stateParams, UserService, users, userCount) {
+const controller = /*@ngInject*/ function($scope, $stateParams, UserService, users, userCount, $translate) {
 	var page = $stateParams.page;
 
 	$scope.page = $stateParams.page;
@@ -32,9 +32,46 @@ const controller = /*@ngInject*/ function($scope, $stateParams, UserService, use
 	$scope.users = users;
 	$scope.userCount = userCount;
 
+	let tooltipKeys = {
+		"approvalEmailAlreadySent": "admin.unapprovedUsers.approvalEmailAlreadySent",
+		"resendApprovalEmail": "admin.unapprovedUsers.resendApprovalEmail",
+		"sendApprovalEmail": "admin.unapprovedUsers.sendApprovalEmail"
+	};
+
+	let tooltips = {};
+	_.forEach(tooltipKeys, (translationKey) =>
+		$translate(translationKey).then(
+			(translation) => {
+				tooltips[translationKey] = translation;
+			},
+
+			() => {
+				tooltips[translationKey] = "Missing localisation: " + translationKey;
+			})
+	);
+
+
+	$scope.getTooltipForUser = function(user) {
+		if (user.statusMessage) {
+			return user.statusMessage;
+		}
+		if (user.approvalEmailSent) {
+			if (user.checked) {
+				return tooltips[tooltipKeys["resendApprovalEmail"]];
+			} else {
+				return tooltips[tooltipKeys["approvalEmailAlreadySent"]];
+			}
+		}
+		if (user.checked) {
+			return tooltips[tooltipKeys["sendApprovalEmail"]];
+		} else {
+			return "";
+		}
+	}
+
 	function updateUsers() {
 		UserService.getPendingUsersPage(page).then(function(users) {
-			$scope.users = users;
+			$scope.users = user;
 		});
 		UserService.countPendingUsers().then(function(count) {
 			$scope.userCount = count;
@@ -58,7 +95,8 @@ const controller = /*@ngInject*/ function($scope, $stateParams, UserService, use
 				}
 				return _.assign(user, {
 					"checked": true,
-					"error": userResponse.statusMessage
+					"statusMessage": userResponse.statusMessage,
+					"resultType": userResponse.resultType
 				});
 			});
 			$scope.loading = false;
@@ -94,6 +132,39 @@ const controller = /*@ngInject*/ function($scope, $stateParams, UserService, use
 			updateUsers();
 		});
 	};
+
+	$scope.getButtonClassForUser = function(user) {
+		if (user.resultType === "FAILURE") {
+			return "btn-danger";
+		}
+		if (user.resultType === "SUCCESS") {
+			return "btn-success";
+		}
+		if (user.approvalEmailSent) {
+			return "btn-warning";
+		}
+		if (user.checked) {
+			return "btn-info";
+		}
+		return "btn-default";
+	};
+
+	$scope.getButtonIconClassForUser = function(user) {
+		if (user.approvalEmailSent) {
+			if (user.checked) {
+				return "fa-refresh";
+			} else {
+				return "fa-hourglass-o";
+			}
+		}
+		if (user.checked) {
+			return "fa-check-square";
+		} else {
+			return "fa-square-o";
+		}
+	};
+
+
 };
 
 module.exports = {

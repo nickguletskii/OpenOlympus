@@ -28,16 +28,20 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
+import org.apache.commons.mail.EmailException;
 import org.apache.http.client.ClientProtocolException;
 import org.ng200.openolympus.controller.user.RegistrationRestController.RegistrationResponse.Status;
 import org.ng200.openolympus.dto.UserDto;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.CaptchaService;
+import org.ng200.openolympus.services.UserApprovalService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.validation.UserDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -112,6 +116,9 @@ public class RegistrationRestController {
 
 	}
 
+	@Value("${openolympus.userApproval.automaticallyApprove:false}")
+	public boolean automaticallyApprove = false;
+
 	@Autowired
 	private UserDtoValidator userDtoValidator;
 	@Autowired
@@ -119,6 +126,9 @@ public class RegistrationRestController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private UserApprovalService userApprovalService;
 
 	@Autowired
 	private CaptchaService captchaService;
@@ -138,7 +148,8 @@ public class RegistrationRestController {
 			@RequestBody @Valid final UserDto userDto,
 			final BindingResult bindingResult)
 					throws BindException, URISyntaxException,
-					ClientProtocolException, IOException {
+					ClientProtocolException, IOException, MessagingException,
+					EmailException {
 		final List<String> recaptchaErrorCodes = this.captchaService
 				.checkCaptcha(userDto.getRecaptchaResponse());
 		if (recaptchaErrorCodes != null && !recaptchaErrorCodes.isEmpty()) {
@@ -175,6 +186,10 @@ public class RegistrationRestController {
 				.setEnabled(true);
 
 		this.userService.insertUser(user);
+
+		if (automaticallyApprove) {
+			this.userApprovalService.approveUser(user);
+		}
 
 		return new RegistrationResponse(Status.OK, null, null, null);
 	}

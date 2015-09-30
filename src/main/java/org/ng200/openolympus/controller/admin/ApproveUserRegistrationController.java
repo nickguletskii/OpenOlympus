@@ -28,30 +28,39 @@ import java.util.stream.Collectors;
 import javax.mail.MessagingException;
 
 import org.apache.commons.mail.EmailException;
-import org.ng200.openolympus.Assertions;
 import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.controller.auth.EmailConfirmationController;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
+import org.ng200.openolympus.services.UserApprovalService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.util.Beans;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.APPROVE_USER_REGISTRATIONS)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVE_USER_REGISTRATIONS)
 		})
 })
 public class ApproveUserRegistrationController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(ApproveUserRegistrationController.class);
+
+	public static enum ResultType {
+		SUCCESS, FAILURE
+	}
 
 	public static class Result extends User {
 		/**
@@ -60,7 +69,10 @@ public class ApproveUserRegistrationController {
 		private static final long serialVersionUID = -6521631631272152983L;
 		private String statusMessage;
 
-		public Result(User user, String message) {
+		private ResultType resultType;
+
+		public Result(User user, ResultType resultType, String message) {
+			this.resultType = resultType;
 			this.statusMessage = message;
 
 			Beans.copy(user, this);
@@ -73,46 +85,35 @@ public class ApproveUserRegistrationController {
 		public void setStatusMessage(String statusMessage) {
 			this.statusMessage = statusMessage;
 		}
-	}
 
-	private final boolean emailConfirmationEnabled = false;// TODO: reimplement
-	                                                       // email
-	                                                       // confirmation
+		public ResultType getResultType() {
+			return resultType;
+		}
+
+		public void setResultType(ResultType resultType) {
+			this.resultType = resultType;
+		}
+	}
 
 	@Autowired
 	private UserService userService;
 
-	public void approveUser(User user) throws MessagingException,
-	        EmailException {
-		Assertions.resourceExists(user);
+	@Autowired
+	private UserApprovalService userApprovalService;
 
-		if (this.emailConfirmationEnabled) {
-
-			final String link = EmailConfirmationController.getUriBuilder()
-			        .queryParam("user", user.getId())
-			        .queryParam("token", user.getEmailConfirmationToken())
-			        .build().encode().toUriString();
-
-			// TODO: reimplement email confirmation
-			user.setApprovalEmailSent(true);
-			user = this.userService.updateUser(user);
-		} else {
-			user.setApproved(true);
-			user.setEmailConfirmationToken(null);
-			this.userService.updateUser(user);
-		}
-	}
-
+	@ResponseBody
 	@RequestMapping(value = "/api/admin/users/approve", method = RequestMethod.POST)
 	public List<Result> approveUsers(@RequestBody List<Long> userIds) {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
-		        .filter(user -> !user.getApprovalEmailSent()).map(u -> {
-			        try {
-				        this.approveUser(u);
-			        } catch (MessagingException | EmailException e) {
-				        return new Result(u, e.getMessage());
-			        }
-			        return new Result(u, "OK");
-		        }).collect(Collectors.toList());
+				.map(u -> {
+					try {
+						userApprovalService.approveUser(u);
+						return new Result(u, ResultType.SUCCESS, "OK");
+					} catch (MessagingException | EmailException e) {
+						return new Result(u, ResultType.FAILURE,
+								e.getMessage());
+					}
+				})
+				.collect(Collectors.toList());
 	}
 }
