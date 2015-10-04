@@ -22,30 +22,52 @@
     THE SOFTWARE.
 
 -->
+<acl-editor acl-getter="/api/group/{{groupId}}/acl"
+    acl-setter="/api/group/{{groupId}}/acl"
+    localisation-namespace="groups.groupView.permissions"></acl-editor>
+<form name="addUserForm"
+    form-for="user"
+    validation-rules="userValidationRules"
+    submit-with="addUser(user)">
+    <acl-typeahead label=""
+        attribute="user"
+        class="fill-parent"
+        option-getter="userOptionProvider"
+        typeahead-template="directives/aclEditor/typeaheadUserItem.html"
+        button-text="{{ buttonStatus.buttonMessage | translate: buttonStatus.data}}"
+        button-success="buttonStatus.isSuccess"></acl-typeahead>
+</form>
 <table class="table table-striped table-bordered table-hover"
-	id="groupMembersTable">
-	<thead>
-		<tr>
-			<th>{{ 'groups.groupView.member.username' | translate}}</th>
-			<th>{{ 'groups.groupView.member.firstNameMain' | translate}}</th>
-			<th>{{ 'groups.groupView.member.middleNameMain' | translate}}</th>
-			<th>{{ 'groups.groupView.member.lastNameMain' | translate}}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-repeat="user in members">
-			<td>{{user.username}}</td>
-			<td>{{user.firstNameMain}}</td>
-			<td>{{user.middleNameMain}}</td>
-			<td>{{user.lastNameMain}}</td>
-		</tr>
-	</tbody>
+    id="groupMembersTable">
+    <thead>
+        <tr>
+            <th>{{ 'groups.groupView.member.username' | translate}}</th>
+            <th>{{ 'groups.groupView.member.firstNameMain' | translate}}</th>
+            <th>{{ 'groups.groupView.member.middleNameMain' | translate}}</th>
+            <th>{{ 'groups.groupView.member.lastNameMain' | translate}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="user in members">
+            <td>{{user.username}}</td>
+            <td>{{user.firstNameMain}}</td>
+            <td>{{user.middleNameMain}}</td>
+            <td>{{user.lastNameMain}}
+                <button class="btn btn-danger btn-xs fa fa-remove pull-right"
+                    ng-really-click="removeUser(item)"
+                    item="user"
+                    ng-really-yes-button="{{'groups.groupView.member.removeConfirmationButton'|translate}}"
+                    ng-really-message="{{'groups.groupView.member.removeConfirmation' |translate}}">
+                </button>
+            </td>
+        </tr>
+    </tbody>
 </table>
 <pagination total-items="memberCount"
-	ng-model="page"
-	previous-text="&lsaquo;"
-	next-text="&rsaquo; "
-	first-text="&laquo; "
-	last-text="&raquo; "
-	direction-links="true "
-	boundary-links="true "></pagination>
+    ng-model="page"
+    previous-text="&lsaquo;"
+    next-text="&rsaquo; "
+    first-text="&laquo; "
+    last-text="&raquo; "
+    direction-links="true "
+    boundary-links="true "></pagination>

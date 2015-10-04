@@ -56,8 +56,8 @@ angular.module("ool.directives")
 			$scope.collapsed = true;
 
 			$scope.refresh = () =>
-				ACLService.getACL($attributes.aclGetter).then((data) => {
-					let permissions = data.permissions;
+				ACLService.getACL($attributes.aclGetter).then((response) => {
+					let permissions = response.data;
 					$scope.permissions = _.map(permissions, perm => _.assign(perm, {
 						user: {}, // Form data object for adding users
 						group: {} // Form data object for adding groups
@@ -259,7 +259,8 @@ angular.module("ool.directives")
 				optionGetter: "=",
 				typeaheadTemplate: "@",
 				tooltip: "@?",
-				buttonText: "@?"
+				buttonText: "@?",
+				buttonSuccess: "=?"
 			},
 			link: function($scope, $element, $attributes, formForController) {
 				FieldHelper.manageFieldRegistration($scope, $attributes, formForController);

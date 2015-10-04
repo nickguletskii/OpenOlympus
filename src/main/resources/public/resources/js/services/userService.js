@@ -25,7 +25,7 @@
 var Util = require("oolutil");
 var _ = require("lodash");
 var angular = require("angular");
-angular.module("ool.services").factory("UserService", /*@ngInject*/ function($http) {
+angular.module("ool.services").factory("UserService", /*@ngInject*/ function($http, $q, Upload, $rootScope) {
 	return {
 		getCurrentUser: function() {
 			return $http.get("api/user/personalInfo", {}).then(_.property("data"));
@@ -71,6 +71,34 @@ angular.module("ool.services").factory("UserService", /*@ngInject*/ function($ht
 			return $http.get("api/archive/rank", {
 				params: {
 					page: page
+				}
+			}).then(_.property("data"));
+		},
+		addUserToGroup: function(groupId, username) {
+			let deferred = $q.defer();
+
+			let formData = new FormData();
+			formData.append("username", username);
+
+			Upload.http({
+				method: "POST",
+				url: "/api/group/" + groupId + "/addUser",
+				headers: {
+					"X-Auth-Token": $rootScope.authToken,
+					"Content-Type": undefined
+				},
+				data: formData,
+				transformRequest: angular.identity
+			}).success(function(data) {
+				deferred.resolve(data);
+			});
+
+			return deferred.promise;
+		},
+		removeUserFromGroup: function(groupId, userId) {
+			return $http.delete("/api/group/" + groupId + "/removeUser", {
+				params: {
+					user: userId
 				}
 			}).then(_.property("data"));
 		}

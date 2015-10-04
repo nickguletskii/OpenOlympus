@@ -126,6 +126,13 @@ public class DaoConfig {
 			groupDao.insert(new Group()
 					.setName(NameConstants.SUPERUSERS_GROUP_NAME));
 		}
+		if (groupDao.fetchOneByName(
+				NameConstants.APPROVED_USERS_GROUP_NAME) == null) {
+			DaoConfig.logger
+					.info("The group of all approved users doesn't exist. Creating...");
+			groupDao.insert(new Group()
+					.setName(NameConstants.APPROVED_USERS_GROUP_NAME));
+		}
 
 		if (userDao.fetchOneByUsername(
 				NameConstants.SYSTEM_ACCOUNT_NAME) == null) {

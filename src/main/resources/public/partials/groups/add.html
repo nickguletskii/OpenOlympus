@@ -24,25 +24,26 @@
 -->
 <h1>{{'group.createForm.labels.heading'|translate}}</h1>
 <form form-autoconfig="form"
-	novalidate>
-	<div class="panel panel-default">
-		<div class="panel-body">
-			<text-field label-translate="group.createForm.labels.name"
-				type="text"
-				attribute="name"></text-field>
-			<submit-button label="{{ form.submitButtonText | translate}}"
-				button-class="{{form.submitButtonClass}}"
-				icon="{{form.submitButtonIcon}}"></submit-button>
-		</div>
-	</div>
-	<div class="panel panel-success"
-		ng-show="form.lastGroupId">
-		<div class="panel-heading">{{'group.createForm.labels.uploaded.heading'|translate}}</div>
-		<div class="panel-body">{{'group.createForm.labels.uploaded.body'|translate}}
-			<button class="btn btn-success"
-				secref ui-sref="groupView({groupId: form.lastGroupId})">{{'group.createForm.labels.goToGroupButton'|translate}}</button>
-		</div>
-	</div>
-	<form-progress-panel form="form"
-		localisation-namespace="group.createForm" />
+    novalidate>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <text-field label-translate="group.createForm.labels.name"
+                type="text"
+                attribute="name"></text-field>
+            <submit-button label="{{ form.submitButtonText | translate}}"
+                button-class="{{form.submitButtonClass}}"
+                icon="{{form.submitButtonIcon}}"></submit-button>
+        </div>
+    </div>
+    <div class="panel panel-success"
+        ng-if="form.lastGroupId">
+        <div class="panel-heading">{{'group.createForm.labels.uploaded.heading'|translate}}</div>
+        <div class="panel-body">{{'group.createForm.labels.uploaded.body'|translate}}
+            <button class="btn btn-success"
+                secref
+                ui-sref="groupView({groupId: form.lastGroupId})">{{'group.createForm.labels.goToGroupButton'|translate}}</button>
+        </div>
+    </div>
+    <form-progress-panel form="form"
+        localisation-namespace="group.createForm" />
 </form>

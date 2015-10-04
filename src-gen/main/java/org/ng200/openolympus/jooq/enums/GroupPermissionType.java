@@ -32,7 +32,9 @@ public enum GroupPermissionType implements EnumType {
 
 	know_about("know_about"),
 
-	edit("edit");
+	edit("edit"),
+
+	manage_acl("manage_acl");
 
 	private final String literal;
 

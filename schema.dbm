@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="0,358" last-zoom="0.65"
+<dbmodel pgmodeler-ver="0.8.1" last-position="0,586" last-zoom="0.65"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -320,7 +320,7 @@ END;]]></definition>
 <usertype name="general_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="create_contests,remove_contests,create_tasks,remove_tasks,view_others_user_details,remove_user,approve_user_registrations,change_other_users_password,change_other_users_personal_info,contest_organiser,enumerate_all_users,task_supervisor,view_other_users_personal_info,create_groups,list_groups,manage_principal_permissions,view_all_solutions,view_archive_during_contest,rejudge_tasks"/>
+	<enumeration values="create_contests,remove_contests,create_tasks,remove_tasks,view_others_user_details,remove_user,approve_user_registrations,change_other_users_password,change_other_users_personal_info,enumerate_all_users,task_supervisor,view_other_users_personal_info,create_groups,list_groups,manage_principal_permissions,view_all_solutions,view_archive_during_contest,rejudge_tasks"/>
 </usertype>
 
 <table name="contest_participation">
@@ -555,7 +555,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1"/>
+		<type name="public.general_permission_type" dimension="1" precision="32750"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -742,6 +742,9 @@ END;]]></definition>
 		<position x="1399.92" y="757.6"/>
 	<position x="1399.92" y="302.055"/>
 	</line>
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
 </relationship>
 
 <index name="solution_by_user" table="public.solution"
@@ -798,7 +801,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="2"/>
+		<type name="public.verdict_status_type" precision="32750"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -1010,7 +1013,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32766"/>
+		<type name="public.task_permission_type" precision="32750"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1029,33 +1032,45 @@ END;]]></definition>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
-	<definition><![CDATA[BEGIN
-	IF (TG_OP = 'UPDATE' AND NEW.superuser = TRUE AND OLD.superuser = FALSE) THEN
-		INSERT INTO group_users(group_id, "user_id",can_add_others_to_group) VALUES
-			((SELECT id FROM "group" WHERE name='#{superusers}'), NEW.id, FALSE);
-		RETURN NEW;
-	ELSIF (TG_OP = 'UPDATE' AND NEW.superuser = FALSE AND OLD.superuser = TRUE) THEN
-		DELETE FROM group_users
-			WHERE group_users.user_id =NEW.id
-			AND group_users.group_id=(SELECT id FROM "group" WHERE name='#{superusers}');
-		RETURN NEW;
-	ELSIF (TG_OP = 'UPDATE') THEN
-		RETURN NEW;
-	ELSIF (TG_OP = 'INSERT') THEN
-		INSERT INTO group_users(group_id, "user_id", can_add_others_to_group)
-		VALUES ((SELECT id FROM "group" WHERE name='#{allUsers}'), NEW.id, FALSE);
-		IF(NEW.superuser=TRUE) THEN
-			INSERT INTO group_users(
-				group_id, "user_id", can_add_others_to_group)
-			VALUES ((SELECT id FROM "group" WHERE name='#{superusers}'), NEW.id, FALSE);
-		END IF;
-		RETURN NEW;
-	ELSIF (TG_OP = 'DELETE') THEN
-		DELETE FROM group_users
-		WHERE (name='#{superusers}' OR name='#{allUsers}')
-		AND user_id=OLD.id;
-		RETURN OLD;
+	<definition><![CDATA[DECLARE
+   superuser_group   bigint;
+   all_users_group   bigint;
+   approved_users_group   bigint;
+BEGIN
+
+superuser_group := (SELECT id FROM "group" WHERE name='#{superusers}');
+all_users_group := (SELECT id FROM "group" WHERE name='#{allUsers}');
+approved_users_group := (SELECT id FROM "group" WHERE name='#{approvedUsers}');
+
+IF (TG_OP = 'UPDATE') THEN
+	IF (NEW.superuser = TRUE AND OLD.superuser = FALSE) THEN
+		PERFORM add_to_group(superuser_group, NEW.id);
 	END IF;
+	IF (NEW.superuser = FALSE AND OLD.superuser = TRUE) THEN
+		PERFORM remove_from_group(superuser_group, NEW.id);
+	END IF;
+	IF (NEW.approved = TRUE AND OLD.approved = FALSE) THEN
+		PERFORM add_to_group(superuser_group, NEW.id);
+	END IF;
+	IF (NEW.approved = FALSE AND OLD.approved = TRUE) THEN
+		PERFORM remove_from_group(superuser_group, NEW.id);
+	END IF;
+	RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+	PERFORM add_to_group(all_users_group, NEW.id);
+	IF(NEW.approved=TRUE) THEN
+		PERFORM add_to_group(approved_users_group, NEW.id);
+	END IF;
+	IF(NEW.superuser=TRUE) THEN
+		PERFORM add_to_group(superuser_group, NEW.id);
+	END IF;
+	RETURN NEW;
+ELSIF (TG_OP = 'DELETE') THEN
+	DELETE FROM group_users
+	WHERE user_id=OLD.id;
+	RETURN OLD;
+END IF;
+
 END;]]></definition>
 </function>
 
@@ -1170,7 +1185,7 @@ END;]]></definition>
 <usertype name="group_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="view_members,add_member,remove_member,know_about,edit"/>
+	<enumeration values="view_members,add_member,remove_member,know_about,edit,manage_acl"/>
 </usertype>
 
 <function name="has_task_permission"
@@ -1314,7 +1329,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32766"/>
+	<type name="public.contest" precision="32767"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp"/>
@@ -1420,7 +1435,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type"/>
+		<type name="public.group_permission_type" precision="32750"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1698,8 +1713,7 @@ END;]]></definition>
    THEN
       DELETE FROM contest_participation
             WHERE     contest_participation.user_id = OLD.user_id
-                  AND contest_participation.contest_id = OLD.contest_id
-                  AND NOT has_contest_permission (OLD.contest_id,
+                  AND NOT has_contest_permission (contest_participation.contest_id,
                                                   OLD.user_id,
                                                   'participate');
       RETURN OLD;
@@ -1908,9 +1922,9 @@ END;]]></definition>
 
 <table name="contest_permission">
 	<schema name="public"/>
-	<position x="1145.1" y="1715.59"/>
+	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="0"/>
+		<type name="public.contest_permission_type" precision="32750"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>
@@ -2001,6 +2015,55 @@ END;
 	 table="public.contest_permission">
 		<function signature="public.trgr_contest_permissions_changed()"/>
 </trigger>
+
+<function name="add_to_group"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="group_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="user_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO group_users(group_id, "user_id",can_add_others_to_group) VALUES
+	(group_id_p, user_id_p, FALSE)]]></definition>
+</function>
+
+<function name="remove_from_group"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" protected="true" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="user_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="group_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[DELETE FROM group_users
+	WHERE group_users.user_id = user_id_p
+	AND group_users.group_id=group_id_p]]></definition>
+</function>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

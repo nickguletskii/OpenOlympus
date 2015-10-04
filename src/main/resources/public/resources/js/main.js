@@ -23,6 +23,7 @@
 require("font-awesome-webpack");
 
 var angular = require("angular");
+var _ = require("lodash");
 require("angular-ui-router");
 require("angular-ui-bootstrap");
 require("angular-ui-bootstrap-tpls");
@@ -64,7 +65,10 @@ angular.module("ool")
 					return response;
 				},
 				"responseError": function(response) {
-					if (response.status === 500) {
+					if(!_.has(response, "config.method")){
+						console.error("No response method for response", response);
+					}
+					if (response.status === 500 || !response.config.method) {
 						$rootScope.showErrorModal = true;
 						return $q.reject(response);
 					}

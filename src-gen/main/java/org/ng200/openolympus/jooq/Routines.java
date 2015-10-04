@@ -15,6 +15,7 @@ import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
 import org.ng200.openolympus.jooq.enums.GroupPermissionType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
+import org.ng200.openolympus.jooq.routines.AddToGroup;
 import org.ng200.openolympus.jooq.routines.CheckImmutability;
 import org.ng200.openolympus.jooq.routines.ContestParticipationImmutableColumns;
 import org.ng200.openolympus.jooq.routines.GetContestEnd;
@@ -57,6 +58,7 @@ import org.ng200.openolympus.jooq.routines.PermissionAppliesToPrincipal;
 import org.ng200.openolympus.jooq.routines.PrincipalImmutableColumns;
 import org.ng200.openolympus.jooq.routines.PurgeGargabeContestParticipations;
 import org.ng200.openolympus.jooq.routines.RaiseContestIntersectsError;
+import org.ng200.openolympus.jooq.routines.RemoveFromGroup;
 import org.ng200.openolympus.jooq.routines.SetLimit;
 import org.ng200.openolympus.jooq.routines.ShowLimit;
 import org.ng200.openolympus.jooq.routines.ShowTrgm;
@@ -86,6 +88,17 @@ import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Routines {
+
+	/**
+	 * Call <code>public.add_to_group</code>
+	 */
+	public static void addToGroup(Configuration configuration, Long groupIdP, Long userIdP) {
+		AddToGroup p = new AddToGroup();
+		p.setGroupIdP(groupIdP);
+		p.setUserIdP(userIdP);
+
+		p.execute(configuration);
+	}
 
 	/**
 	 * Call <code>public.check_immutability</code>
@@ -1284,6 +1297,17 @@ public class Routines {
 		RaiseContestIntersectsError f = new RaiseContestIntersectsError();
 
 		return f.asField();
+	}
+
+	/**
+	 * Call <code>public.remove_from_group</code>
+	 */
+	public static void removeFromGroup(Configuration configuration, Long userIdP, Long groupIdP) {
+		RemoveFromGroup p = new RemoveFromGroup();
+		p.setUserIdP(userIdP);
+		p.setGroupIdP(groupIdP);
+
+		p.execute(configuration);
 	}
 
 	/**

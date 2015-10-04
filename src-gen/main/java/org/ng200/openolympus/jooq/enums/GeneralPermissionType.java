@@ -56,7 +56,9 @@ public enum GeneralPermissionType implements EnumType {
 
 	view_all_solutions("view_all_solutions"),
 
-	view_archive_during_contest("view_archive_during_contest");
+	view_archive_during_contest("view_archive_during_contest"),
+
+	rejudge_tasks("rejudge_tasks");
 
 	private final String literal;
 

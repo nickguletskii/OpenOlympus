@@ -23,8 +23,9 @@
 package org.ng200.openolympus;
 
 public class NameConstants {
-	public static String SUPERUSER_ACCOUNT_NAME = "root";
-	public static String SYSTEM_ACCOUNT_NAME = "system";
-	public static String ALL_USERS_GROUP_NAME = "#{allUsers}";
-	public static String SUPERUSERS_GROUP_NAME = "#{superusers}";
+	public static final String SUPERUSER_ACCOUNT_NAME = "root";
+	public static final String SYSTEM_ACCOUNT_NAME = "system";
+	public static final String ALL_USERS_GROUP_NAME = "#{allUsers}";
+	public static final String SUPERUSERS_GROUP_NAME = "#{superusers}";
+	public static final String APPROVED_USERS_GROUP_NAME = "#{approvedUsers}";
 }

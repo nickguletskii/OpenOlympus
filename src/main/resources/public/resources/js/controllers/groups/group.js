@@ -22,13 +22,94 @@
  */
 "use strict";
 
-const controller = /*@ngInject*/ function($scope,
-	$stateParams, members, membersCount) {
+let angular = require("angular");
+let _ = require("lodash");
+
+const controller = /*@ngInject*/ function($scope, $rootScope,
+	$stateParams, $q, $http, Upload, $translate, members, membersCount, GroupService, UserService) {
 
 	$scope.page = $stateParams.page;
 
+	$scope.groupId = $stateParams.groupId;
+
 	$scope.members = members;
 	$scope.membersCount = membersCount;
+
+	$scope.user = {};
+
+	function updateUsers() {
+		GroupService
+			.getMembersPage($stateParams.groupId, $stateParams.page)
+			.then(
+				(newMembers) =>
+				$scope.members = newMembers);
+	}
+
+
+	$scope.userOptionProvider = function(filterText) {
+		var deferred = $q.defer();
+		$http.get("/api/userCompletion", {
+			params: {
+				term: filterText
+			}
+		}).then((response) => {
+			deferred.resolve(response.data);
+		}, () => {
+			deferred.reject();
+			throw new Error("Principal completion failed.");
+		});
+		return deferred.promise;
+	};
+
+
+	class ButtonStatus {
+		get isSuccess() {
+			return this.lastAdded && (
+				(this.lastAdded === $scope.user.user) ||
+				(this.lastAdded === $scope.user.user.username)
+			);
+		}
+		get buttonMessage() {
+			if (this.isSuccess) {
+				return "groups.groupView.addUserButton.success";
+			}
+			return "groups.groupView.addUserButton";
+		}
+	}
+	$scope.buttonStatus = new ButtonStatus();
+
+	$scope.addUser = function(form) {
+		let deferred = $q.defer();
+		let username = form.user.username || form.user;
+		UserService.addUserToGroup($stateParams.groupId, username).then(function(data) {
+			let errorMapping = {
+				"USER_ALREADY_IN_GROUP": "groups.groupView.addUser.userAlreadyInGroup",
+				"NO_SUCH_USER": "groups.groupView.addUser.noSuchUser"
+			};
+
+			if (_.has(errorMapping, data)) {
+				$translate([errorMapping[data]]).then(map => {
+					deferred.reject({
+						user: map[errorMapping[data]]
+					});
+				});
+			} else {
+				$scope.buttonStatus.data = {
+					username: username
+				};
+				$scope.buttonStatus.lastAdded = username;
+				deferred.resolve();
+
+				updateUsers();
+			}
+		});
+		return deferred.promise;
+	};
+
+	$scope.removeUser = function(user) {
+		UserService.removeUserFromGroup($stateParams.groupId, user.id)
+			.then(updateUsers);
+	};
 };
 module.exports = {
 	"name": "groupView",

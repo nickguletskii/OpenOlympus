@@ -22,17 +22,37 @@
     THE SOFTWARE.
 
 -->
-<div class="form-group" ng-class="{ 'disabled': disable || model.disabled,
+<div class="form-group"
+    ng-class="{ 'disabled': disable || model.disabled,
                   'has-error': model.error}">
-    <field-label ng-if="label" input-uid="{{model.uid + '-filter'}}" iud="{{model.uid}}-label" label="{{label}}" help="{{help}}" required="{{model.required}}">
+    <field-label ng-if="label"
+        input-uid="{{model.uid + '-filter'}}"
+        iud="{{model.uid}}-label"
+        label="{{label}}"
+        help="{{help}}"
+        required="{{model.required}}">
     </field-label>
-    <field-error error="model.error" uid="{{model.uid}}-error">
+    <field-error error="model.error"
+        uid="{{model.uid}}-error">
     </field-error>
     <div class="input-group">
-        <input aria-manager type="text"  id="{{model.uid}}-typeahead" name="{{attribute}}" ng-model="model.bindable" placeholder="{{placeholder}}" form-for-debounce="{{debounce}}" ng-disabled="disable || model.disabled"  typeahead="item for items in optionGetter($viewValue)" typeahead-loading="loading" class="form-control"
-        typeahead-template-url="{{typeaheadTemplate}}" typeahead-input-formatter="formatData(model)" typeahead-on-select="selectItem($item, $model, $label)">
+        <input aria-manager
+            type="text"
+            id="{{model.uid}}-typeahead"
+            name="{{attribute}}"
+            ng-model="model.bindable"
+            placeholder="{{placeholder}}"
+            form-for-debounce="{{debounce}}"
+            ng-disabled="disable || model.disabled"
+            typeahead="item for items in optionGetter($viewValue)"
+            typeahead-loading="loading"
+            class="form-control"
+            typeahead-template-url="{{typeaheadTemplate}}"
+            typeahead-input-formatter="formatData(model)"
+            typeahead-on-select="selectItem($item, $model, $label)">
         <span class="input-group-btn">
-            <button class="btn btn-default" type="submit" ng-disabled="disable || submitButtonModel.disabled || !model.bindable" tooltip="{{tooltip}}" tooltip-trigger="mouseenter"><i class="fa fa-plus fa-fw"></i>{{buttonText | translate}}</button>
+            <button class="btn btn-default" ng-class="{'btn-success': buttonSuccess}" type="submit" ng-disabled="disable || submitButtonModel.disabled || !model.bindable" tooltip="{{tooltip}}" tooltip-trigger="mouseenter">
+            <i class="fa fa-fw" ng-class="{'fa-plus': !buttonSuccess, 'fa-check': buttonSuccess}"></i>{{buttonText | translate}}</button>
         </span>
     </div>
 </div>
