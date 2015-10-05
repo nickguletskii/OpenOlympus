@@ -31,7 +31,8 @@
 <h2>{{name}}</h2>
 <acl-editor acl-getter="/api/task/{{taskId}}/acl"
 	acl-setter="/api/task/{{taskId}}/acl"
-	localisation-namespace="task.permissions"></acl-editor>
+	localisation-namespace="task.permissions"
+    async-if="security.hasTaskPermission(taskId, 'manage_acl')"></acl-editor>
 <div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">{{ 'task.description.heading' | translate }}</h3>
