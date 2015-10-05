@@ -414,10 +414,10 @@ public class ContestService extends GenericCreateUpdateRepository {
 				map.entrySet().stream().flatMap(e -> e.getValue().stream()
 						.map(id -> new Pair<>(e.getKey(), id)))
 						.map(p -> {
-							final ContestPermissionRecord record = new ContestPermissionRecord(
-									p.getFirst(),
-									contest.getId(),
-									p.getSecond());
+							final ContestPermissionRecord record = new ContestPermissionRecord();
+							record.setContestId(contest.getId());
+							record.setPrincipalId(p.getSecond());
+							record.setPermission(p.getFirst());
 							record.attach(this.dslContext.configuration());
 							return record;
 						}).collect(Collectors.toList()))

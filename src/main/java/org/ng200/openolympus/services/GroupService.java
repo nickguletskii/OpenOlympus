@@ -155,9 +155,10 @@ public class GroupService extends GenericCreateUpdateRepository {
 				map.entrySet().stream().flatMap(e -> e.getValue().stream()
 						.map(id -> new Pair<>(e.getKey(), id)))
 						.map(p -> {
-							final GroupPermissionRecord record = new GroupPermissionRecord(
-									groupId,
-									p.getSecond(), p.getFirst());
+							final GroupPermissionRecord record = new GroupPermissionRecord();
+							record.setGroupId(groupId);
+							record.setPrincipalId(p.getSecond());
+							record.setPermission(p.getFirst());
 							record.attach(this.dslContext.configuration());
 							return record;
 						}).collect(Collectors.toList()))

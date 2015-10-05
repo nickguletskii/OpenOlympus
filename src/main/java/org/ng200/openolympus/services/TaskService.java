@@ -280,9 +280,10 @@ public class TaskService extends GenericCreateUpdateRepository {
 		        map.entrySet().stream().flatMap(e -> e.getValue().stream()
 		                .map(id -> new Pair<>(e.getKey(), id)))
 		                .map(p -> {
-			                final TaskPermissionRecord record = new TaskPermissionRecord(
-		                            taskId,
-		                            p.getSecond(), p.getFirst());
+			                final TaskPermissionRecord record = new TaskPermissionRecord();
+			                record.setTaskId(taskId);
+			                record.setPrincipalId(p.getSecond());
+			                record.setPermission(p.getFirst());
 			                record.attach(this.dslContext.configuration());
 			                return record;
 		                }).collect(Collectors.toList()))
