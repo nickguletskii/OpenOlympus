@@ -69,27 +69,6 @@ public class SecurityService {
 		return this.contestService.getRunningContest();
 	}
 
-	public boolean isContestInProgressForUser(final Contest contest,
-			String username) {
-		final Param<Integer> contestV = DSL.val(contest.getId());
-		final Field<Timestamp> now = DSL.val(Timestamp.from(Instant.now()));
-		final Field<Long> userV = this.dslContext.select(Tables.USER.ID)
-				.from(Tables.USER)
-				.where(Tables.USER.USERNAME.eq(username)).asField();
-		return this.dslContext
-				.select(DSL.field(Routines
-						.getContestStartForUser(contestV, userV)
-						.le(now)
-						.and(Routines.getContestEndForUser(contestV, userV).ge(
-								now))))
-				.fetchOne().value1();
-	}
-
-	public boolean isContestOver(final Contest contest) {
-		return this.contestService.getContestEndIncludingAllTimeExtensions(
-				contest).isBefore(Instant.now());
-	}
-
 	public boolean isOnLockdown() {
 		// TODO: Implement lockdowns
 		return false;
