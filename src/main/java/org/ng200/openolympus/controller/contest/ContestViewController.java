@@ -27,19 +27,21 @@ import java.util.Date;
 import java.util.List;
 
 import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.security.annotations.ContestPermissionRequired;
+import org.ng200.openolympus.security.UserKnowsAboutContestSecurityPredicate;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.security.predicates.UserContestViewSecurityPredicate;
+import org.ng200.openolympus.services.AclService;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,15 +52,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("web")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserContestViewSecurityPredicate.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
 		})
 })
-@ContestPermissionRequired(ContestPermissionType.participate)
 public class ContestViewController {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContestViewController.class);
+
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = UserKnowsAboutContestSecurityPredicate.class)
 	public static class ContestDTO {
 		private String name;
 		private TimingDTO timings;
@@ -102,7 +105,7 @@ public class ContestViewController {
 		private Date endTimeIncludingTimeExtensions;
 
 		public TimingDTO(Date startTime, Date endTime,
-		        Date endTimeIncludingTimeExtensions) {
+				Date endTimeIncludingTimeExtensions) {
 			this.startTime = startTime;
 			this.endTime = endTime;
 			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
@@ -125,7 +128,7 @@ public class ContestViewController {
 		}
 
 		public void setEndTimeIncludingTimeExtensions(
-		        Date endTimeIncludingTimeExtensions) {
+				Date endTimeIncludingTimeExtensions) {
 			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
 		}
 
@@ -139,24 +142,39 @@ public class ContestViewController {
 	private ContestService contestService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private AclService aclService;
 
-	@Cacheable(value = "contests",
-	        key = "#contest.id",
-	        unless = "#result == null")
-	@RequestMapping(value = "/api/contest/{contest}",
-	        method = RequestMethod.GET)
+	private boolean canViewTasks(User user, Contest contest) {
+		if (user.getSuperuser())
+			return true;
+		if (aclService.hasContestPermission(contest, user,
+				ContestPermissionType.list_tasks,
+				ContestPermissionType.manage_acl))
+			return true;
+		if (contestService.isContestInProgressForUser(contest, user)
+				&& aclService.hasContestPermission(contest, user,
+						ContestPermissionType.participate)) {
+			return true;
+		}
+		return false;
+	}
 
+	@RequestMapping(value = "/api/contest/{contest}", method = RequestMethod.GET)
 	public ContestDTO showContestHub(
-	        @PathVariable(value = "contest") final Contest contest,
-	        final Principal principal) {
+			@PathVariable(value = "contest") final Contest contest,
+			final Principal principal) {
 		final User user = this.userService
-		        .getUserByUsername(principal.getName());
-		final List<Task> tasks = this.contestService.getContestTasks(contest);
+				.getUserByUsername(principal.getName());
+
+		final List<Task> tasks = canViewTasks(user, contest)
+				? this.contestService.getContestTasks(contest)
+				: null;
 		return new ContestDTO(contest.getName(), new TimingDTO(
-		        contest.getStartTime(), Date.from(contest.getStartTime()
-		                .toInstant().plus(contest.getDuration())),
-		        this.contestService.getContestEndTimeForUser(contest, user)),
-		        tasks);
+				contest.getStartTime(), Date.from(contest.getStartTime()
+						.toInstant().plus(contest.getDuration())),
+				this.contestService.getContestEndTimeForUser(contest, user)),
+				tasks);
 	}
 
 }
