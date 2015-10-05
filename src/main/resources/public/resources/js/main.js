@@ -24,6 +24,7 @@ require("font-awesome-webpack");
 
 var angular = require("angular");
 var _ = require("lodash");
+var errorHandler = require("errorHandler");
 require("angular-ui-router");
 require("angular-ui-bootstrap");
 require("angular-ui-bootstrap-tpls");
@@ -39,10 +40,19 @@ require("ng-file-upload");
 require("app");
 
 angular.module("ool")
+	.factory("missingTranslationHandler", function() {
+		return function(translationId) {
+			let orig = angular.fromJson(localStorage.getItem("missingTranslations") || "[]");
+			let unified = _.union(orig, [translationId]);
+			localStorage.setItem("missingTranslations", angular.toJson(unified));
+		};
+	})
 	.config( /*@ngInject*/ function($translateProvider) {
 		$translateProvider.useSanitizeValueStrategy("escape");
 		$translateProvider.useUrlLoader("/translation");
 		$translateProvider.preferredLanguage("ru");
+		// $translateProvider.translationNotFoundIndicator("$$");
+		$translateProvider.useMissingTranslationHandler("missingTranslationHandler");
 	})
 	.config( /*@ngInject*/ function($httpProvider, $locationProvider) {
 
@@ -65,26 +75,31 @@ angular.module("ool")
 					return response;
 				},
 				"responseError": function(response) {
-					if(!_.has(response, "config.method")){
+					if (!_.has(response, "config.method")) {
 						console.error("No response method for response", response);
 					}
 					if (response.status === 500 || !response.config.method) {
-						$rootScope.showErrorModal = true;
-						return $q.reject(response);
+						errorHandler.showConnectionLostError();
+						$rootScope.$destroy();
 					}
 					var status = response.status;
 					var config = response.config;
 					var method = config.method;
 					var url = config.url;
-
-					if (status === 403) {
-						$location.path("/forbidden");
-						$rootScope.forbidden = true;
-						return $q.reject(response);
-					} else if (response.status === 401) {
-						$location.path("/login");
-					} else {
-						throw new Error(method + " on " + url + " failed with status " + status);
+					switch (status) {
+						case -1:
+							errorHandler.showConnectionLostError();
+							$rootScope.$destroy();
+							return null;
+						case 403:
+							$location.path("/forbidden");
+							$rootScope.forbidden = true;
+							break;
+						case 401:
+							$location.path("/login");
+							break;
+						default:
+							throw new Error(method + " on " + url + " failed with status " + status);
 					}
 
 					return $q.reject(response);
@@ -95,11 +110,8 @@ angular.module("ool")
 	}).factory("$exceptionHandler", /*@ngInject*/ function($injector) {
 		return function(exception) {
 			var $rootScope = $injector.get("$rootScope");
-			var $timeout = $injector.get("$timeout");
 			if (!$rootScope.forbidden) {
-				$timeout(function() {
-					$rootScope.showErrorModal = true;
-				}, 1);
+				errorHandler.showUnknownError();
 			}
 			console.error(exception);
 			//	throw exception;

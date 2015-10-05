@@ -22,18 +22,17 @@
  */
 package org.ng200.openolympus.controller.errors;
 
-import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 @Profile("web")
@@ -42,30 +41,29 @@ public class ExceptionHandlingController {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ExceptionHandlingController.class);
+
 	@ExceptionHandler(Exception.class)
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-	public String handleException(Exception ex) {
+	public ResponseEntity<ExceptionDto> handleException(Exception ex) {
 		ExceptionHandlingController.logger.error("Handling error:", ex);
-		return ex.getMessage();
+		return new ResponseEntity<ExceptionDto>(
+				new ExceptionDto("Internal server error."),
+				HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ExceptionDto> handleMethodArgumentTypeMismatchException(
+			MethodArgumentTypeMismatchException ex) {
+		return new ResponseEntity<ExceptionDto>(
+				new ExceptionDto("Invalid argument."),
+				HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-	public String handleException(HttpMediaTypeNotAcceptableException ex) {
-		ExceptionHandlingController.logger.error("Bad media types:", ex);
-		ExceptionHandlingController.logger.error("Supported media types: {}",
-				ex.getSupportedMediaTypes());
-		return ex.getMessage();
-	}
-
-	@ExceptionHandler(GeneralNestedRuntimeException.class)
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-	public String handleNestedException(GeneralNestedRuntimeException ex)
-			throws Throwable {
-		throw ex.getCause();
+	public ResponseEntity<ExceptionDto> handleException(
+			HttpMediaTypeNotAcceptableException ex) {
+		return new ResponseEntity<ExceptionDto>(
+				new ExceptionDto("Http media type not supported."),
+				HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 	}
 
 }

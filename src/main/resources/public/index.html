@@ -32,8 +32,7 @@
         content="text/html; charset=UTF-8" />
     <title>OpenOlympus</title>
     <link rel="icon"
-        type="image/png"
-        href="/favicon.png" />
+        href="/favicon.ico" />
     <link rel="stylesheet"
         href="/resources/bundled/bundle.css">
     <base href="/" />
@@ -41,7 +40,8 @@
 
 <body ui-sref-opts="reload"
     ng-class="{fullScreen: fullScreen}">
-    <div ng-show="!hideResourcesLoading"
+    <div id="loadingOverlayRoot"
+        ng-show="!hideResourcesLoading"
         class="loadingResourcesOverlay">
         <div class="loadingResourcesOverlayMid text-center">
             <h1 class="bg-primary"><i class="fa fa-cog fa-5x loadingResourcesOverlaySpinning"></i></h1>
@@ -49,7 +49,8 @@
             <h3 class="bg-primary">Loading...</h3>
         </div>
     </div>
-    <nav class="navbar navbar-default navbar-fixed-top"
+    <nav id="navbarRoot"
+        class="navbar navbar-default navbar-fixed-top"
         role="navigation"
         ng-if="!showErrorModal">
         <div class="container-fluid"
@@ -66,7 +67,7 @@
                 </button>
                 <a class="navbar-brand"
                     href="/"> <img alt="{{'topbar.openolympus' | translate}}"
-                        src="/favicon.png"> {{'topbar.openolympus' | translate}} </a>
+                        src="/favicon.ico"> {{'topbar.openolympus' | translate}} </a>
             </div>
             <div class="collapse navbar-collapse"
                 ng-class="!navCollapsed &amp;&amp; 'in'"
@@ -188,7 +189,8 @@
             </div>
         </div>
     </nav>
-    <div ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'"
+    <div id="angularRoot"
+        ng-class="stateConfig.fluidContainer ? 'container-fluid' : 'container'"
         ng-show="!showErrorModal"
         ng-cloak="">
         <div class="row">
@@ -215,18 +217,43 @@
             </div>
         </footer>
     </div>
-    <div class="container text-center"
-        ng-if="showErrorModal"
-        ng-cloak="">
+    <div id="unknownErrorRoot"
+        class="container text-center hidden">
         <div class="row">
             <span class="fa fa-exclamation-triangle text-danger"
                 style="font-size: 20em"></span>
         </div>
         <div class="row">
-            <h1>{{'error.title' | translate}}</h1>
-            <p>{{'error.body' | translate}}</p>
-            <button class="btn btn-danger"
-                on-click="window.location.reload()">{{'error.reloadPage' | translate}}</button>
+            <h1 translate="error.title">Oups, an error has occurred!</h1>
+            <p translate="error.body">You may try reloading the page or navigating back to see if the problem is temporary.</p>
+            <button class="btn btn-danger reload-button"
+                translate="error.reloadPage">Reload page</button>
+        </div>
+    </div>
+    <div id="connectionLostErrorRoot"
+        class="container text-center hidden">
+        <div class="row">
+            <span class="fa fa-chain-broken text-danger"
+                style="font-size: 20em"></span>
+        </div>
+        <div class="row">
+            <h1 translate="error.disconnected.title">Disconnected from server!</h1>
+            <p translate="error.disconnected.body">Please check your internet connection. If the problem persists, please contact the server administrators.</p>
+            <button class="btn btn-danger reload-button"
+                translate="error.reloadPage">Reload page</button>
+        </div>
+    </div>
+    <div id="gatewayTimeoutErrorRoot"
+        class="container text-center hidden">
+        <div class="row">
+            <span class="fa fa-chain-broken text-danger"
+                style="font-size: 20em"></span>
+        </div>
+        <div class="row">
+            <h1 translate="error.gatewayTimeout.title">Error 504: Gateway timeout!</h1>
+            <p translate="error.gatewayTimeout.body">The OpenOlympus server is not responding to the reverse proxy's requests. This may be caused by high load. If the problem persists, please contact the administrator.</p>
+            <button class="btn btn-danger reload-button"
+                translate="error.reloadPage">Reload page</button>
         </div>
     </div>
     <script src="/resources/bundled/js/vendor.bundle.js"></script>

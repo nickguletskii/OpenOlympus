@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License
  * Copyright (c) 2014-2015 Nick Guletskii
  *
@@ -20,33 +20,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.controller;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+let $ = require("jquery");
 
-@Controller
-@Profile("web")
-public class FaviconController {
-	private final ClassPathResource ico = new ClassPathResource(
-			"public/favicon.ico");
-	private final ClassPathResource png = new ClassPathResource(
-			"public/favicon.png");
-
-	@RequestMapping(value = "/**/favicon.ico", method = RequestMethod.GET)
-	@ResponseBody
-	public Resource faviconIco() {
-		return this.ico;
+class Handler {
+	removeAngular() {
+		$("#angularRoot").remove();
+		$("#navbarRoot").remove();
+		$("#loadingOverlayRoot").remove();
+	}
+	setupReloadButton() {
+		$(".reload-button").click(() => window.location.reload());
 	}
 
-	@RequestMapping(value = "/**/favicon.png", method = RequestMethod.GET)
-	@ResponseBody
-	public Resource faviconPng() {
-		return this.png;
+	showError(name) {
+		this.removeAngular();
+		$("#" + name).removeClass("hidden");
+		this.setupReloadButton();
+	}
+
+	showUnknownError() {
+		this.showError("unknownErrorRoot");
+	}
+	showConnectionLostError() {
+		this.showError("connectionLostErrorRoot");
+	}
+	showGatewayTimeoutError() {
+		this.showError("gatewayTimeoutErrorRoot");
 	}
 }
+
+module.exports = new Handler();

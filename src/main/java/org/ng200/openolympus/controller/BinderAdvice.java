@@ -23,6 +23,7 @@
 package org.ng200.openolympus.controller;
 
 import java.beans.PropertyEditorSupport;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ import java.time.LocalDate;
 import javax.servlet.http.HttpServletRequest;
 
 import org.joor.Reflect;
+import org.joor.ReflectException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.Principal;
@@ -85,7 +87,14 @@ public class BinderAdvice implements ApplicationContextAware {
 
 		@Override
 		public void setAsText(String text) throws IllegalArgumentException {
-			this.setValue(this.dao.call("fetchOneById", text).get());
+			try {
+				this.setValue(this.dao.call("fetchOneById", text).get());
+			} catch (ReflectException e) {
+				if (e.getCause() instanceof InvocationTargetException) {
+					throw new IllegalArgumentException(e.getCause().getCause());
+				}
+				throw e;
+			}
 		}
 
 	}
