@@ -327,17 +327,22 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 	public boolean isContestInProgressForUser(final Contest contest,
 			final User user) {
-		if (Instant.now().isBefore(contest.getStartTime().toInstant())) {
-			return false;
-		}
-		return !this.getContestEndTimeForUser(contest, user).toInstant()
-				.isAfter(Instant.now());
+		return dslContext.select(DSL.field(
+				DSL.currentTimestamp().between(
+						Routines.getContestStartForUser(
+								contest.getId(), user.getId()),
+						Routines.getContestEndForUser(
+								contest.getId(), user.getId()))))
+				.fetchOne().value1();
 	}
 
 	public boolean isContestOverIncludingAllTimeExtensions(
 			final Contest contest) {
-		return this.getContestEndIncludingAllTimeExtensions(contest).isBefore(
-				Instant.now());
+		return dslContext.select(DSL.field(
+				DSL.currentTimestamp().greaterThan(
+						Routines.getContestEnd(
+								contest.getId()))))
+				.fetchOne().value1();
 	}
 
 	public boolean isUserParticipatingIn(final User user,
