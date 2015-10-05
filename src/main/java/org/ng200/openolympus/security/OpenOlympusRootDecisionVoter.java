@@ -1,5 +1,6 @@
 package org.ng200.openolympus.security;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -21,6 +22,7 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.services.SecurityClearanceVerificationService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.util.AnnotationExtraUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,8 +182,9 @@ public class OpenOlympusRootDecisionVoter
 	private Object getObjectForParameter(MethodInvocation invocation,
 			Parameter parameter) {
 		if (parameter.isAnnotationPresent(FindAnnotation.class)) {
-			return AnnotationUtils.findAnnotation(
+			return AnnotationExtraUtils.findAnnotation(
 					invocation.getMethod(),
+					invocation.getMethod().getDeclaringClass(),
 					(Class) parameter.getType());
 		}
 		if (parameter.isAnnotationPresent(CurrentUser.class)) {
@@ -193,11 +196,14 @@ public class OpenOlympusRootDecisionVoter
 		}
 		if (parameter.isAnnotationPresent(
 				org.ng200.openolympus.security.annotations.Parameter.class)) {
-			return getObjectForParameterName(invocation,
-					AnnotationUtils.findAnnotation(
-							parameter,
-							org.ng200.openolympus.security.annotations.Parameter.class)
-							.value());
+			String parameterName = AnnotationUtils.findAnnotation(
+					parameter,
+					org.ng200.openolympus.security.annotations.Parameter.class)
+					.value();
+			Object objectForParameterName = getObjectForParameterName(
+					invocation,
+					parameterName);
+			return objectForParameterName;
 		}
 		return getObjectForParameterName(invocation, parameter.getName());
 	}
