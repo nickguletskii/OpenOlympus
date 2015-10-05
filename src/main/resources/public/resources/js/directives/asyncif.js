@@ -24,22 +24,35 @@
 
 var angular = require("angular");
 
-angular.module("ool.directives", ["ool.services"]);
 
-require("angular");
-require("directives/date/datepickerLocaldate");
-require("directives/date/datepicker");
-require("directives/reallyClick");
-require("directives/lang");
-require("directives/dynamic");
-require("directives/captcha/captcha");
-require("directives/simple/simpleDirectives");
-require("directives/acl/acl");
-require("directives/fileInput/fileInput");
-require("directives/fileInput/fileNgModel");
-require("directives/typeahead/typeahead");
-require("directives/form/defaultFormDirectives");
-require("directives/principalPermissions/principalPermissions");
-require("directives/secref");
-require("directives/asyncif");
-require("directives/hideIfDoesntContain");
+angular.module("ool.directives").directive("asyncIf", /*@ngInject*/ function($animate, $state, $injector, $rootScope, PromiseUtils) {
+	return {
+		multiElement: true,
+		transclude: "element",
+		priority: 601,
+		terminal: true,
+		restrict: "A",
+		$$tlb: true,
+		link: function($scope, $element, $attr, ctrl, $transclude) {
+			let ngIf = require("directives/angularInternal/ngIf")($element, $attr, $transclude, $animate);
+
+			function ngIfWatchAction() {
+
+				let allowed = $scope.$eval($attr.asyncIf, {
+					PromiseUtils: PromiseUtils
+				});
+
+				if (!allowed) {
+					ngIf(false);
+				} else if (allowed.then) {
+					allowed.then((val) => ngIf(val));
+				} else {
+					ngIf(allowed);
+				}
+			}
+
+			$rootScope.$on("securityInfoChanged", ngIfWatchAction);
+			$scope.$watch($attr.uiSref, ngIfWatchAction);
+		}
+	};
+});
