@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="0,586" last-zoom="0.65"
+<dbmodel pgmodeler-ver="0.8.1" last-position="0,679" last-zoom="0.65"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -237,7 +237,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -245,14 +245,14 @@ WHERE contest.id = contest_id ]]></definition>
 		<type name="integer"/>
 	</parameter>
 	<definition><![CDATA[BEGIN
- PERFORM purge_garbage_contest_participations(contest_id_p);
- PERFORM insert_new_contest_participations(contest_id_p);
+   PERFORM purge_gargabe_contest_participations(contest_id_p);
+   PERFORM insert_new_contest_participations(contest_id_p);
 
-   UPDATE contest_participations cp
+   UPDATE contest_participation cp
       SET score =
              (SELECT get_user_total_score_in_contest (cp.contest_id,
                                                       cp.user_id))
-    WHERE contest_participations.contest_id = contest_id_p;
+    WHERE cp.contest_id = contest_id_p;
 END;]]></definition>
 </function>
 
@@ -314,7 +314,7 @@ END;]]></definition>
 	<parameter name="_param2">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participations SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participations.contest_id WHERE solutions.user_id=contest_participations.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participations.contest_id,contest_participations.user_id)) AND (SELECT get_contest_end_for_user(contest_participations.contest_id,contest_participations.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participations.user_id = $1 AND contest_participations.contest_id = $2 ]]></definition>
+	<definition><![CDATA[ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participation SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participation.contest_id WHERE solutions.user_id=contest_participation.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participation.contest_id,contest_participation.user_id)) AND (SELECT get_contest_end_for_user(contest_participation.contest_id,contest_participation.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participation.user_id = $1 AND contest_participation.contest_id = $2 ]]></definition>
 </function>
 
 <usertype name="general_permission_type" configuration="enumeration">
@@ -555,7 +555,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32750"/>
+		<type name="public.general_permission_type" dimension="1" precision="32510"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -801,7 +801,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32750"/>
+		<type name="public.verdict_status_type" precision="32510"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -963,7 +963,7 @@ END;]]></definition>
 <usertype name="contest_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="edit,view_tasks_before_contest_started,delete,add_user,add_task,list_tasks,extend_time,know_about,manage_acl,participate,view_participants,remove_task,view_results_during_contest,view_results_after_contest,view_all_solutions,view_tasks_after_contest_started"/>
+	<enumeration values="edit,view_tasks_before_contest_started,delete,add_task,list_tasks,extend_time,know_about,manage_acl,participate,view_participants,remove_task,view_results_during_contest,view_results_after_contest,view_all_solutions,view_tasks_after_contest_started"/>
 </usertype>
 
 <function name="keep_user_as_principal"
@@ -1013,7 +1013,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32750"/>
+		<type name="public.task_permission_type" precision="32510"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1329,7 +1329,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32767"/>
+	<type name="public.contest" precision="32766"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp"/>
@@ -1435,7 +1435,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32750"/>
+		<type name="public.group_permission_type" precision="32510"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1635,7 +1635,7 @@ END;]]></definition>
 	<definition><![CDATA[BEGIN
     PERFORM check_immutability('id', OLD.id, NEW.id);
     PERFORM check_immutability('user_id', OLD.user_id, NEW.user_id);
-    PERFORM check_immutability('group_id', OLD.group_id, NEW.group_id);
+    PERFORM check_immutability('contest_id', OLD.contest_id, NEW.contest_id);
     RETURN NEW;
 END;]]></definition>
 </function>
@@ -1924,7 +1924,7 @@ END;]]></definition>
 	<schema name="public"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32750"/>
+		<type name="public.contest_permission_type" precision="32510"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>

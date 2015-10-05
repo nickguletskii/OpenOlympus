@@ -30,8 +30,6 @@ public enum ContestPermissionType implements EnumType {
 
 	delete("delete"),
 
-	add_user("add_user"),
-
 	add_task("add_task"),
 
 	list_tasks("list_tasks"),
