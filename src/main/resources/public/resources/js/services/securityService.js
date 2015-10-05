@@ -54,6 +54,11 @@ class SecurityService {
 			() => {
 				if (this.isSuperUserImmediate) {
 					deferred.resolve(true);
+					return;
+				}
+				if(!this.hasPrincipal){
+					deferred.resolve(false);
+					return;
 				}
 				this.$http.get(url(this.user.id), {
 						params: {

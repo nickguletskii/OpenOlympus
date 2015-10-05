@@ -66,7 +66,7 @@ module.exports = {
 		canAccess: /*@ngInject*/ function(PromiseUtils, SecurityService, $refStateParams) {
 			return PromiseUtils.and(
 				SecurityService.hasPermission("approved"),
-				SecurityService.hasGroupPermission($refStateParams.groupId, "modify")
+				SecurityService.hasTaskPermission($refStateParams.taskId, "modify")
 			);
 		}
 	}

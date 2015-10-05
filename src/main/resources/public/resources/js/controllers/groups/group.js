@@ -22,7 +22,6 @@
  */
 "use strict";
 
-let angular = require("angular");
 let _ = require("lodash");
 
 const controller = /*@ngInject*/ function($scope, $rootScope,

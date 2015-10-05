@@ -24,11 +24,13 @@
 -->
 <acl-editor acl-getter="/api/group/{{groupId}}/acl"
     acl-setter="/api/group/{{groupId}}/acl"
-    localisation-namespace="groups.groupView.permissions"></acl-editor>
+    localisation-namespace="groups.groupView.permissions"
+    async-if="security.hasGroupPermission(groupId, 'manage_acl')"></acl-editor>
 <form name="addUserForm"
     form-for="user"
     validation-rules="userValidationRules"
-    submit-with="addUser(user)">
+    submit-with="addUser(user)"
+    async-if="security.hasGroupPermission(groupId, 'add_member')">
     <acl-typeahead label=""
         attribute="user"
         class="fill-parent"
@@ -57,7 +59,8 @@
                     ng-really-click="removeUser(item)"
                     item="user"
                     ng-really-yes-button="{{'groups.groupView.member.removeConfirmationButton'|translate}}"
-                    ng-really-message="{{'groups.groupView.member.removeConfirmation' |translate}}">
+                    ng-really-message="{{'groups.groupView.member.removeConfirmation' |translate}}"
+                    async-if="security.hasGroupPermission(groupId, 'remove_member')">
                 </button>
             </td>
         </tr>

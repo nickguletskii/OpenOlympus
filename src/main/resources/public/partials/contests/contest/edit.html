@@ -23,6 +23,10 @@
 
 -->
 <h1>{{'contest.editForm.labels.heading'|translate}}</h1>
+<acl-editor acl-getter="/api/contest/{{contestId}}/acl"
+    acl-setter="/api/contest/{{contestId}}/acl"
+    localisation-namespace="contest.permissions"
+    async-if="security.hasContestPermission(contestId, 'manage_acl')"></acl-editor>
 <form form-autoconfig="form"
     novalidate>
     <div class="panel panel-default">

@@ -23,6 +23,10 @@
 
 -->
 <h1>{{'task.editForm.labels.heading'|translate}}</h1>
+<acl-editor acl-getter="/api/task/{{taskId}}/acl"
+    acl-setter="/api/task/{{taskId}}/acl"
+    localisation-namespace="task.permissions"
+    async-if="security.hasTaskPermission(taskId, 'manage_acl')"></acl-editor>
 <form form-autoconfig="form"
     novalidate>
     <div class="panel panel-default">

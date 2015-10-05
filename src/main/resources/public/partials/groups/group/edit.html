@@ -23,6 +23,10 @@
 
 -->
 <h1>{{'group.editForm.labels.heading'|translate}}</h1>
+<acl-editor acl-getter="/api/group/{{groupId}}/acl"
+    acl-setter="/api/group/{{groupId}}/acl"
+    localisation-namespace="groups.groupView.permissions"
+    async-if="security.hasGroupPermission(groupId, 'manage_acl')"></acl-editor>
 <form form-autoconfig="form"
 	novalidate>
 	<div class="panel panel-default">
