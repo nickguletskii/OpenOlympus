@@ -44,12 +44,10 @@ public class SinglepageController {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SinglepageController.class);
 
+
 	@RequestMapping(value = "/**", produces = MediaType.TEXT_HTML_VALUE)
 	@ResponseBody
 	public Resource singlepage(WebRequest requst) throws ResourceException {
-		SinglepageController.logger.debug(
-				"Singlepage controller called for URI: {}",
-				requst.getDescription(false));
 		return new ClassPathResource("public/index.html");
 	}
 
