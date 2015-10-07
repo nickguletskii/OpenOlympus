@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
@@ -59,11 +60,10 @@ public class ExceptionHandlingController {
 	}
 
 	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-	public ResponseEntity<ExceptionDto> handleException(
+	@ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+	public void handleMediaTypeException(
 			HttpMediaTypeNotAcceptableException ex) {
-		return new ResponseEntity<ExceptionDto>(
-				new ExceptionDto("Http media type not supported."),
-				HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+
 	}
 
 }
