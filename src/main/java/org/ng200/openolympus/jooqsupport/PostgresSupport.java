@@ -30,5 +30,5 @@ import org.jooq.util.postgres.PostgresDSL;
 public class PostgresSupport {
 
 	public static final Field<OffsetDateTime> CURRENT_TIMESTAMP = PostgresDSL
-			.field("current_timestamp", CustomTypes.TIMESTAMPTZ);
+	        .field("current_timestamp", OffsetDateTime.class);
 }

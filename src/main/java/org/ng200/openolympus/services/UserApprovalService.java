@@ -55,7 +55,7 @@ public class UserApprovalService {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
+	@Autowired(required=false)
 	private JavaMailSender javaMailSender;
 
 	private final SecureRandom random = new SecureRandom();

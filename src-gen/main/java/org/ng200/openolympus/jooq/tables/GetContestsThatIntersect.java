@@ -35,7 +35,7 @@ import org.ng200.openolympus.util.DurationConverter;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GetContestsThatIntersect extends TableImpl<GetContestsThatIntersectRecord> {
 
-	private static final long serialVersionUID = -1480306817;
+	private static final long serialVersionUID = 875063265;
 
 	/**
 	 * The reference instance of <code>public.get_contests_that_intersect</code>
@@ -73,7 +73,7 @@ public class GetContestsThatIntersect extends TableImpl<GetContestsThatIntersect
 	/**
 	 * The column <code>public.get_contests_that_intersect.start_time</code>.
 	 */
-	public final TableField<GetContestsThatIntersectRecord, OffsetDateTime> START_TIME = createField("start_time", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "", new DateTimeBinding());
+	public final TableField<GetContestsThatIntersectRecord, OffsetDateTime> START_TIME = createField("start_time", org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, this, "", new DateTimeBinding());
 
 	/**
 	 * Create a <code>public.get_contests_that_intersect</code> table reference

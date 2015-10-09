@@ -37,7 +37,7 @@ import org.ng200.openolympus.util.DurationConverter;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Contest extends TableImpl<ContestRecord> {
 
-	private static final long serialVersionUID = -521902179;
+	private static final long serialVersionUID = 2138701941;
 
 	/**
 	 * The reference instance of <code>public.contest</code>
@@ -75,7 +75,7 @@ public class Contest extends TableImpl<ContestRecord> {
 	/**
 	 * The column <code>public.contest.start_time</code>.
 	 */
-	public final TableField<ContestRecord, OffsetDateTime> START_TIME = createField("start_time", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "", new DateTimeBinding());
+	public final TableField<ContestRecord, OffsetDateTime> START_TIME = createField("start_time", org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, this, "", new DateTimeBinding());
 
 	/**
 	 * Create a <code>public.contest</code> table reference

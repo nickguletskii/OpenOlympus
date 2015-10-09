@@ -28,12 +28,12 @@ import org.ng200.openolympus.util.DateTimeBinding;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GetContestStart extends AbstractRoutine<OffsetDateTime> {
 
-	private static final long serialVersionUID = -454979436;
+	private static final long serialVersionUID = 594049708;
 
 	/**
 	 * The parameter <code>public.get_contest_start.RETURN_VALUE</code>.
 	 */
-	public static final Parameter<OffsetDateTime> RETURN_VALUE = createParameter("RETURN_VALUE", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, false, new DateTimeBinding());
+	public static final Parameter<OffsetDateTime> RETURN_VALUE = createParameter("RETURN_VALUE", org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, false, new DateTimeBinding());
 
 	/**
 	 * The parameter <code>public.get_contest_start.contest_id</code>.
@@ -44,7 +44,7 @@ public class GetContestStart extends AbstractRoutine<OffsetDateTime> {
 	 * Create a new routine call instance
 	 */
 	public GetContestStart() {
-		super("get_contest_start", Public.PUBLIC, org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, new DateTimeBinding());
+		super("get_contest_start", Public.PUBLIC, org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, new DateTimeBinding());
 
 		setReturnParameter(RETURN_VALUE);
 		addInParameter(CONTEST_ID);

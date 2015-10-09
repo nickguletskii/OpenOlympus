@@ -35,7 +35,7 @@ import org.ng200.openolympus.util.DateTimeBinding;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Task extends TableImpl<TaskRecord> {
 
-	private static final long serialVersionUID = 749620599;
+	private static final long serialVersionUID = 1860354707;
 
 	/**
 	 * The reference instance of <code>public.task</code>
@@ -73,7 +73,7 @@ public class Task extends TableImpl<TaskRecord> {
 	/**
 	 * The column <code>public.task.created_date</code>.
 	 */
-	public final TableField<TaskRecord, OffsetDateTime> CREATED_DATE = createField("created_date", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "", new DateTimeBinding());
+	public final TableField<TaskRecord, OffsetDateTime> CREATED_DATE = createField("created_date", org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, this, "", new DateTimeBinding());
 
 	/**
 	 * Create a <code>public.task</code> table reference

@@ -22,19 +22,22 @@
  */
 package org.ng200.openolympus.jooqsupport;
 
+import java.time.OffsetDateTime;
+
 import org.jooq.util.ColumnDefinition;
 import org.jooq.util.DataTypeDefinition;
 import org.jooq.util.Database;
 import org.jooq.util.GeneratorStrategy.Mode;
 import org.jooq.util.JavaGenerator;
 import org.jooq.util.JavaWriter;
+import org.jooq.util.SchemaDefinition;
 import org.jooq.util.TableDefinition;
 import org.joor.Reflect;
 
 public class OpenOlympusCodeGenerator extends JavaGenerator {
 	@Override
 	protected void generateDaoClassFooter(TableDefinition table,
-			JavaWriter out) {
+	        JavaWriter out) {
 		final ColumnDefinition idColumn = table.getColumn("id", true);
 
 		if (idColumn == null) {
@@ -48,17 +51,17 @@ public class OpenOlympusCodeGenerator extends JavaGenerator {
 		}
 
 		out.tab(1).println("public %s fetchOneById(String id) {",
-				this.getStrategy().getFullJavaClassName(table, Mode.POJO));
+		        this.getStrategy().getFullJavaClassName(table, Mode.POJO));
 		out.tab(2)
-				.println("return fetchOneById(%s.valueOf(id));", identityName);
+		        .println("return fetchOneById(%s.valueOf(id));", identityName);
 		out.tab(1).println("}");
 	}
 
 	@Override
 	protected String getJavaTypeReference(Database database,
-			DataTypeDefinition type) {
+	        DataTypeDefinition type) {
 		if (type.getType().equals("timestamp with time zone")) {
-			return "org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ";
+			return "org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME";
 		}
 		if (type.getType().equals("date")) {
 			return "org.ng200.openolympus.jooqsupport.CustomTypes.LOCALDATE";

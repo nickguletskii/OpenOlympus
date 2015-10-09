@@ -34,7 +34,7 @@ import org.ng200.openolympus.util.DateTimeBinding;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersistentLogins extends TableImpl<PersistentLoginsRecord> {
 
-	private static final long serialVersionUID = -533394796;
+	private static final long serialVersionUID = 1305367096;
 
 	/**
 	 * The reference instance of <code>public.persistent_logins</code>
@@ -67,7 +67,7 @@ public class PersistentLogins extends TableImpl<PersistentLoginsRecord> {
 	/**
 	 * The column <code>public.persistent_logins.last_used</code>.
 	 */
-	public final TableField<PersistentLoginsRecord, OffsetDateTime> LAST_USED = createField("last_used", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "", new DateTimeBinding());
+	public final TableField<PersistentLoginsRecord, OffsetDateTime> LAST_USED = createField("last_used", org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, this, "", new DateTimeBinding());
 
 	/**
 	 * Create a <code>public.persistent_logins</code> table reference

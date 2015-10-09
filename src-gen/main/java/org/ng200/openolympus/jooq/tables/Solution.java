@@ -37,7 +37,7 @@ import org.ng200.openolympus.util.DateTimeBinding;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Solution extends TableImpl<SolutionRecord> {
 
-	private static final long serialVersionUID = 444450213;
+	private static final long serialVersionUID = -1515880419;
 
 	/**
 	 * The reference instance of <code>public.solution</code>
@@ -80,7 +80,7 @@ public class Solution extends TableImpl<SolutionRecord> {
 	/**
 	 * The column <code>public.solution.time_added</code>.
 	 */
-	public final TableField<SolutionRecord, OffsetDateTime> TIME_ADDED = createField("time_added", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "", new DateTimeBinding());
+	public final TableField<SolutionRecord, OffsetDateTime> TIME_ADDED = createField("time_added", org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, this, "", new DateTimeBinding());
 
 	/**
 	 * The column <code>public.solution.user_id</code>.

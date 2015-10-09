@@ -28,12 +28,12 @@ import org.ng200.openolympus.util.DateTimeBinding;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GetSolutionTimeAdded extends AbstractRoutine<OffsetDateTime> {
 
-	private static final long serialVersionUID = 2023736912;
+	private static final long serialVersionUID = 742634224;
 
 	/**
 	 * The parameter <code>public.get_solution_time_added.RETURN_VALUE</code>.
 	 */
-	public static final Parameter<OffsetDateTime> RETURN_VALUE = createParameter("RETURN_VALUE", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, false, new DateTimeBinding());
+	public static final Parameter<OffsetDateTime> RETURN_VALUE = createParameter("RETURN_VALUE", org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, false, new DateTimeBinding());
 
 	/**
 	 * The parameter <code>public.get_solution_time_added.solution_id</code>.
@@ -44,7 +44,7 @@ public class GetSolutionTimeAdded extends AbstractRoutine<OffsetDateTime> {
 	 * Create a new routine call instance
 	 */
 	public GetSolutionTimeAdded() {
-		super("get_solution_time_added", Public.PUBLIC, org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, new DateTimeBinding());
+		super("get_solution_time_added", Public.PUBLIC, org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME, new DateTimeBinding());
 
 		setReturnParameter(RETURN_VALUE);
 		addInParameter(SOLUTION_ID);
