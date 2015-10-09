@@ -82,8 +82,6 @@ public class OpenOlympusGitRepositoryResolver
 
 		final int id = Integer.valueOf(matcher.group(1));
 
-		OpenOlympusGitRepositoryResolver.logger.info("Id: {}", id);
-
 		final Task task = this.taskService.getById(id);
 
 		if (!this.taskService.canModifyTask(task, user)) {
