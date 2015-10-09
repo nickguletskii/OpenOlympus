@@ -43,6 +43,7 @@ var config = {
 	],
 	output: {
 		path: path.resolve(generatedResourcesRoot),
+		publicPath: "/resources/bundled/",
 		filename: "js/bundle.js"
 	},
 	cache: true,
