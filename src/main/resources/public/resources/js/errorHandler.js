@@ -34,6 +34,10 @@ class Handler {
 	}
 
 	showError(name) {
+		if (this.errorShown) {
+			return;
+		}
+		this.errorShown = true;
 		this.removeAngular();
 		$("#" + name).removeClass("hidden");
 		this.setupReloadButton();
