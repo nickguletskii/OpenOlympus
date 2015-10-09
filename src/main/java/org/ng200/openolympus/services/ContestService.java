@@ -23,9 +23,9 @@
 package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +59,7 @@ import org.ng200.openolympus.jooq.tables.pojos.TimeExtension;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
 import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
+import org.ng200.openolympus.jooqsupport.PostgresSupport;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.util.Pair;
 import org.slf4j.Logger;
@@ -123,40 +124,40 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return this.contestDao.fetchOneByName(name);
 	}
 
-	public Instant getContestEndIncludingAllTimeExtensions(
+	public OffsetDateTime getContestEndIncludingAllTimeExtensions(
 			final Contest contest) {
 		final GetContestEnd procedure = new GetContestEnd();
 		procedure.setContestId(contest.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
-		return procedure.getReturnValue().toInstant();
+		return procedure.getReturnValue();
 	}
 
-	public Date getContestEndTimeForUser(Contest contest, User user) {
+	public OffsetDateTime getContestEndTimeForUser(Contest contest, User user) {
 		final GetContestEndForUser procedure = new GetContestEndForUser();
 		procedure.setContestId(contest.getId());
 		procedure.setUserId(user.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
-		return Date.from(procedure.getReturnValue().toInstant());
+		return procedure.getReturnValue();
 	}
 
-	public Instant getContestStartIncludingAllTimeExtensions(
+	public OffsetDateTime getContestStartIncludingAllTimeExtensions(
 			final Contest contest) {
 		final GetContestStart procedure = new GetContestStart();
 		procedure.setContestId(contest.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
-		return procedure.getReturnValue().toInstant();
+		return procedure.getReturnValue();
 	}
 
-	public Date getContestStartTimeForUser(Contest contest, User user) {
+	public OffsetDateTime getContestStartTimeForUser(Contest contest, User user) {
 		final GetContestStartForUser procedure = new GetContestStartForUser();
 		procedure.setContestId(contest.getId());
 		procedure.setUserId(user.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
-		return Date.from(procedure.getReturnValue().toInstant());
+		return procedure.getReturnValue();
 	}
 
 	public List<UserRanking> getContestResults(Contest contest) {
@@ -215,8 +216,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 
 		return this.dslContext
 				.selectFrom(Routines.getContestsThatIntersect(
-						Timestamp.from(startDate.toInstant()),
-						Timestamp.from(endDate.toInstant())))
+						PostgresSupport.CURRENT_TIMESTAMP,
+						PostgresSupport.CURRENT_TIMESTAMP))
 				.fetchInto(Contest.class);
 	}
 
@@ -247,8 +248,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 	public Contest getRunningContest() {
 		return this.dslContext
 				.selectFrom(Routines.getContestsThatIntersect(
-						DSL.field("LOCALTIMESTAMP", Timestamp.class),
-						DSL.field("LOCALTIMESTAMP", Timestamp.class)))
+						PostgresSupport.CURRENT_TIMESTAMP,
+						PostgresSupport.CURRENT_TIMESTAMP))
 				.fetchOneInto(Contest.class);
 	}
 
@@ -328,7 +329,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 	public boolean isContestInProgressForUser(final Contest contest,
 			final User user) {
 		return dslContext.select(DSL.field(
-				DSL.currentTimestamp().between(
+				PostgresSupport.CURRENT_TIMESTAMP.between(
 						Routines.getContestStartForUser(
 								contest.getId(), user.getId()),
 						Routines.getContestEndForUser(
@@ -339,7 +340,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 	public boolean isContestOverIncludingAllTimeExtensions(
 			final Contest contest) {
 		return dslContext.select(DSL.field(
-				DSL.currentTimestamp().greaterThan(
+				PostgresSupport.CURRENT_TIMESTAMP.greaterThan(
 						Routines.getContestEnd(
 								contest.getId()))))
 				.fetchOne().value1();

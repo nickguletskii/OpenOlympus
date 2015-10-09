@@ -29,7 +29,9 @@ angular.module("ool.services").factory("TaskService", /*@ngInject*/ function($ht
 		getTaskIndexPage: function(taskId) {
 			let deferred = $q.defer();
 			$http.get(
-					"/api/task/" + taskId + "/data/localisation.json"
+					"/api/task/" + taskId + "/data/localisation.json", {
+						acceptableFailureCodes: [404]
+					}
 				)
 				.then((response) => {
 					let path = response.data[$rootScope.currentLanguage] ||
@@ -39,7 +41,7 @@ angular.module("ool.services").factory("TaskService", /*@ngInject*/ function($ht
 					} else {
 						deferred.resolve(path);
 					}
-				});
+				}, (response) => deferred.reject(response.status));
 			return deferred.promise;
 		},
 		getTaskName: function(taskId) {

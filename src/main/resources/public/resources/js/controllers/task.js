@@ -22,8 +22,11 @@
  */
 "use strict";
 
-const controller = /*@ngInject*/ function($scope, $state, $stateParams, FormDefaultHelperService, taskName, taskIndexPage) {
+const controller = /*@ngInject*/ function($scope, $state, $stateParams, $location, FormDefaultHelperService, taskName, taskIndexPage) {
 	$scope.name = taskName;
+
+	$scope.baseUrl = $location.protocol() + "://" + $location.host() + ":" + $location.port();
+
 	$scope.indexPath = taskIndexPage;
 
 	$scope.taskId = $stateParams.taskId;
@@ -52,8 +55,16 @@ module.exports = {
 	"templateUrl": "/partials/task.html",
 	"controller": controller,
 	"resolve": {
-		"taskIndexPage": function(TaskService, $stateParams) {
-			return TaskService.getTaskIndexPage($stateParams.taskId);
+		"taskIndexPage": function(TaskService, $stateParams, $q) {
+			let deferred = $q.defer();
+			TaskService.getTaskIndexPage($stateParams.taskId)
+				.then(x => deferred.resolve(x), (error) => {
+					if (error === 404) {
+						deferred.resolve(null);
+					}
+					deferred.reject(error);
+				});
+			return deferred.promise;
 		},
 		"taskName": function(TaskService, $stateParams) {
 			return TaskService.getTaskName($stateParams.taskId);

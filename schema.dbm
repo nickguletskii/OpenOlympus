@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="0,679" last-zoom="0.65"
+<dbmodel pgmodeler-ver="0.8.1" last-position="0,0" last-zoom="0.65"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -25,7 +25,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="timestamp"/>
+	<type name="timestamp" with-timezone="true"/>
 	</return-type>
 	<parameter name="contest_id">
 		<type name="integer"/>
@@ -55,7 +55,7 @@ WHERE contest.id = contest_id]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="timestamp"/>
+	<type name="timestamp" with-timezone="true"/>
 	</return-type>
 	<parameter name="contest_id" in="true">
 		<type name="integer"/>
@@ -88,7 +88,7 @@ WHERE contest.id = contest_id ]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="timestamp"/>
+	<type name="timestamp" with-timezone="true"/>
 	</return-type>
 	<parameter name="contest_id">
 		<type name="integer"/>
@@ -108,7 +108,7 @@ WHERE contest.id = contest_id ]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="timestamp"/>
+	<type name="timestamp" with-timezone="true"/>
 	</return-type>
 	<parameter name="contest_id">
 		<type name="integer"/>
@@ -151,7 +151,7 @@ WHERE contest.id = contest_id ]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="timestamp"/>
+	<type name="timestamp" with-timezone="true"/>
 	</return-type>
 	<parameter name="solution_id">
 		<type name="bigint"/>
@@ -389,7 +389,7 @@ END;]]></definition>
 		<type name="character varying" length="64"/>
 	</column>
 	<column name="last_used" not-null="true">
-		<type name="timestamp"/>
+		<type name="timestamp" with-timezone="true"/>
 	</column>
 	<constraint name="persistent_logins_pkey" type="pk-constr" table="public.persistent_logins">
 		<columns names="series" ref-type="src-columns"/>
@@ -440,7 +440,7 @@ END;]]></definition>
 		<type name="boolean"/>
 	</column>
 	<column name="time_added">
-		<type name="timestamp"/>
+		<type name="timestamp" with-timezone="true"/>
 	</column>
 	<constraint name="solution_pkey" type="pk-constr" table="public.solution">
 		<columns names="id" ref-type="src-columns"/>
@@ -502,7 +502,7 @@ END;]]></definition>
 		<type name="boolean"/>
 	</column>
 	<column name="start_time">
-		<type name="timestamp"/>
+		<type name="timestamp" with-timezone="true"/>
 	</column>
 	<constraint name="contest_pkey" type="pk-constr" table="public.contest">
 		<columns names="id" ref-type="src-columns"/>
@@ -529,7 +529,7 @@ END;]]></definition>
 		<type name="text" length="255"/>
 	</column>
 	<column name="created_date">
-		<type name="timestamp"/>
+		<type name="timestamp" with-timezone="true"/>
 	</column>
 	<constraint name="task_pkey" type="pk-constr" table="public.task">
 		<columns names="id" ref-type="src-columns"/>
@@ -555,7 +555,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32510"/>
+		<type name="public.general_permission_type" dimension="1" precision="32534"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -594,7 +594,7 @@ END;]]></definition>
 		<type name="boolean"/>
 	</column>
 	<column name="birth_date">
-		<type name="timestamp"/>
+		<type name="date" with-timezone="true"/>
 	</column>
 	<column name="email_address">
 		<type name="character varying" length="255"/>
@@ -801,7 +801,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32510"/>
+		<type name="public.verdict_status_type" precision="32534"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -1013,7 +1013,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32510"/>
+		<type name="public.task_permission_type" precision="32534"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1264,7 +1264,7 @@ END;]]></definition>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
-	<definition><![CDATA[DECLARE end_time timestamp WITHOUT time ZONE;
+	<definition><![CDATA[DECLARE end_time timestamp WITH time ZONE;
 BEGIN
     end_time = (
         SELECT (
@@ -1296,12 +1296,12 @@ IF EXISTS (
     FROM
         contest
     WHERE
-        tsrange (
+        tstzrange (
             get_contest_start (
                 contest.id ),
         get_contest_end (
             contest.id ) )
-&& tsrange (
+&& tstzrange (
     NEW.start_time,
     end_time )
 AND contest.id != NEW.id )
@@ -1332,12 +1332,12 @@ END;]]></definition>
 	<type name="public.contest" precision="32766"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
-		<type name="timestamp"/>
+		<type name="timestamp" with-timezone="true"/>
 	</parameter>
 	<parameter name="time_range_end" in="true">
-		<type name="timestamp"/>
+		<type name="timestamp" with-timezone="true"/>
 	</parameter>
-	<definition><![CDATA[SELECT * FROM contest WHERE tsrange(get_contest_start(contest.id), get_contest_end(contest.id)) && tsrange(time_range_start, time_range_end)]]></definition>
+	<definition><![CDATA[SELECT * FROM contest WHERE tstzrange(get_contest_start(contest.id), get_contest_end(contest.id)) && tstzrange(time_range_start, time_range_end)]]></definition>
 </function>
 
 <extension name="pg_trgm">
@@ -1435,7 +1435,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32510"/>
+		<type name="public.group_permission_type" precision="32534"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1924,7 +1924,7 @@ END;]]></definition>
 	<schema name="public"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32510"/>
+		<type name="public.contest_permission_type" precision="32534"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>

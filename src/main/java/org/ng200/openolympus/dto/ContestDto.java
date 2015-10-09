@@ -23,13 +23,11 @@
 package org.ng200.openolympus.dto;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.ng200.openolympus.util.DateUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
@@ -40,8 +38,7 @@ public class ContestDto {
 	private String name;
 	@NotNull(message = "empty")
 	@DateTimeFormat(iso = ISO.DATE_TIME)
-	private Date startTime = DateUtils
-			.roundTo30Minutes(Date.from(Instant.now()));
+	private OffsetDateTime startTime;
 	@NotNull(message = "empty")
 	private Duration duration;
 
@@ -55,7 +52,7 @@ public class ContestDto {
 		return this.name;
 	}
 
-	public Date getStartTime() {
+	public OffsetDateTime getStartTime() {
 		return this.startTime;
 	}
 
@@ -76,7 +73,7 @@ public class ContestDto {
 		this.showFullTestsDuringContest = showFullTestsDuringContest;
 	}
 
-	public void setStartTime(final Date startTime) {
+	public void setStartTime(final OffsetDateTime startTime) {
 		this.startTime = startTime;
 	}
 

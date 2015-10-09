@@ -22,42 +22,13 @@
  */
 package org.ng200.openolympus.model;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 
-import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.annotations.SecurityClearanceRequired;
-import org.ng200.openolympus.jooq.tables.interfaces.ISolution;
-import org.ng200.openolympus.security.predicates.SolutionScoreSecurityPredicate;
-import org.ng200.openolympus.security.predicates.SolutionSecurityPredicate;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionSecurityPredicate.class)
-public interface ISolutionSecurityDescription extends ISolution {
-	@Override
-	public String getFile();
+public interface ITaskDateFormat {
 
-	@Override
-	public Long getId();
-
-	@Override
-	public BigDecimal getMaximumScore();
-
-	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
-	public BigDecimal getScore();
-
-	@Override
-	public Integer getTaskId();
-
-	@Override
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
-	public Boolean getTested();
-
-	@Override
-	public OffsetDateTime getTimeAdded();
-
-	@Override
-	public Long getUserId();
-
+	@DateTimeFormat(iso = ISO.DATE_TIME)
+	public OffsetDateTime getCreatedDate();
 }

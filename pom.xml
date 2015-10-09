@@ -41,6 +41,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<skipTests>true</skipTests>
+		<jooq.version>3.7.0-SNAPSHOT</jooq.version>
 	</properties>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -225,6 +226,10 @@
 			<artifactId>org.eclipse.jgit.http.server</artifactId>
 			<version>4.0.1.201506240215-r</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -246,7 +251,7 @@
 					<plugin>
 						<groupId>org.jooq</groupId>
 						<artifactId>jooq-codegen-maven</artifactId>
-						<version>3.6.2</version>
+						<version>${jooq.version}</version>
 
 
 						<executions>
@@ -260,9 +265,9 @@
 
 						<dependencies>
 							<dependency>
-								<groupId>postgresql</groupId>
+								<groupId>org.postgresql</groupId>
 								<artifactId>postgresql</artifactId>
-								<version>9.1-901-1.jdbc4</version>
+								<version>${postgresql.version}</version>
 							</dependency>
 						</dependencies>
 
@@ -283,8 +288,10 @@
 									<inputSchema>public</inputSchema>
 									<customTypes>
 										<customType>
-											<name>java.time.LocalDateTime</name>
-											<converter>org.ng200.openolympus.util.DateTimeConverter</converter>
+											<name>java.time.OffsetDateTime</name>
+										</customType>
+										<customType>
+											<name>java.time.LocalDate</name>
 										</customType>
 										<customType>
 											<name>java.time.Duration</name>
@@ -293,16 +300,16 @@
 									</customTypes>
 									<forcedTypes>
 										<forcedType>
-											<name>java.time.LocalDateTime</name>
-											<types>timestamp without time zone</types>
+											<name>java.time.OffsetDateTime</name>
+											<types>timestamp.*</types>
+										</forcedType>
+										<forcedType>
+											<name>java.time.LocalDate</name>
+											<types>date.*</types>
 										</forcedType>
 										<forcedType>
 											<name>java.time.Duration</name>
 											<expression>.*duration.*</expression>
-										</forcedType>
-										<forcedType>
-											<name>java.time.LocalDateTime</name>
-											<expression>.*created_date.*</expression>
 										</forcedType>
 										<forcedType>
 											<name>java.time.Duration</name>
@@ -355,6 +362,10 @@
 												<expression>task</expression>
 
 												<pojoExtends>org.ng200.openolympus.model.LockableResourceImplWithIntegerId</pojoExtends>
+												<pojoImplements>
+													org.ng200.openolympus.model.ITaskSecurityDescription,
+													org.ng200.openolympus.model.ITaskDateFormat
+												</pojoImplements>
 											</table>
 											<table>
 												<expression>USER</expression>

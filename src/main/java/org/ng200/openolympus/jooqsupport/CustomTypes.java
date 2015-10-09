@@ -20,32 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.model;
+package org.ng200.openolympus.jooqsupport;
 
-import java.time.Duration;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
-import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.annotations.SecurityClearanceRequired;
-import org.ng200.openolympus.jooq.tables.interfaces.IContest;
-import org.ng200.openolympus.security.UserKnowsAboutContestSecurityPredicate;
+import org.jooq.DataType;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DefaultDataType;
 
-@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = UserKnowsAboutContestSecurityPredicate.class)
-public interface IContestSecurityDescription extends IContest {
-
-	@Override
-	public Duration getDuration();
-
-	@Override
-	public Integer getId();
-
-	@Override
-	public String getName();
-
-	@Override
-	public Boolean getShowFullTestsDuringContest();
-
-	@Override
-	public OffsetDateTime getStartTime();
-
+public class CustomTypes {
+	public static final DataType<OffsetDateTime> TIMESTAMPTZ = new DefaultDataType<OffsetDateTime>(
+			SQLDialect.POSTGRES, OffsetDateTime.class, "timetamptz");
+	public static final DataType<LocalDate> LOCALDATE = new DefaultDataType<LocalDate>(
+			SQLDialect.POSTGRES, LocalDate.class, "date");
 }

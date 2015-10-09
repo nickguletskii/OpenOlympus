@@ -23,8 +23,7 @@
 package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -110,14 +109,13 @@ public class SolutionService extends GenericCreateUpdateRepository {
 	}
 
 	public List<Solution> getPage(final User user, final Integer pageNumber,
-			final int pageSize, final Date startTime, final Date endTime) {
+			final int pageSize, final OffsetDateTime startTime,
+			final OffsetDateTime endTime) {
 		return this.dslContext
 				.selectCount()
 				.from(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
-						Tables.SOLUTION.TIME_ADDED.between(
-								Timestamp.from(startTime.toInstant()),
-								Timestamp.from(endTime.toInstant()))))
+						Tables.SOLUTION.TIME_ADDED.between(startTime, endTime)))
 				.groupBy(Tables.SOLUTION.ID)
 				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);

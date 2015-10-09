@@ -23,23 +23,29 @@
 package org.ng200.openolympus.model;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.interfaces.ITask;
 
 public interface ITaskSecurityDescription extends ITask {
 
 	@Override
-	public LocalDateTime getCreatedDate();
+	public OffsetDateTime getCreatedDate();
 
 	@Override
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.INTERNAL)
 	public String getDescriptionFile();
 
 	@Override
 	public Integer getId();
 
+	// TODO: hide name too
 	@Override
 	public String getName();
 
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.INTERNAL)
 	@Override
 	public String getTaskLocation();
 }

@@ -23,7 +23,7 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.security.Principal;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.ng200.openolympus.SecurityClearanceType;
@@ -100,39 +100,39 @@ public class ContestViewController {
 	}
 
 	public static class TimingDTO {
-		private Date startTime;
-		private Date endTime;
-		private Date endTimeIncludingTimeExtensions;
+		private OffsetDateTime startTime;
+		private OffsetDateTime endTime;
+		private OffsetDateTime endTimeIncludingTimeExtensions;
 
-		public TimingDTO(Date startTime, Date endTime,
-				Date endTimeIncludingTimeExtensions) {
+		public TimingDTO(OffsetDateTime startTime, OffsetDateTime endTime,
+				OffsetDateTime endTimeIncludingTimeExtensions) {
 			this.startTime = startTime;
 			this.endTime = endTime;
 			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
 		}
 
-		public Date getEndTime() {
+		public OffsetDateTime getEndTime() {
 			return this.endTime;
 		}
 
-		public Date getEndTimeIncludingTimeExtensions() {
+		public OffsetDateTime getEndTimeIncludingTimeExtensions() {
 			return this.endTimeIncludingTimeExtensions;
 		}
 
-		public Date getStartTime() {
+		public OffsetDateTime getStartTime() {
 			return this.startTime;
 		}
 
-		public void setEndTime(Date endTime) {
+		public void setEndTime(OffsetDateTime endTime) {
 			this.endTime = endTime;
 		}
 
 		public void setEndTimeIncludingTimeExtensions(
-				Date endTimeIncludingTimeExtensions) {
+				OffsetDateTime endTimeIncludingTimeExtensions) {
 			this.endTimeIncludingTimeExtensions = endTimeIncludingTimeExtensions;
 		}
 
-		public void setStartTime(Date startTime) {
+		public void setStartTime(OffsetDateTime startTime) {
 			this.startTime = startTime;
 		}
 
@@ -170,10 +170,13 @@ public class ContestViewController {
 		final List<Task> tasks = canViewTasks(user, contest)
 				? this.contestService.getContestTasks(contest)
 				: null;
-		return new ContestDTO(contest.getName(), new TimingDTO(
-				contest.getStartTime(), Date.from(contest.getStartTime()
-						.toInstant().plus(contest.getDuration())),
-				this.contestService.getContestEndTimeForUser(contest, user)),
+		return new ContestDTO(contest.getName(),
+				new TimingDTO(contestService
+						.getContestStartIncludingAllTimeExtensions(contest),
+						contestService.getContestEndIncludingAllTimeExtensions(
+								contest),
+						contestService.getContestStartTimeForUser(contest,
+								user)),
 				tasks);
 	}
 

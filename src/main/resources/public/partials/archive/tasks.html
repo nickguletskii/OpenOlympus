@@ -31,7 +31,7 @@
     id="tasksTable">
     <thead>
         <tr>
-            <th ng-if="security.isUser()"
+            <th ng-if="security.isLoggedIn"
                 translate="archive.list.score"
                 width="50"></th>
             <th translate="archive.list.maximumScore"
@@ -43,9 +43,9 @@
     </thead>
     <tbody>
         <tr ng-repeat="task in tasks">
-            <td ng-if="security.isUser()">{{task.score}}</td>
+            <td ng-if="security.isLoggedIn">{{task.score}}</td>
             <td>{{task.maxScore}}</td>
-            <td>{{task.timeAdded | asDate | date:'yyyy-MM-dd'}}</td>
+            <td>{{task.createdDate | localiseTimestamped}}</td>
             <td>
                 <a ui-sref="taskView({taskId: task.id})">{{task.name}}</a>
                 <button type="button"

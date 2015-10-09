@@ -24,6 +24,7 @@ package org.ng200.openolympus.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
@@ -46,7 +47,7 @@ public class SolutionDto implements Serializable {
 
 	private BigDecimal score;
 	private BigDecimal maximumScore;
-	private Date submissionTime;
+	private OffsetDateTime submissionTime;
 	private Task task;
 
 	public SolutionDto(Solution solution, Task task) {
@@ -70,7 +71,7 @@ public class SolutionDto implements Serializable {
 		return this.score;
 	}
 
-	public Date getSubmissionTime() {
+	public OffsetDateTime getSubmissionTime() {
 		return this.submissionTime;
 	}
 
@@ -94,7 +95,7 @@ public class SolutionDto implements Serializable {
 		this.score = score;
 	}
 
-	public void setSubmissionTime(Date timeAdded) {
+	public void setSubmissionTime(OffsetDateTime timeAdded) {
 		this.submissionTime = timeAdded;
 	}
 

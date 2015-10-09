@@ -22,7 +22,7 @@
  */
 package org.ng200.openolympus.dto;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -88,7 +88,7 @@ public class UserInfoDto {
 	private String school;
 
 	@DateTimeFormat(iso = ISO.DATE)
-	private Date dateOfBirth;
+	private LocalDate dateOfBirth;
 
 	public String getAddressCity() {
 		return this.addressCity;
@@ -110,7 +110,7 @@ public class UserInfoDto {
 		return this.addressState;
 	}
 
-	public Date getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return this.dateOfBirth;
 	}
 
@@ -186,7 +186,7 @@ public class UserInfoDto {
 		this.addressState = addressState;
 	}
 
-	public void setDateOfBirth(final Date dateOfBirth) {
+	public void setDateOfBirth(final LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 

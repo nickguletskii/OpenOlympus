@@ -22,7 +22,7 @@
  */
 package org.ng200.openolympus.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
 
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
@@ -56,7 +56,7 @@ public interface IUserSecurityDescription extends IUser {
 
 	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)
-	public Timestamp getBirthDate();
+	public LocalDate getBirthDate();
 
 	@Override
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = PrincipalMatchesUser.Private.class)

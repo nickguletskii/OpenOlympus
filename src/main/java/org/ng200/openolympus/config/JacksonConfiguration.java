@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 
 @SuppressWarnings("deprecation")
 @Component
@@ -54,6 +55,7 @@ public class JacksonConfiguration {
 				.json()
 				.failOnUnknownProperties(false)
 				.modules(new DurationJacksonModule())
+				.modules(new JSR310Module())
 				.filters(new FilterProvider() {
 
 					@Override
@@ -69,6 +71,8 @@ public class JacksonConfiguration {
 								.securityClearanceJacksonFilter();
 					}
 				})
+				.featuresToDisable(
+						com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.annotationIntrospector(new JacksonAnnotationIntrospector());
 	}
 

@@ -22,6 +22,7 @@
  */
 package org.ng200.openolympus.controller.errors;
 
+import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -63,7 +64,12 @@ public class ExceptionHandlingController {
 	@ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
 	public void handleMediaTypeException(
 			HttpMediaTypeNotAcceptableException ex) {
+	}
 
+	@ExceptionHandler(ResourceNotFoundException.class)
+	@ResponseStatus(code = HttpStatus.NOT_FOUND)
+	public void handleNotFoundException(
+			ResourceNotFoundException ex) {
 	}
 
 }

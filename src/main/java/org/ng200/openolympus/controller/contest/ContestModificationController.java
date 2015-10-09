@@ -90,8 +90,7 @@ public class ContestModificationController {
 		}
 		contest.setName(contestDto.getName());
 		contest.setDuration(contestDto.getDuration());
-		contest.setStartTime(
-		        new Timestamp(contestDto.getStartTime().getTime()));
+		contest.setStartTime(contestDto.getStartTime());
 		contest.setShowFullTestsDuringContest(contestDto
 		        .isShowFullTestsDuringContest());
 		contest = this.contestService.updateContest(contest);

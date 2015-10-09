@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 
 import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
@@ -55,8 +56,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource(value = {
-                              "classpath:test-db.properties",
-                              "file:secret.properties"
+								"classpath:test-db.properties",
+								"file:secret.properties"
 })
 @SpringApplicationConfiguration(classes = Application.class)
 
@@ -78,45 +79,45 @@ public class ContestParticipantDatabaseTest {
 	private UserService userService;
 
 	private void addContestPermission(Contest contest, long principalId,
-	        ContestPermissionType contestPermsissionType) {
+			ContestPermissionType contestPermsissionType) {
 		this.dslContext.insertInto(Tables.CONTEST_PERMISSION)
-		        .columns(Tables.CONTEST_PERMISSION.CONTEST_ID,
-		                Tables.CONTEST_PERMISSION.PRINCIPAL_ID,
-		                Tables.CONTEST_PERMISSION.PERMISSION)
-		        .values(contest.getId(), principalId, contestPermsissionType)
-		        .execute();
+				.columns(Tables.CONTEST_PERMISSION.CONTEST_ID,
+						Tables.CONTEST_PERMISSION.PRINCIPAL_ID,
+						Tables.CONTEST_PERMISSION.PERMISSION)
+				.values(contest.getId(), principalId, contestPermsissionType)
+				.execute();
 	}
 
 	private Contest createContest() {
 		final Contest contest = this.contestService
-		        .insertContest(new Contest()
-		                .setDuration(Duration.ofHours(1))
-		                .setName("Test")
-		                .setShowFullTestsDuringContest(false)
-		                .setStartTime(Timestamp.from(Instant.now())));
+				.insertContest(new Contest()
+						.setDuration(Duration.ofHours(1))
+						.setName("Test")
+						.setShowFullTestsDuringContest(false)
+						.setStartTime(OffsetDateTime.now()));
 
 		Assert.assertNotNull("Contest must have an ID after insertion!",
-		        contest.getId());
+				contest.getId());
 		Assert.assertNotNull("Contest must exist after insertion!",
-		        this.contestService.getContestByName("Test"));
+				this.contestService.getContestByName("Test"));
 		return contest;
 	}
 
 	private DeleteConditionStep<ContestPermissionRecord> deleteContestPermission(
-	        Contest contest, long principalId,
-	        ContestPermissionType permissionType) {
+			Contest contest, long principalId,
+			ContestPermissionType permissionType) {
 		return this.dslContext.deleteFrom(Tables.CONTEST_PERMISSION)
-		        .where(Tables.CONTEST_PERMISSION.CONTEST_ID
-		                .eq(contest.getId())
-		                .and(Tables.CONTEST_PERMISSION.PRINCIPAL_ID
-		                        .eq(principalId)
-		                        .and(Tables.CONTEST_PERMISSION.PERMISSION.eq(
-		                                permissionType))));
+				.where(Tables.CONTEST_PERMISSION.CONTEST_ID
+						.eq(contest.getId())
+						.and(Tables.CONTEST_PERMISSION.PRINCIPAL_ID
+								.eq(principalId)
+								.and(Tables.CONTEST_PERMISSION.PERMISSION.eq(
+										permissionType))));
 	}
 
 	private Group getAllUsersGroup() {
 		final Group group = this.groupService
-		        .getGroupByName(NameConstants.ALL_USERS_GROUP_NAME);
+				.getGroupByName(NameConstants.ALL_USERS_GROUP_NAME);
 
 		Assert.assertNotNull(group);
 
@@ -124,19 +125,19 @@ public class ContestParticipantDatabaseTest {
 	}
 
 	private Result<ContestParticipationRecord> getContestParticipations(
-	        Contest contest,
-	        User user) {
+			Contest contest,
+			User user) {
 		return this.dslContext.selectFrom(Tables.CONTEST_PARTICIPATION)
-		        .where(Tables.CONTEST_PARTICIPATION.CONTEST_ID
-		                .eq(contest.getId()))
-		        .and(Tables.CONTEST_PARTICIPATION.USER_ID
-		                .eq(user.getId()))
-		        .fetch();
+				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID
+						.eq(contest.getId()))
+				.and(Tables.CONTEST_PARTICIPATION.USER_ID
+						.eq(user.getId()))
+				.fetch();
 	}
 
 	private User getRootUser() {
 		final User user = this.userService
-		        .getUserByUsername(NameConstants.SUPERUSER_ACCOUNT_NAME);
+				.getUserByUsername(NameConstants.SUPERUSER_ACCOUNT_NAME);
 
 		Assert.assertNotNull("Superuser must exist!", user);
 		return user;
@@ -146,7 +147,7 @@ public class ContestParticipantDatabaseTest {
 	@Rollback
 	@Transactional
 	public void testGivingGroupOtherPermissionDoesntAddAsParticipant()
-	        throws DataAccessException, IOException {
+			throws DataAccessException, IOException {
 		Assert.assertNotNull(this.dslContext);
 		final Contest contest = this.createContest();
 
@@ -155,21 +156,21 @@ public class ContestParticipantDatabaseTest {
 		final Group allUsersGroup = this.getAllUsersGroup();
 
 		this.addContestPermission(contest, allUsersGroup.getId(),
-		        ContestPermissionType.know_about);
+				ContestPermissionType.know_about);
 
 		Assert.assertTrue(
-		        "Granting permission 'know_about' shouldn't add user as participant!",
-		        this.getContestParticipations(contest, user).isEmpty());
+				"Granting permission 'know_about' shouldn't add user as participant!",
+				this.getContestParticipations(contest, user).isEmpty());
 
 		this.addContestPermission(contest, allUsersGroup.getId(),
-		        ContestPermissionType.participate);
+				ContestPermissionType.participate);
 	}
 
 	@Test
 	@Rollback
 	@Transactional
 	public void testGivingGroupParticipatePermissionAddsAsParticipant()
-	        throws DataAccessException, IOException {
+			throws DataAccessException, IOException {
 		Assert.assertNotNull(this.dslContext);
 		final Contest contest = this.createContest();
 
@@ -178,74 +179,74 @@ public class ContestParticipantDatabaseTest {
 		final Group allUsersGroup = this.getAllUsersGroup();
 
 		this.addContestPermission(contest, allUsersGroup.getId(),
-		        ContestPermissionType.participate);
+				ContestPermissionType.participate);
 
 		Assert.assertTrue(
-		        "Granting permission 'participant' should add one and one contest participation table row per user only!",
-		        this.getContestParticipations(contest, user).size() == 1);
+				"Granting permission 'participant' should add one and one contest participation table row per user only!",
+				this.getContestParticipations(contest, user).size() == 1);
 
 		this.deleteContestPermission(contest, allUsersGroup.getId(),
-		        ContestPermissionType.participate)
-		        .execute();
+				ContestPermissionType.participate)
+				.execute();
 
 		Assert.assertTrue(
-		        "Removing permission 'participant' remove the contest participation table row!",
-		        this.getContestParticipations(contest, user).size() == 0);
+				"Removing permission 'participant' remove the contest participation table row!",
+				this.getContestParticipations(contest, user).size() == 0);
 	}
 
 	@Test
 	@Rollback
 	@Transactional
 	public void testGivingUserOtherPermissionDoesntAddAsParticipant()
-	        throws DataAccessException, IOException {
+			throws DataAccessException, IOException {
 		Assert.assertNotNull(this.dslContext);
 		final Contest contest = this.createContest();
 
 		final User user = this.getRootUser();
 
 		this.addContestPermission(contest, user.getId(),
-		        ContestPermissionType.know_about);
+				ContestPermissionType.know_about);
 
 		Assert.assertTrue(
-		        "Granting permission 'know_about' shouldn't add user as participant!",
-		        this.getContestParticipations(contest, user).isEmpty());
+				"Granting permission 'know_about' shouldn't add user as participant!",
+				this.getContestParticipations(contest, user).isEmpty());
 	}
 
 	@Test
 	@Rollback
 	@Transactional
 	public void testGivingUserParticipatePermissionAddsAsParticipant()
-	        throws DataAccessException, IOException {
+			throws DataAccessException, IOException {
 		Assert.assertNotNull(this.dslContext);
 		final Contest contest = this.createContest();
 
 		final User user = this.getRootUser();
 
 		this.addContestPermission(contest, user.getId(),
-		        ContestPermissionType.participate);
+				ContestPermissionType.participate);
 
 		Assert.assertTrue(
-		        "Granting permission 'participant' should add one and one contest participation table row only!",
-		        this.getContestParticipations(contest, user).size() == 1);
+				"Granting permission 'participant' should add one and one contest participation table row only!",
+				this.getContestParticipations(contest, user).size() == 1);
 
 		Assert.assertNotNull("User score in contest must not be null",
-		        this.getContestParticipations(contest, user)
-		                .get(0).getScore());
+				this.getContestParticipations(contest, user)
+						.get(0).getScore());
 
 		Assert.assertTrue(this.deleteContestPermission(contest, user.getId(),
-		        ContestPermissionType.participate)
-		        .execute() == 1);
+				ContestPermissionType.participate)
+				.execute() == 1);
 
 		Assert.assertTrue(
-		        "Removing permission 'participant' remove the contest participation table row!",
-		        this.getContestParticipations(contest, user).size() == 0);
+				"Removing permission 'participant' remove the contest participation table row!",
+				this.getContestParticipations(contest, user).size() == 0);
 	}
 
 	@Test
 	@Rollback
 	@Transactional
 	public void testRevokingUserPermissionDoesntRemoveParticipantWhenDuplicate()
-	        throws DataAccessException, IOException {
+			throws DataAccessException, IOException {
 		Assert.assertNotNull(this.dslContext);
 		final Contest contest = this.createContest();
 
@@ -254,28 +255,28 @@ public class ContestParticipantDatabaseTest {
 		final Group allUsersGroup = this.getAllUsersGroup();
 
 		this.addContestPermission(contest, allUsersGroup.getId(),
-		        ContestPermissionType.participate);
+				ContestPermissionType.participate);
 		this.addContestPermission(contest, user.getId(),
-		        ContestPermissionType.participate);
+				ContestPermissionType.participate);
 
 		Assert.assertTrue(
-		        "Granting permission 'participant' should add one and one contest participation table row per user only!",
-		        this.getContestParticipations(contest, user).size() == 1);
+				"Granting permission 'participant' should add one and one contest participation table row per user only!",
+				this.getContestParticipations(contest, user).size() == 1);
 
 		this.deleteContestPermission(contest, user.getId(),
-		        ContestPermissionType.participate)
-		        .execute();
+				ContestPermissionType.participate)
+				.execute();
 
 		Assert.assertTrue(
-		        "Removing one 'participant' permission shouldn't remove contest participation if another remains!",
-		        this.getContestParticipations(contest, user).size() == 1);
+				"Removing one 'participant' permission shouldn't remove contest participation if another remains!",
+				this.getContestParticipations(contest, user).size() == 1);
 	}
 
 	@Test
 	@Rollback
 	@Transactional
 	public void testRevokingGroupPermissionDoesntRemoveParticipantWhenDuplicate()
-	        throws DataAccessException, IOException {
+			throws DataAccessException, IOException {
 		Assert.assertNotNull(this.dslContext);
 		final Contest contest = this.createContest();
 
@@ -284,21 +285,21 @@ public class ContestParticipantDatabaseTest {
 		final Group allUsersGroup = this.getAllUsersGroup();
 
 		this.addContestPermission(contest, allUsersGroup.getId(),
-		        ContestPermissionType.participate);
+				ContestPermissionType.participate);
 		this.addContestPermission(contest, user.getId(),
-		        ContestPermissionType.participate);
+				ContestPermissionType.participate);
 
 		Assert.assertTrue(
-		        "Granting permission 'participant' should add one and one contest participation table row per user only!",
-		        this.getContestParticipations(contest, user).size() == 1);
+				"Granting permission 'participant' should add one and one contest participation table row per user only!",
+				this.getContestParticipations(contest, user).size() == 1);
 
 		this.deleteContestPermission(contest, allUsersGroup.getId(),
-		        ContestPermissionType.participate)
-		        .execute();
+				ContestPermissionType.participate)
+				.execute();
 
 		Assert.assertTrue(
-		        "Removing one 'participant' permission shouldn't remove contest participation if another remains!",
-		        this.getContestParticipations(contest, user).size() == 1);
+				"Removing one 'participant' permission shouldn't remove contest participation if another remains!",
+				this.getContestParticipations(contest, user).size() == 1);
 	}
 
 }

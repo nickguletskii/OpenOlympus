@@ -23,40 +23,58 @@
 
 -->
 <button type="button"
-	th:attr="tooltip= #{task.editButton}"
-	class="hidden-print btn btn-primary fa fa-pencil"
-	secref
-	ui-sref="taskModificationView({taskId: taskId})">
+    th:attr="tooltip= #{task.editButton}"
+    class="hidden-print btn btn-primary fa fa-pencil"
+    secref
+    ui-sref="taskModificationView({taskId: taskId})">
 </button>
 <h2>{{name}}</h2>
 <acl-editor acl-getter="/api/task/{{taskId}}/acl"
-	acl-setter="/api/task/{{taskId}}/acl"
-	localisation-namespace="task.permissions"
+    acl-setter="/api/task/{{taskId}}/acl"
+    localisation-namespace="task.permissions"
     async-if="security.hasTaskPermission(taskId, 'manage_acl')"></acl-editor>
 <div class="panel panel-primary">
-	<div class="panel-heading">
-		<h3 class="panel-title">{{ 'task.description.heading' | translate }}</h3>
-	</div>
-	<div class="panel-body">
-		<ng-include src="'/api/task/'+taskId+'/data/'+indexPath">
-		</ng-include>
-	</div>
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'task.description.heading' | translate }}</h3>
+    </div>
+    <div class="panel-body"
+        ng-if="!indexPath">
+        {{ 'task.taskFormat.empty.git.message' }}
+        
+        <pre>
+git init
+git remote add origin {{baseUrl}}/git/tasks/{{taskId}}</pre>
+        
+        {{ 'task.taskFormat.localisationJson' }}
+
+        <pre>
+{
+	"default": "index.en.html",
+	"en":      "index.en.html",
+	"ru":      "index.ru.html"
+}</pre>
+    </div>
+    <div class="panel-body"
+        ng-if="indexPath">
+        <ng-include src="'/api/task/'+taskId+'/data/'+indexPath">
+        </ng-include>
+    </div>
 </div>
 <div class="panel panel-primary">
-	<div class="panel-heading">
-		<h3 class="panel-title">{{ 'task.submit.heading' | translate }}</h3>
-	</div>
-	<div class="panel-body">
-		<form form-autoconfig="solutionSubmissionForm"
-			novalidate>
-			<file-input label-translate="task.solutionSubmissionForm.labels.solutionFile"
-				type="text"
-				attribute="solutionFile"></file-input>
-			<submit-button label="{{ solutionSubmissionForm.submitButtonText | translate}}"
-				button-class="{{solutionSubmissionForm.submitButtonClass}}"
-				icon="{{solutionSubmissionForm.submitButtonIcon}}"></submit-button>
-		</form>
-		<form-progress-panel form="solutionSubmissionForm"
-			localisation-namespace="task.solutionSubmissionForm" />
-	</div>
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'task.submit.heading' | translate }}</h3>
+    </div>
+    <div class="panel-body">
+        <form form-autoconfig="solutionSubmissionForm"
+            novalidate>
+            <file-input label-translate="task.solutionSubmissionForm.labels.solutionFile"
+                type="text"
+                attribute="solutionFile"></file-input>
+            <submit-button label="{{ solutionSubmissionForm.submitButtonText | translate}}"
+                button-class="{{solutionSubmissionForm.submitButtonClass}}"
+                icon="{{solutionSubmissionForm.submitButtonIcon}}"></submit-button>
+        </form>
+        <form-progress-panel form="solutionSubmissionForm"
+            localisation-namespace="task.solutionSubmissionForm" />
+    </div>
 </div>

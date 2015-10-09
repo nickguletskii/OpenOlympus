@@ -84,8 +84,7 @@ public class ContestCreationController {
 		        .setName(contestDto.getName())
 		        .setShowFullTestsDuringContest(
 		                contestDto.isShowFullTestsDuringContest())
-		        .setStartTime(
-		                Timestamp.from(contestDto.getStartTime().toInstant()));
+		        .setStartTime(contestDto.getStartTime()); // TODO: fix
 		contest = this.contestService.insertContest(contest);
 		return new BindingResponse(Status.OK, null,
 		        new ImmutableMap.Builder<String, Object>().put("id",

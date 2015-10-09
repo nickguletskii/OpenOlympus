@@ -86,6 +86,9 @@ angular.module("ool")
 					var config = response.config;
 					var method = config.method;
 					var url = config.url;
+					if(_.includes(config.acceptableFailureCodes, status)){
+						return $q.reject(response);
+					}
 					switch (status) {
 						case -1:
 							errorHandler.showConnectionLostError();

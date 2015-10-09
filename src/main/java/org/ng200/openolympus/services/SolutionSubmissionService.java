@@ -24,8 +24,7 @@ package org.ng200.openolympus.services;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 
 import org.ng200.openolympus.dto.SolutionSubmissionDto;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
@@ -60,7 +59,7 @@ public class SolutionSubmissionService {
 
 		Solution solution = new Solution().setTaskId(task.getId())
 				.setUserId(user.getId())
-				.setTimeAdded(Timestamp.from(Instant.now()))
+				.setTimeAdded(OffsetDateTime.now())
 				.setTested(false);
 
 		this.storageService.setSolutionFile(solution, solutionFile);

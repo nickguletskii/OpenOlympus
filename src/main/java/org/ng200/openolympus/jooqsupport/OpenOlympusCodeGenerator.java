@@ -23,6 +23,8 @@
 package org.ng200.openolympus.jooqsupport;
 
 import org.jooq.util.ColumnDefinition;
+import org.jooq.util.DataTypeDefinition;
+import org.jooq.util.Database;
 import org.jooq.util.GeneratorStrategy.Mode;
 import org.jooq.util.JavaGenerator;
 import org.jooq.util.JavaWriter;
@@ -51,4 +53,17 @@ public class OpenOlympusCodeGenerator extends JavaGenerator {
 				.println("return fetchOneById(%s.valueOf(id));", identityName);
 		out.tab(1).println("}");
 	}
+
+	@Override
+	protected String getJavaTypeReference(Database database,
+			DataTypeDefinition type) {
+		if (type.getType().equals("timestamp with time zone")) {
+			return "org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ";
+		}
+		if (type.getType().equals("date")) {
+			return "org.ng200.openolympus.jooqsupport.CustomTypes.LOCALDATE";
+		}
+		return super.getJavaTypeReference(database, type);
+	}
+
 }

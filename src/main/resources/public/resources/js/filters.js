@@ -24,14 +24,16 @@
 
 var angular = require("angular");
 var _ = require("lodash");
+var moment = require("moment");
 require("services");
 
 /* Filters */
 
 module.exports = angular.module("ool.filters", ["ool.services"])
-	.filter("asDate", function() {
+	.filter("localiseTimestamped", function() {
 		return function(input) {
-			return new Date(input);
+			console.log(input.replace(/T/, " "));
+			return moment(input.replace(/T/, "")).format();
 		};
 	}).filter("minusOneNoValue", function() {
 		return function(input) {
