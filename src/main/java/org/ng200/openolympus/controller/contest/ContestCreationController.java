@@ -52,9 +52,8 @@ import com.google.common.collect.ImmutableMap;
 @Profile("web")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.CONTEST_CREATOR)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.CONTEST_CREATOR)
 		})
 })
 public class ContestCreationController {
@@ -67,8 +66,8 @@ public class ContestCreationController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contests/create")
 	public BindingResponse createContest(@Valid final ContestDto contestDto,
-	        final BindingResult bindingResult) throws IllegalStateException,
-	                IOException, ArchiveException, BindException {
+			final BindingResult bindingResult) throws IllegalStateException,
+					IOException, ArchiveException, BindException {
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
@@ -80,15 +79,15 @@ public class ContestCreationController {
 			throw new BindException(bindingResult);
 		}
 		Contest contest = new Contest()
-		        .setDuration(contestDto.getDuration())
-		        .setName(contestDto.getName())
-		        .setShowFullTestsDuringContest(
-		                contestDto.isShowFullTestsDuringContest())
-		        .setStartTime(contestDto.getStartTime()); // TODO: fix
+				.setDuration(contestDto.getDuration())
+				.setName(contestDto.getName())
+				.setShowFullTestsDuringContest(
+						contestDto.isShowFullTestsDuringContest())
+				.setStartTime(contestDto.getStartTime());
 		contest = this.contestService.insertContest(contest);
 		return new BindingResponse(Status.OK, null,
-		        new ImmutableMap.Builder<String, Object>().put("id",
-		                contest.getId()).build());
+				new ImmutableMap.Builder<String, Object>().put("id",
+						contest.getId()).build());
 	}
 
 }

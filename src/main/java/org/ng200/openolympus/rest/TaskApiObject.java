@@ -22,14 +22,15 @@
  */
 package org.ng200.openolympus.rest;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 public class TaskApiObject {
 	private Long id;
 	private String name;
-	private Date timeAdded;
+	private OffsetDateTime timeAdded;
 
-	public TaskApiObject(final Long id, final String name, final Date added) {
+	public TaskApiObject(final Long id, final String name, final OffsetDateTime added) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -44,7 +45,7 @@ public class TaskApiObject {
 		return this.name;
 	}
 
-	public Date getTimeAdded() {
+	public OffsetDateTime getTimeAdded() {
 		return this.timeAdded;
 	}
 
@@ -56,7 +57,7 @@ public class TaskApiObject {
 		this.name = name;
 	}
 
-	public void setTimeAdded(final Date added) {
+	public void setTimeAdded(final OffsetDateTime added) {
 		this.timeAdded = added;
 	}
 }

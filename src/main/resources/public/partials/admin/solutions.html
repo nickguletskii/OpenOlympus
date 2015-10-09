@@ -37,7 +37,7 @@
         <tr ng-repeat="solution in solutions">
             <td>
                 <a secref
-                    ui-sref="solutionView({solutionId: solution.id})">{{solution.submissionTime | asDate | date:'yyyy-MM-dd hh:mm:ss'}}</a>
+                    ui-sref="solutionView({solutionId: solution.id})">{{solution.submissionTime | localiseTimestamped}}</a>
             </td>
             <td>{{solution.task.name}}</td>
             <td>{{solution.score}}</td>

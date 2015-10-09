@@ -31,7 +31,8 @@ import org.jooq.impl.DefaultDataType;
 
 public class CustomTypes {
 	public static final DataType<OffsetDateTime> TIMESTAMPTZ = new DefaultDataType<OffsetDateTime>(
-			SQLDialect.POSTGRES, OffsetDateTime.class, "timetamptz");
+			SQLDialect.POSTGRES, OffsetDateTime.class,
+			"timestamp with time zone");
 	public static final DataType<LocalDate> LOCALDATE = new DefaultDataType<LocalDate>(
 			SQLDialect.POSTGRES, LocalDate.class, "date");
 }

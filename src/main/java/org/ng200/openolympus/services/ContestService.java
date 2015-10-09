@@ -24,9 +24,7 @@ package org.ng200.openolympus.services;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -151,7 +149,8 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return procedure.getReturnValue();
 	}
 
-	public OffsetDateTime getContestStartTimeForUser(Contest contest, User user) {
+	public OffsetDateTime getContestStartTimeForUser(Contest contest,
+			User user) {
 		final GetContestStartForUser procedure = new GetContestStartForUser();
 		procedure.setContestId(contest.getId());
 		procedure.setUserId(user.getId());
@@ -211,8 +210,9 @@ public class ContestService extends GenericCreateUpdateRepository {
 				.fetchInto(Contest.class);
 	}
 
-	public List<Contest> getContestsThatIntersect(final Date startDate,
-			final Date endDate) {
+	public List<Contest> getContestsThatIntersect(
+			final OffsetDateTime startDate,
+			final OffsetDateTime endDate) {
 
 		return this.dslContext
 				.selectFrom(Routines.getContestsThatIntersect(

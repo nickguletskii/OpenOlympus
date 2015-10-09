@@ -20,6 +20,7 @@ import org.jooq.impl.TableImpl;
 import org.ng200.openolympus.jooq.Keys;
 import org.ng200.openolympus.jooq.Public;
 import org.ng200.openolympus.jooq.tables.records.ContestRecord;
+import org.ng200.openolympus.util.DateTimeBinding;
 import org.ng200.openolympus.util.DurationConverter;
 
 
@@ -36,7 +37,7 @@ import org.ng200.openolympus.util.DurationConverter;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Contest extends TableImpl<ContestRecord> {
 
-	private static final long serialVersionUID = 470142846;
+	private static final long serialVersionUID = -521902179;
 
 	/**
 	 * The reference instance of <code>public.contest</code>
@@ -74,7 +75,7 @@ public class Contest extends TableImpl<ContestRecord> {
 	/**
 	 * The column <code>public.contest.start_time</code>.
 	 */
-	public final TableField<ContestRecord, OffsetDateTime> START_TIME = createField("start_time", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "");
+	public final TableField<ContestRecord, OffsetDateTime> START_TIME = createField("start_time", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "", new DateTimeBinding());
 
 	/**
 	 * Create a <code>public.contest</code> table reference

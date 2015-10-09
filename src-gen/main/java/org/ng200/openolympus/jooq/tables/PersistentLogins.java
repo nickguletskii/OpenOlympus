@@ -18,6 +18,7 @@ import org.jooq.impl.TableImpl;
 import org.ng200.openolympus.jooq.Keys;
 import org.ng200.openolympus.jooq.Public;
 import org.ng200.openolympus.jooq.tables.records.PersistentLoginsRecord;
+import org.ng200.openolympus.util.DateTimeBinding;
 
 
 /**
@@ -33,7 +34,7 @@ import org.ng200.openolympus.jooq.tables.records.PersistentLoginsRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersistentLogins extends TableImpl<PersistentLoginsRecord> {
 
-	private static final long serialVersionUID = -1726862515;
+	private static final long serialVersionUID = -533394796;
 
 	/**
 	 * The reference instance of <code>public.persistent_logins</code>
@@ -66,7 +67,7 @@ public class PersistentLogins extends TableImpl<PersistentLoginsRecord> {
 	/**
 	 * The column <code>public.persistent_logins.last_used</code>.
 	 */
-	public final TableField<PersistentLoginsRecord, OffsetDateTime> LAST_USED = createField("last_used", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "");
+	public final TableField<PersistentLoginsRecord, OffsetDateTime> LAST_USED = createField("last_used", org.ng200.openolympus.jooqsupport.CustomTypes.TIMESTAMPTZ, this, "", new DateTimeBinding());
 
 	/**
 	 * Create a <code>public.persistent_logins</code> table reference

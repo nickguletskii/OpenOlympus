@@ -22,7 +22,7 @@
  */
 package org.ng200.openolympus.validation;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.ng200.openolympus.dto.ContestDto;
@@ -51,9 +51,9 @@ public class ContestDtoValidator {
 					"contest.add.form.errors.contestAlreadyExists");
 		}
 
-		final Date start = contestDto.getStartTime();
-		final Date end = Date.from(contestDto.getStartTime().toInstant()
-				.plus(contestDto.getDuration()));
+		final OffsetDateTime start = contestDto.getStartTime();
+		final OffsetDateTime end = contestDto.getStartTime()
+				.plus(contestDto.getDuration());
 		final List<Contest> contestsThatIntersect = this.contestService
 				.getContestsThatIntersect(start, end);
 

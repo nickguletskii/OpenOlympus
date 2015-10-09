@@ -25,13 +25,11 @@ package org.ng200.openolympus.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Date;
 
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.model.views.UnprivilegedView;
 
-@SuppressWarnings("unused")
 public class SolutionDto implements Serializable {
 
 	public static interface SolutionDTOView extends UnprivilegedView {

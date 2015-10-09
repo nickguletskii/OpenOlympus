@@ -37,7 +37,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="contest in contests">
-            <td>{{contest.startTime | asDate | date:'yyyy-MM-dd hh:mm:ss'}}</td>
+            <td>{{contest.startTime | localiseTimestamped}}</td>
             <td>
                 <a secref
                     ui-sref="contestView({contestId: contest.id})">{{contest.name}}</a>
