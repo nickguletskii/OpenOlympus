@@ -23,9 +23,7 @@
 package org.ng200.openolympus;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 
 import org.jooq.DSLContext;

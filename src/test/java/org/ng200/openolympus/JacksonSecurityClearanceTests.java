@@ -29,12 +29,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
-import org.ng200.openolympus.config.JacksonConfiguration;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
@@ -43,16 +42,13 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = JacksonConfiguration.class)
-@PropertySource(value = {
-							"classpath:openolympus.properties",
-							"file:openolympus.properties",
-							"classpath:application.properties",
-							"file:application.properties",
-							"classpath:secret.properties",
-							"file:secret.properties"
-}, ignoreResourceNotFound = true)
-public class SecurityClearanceTests {
+@TestPropertySource(value = {
+								"classpath:test-db.properties",
+								"file:secret.properties"
+})
+@SpringApplicationConfiguration(classes = Application.class)
+public class JacksonSecurityClearanceTests {
+	
 	@JsonFilter("simple-strict-security")
 	public static class AnnotatedObject {
 		private String anonymousField = "anonymousFieldValue";

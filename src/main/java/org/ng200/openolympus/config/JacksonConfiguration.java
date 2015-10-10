@@ -54,8 +54,8 @@ public class JacksonConfiguration {
 		return Jackson2ObjectMapperBuilder
 				.json()
 				.failOnUnknownProperties(false)
-				.modules(new DurationJacksonModule())
 				.modules(new JSR310Module())
+				.modules(new DurationJacksonModule())
 				.filters(new FilterProvider() {
 
 					@Override
