@@ -100,7 +100,7 @@ public class ContestACLController {
 
 	@RequestMapping(value = "/api/contest/{contest}/acl",
 	        method = RequestMethod.PUT)
-	public void getContestACL(
+	public void setContestACL(
 	        @PathVariable("contest") Contest contest,
 	        @RequestBody Map<String, List<Long>> dto,
 	        final BindingResult bindingResult, final Principal principal) {

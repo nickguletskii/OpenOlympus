@@ -29,7 +29,7 @@ public class TestUserFactory {
 		private String prefix = "testUser";
 		private boolean approved = true;
 		private boolean superuser = false;
-		private GeneralPermissionType[] permissions;
+		private GeneralPermissionType[] permissions = {};
 
 		public GeneralPermissionType[] getPermissions() {
 			return permissions;

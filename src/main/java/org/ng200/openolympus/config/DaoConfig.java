@@ -26,6 +26,7 @@ import org.jooq.DSLContext;
 import org.ng200.openolympus.NameConstants;
 import org.ng200.openolympus.jooq.tables.daos.ContestDao;
 import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
+import org.ng200.openolympus.jooq.tables.daos.ContestPermissionDao;
 import org.ng200.openolympus.jooq.tables.daos.ContestTasksDao;
 import org.ng200.openolympus.jooq.tables.daos.GroupDao;
 import org.ng200.openolympus.jooq.tables.daos.GroupUsersDao;
@@ -104,6 +105,11 @@ public class DaoConfig {
 	@Bean
 	public PrincipalDao principalDao() {
 		return new PrincipalDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public ContestPermissionDao contestPermissionDao() {
+		return new ContestPermissionDao(this.dslContext.configuration());
 	}
 
 	@Bean

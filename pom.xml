@@ -217,6 +217,10 @@
 			<artifactId>jppf-common</artifactId>
 			<version>5.0.4</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
