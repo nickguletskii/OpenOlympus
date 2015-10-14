@@ -187,8 +187,8 @@ public class JacksonSerializationFactory {
 				.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
 						false);
 		try {
-			objectMapper.addMixInAnnotations(Path.class, PathMixin.class);
-			objectMapper.addMixInAnnotations(
+			objectMapper.addMixIn(Path.class, PathMixin.class);
+			objectMapper.addMixIn(
 					Class.forName("sun.nio.fs.UnixPath"), PathMixin.class);
 			return objectMapper;
 		} catch (final Exception e) {

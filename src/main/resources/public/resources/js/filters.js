@@ -32,6 +32,9 @@ require("services");
 module.exports = angular.module("ool.filters", ["ool.services"])
 	.filter("localiseTimestamped", function() {
 		return function(input) {
+			if (!input || !angular.isString(input)) {
+				return input;
+			}
 			return moment(input.replace(/T/, " ")).local().format("YYYY-MM-DD HH:mm:ss");
 		};
 	}).filter("minusOneNoValue", function() {

@@ -45,6 +45,7 @@ import org.ng200.openolympus.SharedTemporaryStorageFactory;
 import org.ng200.openolympus.cerberus.SolutionJudge;
 import org.ng200.openolympus.cerberus.SolutionJudgeFactory;
 import org.ng200.openolympus.cerberus.util.Lists;
+import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.services.SolutionService;
@@ -121,23 +122,21 @@ public class TaskContainer {
 			final Solution solution,
 			final Function<CompletableFuture<SolutionJudge>, CompletableFuture<SolutionJudge>> function)
 					throws ExecutionException {
-		synchronized (solution) {
-			this.judgeCache
-					.compute(
-							solution,
-							(sol, futureJudge) -> {
-								if (futureJudge == null) {
-									futureJudge = CompletableFuture
-											.supplyAsync(
-													() -> TaskContainer.this.solutionJudgeFactory
-															.createJudge(
-																	TaskContainer.this.properties,
-																	this.sharedTemporaryStorageFactory),
-													this.executorService);
-								}
-								return function.apply(futureJudge);
-							});
-		}
+		this.judgeCache
+				.compute(
+						solution,
+						(sol, futureJudge) -> {
+							if (futureJudge == null) {
+								futureJudge = CompletableFuture
+										.supplyAsync(
+												() -> TaskContainer.this.solutionJudgeFactory
+														.createJudge(
+																TaskContainer.this.properties,
+																this.sharedTemporaryStorageFactory),
+												this.executorService);
+							}
+							return function.apply(futureJudge);
+						});
 	}
 
 	public void collectGarbage(final SolutionService solutionService) {
@@ -156,10 +155,13 @@ public class TaskContainer {
 				this.path.resolve("mainTests"),
 				(paths) -> paths.map(x -> new Pair<>(x, false)).collect(
 						Collectors.toList())));
-		testDirs.addAll(FileAccess.actOnChildren(
-				this.path.resolve("baseTests"),
-				(paths) -> paths.map(x -> new Pair<>(x, true)).collect(
-						Collectors.toList())));
+
+		if (FileAccess.exists(this.path.resolve("baseTests"))) {
+			testDirs.addAll(FileAccess.actOnChildren(
+					this.path.resolve("baseTests"),
+					(paths) -> paths.map(x -> new Pair<>(x, true)).collect(
+							Collectors.toList())));
+		}
 
 		final List<Verdict> verdicts = testDirs
 				.stream()
@@ -177,19 +179,18 @@ public class TaskContainer {
 													relativePath,
 													this.properties))
 							.setPath(relativePath)
-							.setViewableDuringContest(test.getSecond());
+							.setViewableDuringContest(test.getSecond())
+							.setStatus(VerdictStatusType.waiting);
 				}).collect(Collectors.toList());
 		return verdicts;
 	}
 
 	public ClassLoader getClassLoader() throws MalformedURLException {
-		@SuppressWarnings("resource")
-		final ClassLoader classLoader = new URLClassLoader(
+		return new URLClassLoader(
 				this.getClassLoaderURLs()
 						.toArray(new URL[0]),
 				Thread.currentThread()
 						.getContextClassLoader());
-		return classLoader;
 	}
 
 	public List<URL> getClassLoaderURLs() throws MalformedURLException {

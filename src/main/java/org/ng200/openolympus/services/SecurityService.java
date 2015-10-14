@@ -23,14 +23,8 @@
 package org.ng200.openolympus.services;
 
 import java.security.Principal;
-import java.sql.Timestamp;
-import java.time.Instant;
 
 import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Param;
-import org.jooq.impl.DSL;
-import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.ContestTasksDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
@@ -39,7 +33,6 @@ import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.ContestTasks;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
-import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -99,13 +92,6 @@ public class SecurityService {
 		return this.dslContext.select(Tables.USER.SUPERUSER).from(Tables.USER)
 				.where(Tables.USER.USERNAME.eq(principal.getName())).fetchOne()
 				.value1();
-	}
-
-	private boolean isSuperuser(final User user) {
-		if (user == null) {
-			return false;
-		}
-		return user.getSuperuser();
 	}
 
 	public boolean isTaskInContest(Task task, Contest contest) {

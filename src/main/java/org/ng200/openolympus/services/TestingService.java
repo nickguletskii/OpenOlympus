@@ -29,32 +29,30 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectForUpdateOfStep;
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
-import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.task.storage.DataProvider;
-import org.jppf.task.storage.MemoryMapDataProvider;
-import org.ng200.openolympus.Authorities;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobListenerAdapter;
 import org.ng200.openolympus.cerberus.Janitor;
 import org.ng200.openolympus.cerberus.SolutionJudge;
 import org.ng200.openolympus.cerberus.SolutionResult;
 import org.ng200.openolympus.cerberus.SolutionResult.Result;
 import org.ng200.openolympus.cerberus.util.Lists;
-import org.ng200.openolympus.factory.JacksonSerializationFactory;
+import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
+import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.VerdictStatusType;
 import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
@@ -72,12 +70,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.HtmlUtils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -86,39 +80,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Service
 public class TestingService {
 
-	private final class SystemAuthenticationToken extends
-			AbstractAuthenticationToken {
-		/**
-		 *
-		 */
-		private static final long serialVersionUID = -5336945477077794036L;
-
-		public SystemAuthenticationToken() {
-			super(Lists.from(Authorities.SUPERUSER, Authorities.USER));
-			this.setAuthenticated(true);
-		}
-
-		private SystemAuthenticationToken(
-				Collection<? extends GrantedAuthority> authorities) {
-			super(authorities);
-		}
-
-		@Override
-		public Object getCredentials() {
-			return null;
-		}
-
-		@Override
-		public Object getPrincipal() {
-			return TestingService.this.userService.getUserByUsername("system");
-		}
-	}
-
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestingService.class);
 	private final JPPFClient jppfClient = new JPPFClient();
-
-	private final DataProvider dataProvider = new MemoryMapDataProvider();
 
 	private final Cache<Integer, Pair<String, String>> internalErrors = CacheBuilder
 			.newBuilder().maximumSize(30).build();
@@ -128,15 +92,9 @@ public class TestingService {
 	private final ScheduledExecutorService verdictCheckSchedulingExecutorService = Executors
 			.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
 					.setNameFormat("Judgement scheduler %1$d").build());
-	private final ExecutorService compilationAndCheckingExecutor = Executors
-			.newFixedThreadPool(
-					16,
-					new ThreadFactoryBuilder().setNameFormat(
-							"Judgement awaiter %1$d").build());
+
 	@Autowired
 	private SolutionService solutionService;
-
-	private UserService userService;
 
 	@Autowired
 	private TaskContainerCache taskContainerCache;
@@ -150,64 +108,69 @@ public class TestingService {
 	@Autowired
 	private VerdictDao verdictDao;
 
-	@Autowired
-	private TaskService taskService;
-
 	private StorageService storageService;
 
 	@Autowired
 	public TestingService(TaskContainerCache taskContainerCache,
-			StorageService storageService) {
-		super();
+			StorageService storageService, DSLContext dslContext) {
 		this.taskContainerCache = taskContainerCache;
 		this.storageService = storageService;
 
-		this.dataProvider.setParameter("storageService", storageService);
-
-		final HashSet<Verdict> alreadyScheduledJobs = new HashSet<>();
 		this.verdictCheckSchedulingExecutorService.scheduleAtFixedRate(
 				() -> {
-					this.logInAsSystem();
-					this.solutionService
-							.getPendingVerdicts()
-							.filter((verdict) -> !alreadyScheduledJobs
-									.contains(verdict))
-							.sorted((l, r) -> {
-
-						if (l.getViewableDuringContest() != r
-								.getViewableDuringContest()) {
-							// Schedule base tests first
-							return Boolean.compare(
-									r.getViewableDuringContest(),
-									l.getViewableDuringContest());
+					Verdict toTest;
+					try {
+						while ((toTest = getAndLockVerdictForTesting(
+								dslContext)) != null) {
+							this.processVerdict(toTest);
 						}
-						return Long.compare(l.getId(), r.getId());
-					}).forEach((verdict) -> {
-						alreadyScheduledJobs.add(verdict);
-						this.processVerdict(verdict);
-					});
+					} catch (Throwable t) {
+						logger.error(
+								"Couldn't poll database for pending verdicts: {}",
+								t);
+					}
 				} , 0, 100, TimeUnit.MILLISECONDS);
+	}
+
+	private Verdict getAndLockVerdictForTesting(DSLContext dslContext) {
+		SelectForUpdateOfStep<Record1<Long>> view = dslContext
+				.select(Tables.VERDICT.ID)
+				.from(Tables.VERDICT)
+				.where(Tables.VERDICT.STATUS
+						.eq(VerdictStatusType.waiting))
+				.orderBy(
+						Tables.VERDICT.VIEWABLE_DURING_CONTEST
+								.desc(),
+						Tables.VERDICT.SOLUTION_ID.asc(),
+						Tables.VERDICT.ID.asc())
+				.limit(1)
+				.forUpdate();
+		return dslContext
+				.update(Tables.VERDICT)
+				.set(Tables.VERDICT.STATUS,
+						VerdictStatusType.being_tested)
+				.from(view)
+				.where(Tables.VERDICT.ID
+						.eq(view.field(Tables.VERDICT.ID)))
+				.returning(Tables.VERDICT.fields())
+				.fetchOptional()
+				.map(verdictRecord -> verdictRecord
+						.into(Verdict.class))
+				.orElse(null);
 	}
 
 	private void checkVerdict(final Verdict verdict, final SolutionJudge judge,
 			final List<Path> testFiles, final BigDecimal maximumScore,
 			final Properties properties) throws ExecutionException {
-		if (this.dataProvider == null) {
-			throw new IllegalStateException("Shared data provider is null!");
-		}
 		final Solution solution = this.solutionDao
 				.fetchOneById(verdict.getSolutionId());
 		final Task task = this.taskDao.fetchOneById(solution.getTaskId());
-
-		final Lock lock = task.readLock();
-		lock.lock();
 
 		try {
 			TestingService.logger.info("Scheduling verdict {} for testing.",
 					verdict.getId());
 
 			final JPPFJob job = new JPPFJob();
-			job.setDataProvider(this.dataProvider);
 
 			job.setName("Check verdict " + verdict.getId());
 
@@ -217,8 +180,6 @@ public class TestingService {
 
 			job.getSLA().setMaxNodes(1);
 			job.getSLA().setPriority(priority);
-			job.getSLA()
-					.setDispatchExpirationSchedule(new JPPFSchedule(60000L));
 			job.getSLA().setMaxDispatchExpirations(3);
 
 			final TaskContainer taskContainer = this.taskContainerCache
@@ -234,95 +195,101 @@ public class TestingService {
 							properties),
 					taskContainer.getClassLoaderURLs()));
 
-			job.setBlocking(true);
+			job.setBlocking(false);
 
 			this.jppfClient.registerClassLoader(taskContainer.getClassLoader(),
 					job.getUuid());
+
+			job.addJobListener(new JobListenerAdapter() {
+
+				@Override
+				public void jobEnded(JobEvent event) {
+
+				}
+
+				@Override
+				public void jobReturned(JobEvent event) {
+					try {
+						final JsonTaskExecutionResult<Pair<SolutionJudge, SolutionResult>> checkingResult = ((JacksonSerializationDelegatingTask<Pair<SolutionJudge, SolutionResult>, VerdictCheckingTask>) event
+								.getJob().getResults().getResultTask(0))
+										.getResultOrThrowable();
+						if (checkingResult.getError() != null) {
+							throw checkingResult.getError();
+						}
+
+						final SolutionResult result = checkingResult.getResult()
+								.getSecond();
+
+						verdict.setScore(result.getScore());
+
+						verdict.setMemoryPeak(result.getMemoryPeak());
+						verdict.setCpuTime(
+								Duration.ofMillis(result.getCpuTime()));
+						verdict.setRealTime(
+								Duration.ofMillis(result.getRealTime()));
+
+						verdict.setStatus(
+								convertCerberusResultToVerdictStatus(result
+										.getResult()));
+						switch (result.getResult()) {
+						case OK:
+						case TIME_LIMIT:
+						case MEMORY_LIMIT:
+						case OUTPUT_LIMIT:
+						case PRESENTATION_ERROR:
+						case WRONG_ANSWER:
+						case RUNTIME_ERROR:
+						case SECURITY_VIOLATION:
+							break;
+						case INTERNAL_ERROR:
+							result.getErrorMessages().forEach(
+									(stage, message) -> internalErrors.put(
+											internalErrorCounter++,
+											new Pair<String, String>(
+													task.getName(),
+													message)));
+							break;
+						case COMPILE_ERROR:
+							final String message = result.getErrorMessages()
+									.values()
+									.stream().collect(Collectors.joining("\n"));
+
+							verdict.setAdditionalInformation(message
+									.substring(0, Math.min(128,
+											message.length())));
+							break;
+						case WAITING:
+							throw new IllegalStateException(
+									"Judge returned result \"waiting\".");
+						}
+					} catch (Throwable t) {
+						verdict.setStatus(VerdictStatusType.internal_error);
+						logger.error(
+								"Testing system internal error: couldn't commit a verdict: {}",
+								t);
+					} finally {
+						solutionService.updateVerdict(verdict);
+					}
+				}
+
+			});
 			this.jppfClient.submitJob(job);
-			@SuppressWarnings("unchecked")
-			final org.jppf.node.protocol.Task<String> jppfTask = (org.jppf.node.protocol.Task<String>) job
-					.awaitResults().get(0);
-
-			if (jppfTask.getThrowable() != null) {
-				throw jppfTask.getThrowable();
-			}
-
-			JacksonSerializationFactory
-					.createObjectMapper();
-
-			final JsonTaskExecutionResult<Pair<SolutionJudge, SolutionResult>> checkingResult = ((JacksonSerializationDelegatingTask<Pair<SolutionJudge, SolutionResult>, VerdictCheckingTask>) job
-					.awaitResults().get(0)).getResultOrThrowable();
-
-			if (checkingResult.getError() != null) {
-				throw checkingResult.getError();
-			}
-
-			final SolutionResult result = checkingResult.getResult()
-					.getSecond();
-
-			verdict.setScore(result.getScore());
-
-			verdict.setMemoryPeak(result.getMemoryPeak());
-			verdict.setCpuTime(Duration.ofMillis(result.getCpuTime()));
-			verdict.setRealTime(Duration.ofMillis(result.getRealTime()));
-
-			verdict.setStatus(this.convertCerberusResultToVerdictStatus(result
-					.getResult()));
-			switch (result.getResult()) {
-			case OK:
-			case TIME_LIMIT:
-			case MEMORY_LIMIT:
-			case OUTPUT_LIMIT:
-			case PRESENTATION_ERROR:
-			case WRONG_ANSWER:
-			case RUNTIME_ERROR:
-			case SECURITY_VIOLATION:
-				break;
-			case INTERNAL_ERROR:
-				result.getErrorMessages().forEach(
-						(stage, message) -> this.internalErrors.put(
-								this.internalErrorCounter++,
-								new Pair<String, String>(task.getName(),
-										message)));
-				break;
-			case COMPILE_ERROR:
-				final String message = result.getErrorMessages().values()
-						.stream().collect(Collectors.joining("\n"));
-
-				verdict.setAdditionalInformation(HtmlUtils.htmlEscape(message
-						.substring(0, Math.min(128, message.length()))));
-				break;
-			case WAITING:
-				throw new IllegalStateException(
-						"Judge returned result \"waiting\".");
-			}
 
 		} catch (final Throwable throwable) {
 			verdict.setStatus(VerdictStatusType.internal_error);
-			throw new RuntimeException("Couldn't run solution: ", throwable);
-		} finally {
-			lock.unlock();
-
-			if (verdict.getStatus() == VerdictStatusType.waiting) {
-				verdict.setStatus(VerdictStatusType.internal_error);
-				TestingService.logger
-						.error("Judge for task {} did not set the result status to an acceptable value: got WAITING instead.",
-								task.getId());
-			}
 			this.solutionService.updateVerdict(verdict);
+			throw new RuntimeException("Couldn't run solution: ", throwable);
 		}
 	}
 
-	private SolutionJudge compileSolution(final Solution solution,
+	private CompletableFuture<SolutionJudge> compileSolution(
+			final Solution solution,
 			final SolutionJudge judge, final Properties properties)
 					throws ExecutionException {
-		if (this.dataProvider == null) {
-			throw new IllegalStateException("Shared data provider is null!");
-		}
-		final Task task = this.taskDao.fetchOneById(solution.getTaskId());
 
-		final Lock lock = task.readLock();
-		lock.lock();
+		final CompletableFuture<SolutionJudge> completableFuture = new CompletableFuture<>();
+
+		final Task task = this.taskDao.fetchOneById(solution.getTaskId());
 
 		try {
 			TestingService.logger
@@ -330,15 +297,12 @@ public class TestingService {
 							solution.getId());
 
 			final JPPFJob job = new JPPFJob();
-			job.setDataProvider(this.dataProvider);
 
 			job.setName("Compile solution " + solution.getId());
 
 			job.getSLA().setMaxNodes(1);
 			job.getSLA().setPriority(
 					(int) (Integer.MAX_VALUE - solution.getId()));
-			job.getSLA()
-					.setDispatchExpirationSchedule(new JPPFSchedule(20000L));
 			job.getSLA().setMaxDispatchExpirations(5);
 
 			final TaskContainer taskContainer = this.taskContainerCache
@@ -359,21 +323,38 @@ public class TestingService {
 
 			this.jppfClient.registerClassLoader(taskContainer.getClassLoader(),
 					job.getUuid());
+
+			job.addJobListener(new JobListenerAdapter() {
+
+				@Override
+				public void jobEnded(JobEvent event) {
+
+				}
+
+				@Override
+				public void jobReturned(JobEvent event) {
+					try {
+						JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) event
+								.getJob().getResults().getResultTask(0))
+										.getResultOrThrowable();
+						if (result.getError() != null) {
+							completableFuture
+									.completeExceptionally(result.getError());
+						}
+						completableFuture.complete(result.getResult());
+					} catch (Throwable t) {
+						completableFuture.completeExceptionally(t);
+					}
+				}
+
+			});
 			this.jppfClient.submitJob(job);
-			final JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) job
-					.awaitResults().get(0)).getResultOrThrowable();
 
-			if (result.getError() != null) {
-				throw result.getError();
-			}
-
-			return result.getResult();
+			return completableFuture;
 
 		} catch (final Throwable throwable) {
 			throw new RuntimeException("Couldn't compile solution: ",
 					throwable);
-		} finally {
-			lock.unlock();
 		}
 	}
 
@@ -412,9 +393,52 @@ public class TestingService {
 		return new ArrayList<>(this.internalErrors.asMap().values());
 	}
 
-	private void logInAsSystem() {
-		SecurityContextHolder.getContext().setAuthentication(
-				new SystemAuthenticationToken());
+	private CompletableFuture<SolutionJudge> actOnJudge(Verdict verdict,
+			Solution solution,
+			Task task,
+			TaskContainer taskContainer,
+			CompletableFuture<SolutionJudge> futureJudge) {
+		return futureJudge
+				.thenCompose(judge -> {
+					try {
+						if (!judge.isCompiled()) {
+							return this.compileSolution(
+									solution, judge,
+									taskContainer
+											.getProperties());
+						}
+					} catch (final Throwable e) {
+						TestingService.logger.error(
+								"Solution compilation failed "
+										+ "because judge for task "
+										+ "\"{}\"({}) thew an "
+										+ "exception: {}",
+								task.getName(), task.getId(), e);
+						CompletableFuture<SolutionJudge> ex = new CompletableFuture<>();
+						ex.completeExceptionally(e);
+						return ex;
+					} finally {
+						Janitor.cleanUp(judge);
+					}
+					return CompletableFuture
+							.<SolutionJudge> completedFuture(judge);
+				})
+				.thenApply((judge) -> {
+					try {
+						this.checkVerdict(verdict, judge,
+								taskContainer
+										.getTestFiles(verdict
+												.getPath()),
+								verdict.getMaximumScore(),
+								taskContainer.getProperties());
+						return judge;
+					} catch (final Throwable e) {
+						throw new GeneralNestedRuntimeException(
+								"Couldn't check verdict: ", e);
+					} finally {
+						Janitor.cleanUp(judge);
+					}
+				});
 	}
 
 	private void processVerdict(final Verdict verdict) {
@@ -424,76 +448,16 @@ public class TestingService {
 			final Task task = this.taskDao.fetchOneById(solution.getTaskId());
 			final TaskContainer taskContainer = this.taskContainerCache
 					.getTaskContainerForTask(task);
-			final Function<CompletableFuture<SolutionJudge>, CompletableFuture<SolutionJudge>> functionToApplyToJudge = (
-					final CompletableFuture<SolutionJudge> futureJudge) -> {
-				this.logInAsSystem();
-				return futureJudge
-						.thenApplyAsync(
-								(final SolutionJudge judge) -> {
-					this.logInAsSystem();
-					try {
-						if (!judge.isCompiled()) {
-							return this.compileSolution(
-									solution, judge,
-									taskContainer
-											.getProperties());
-						}
-					} catch (final Exception e) {
-						TestingService.logger.error(
-								"Solution compilation failed "
-										+ "because judge for task "
-										+ "\"{}\"({}) thew an "
-										+ "exception: {}",
-								task.getName(), task.getId(), e);
-					} finally {
-						Janitor.cleanUp(judge);
-					}
-					return judge;
-				} , this.compilationAndCheckingExecutor)
-						.thenApplyAsync(
-								(final SolutionJudge judge) -> {
-					this.logInAsSystem();
-					try {
-						this.checkVerdict(verdict, judge,
-								taskContainer
-										.getTestFiles(verdict
-												.getPath()),
-								verdict.getMaximumScore(),
-								taskContainer.getProperties());
-					} catch (final Throwable e) {
-						final Task t = this.taskService
-								.getTaskFromVerdict(verdict);
-						TestingService.logger
-								.error("Solution judgement failed "
-										+ "because judge for task "
-										+ "\"{}\"({}) thew an "
-										+ "exception: {}",
-										t.getName(), t.getId(),
-										e);
-					} finally {
-						Janitor.cleanUp(judge);
-					}
 
-					return judge;
-				} , this.compilationAndCheckingExecutor)
-						.handle((final SolutionJudge judge,
-								final Throwable throwable) -> {
-					this.logInAsSystem();
-
-					if (throwable != null) {
-						throw new RuntimeException(
-								"Couldn't judge verdict: ", throwable);
-					}
-					return judge;
-				});
-			};
-			this.logInAsSystem();
-
-			taskContainer.applyToJudge(solution, functionToApplyToJudge);
+			taskContainer.applyToJudge(solution,
+					(futureJudge) -> actOnJudge(verdict, solution, task,
+							taskContainer,
+							futureJudge));
 		} catch (final Exception e) {
 			TestingService.logger.error(
 					"Couldn't schedule judgement for verdict {}: ", verdict, e);
 		}
+
 	}
 
 	public void reloadTasks() {

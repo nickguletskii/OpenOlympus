@@ -66,89 +66,85 @@ public class SolutionListController {
 	private TaskService taskService;
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(SecurityClearanceType.VIEW_ALL_SOLUTIONS)
+					@SecurityAnd({
+									@SecurityLeaf(SecurityClearanceType.VIEW_ALL_SOLUTIONS)
 			})
 	})
-	@RequestMapping(value = "/api/admin/solutionsCount",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/admin/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCount(final User user) {
 		return this.solutionService.getSolutionCount();
 	}
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(SecurityClearanceType.APPROVED_USER)
+					@SecurityAnd({
+									@SecurityLeaf(SecurityClearanceType.APPROVED_USER)
 			})
 	})
-	@RequestMapping(value = "/api/user/solutionsCount",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCountForUser(final Principal principal) {
 		final User user = this.userService.getUserByUsername(principal
-		        .getName());
+				.getName());
 
 		// TODO: replace with SQL
 		if (this.contestService.getRunningContest() == null) {
 			return this.solutionService.countUserSolutions(user);
 		}
 		return this.solutionService.countUserSolutionsInContest(user,
-		        this.contestService.getRunningContest());
+				this.contestService.getRunningContest());
 	}
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(SecurityClearanceType.VIEW_ALL_SOLUTIONS)
+					@SecurityAnd({
+									@SecurityLeaf(SecurityClearanceType.VIEW_ALL_SOLUTIONS)
 			})
 	})
 	@RequestMapping(value = "/api/admin/solutions", method = RequestMethod.GET)
 	public List<SolutionDto> showAllSolutions(
-	        @RequestParam(value = "page",
-	                defaultValue = "1") final Integer pageNumber,
-	        final Model model) {
+			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
+			final Model model) {
 		return this.solutionService
-		        .getPage(pageNumber, SolutionListController.PAGE_SIZE)
-		        .stream()
-		        .map(solution -> new SolutionDto(solution, this.taskService
-		                .getById(solution.getTaskId())))
-		        .collect(Collectors.toList());
+				.getPage(pageNumber, SolutionListController.PAGE_SIZE)
+				.stream()
+				.map(solution -> new SolutionDto(solution, this.taskService
+						.getById(solution.getTaskId())))
+				.collect(Collectors.toList());
 	}
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(SecurityClearanceType.APPROVED_USER)
+					@SecurityAnd({
+									@SecurityLeaf(SecurityClearanceType.APPROVED_USER)
 			})
 	})
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
 
 	public List<SolutionDto> showUserSolutions(
-	        @RequestParam(value = "page",
-	                defaultValue = "1") final Integer pageNumber,
-	        final Model model, final Principal principal) {
+			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
+			final Model model, final Principal principal) {
 		final User user = this.userService.getUserByUsername(principal
-		        .getName());
+				.getName());
 		final List<Solution> solutions = new ArrayList<>();
 		final Contest contest = this.contestService.getRunningContest();
 		if (contest != null) {
 			solutions
-			        .addAll(this.solutionService.getPage(user, pageNumber,
-			                SolutionListController.PAGE_SIZE, contest
-			                        .getStartTime(),
-			                this.contestService
-			                        .getContestEndTimeForUser(contest, user)));
+					.addAll(this.solutionService.getPage(user, pageNumber,
+							SolutionListController.PAGE_SIZE, contest
+									.getStartTime(),
+							this.contestService
+									.getContestEndTimeForUser(contest, user)));
 		} else {
 			solutions.addAll(this.solutionService.getPageOutsideOfContest(user,
-			        pageNumber, SolutionListController.PAGE_SIZE));
+					pageNumber, SolutionListController.PAGE_SIZE));
 		}
 
 		return solutions
-		        .stream()
-		        .map(solution -> new SolutionDto(solution, this.taskService
-		                .getById(solution.getTaskId())))
-		        .map(dto -> {
-			        if (contest != null) {
-				        dto.setScore(null);
-			        }
-			        return dto;
-		        }).collect(Collectors.toList());
+				.stream()
+				.map(solution -> new SolutionDto(solution, this.taskService
+						.getById(solution.getTaskId())))
+				.map(dto -> {
+					if (contest != null) {
+						dto.setScore(null);
+					}
+					return dto;
+				}).collect(Collectors.toList());
 	}
 }

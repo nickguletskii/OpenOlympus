@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.ng200.openolympus.jooq.tables.interfaces.ITask;
-import org.ng200.openolympus.model.ITaskDateFormat;
 import org.ng200.openolympus.model.ITaskSecurityDescription;
 import org.ng200.openolympus.model.LockableResourceImplWithIntegerId;
 
@@ -31,9 +30,9 @@ import org.ng200.openolympus.model.LockableResourceImplWithIntegerId;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "task", schema = "public")
-public class Task extends LockableResourceImplWithIntegerId implements ITaskSecurityDescription, ITaskDateFormat, ITask {
+public class Task extends LockableResourceImplWithIntegerId implements ITaskSecurityDescription, ITask {
 
-	private static final long serialVersionUID = 690472494;
+	private static final long serialVersionUID = 1514961417;
 
 	private Integer        id;
 	private String         descriptionFile;

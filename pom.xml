@@ -116,18 +116,13 @@
 		<dependency>
 			<groupId>org.jppf</groupId>
 			<artifactId>jppf-client</artifactId>
-			<version>4.2.5</version>
+			<version>5.0.4</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-log4j12</artifactId>
 					<groupId>org.slf4j</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.jppf</groupId>
-			<artifactId>jppf-common</artifactId>
-			<version>4.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
@@ -218,8 +213,9 @@
 			<version>4.0.1.201506240215-r</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
+			<groupId>org.jppf</groupId>
+			<artifactId>jppf-common</artifactId>
+			<version>5.0.4</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -242,7 +238,7 @@
 					<plugin>
 						<groupId>org.jooq</groupId>
 						<artifactId>jooq-codegen-maven</artifactId>
-						<version>${jooq.version}</version>
+						<version>${jooq.version}-SNAPSHOT</version>
 
 
 						<executions>
@@ -356,8 +352,7 @@
 
 												<pojoExtends>org.ng200.openolympus.model.LockableResourceImplWithIntegerId</pojoExtends>
 												<pojoImplements>
-													org.ng200.openolympus.model.ITaskSecurityDescription,
-													org.ng200.openolympus.model.ITaskDateFormat
+													org.ng200.openolympus.model.ITaskSecurityDescription
 												</pojoImplements>
 											</table>
 											<table>

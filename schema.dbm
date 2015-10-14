@@ -266,7 +266,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -314,7 +314,7 @@ END;]]></definition>
 	<parameter name="_param2">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participation SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participation.contest_id WHERE solutions.user_id=contest_participation.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participation.contest_id,contest_participation.user_id)) AND (SELECT get_contest_end_for_user(contest_participation.contest_id,contest_participation.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participation.user_id = $1 AND contest_participation.contest_id = $2 ]]></definition>
+	<definition><![CDATA[ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participation SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contest_tasks ON contest_tasks.tasks_id = solutions.task_id AND contest_tasks.contests_id=contest_participation.contest_id WHERE solutions.user_id=contest_participation.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participation.contest_id,contest_participation.user_id)) AND (SELECT get_contest_end_for_user(contest_participation.contest_id,contest_participation.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participation.user_id = $1 AND contest_participation.contest_id = $2 ]]></definition>
 </function>
 
 <usertype name="general_permission_type" configuration="enumeration">
@@ -555,7 +555,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32534"/>
+		<type name="public.general_permission_type" dimension="1" precision="32529"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -784,7 +784,7 @@ END;]]></definition>
 <usertype name="verdict_status_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="waiting,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error,presentation_error,output_limit_exceeded,compile_error"/>
+	<enumeration values="waiting,being_tested,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error,presentation_error,output_limit_exceeded,compile_error"/>
 </usertype>
 
 <table name="verdict">
@@ -801,7 +801,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32534"/>
+		<type name="public.verdict_status_type" precision="32529"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -1013,7 +1013,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32534"/>
+		<type name="public.task_permission_type" precision="32529"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1329,7 +1329,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32766"/>
+	<type name="public.contest" precision="32765"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp" with-timezone="true"/>
@@ -1435,7 +1435,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32534"/>
+		<type name="public.group_permission_type" precision="32529"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1879,7 +1879,7 @@ BEGIN
                                                       cp.user_id))
     WHERE     cp.user_id = user_id_v
           AND cp.contest_id IN (SELECT ct.contest_id
-                                  FROM contests_tasks ct
+                                  FROM contest_tasks ct
                                  WHERE ct.task_id = task_id_v);
     IF TG_OP='DELETE' THEN
     	return OLD;
@@ -1924,7 +1924,7 @@ END;]]></definition>
 	<schema name="public"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32534"/>
+		<type name="public.contest_permission_type" precision="32529"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>

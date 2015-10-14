@@ -39,7 +39,6 @@ import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,7 +101,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 	}
 
 	public List<Solution> getPage(final int pageNumber, final int pageSize) {
-		return this.dslContext.selectCount().from(Tables.SOLUTION)
+		return this.dslContext.selectFrom(Tables.SOLUTION)
 				.groupBy(Tables.SOLUTION.ID)
 				.orderBy(Tables.SOLUTION.TIME_ADDED.desc()).limit(pageSize)
 				.offset(pageSize * (pageNumber - 1)).fetchInto(Solution.class);
@@ -175,7 +174,6 @@ public class SolutionService extends GenericCreateUpdateRepository {
 		return this.insert(solution, Tables.SOLUTION);
 	}
 
-	@CacheEvict(value = "solutions", key = "#verdict.solution.id")
 	@Transactional
 	public synchronized Verdict updateVerdict(Verdict verdict) {
 		return this.update(verdict, Tables.VERDICT);

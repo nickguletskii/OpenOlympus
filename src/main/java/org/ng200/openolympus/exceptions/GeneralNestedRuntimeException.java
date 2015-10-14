@@ -31,8 +31,8 @@ public class GeneralNestedRuntimeException extends NestedRuntimeException {
 	 */
 	private static final long serialVersionUID = -1758154007798845356L;
 
-	public GeneralNestedRuntimeException(String msg, Exception cause) {
-		super(msg, cause);
+	public GeneralNestedRuntimeException(String msg, Throwable e) {
+		super(msg, e);
 	}
 
 }

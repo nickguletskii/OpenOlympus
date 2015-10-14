@@ -23,6 +23,7 @@
 package org.ng200.openolympus.config;
 
 import org.ng200.openolympus.DurationJacksonModule;
+import org.ng200.openolympus.OffsetDateTimeModule;
 import org.ng200.openolympus.SecurityClearanceJacksonFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,6 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 
 @SuppressWarnings("deprecation")
 @Component
@@ -54,8 +54,8 @@ public class JacksonConfiguration {
 		return Jackson2ObjectMapperBuilder
 				.json()
 				.failOnUnknownProperties(false)
-				.modules(new JSR310Module())
-				.modules(new DurationJacksonModule())
+				.modules(new OffsetDateTimeModule(),
+						new DurationJacksonModule())
 				.filters(new FilterProvider() {
 
 					@Override
@@ -71,8 +71,6 @@ public class JacksonConfiguration {
 								.securityClearanceJacksonFilter();
 					}
 				})
-				.featuresToDisable(
-						com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.annotationIntrospector(new JacksonAnnotationIntrospector());
 	}
 

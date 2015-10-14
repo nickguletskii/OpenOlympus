@@ -26,6 +26,8 @@ public enum VerdictStatusType implements EnumType {
 
 	waiting("waiting"),
 
+	being_tested("being_tested"),
+
 	ok("ok"),
 
 	wrong_answer("wrong_answer"),

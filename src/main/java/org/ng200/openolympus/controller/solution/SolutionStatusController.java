@@ -24,21 +24,21 @@ package org.ng200.openolympus.controller.solution;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.ng200.openolympus.SecurityClearanceType;
-import org.ng200.openolympus.controller.solution.VerdictStatusController.VerdictDto;
+import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.SolutionIsInContestModeratedByCurrentUserSecurityPredicate;
+import org.ng200.openolympus.security.predicates.SolutionScoreSecurityPredicate;
+import org.ng200.openolympus.security.predicates.SolutionSecurityPredicate;
 import org.ng200.openolympus.security.predicates.UserIsOwnerOfSolutionSecurityPredicate;
 import org.ng200.openolympus.services.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,51 +50,45 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("web")
 @RequestMapping(value = "/api/solution/{id}")
 @SecurityOr({
-    @SecurityAnd({
-                   @SecurityLeaf(
-                           value = SecurityClearanceType.APPROVED_USER,
-                           predicates = UserIsOwnerOfSolutionSecurityPredicate.class)
-}),
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserIsOwnerOfSolutionSecurityPredicate.class)
+		}),
 
-    @SecurityAnd({
-                   @SecurityLeaf(
-                           value = SecurityClearanceType.ANONYMOUS,
-                           predicates = SolutionIsInContestModeratedByCurrentUserSecurityPredicate.class)
-}),
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.ANONYMOUS, predicates = SolutionIsInContestModeratedByCurrentUserSecurityPredicate.class)
+		}),
 
-    @SecurityAnd({
-                   @SecurityLeaf(
-                           value = SecurityClearanceType.VIEW_ALL_SOLUTIONS)
-})
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.VIEW_ALL_SOLUTIONS)
+		})
 
 })
 public class SolutionStatusController {
 
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionSecurityPredicate.class)
 	public static class SolutionDto {
 		private BigDecimal score;
 		private BigDecimal maximumScore;
-		private List<VerdictDto> verdicts;
+		private List<Verdict> verdicts;
 
-		public SolutionDto(List<VerdictDto> verdicts) {
+		public SolutionDto(List<Verdict> verdicts) {
 			super();
-			this.score = verdicts.stream().map(verdict -> verdict.getScore())
-			        .reduce((x, y) -> x.add(y)).orElse(null);
-			this.maximumScore = verdicts.stream()
-			        .map(verdict -> verdict.getMaximumScore())
-			        .reduce((x, y) -> x.add(y)).orElse(null);
 			this.verdicts = verdicts;
 		}
 
-		public BigDecimal getMaximumScore() {
-			return this.maximumScore;
-		}
-
-		public BigDecimal getScore() {
-			return this.score;
-		}
-
-		public List<VerdictDto> getVerdicts() {
+		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
+		public List<Verdict> getVerdicts() {
 			return this.verdicts;
+		}
+
+		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
+		public BigDecimal getScore() {
+			return score;
+		}
+
+		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
+		public BigDecimal getMaximumScore() {
+			return maximumScore;
 		}
 
 		public void setMaximumScore(BigDecimal maximumScore) {
@@ -105,7 +99,7 @@ public class SolutionStatusController {
 			this.score = score;
 		}
 
-		public void setVerdicts(List<VerdictDto> verdicts) {
+		public void setVerdicts(List<Verdict> verdicts) {
 			this.verdicts = verdicts;
 		}
 	}
@@ -113,23 +107,16 @@ public class SolutionStatusController {
 	@Autowired
 	private SolutionService solutionService;
 
-	@Autowired
-	private VerdictStatusController verdictJSONController;
-
 	@RequestMapping(method = RequestMethod.GET)
-	@Cacheable(value = "solutions", key = "#solution.id")
 	public @ResponseBody SolutionDto solutionApi(
-	        @PathVariable(value = "id") final Solution solution,
-	        final Locale locale) {
+			@PathVariable(value = "id") final Solution solution) {
 		final List<Verdict> verdicts = this.solutionService
-		        .getVerdictsVisibleDuringContest(solution);
+				.getVerdictsVisibleDuringContest(solution);
 
 		final SolutionDto dto = new SolutionDto(verdicts
-		        .stream()
-		        .sorted((l, r) -> Long.compare(l.getId(), r.getId()))
-		        .map(verdict -> this.verdictJSONController.showVerdict(verdict,
-		                locale))
-		        .collect(Collectors.toList()));
+				.stream()
+				.sorted((l, r) -> Long.compare(l.getId(), r.getId()))
+				.collect(Collectors.toList()));
 		return dto;
 	}
 }

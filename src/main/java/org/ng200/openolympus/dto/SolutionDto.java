@@ -26,14 +26,15 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+import org.ng200.openolympus.SecurityClearanceType;
+import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
-import org.ng200.openolympus.model.views.UnprivilegedView;
+import org.ng200.openolympus.security.predicates.SolutionScoreSecurityPredicate;
+import org.ng200.openolympus.security.predicates.SolutionSecurityPredicate;
 
+@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionSecurityPredicate.class)
 public class SolutionDto implements Serializable {
-
-	public static interface SolutionDTOView extends UnprivilegedView {
-	}
 
 	/**
 	 *
@@ -61,10 +62,12 @@ public class SolutionDto implements Serializable {
 		return this.id;
 	}
 
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
 	public BigDecimal getMaximumScore() {
 		return this.maximumScore;
 	}
 
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
 	public BigDecimal getScore() {
 		return this.score;
 	}

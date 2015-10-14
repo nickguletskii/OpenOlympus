@@ -23,7 +23,6 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import javax.validation.Valid;
 
@@ -56,10 +55,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("web")
 @RequestMapping("/api/contest/{contest}/edit")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasContestPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasContestPermission.class)
 		})
 })
 @ContestPermissionRequired(ContestPermissionType.edit)
@@ -73,14 +70,13 @@ public class ContestModificationController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	@Caching(evict = {
-	                   @CacheEvict(value = "contests", key = "#contest.id"),
-	                   @CacheEvict(value = "solutions", allEntries = true)
+						@CacheEvict(value = "contests", key = "#contest.id")
 	})
 	public BindingResponse editContest(
-	        @PathVariable("contest") Contest contest,
-	        @Valid final ContestDto contestDto,
-	        final BindingResult bindingResult) throws IllegalStateException,
-	                IOException, ArchiveException, BindException {
+			@PathVariable("contest") Contest contest,
+			@Valid final ContestDto contestDto,
+			final BindingResult bindingResult) throws IllegalStateException,
+					IOException, ArchiveException, BindException {
 		Assertions.resourceExists(contest);
 
 		this.contestDtoValidator.validate(contestDto, contest, bindingResult);
@@ -92,14 +88,14 @@ public class ContestModificationController {
 		contest.setDuration(contestDto.getDuration());
 		contest.setStartTime(contestDto.getStartTime());
 		contest.setShowFullTestsDuringContest(contestDto
-		        .isShowFullTestsDuringContest());
+				.isShowFullTestsDuringContest());
 		contest = this.contestService.updateContest(contest);
 		return BindingResponse.OK;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public Contest showContestEditingForm(
-	        @PathVariable("contest") final Contest contest) {
+			@PathVariable("contest") final Contest contest) {
 		return contest;
 	}
 }

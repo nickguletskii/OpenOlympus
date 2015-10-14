@@ -36,14 +36,22 @@ const controller = /*@ngInject*/ function($timeout, $scope, $rootScope, $statePa
 	$scope.removeTask = function(task) {
 		ContestService.removeTask($stateParams.contestId, task.id).then(updateTasks);
 	};
+
+	let prevValue = null;
+
 	var tick = function() {
 		$scope.$apply(function() {
 			if (datetime.currentServerTime().isBefore(moment(contest.timings.startTime))) {
 				$scope.contest.countdown = datetime.timeTo(contest.timings.startTime);
 				$scope.contest.countdownKey = "contest.timeToStart";
+				prevValue = "timeToStart";
 			} else if (datetime.currentServerTime().isBefore(moment(contest.timings.endTimeIncludingTimeExtensions))) {
 				$scope.contest.countdown = datetime.timeTo(contest.timings.endTimeIncludingTimeExtensions);
 				$scope.contest.countdownKey = "contest.timeToEnd";
+				if (prevValue === "timeToStart") {
+					updateTasks();
+				}
+				prevValue = "timeToEnd";
 			} else {
 				$scope.contest.countdownKey = "contest.ended";
 			}
