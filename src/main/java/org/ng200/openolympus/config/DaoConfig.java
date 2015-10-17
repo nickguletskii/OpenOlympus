@@ -34,6 +34,7 @@ import org.ng200.openolympus.jooq.tables.daos.PrincipalDao;
 import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
 import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
+import org.ng200.openolympus.jooq.tables.daos.TaskPermissionDao;
 import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
 import org.ng200.openolympus.jooq.tables.daos.VerdictDao;
@@ -110,6 +111,11 @@ public class DaoConfig {
 	@Bean
 	public ContestPermissionDao contestPermissionDao() {
 		return new ContestPermissionDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public TaskPermissionDao taskPermissionDao() {
+		return new TaskPermissionDao(this.dslContext.configuration());
 	}
 
 	@Bean

@@ -229,7 +229,7 @@ ALTER FUNCTION public.update_contest(IN integer) OWNER TO postgres;
 -- DROP FUNCTION IF EXISTS public.update_solution(IN bigint) CASCADE;
 CREATE FUNCTION public.update_solution (IN solution_id_p bigint)
 	RETURNS void
-	LANGUAGE sql
+	LANGUAGE plpgsql
 	VOLATILE 
 	CALLED ON NULL INPUT
 	SECURITY INVOKER
@@ -269,7 +269,7 @@ CREATE FUNCTION public.update_user_in_contest ( _param1 bigint,  _param2 bigint)
 	SECURITY INVOKER
 	COST 100
 	AS $$
- UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participation SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contests_tasks ON contests_tasks.tasks_id = solutions.task_id AND contests_tasks.contests_id=contest_participation.contest_id WHERE solutions.user_id=contest_participation.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participation.contest_id,contest_participation.user_id)) AND (SELECT get_contest_end_for_user(contest_participation.contest_id,contest_participation.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participation.user_id = $1 AND contest_participation.contest_id = $2 
+ UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participation SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contest_tasks ON contest_tasks.tasks_id = solutions.task_id AND contest_tasks.contests_id=contest_participation.contest_id WHERE solutions.user_id=contest_participation.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participation.contest_id,contest_participation.user_id)) AND (SELECT get_contest_end_for_user(contest_participation.contest_id,contest_participation.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participation.user_id = $1 AND contest_participation.contest_id = $2 
 $$;
 -- ddl-end --
 ALTER FUNCTION public.update_user_in_contest(bigint,bigint) OWNER TO postgres;
@@ -547,7 +547,7 @@ ON DELETE CASCADE ON UPDATE CASCADE;
 -- object: public.verdict_status_type | type: TYPE --
 -- DROP TYPE IF EXISTS public.verdict_status_type CASCADE;
 CREATE TYPE public.verdict_status_type AS
- ENUM ('waiting','ok','wrong_answer','runtime_error','cpu_time_limit_exceeded','real_time_limit_exceeded','memory_limit_exceeded','disk_limit_exceeded','security_violated','internal_error','presentation_error','output_limit_exceeded','compile_error');
+ ENUM ('waiting','being_tested','ok','wrong_answer','runtime_error','cpu_time_limit_exceeded','real_time_limit_exceeded','memory_limit_exceeded','disk_limit_exceeded','security_violated','internal_error','presentation_error','output_limit_exceeded','compile_error');
 -- ddl-end --
 ALTER TYPE public.verdict_status_type OWNER TO postgres;
 -- ddl-end --
@@ -642,7 +642,7 @@ ON DELETE RESTRICT ON UPDATE CASCADE;
 -- object: public.task_permission_type | type: TYPE --
 -- DROP TYPE IF EXISTS public.task_permission_type CASCADE;
 CREATE TYPE public.task_permission_type AS
- ENUM ('view','view_during_contest','modify','manage_acl','rejudge');
+ ENUM ('view','view_during_contest','modify','manage_acl','rejudge','add_to_contest');
 -- ddl-end --
 ALTER TYPE public.task_permission_type OWNER TO postgres;
 -- ddl-end --
@@ -1492,7 +1492,7 @@ BEGIN
                                                       cp.user_id))
     WHERE     cp.user_id = user_id_v
           AND cp.contest_id IN (SELECT ct.contest_id
-                                  FROM contests_tasks ct
+                                  FROM contest_tasks ct
                                  WHERE ct.task_id = task_id_v);
     IF TG_OP='DELETE' THEN
     	return OLD;

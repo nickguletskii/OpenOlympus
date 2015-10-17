@@ -32,15 +32,16 @@ import org.ng200.openolympus.dto.ContestTaskAdditionDto;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.security.annotations.ContestPermissionRequired;
+import org.ng200.openolympus.security.annotations.NamedParameter;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
+import org.ng200.openolympus.security.predicates.UserCanAddTaskPredicate;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Profile;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
@@ -56,10 +57,11 @@ import com.google.common.collect.ImmutableMap;
 @Profile("web")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasContestPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = {
+																											UserHasContestPermission.class,
+																											UserCanAddTaskPredicate.class
+				})
 		})
 })
 @ContestPermissionRequired(ContestPermissionType.add_task)
@@ -73,29 +75,28 @@ public class ContestTaskAdditionController {
 	@Autowired
 	private ContestService contestService;
 
-	@CacheEvict(value = "contests", key = "#contest.id")
-	@RequestMapping(method = RequestMethod.POST,
-	        value = "/api/contest/{contest}/addTask")
+	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addTask")
 	public BindingResponse addTask(final Model model,
-	        @PathVariable(value = "contest") final Contest contest,
-	        @Valid final ContestTaskAdditionDto contestTaskAdditionDto,
-	        final BindingResult bindingResult) throws BindException {
+			@PathVariable(value = "contest") final Contest contest,
+			@NamedParameter("contestTaskAdditionDto") @Valid final ContestTaskAdditionDto contestTaskAdditionDto,
+			final BindingResult bindingResult) throws BindException {
 		Assertions.resourceExists(contest);
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 		this.contestTaskAdditionDtoValidator.validate(contest,
-		        contestTaskAdditionDto, bindingResult);
+				contestTaskAdditionDto, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
+
 		this.contestService
-		        .addContestTask(contest, this.taskService
-		                .getTaskByName(contestTaskAdditionDto.getTaskName()));
+				.addContestTask(contest, this.taskService
+						.getTaskByName(contestTaskAdditionDto.getTaskName()));
 		return new BindingResponse(Status.OK, null, ImmutableMap
-		        .<String, Object> builder()
-		        .put("taskName", contestTaskAdditionDto.getTaskName()).build());
+				.<String, Object> builder()
+				.put("taskName", contestTaskAdditionDto.getTaskName()).build());
 	}
 
 }

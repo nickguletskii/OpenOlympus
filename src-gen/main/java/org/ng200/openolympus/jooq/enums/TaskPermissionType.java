@@ -32,7 +32,9 @@ public enum TaskPermissionType implements EnumType {
 
 	manage_acl("manage_acl"),
 
-	rejudge("rejudge");
+	rejudge("rejudge"),
+
+	add_to_contest("add_to_contest");
 
 	private final String literal;
 

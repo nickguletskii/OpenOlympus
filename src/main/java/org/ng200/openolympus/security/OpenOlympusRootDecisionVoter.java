@@ -38,6 +38,7 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.FindAnnotation;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
+import org.ng200.openolympus.security.annotations.NamedParameter;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
@@ -264,6 +265,10 @@ public class OpenOlympusRootDecisionVoter
 		if (parameter.isAnnotationPresent(PathVariable.class)) {
 			return AnnotationUtils.findAnnotation(
 					parameter, PathVariable.class).value();
+		}
+		if (parameter.isAnnotationPresent(NamedParameter.class)) {
+			return AnnotationUtils
+					.findAnnotation(parameter, NamedParameter.class).value();
 		}
 		return parameter.getName();
 	}

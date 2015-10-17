@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="89,286" last-zoom="0.55"
+<dbmodel pgmodeler-ver="0.8.1" last-position="570,0" last-zoom="0.55"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -555,7 +555,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32570"/>
+		<type name="public.general_permission_type" dimension="1" precision="32564"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -783,7 +783,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32570"/>
+		<type name="public.verdict_status_type" precision="32564"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -905,7 +905,7 @@ END;]]></definition>
 <usertype name="task_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<enumeration values="view,view_during_contest,modify,manage_acl,rejudge"/>
+	<enumeration values="view,view_during_contest,modify,manage_acl,rejudge,add_to_contest"/>
 </usertype>
 
 <usertype name="acl_permission_type" configuration="enumeration">
@@ -964,7 +964,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32570"/>
+		<type name="public.task_permission_type" precision="32564"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1382,7 +1382,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32570"/>
+		<type name="public.group_permission_type" precision="32564"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1875,7 +1875,7 @@ END;]]></definition>
 	<schema name="public"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32570"/>
+		<type name="public.contest_permission_type" precision="32564"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>

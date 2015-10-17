@@ -387,8 +387,7 @@ public class ContestService extends GenericCreateUpdateRepository {
 		return this.update(contest, Tables.CONTEST);
 	}
 
-	public boolean userKnowsAboutContest(User user, Contest contest,
-			ContestPermissionType knowAbout) {
+	public boolean userKnowsAboutContest(User user, Contest contest) {
 		return Routines.hasContestPermission(this.dslContext.configuration(),
 				contest.getId(), user.getId(), ContestPermissionType.know_about)
 				.booleanValue()

@@ -9,7 +9,9 @@ import org.junit.runner.RunWith;
 import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.enums.GeneralPermissionType;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -52,6 +54,9 @@ public class ContestSecurityTests {
 
 	@Autowired
 	private TestContestFactory testContestFactory;
+
+	@Autowired
+	private TestTaskFactory testTaskFactory;
 
 	@Before
 	public void setup() {
@@ -525,21 +530,23 @@ public class ContestSecurityTests {
 	@Test
 	@Rollback
 	@Transactional
-	public void testContestTaskAdditionWithoutPermission() throws Exception {
+	public void testContestTaskAdditionWithoutPermissionWithoutTaskPermission()
+			throws Exception {
 
 		final User user = this.testUserFactory.user()
 				.build();
 
 		final Contest contest = this.testContestFactory.contest()
-				.permit(user, ContestPermissionType.participate)
+				.build();
+
+		final Task task = this.testTaskFactory.task()
 				.build();
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders
-						.post("/api/contest/{contest}/addUserTime",
+						.post("/api/contest/{contest}/addTask",
 								contest.getId())
-						.param("time", "" + Duration.ofHours(1).toMillis())
-						.param("user", user.getId().toString())
+						.param("name", task.getName())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
@@ -550,22 +557,135 @@ public class ContestSecurityTests {
 	@Test
 	@Rollback
 	@Transactional
-	public void testContestTaskAdditionWithPermission() throws Exception {
+	public void testContestTaskAdditionWithPermissionWithoutTaskPermission()
+			throws Exception {
+		final User user = this.testUserFactory.user()
+				.build();
+
+		final Contest contest = this.testContestFactory.contest()
+				.permit(user, ContestPermissionType.add_task)
+				.build();
+
+		final Task task = this.testTaskFactory.task()
+				.build();
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders
+						.post("/api/contest/{contest}/addTask",
+								contest.getId())
+						.param("name", task.getName())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.with(SecurityMockMvcRequestPostProcessors.user(user)))
+				.andExpect(MockMvcResultMatchers.status().isForbidden())
+				.andReturn();
+	}
+
+	@Test
+	@Rollback
+	@Transactional
+	public void testContestTaskAdditionWithoutPermissionWithTaskPermission()
+			throws Exception {
 
 		final User user = this.testUserFactory.user()
 				.build();
 
 		final Contest contest = this.testContestFactory.contest()
-				.permit(user, ContestPermissionType.extend_time)
-				.permit(user, ContestPermissionType.participate)
+				.build();
+
+		final Task task = this.testTaskFactory.task()
+				.permit(user, TaskPermissionType.add_to_contest)
 				.build();
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders
-						.post("/api/contest/{contest}/addUserTime",
+						.post("/api/contest/{contest}/addTask",
 								contest.getId())
-						.param("time", "" + Duration.ofHours(1).toMillis())
-						.param("user", user.getId().toString())
+						.param("name", task.getName())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.with(SecurityMockMvcRequestPostProcessors.user(user)))
+				.andExpect(MockMvcResultMatchers.status().isForbidden())
+				.andReturn();
+	}
+
+	@Test
+	@Rollback
+	@Transactional
+	public void testContestTaskAdditionWithPermissionWithTaskPermission()
+			throws Exception {
+		final User user = this.testUserFactory.user()
+				.build();
+
+		final Contest contest = this.testContestFactory.contest()
+				.permit(user, ContestPermissionType.add_task)
+				.build();
+
+		final Task task = this.testTaskFactory.task()
+				.permit(user, TaskPermissionType.add_to_contest)
+				.build();
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders
+						.post("/api/contest/{contest}/addTask",
+								contest.getId())
+						.param("name", task.getName())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.with(SecurityMockMvcRequestPostProcessors.user(user)))
+				.andExpect(MockMvcResultMatchers.status().isForbidden())
+				.andReturn();
+	}
+
+	@Test
+	@Rollback
+	@Transactional
+	public void testContestTaskRemovalWithoutPermission()
+			throws Exception {
+
+		final User user = this.testUserFactory.user()
+				.build();
+
+		final Task task = this.testTaskFactory.task()
+				.build();
+
+		final Contest contest = this.testContestFactory.contest()
+				.withTasks(task)
+				.build();
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders
+						.delete("/api/contest/{contest}/removeTask",
+								contest.getId())
+						.param("task", task.getId().toString())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.with(SecurityMockMvcRequestPostProcessors.user(user)))
+				.andExpect(MockMvcResultMatchers.status().isForbidden())
+				.andReturn();
+	}
+
+	@Test
+	@Rollback
+	@Transactional
+	public void testContestTaskRemovalWithPermission()
+			throws Exception {
+		final User user = this.testUserFactory.user()
+				.build();
+
+		final Task task = this.testTaskFactory.task()
+				.build();
+
+		final Contest contest = this.testContestFactory.contest()
+				.withTasks(task)
+				.permit(user, ContestPermissionType.remove_task)
+				.build();
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders
+						.delete("/api/contest/{contest}/removeTask",
+								contest.getId())
+						.param("task", task.getId().toString())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))

@@ -5,14 +5,18 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
+import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.daos.ContestPermissionDao;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.ContestPermission;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.records.ContestRecord;
+import org.ng200.openolympus.jooq.tables.records.ContestTasksRecord;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +35,16 @@ public class TestContestFactory {
 		private String prefix = "testContest";
 		private boolean showFullTestsDuringContest = false;
 		private List<Pair<ContestPermissionType, Long>> permissions = new ArrayList<>();
+		private List<Integer> tasks = new ArrayList<>();
+
+		public List<Integer> getTasks() {
+			return tasks;
+		}
+
+		public void setTasks(List<Integer> tasks) {
+			this.tasks = tasks;
+		}
+
 		private OffsetDateTime startTime = null;
 		private Duration duration = Duration.ofMinutes(1);
 
@@ -103,6 +117,14 @@ public class TestContestFactory {
 							.setContestId(contestRecord.getId()))
 					.collect(Collectors.toList()));
 
+			for (Integer task : tasks) {
+				final ContestTasksRecord record = new ContestTasksRecord(
+						contestRecord.getId(),
+						task);
+				record.attach(dslContext.configuration());
+				record.insert();
+			}
+
 			return contestRecord.into(Contest.class);
 		}
 
@@ -132,6 +154,17 @@ public class TestContestFactory {
 		public TestContestBuilder ended() {
 			this.startTime = OffsetDateTime.now().minus(Duration.ofMinutes(5));
 			this.duration = Duration.ofMinutes(4);
+			return this;
+		}
+
+		public TestContestBuilder withTasks(Task... tasks) {
+			this.tasks.addAll(Stream.of(tasks).map(t -> t.getId())
+					.collect(Collectors.toList()));
+			return this;
+		}
+
+		public TestContestBuilder withTasks(Integer... tasks) {
+			this.tasks.addAll(Lists.from(tasks));
 			return this;
 		}
 	}
