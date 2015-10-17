@@ -32,6 +32,15 @@ public class TestContestFactory {
 		private boolean showFullTestsDuringContest = false;
 		private List<Pair<ContestPermissionType, Long>> permissions = new ArrayList<>();
 		private OffsetDateTime startTime = null;
+		private Duration duration = Duration.ofMinutes(1);
+
+		public Duration getDuration() {
+			return duration;
+		}
+
+		public void setDuration(Duration duration) {
+			this.duration = duration;
+		}
 
 		public OffsetDateTime getStartTime() {
 			return startTime;
@@ -78,7 +87,7 @@ public class TestContestFactory {
 			contestRecord.attach(dslContext.configuration());
 			String name = prefix + "_" + TestUtils.generateId();
 			contestRecord.setName(name)
-					.setDuration(Duration.ofMinutes(1))
+					.setDuration(duration)
 					.setStartTime(startTime == null
 							? OffsetDateTime.now()
 							: startTime)
@@ -105,6 +114,24 @@ public class TestContestFactory {
 		public TestContestBuilder permit(Long user,
 				ContestPermissionType perm) {
 			permissions.add(new Pair<ContestPermissionType, Long>(perm, user));
+			return this;
+		}
+
+		public TestContestBuilder inProgress() {
+			this.startTime = OffsetDateTime.now().minus(Duration.ofMinutes(1));
+			this.duration = Duration.ofMinutes(2);
+			return this;
+		}
+
+		public TestContestBuilder notStarted() {
+			this.startTime = OffsetDateTime.now().plus(Duration.ofMinutes(1));
+			this.duration = Duration.ofMinutes(2);
+			return this;
+		}
+
+		public TestContestBuilder ended() {
+			this.startTime = OffsetDateTime.now().minus(Duration.ofMinutes(5));
+			this.duration = Duration.ofMinutes(4);
 			return this;
 		}
 	}
