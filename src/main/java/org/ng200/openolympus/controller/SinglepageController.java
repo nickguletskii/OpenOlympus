@@ -22,33 +22,39 @@
  */
 package org.ng200.openolympus.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.opensaml.util.resource.ResourceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.WebRequest;
 
 @Order(Ordered.LOWEST_PRECEDENCE - 10)
 @Controller
 @Profile("web")
 public class SinglepageController {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SinglepageController.class);
-
+	private static AntPathRequestMatcher API_PATH_MATCHER = new AntPathRequestMatcher(
+			"/api/**");
 
 	@RequestMapping(value = "/**", produces = MediaType.TEXT_HTML_VALUE)
 	@ResponseBody
-	public Resource singlepage(WebRequest requst) throws ResourceException {
-		return new ClassPathResource("public/index.html");
+	public ResponseEntity<Resource> singlepage(HttpServletRequest request)
+			throws ResourceException {
+		if (API_PATH_MATCHER.matches(request)) {
+			return new ResponseEntity<Resource>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<Resource>(
+				new ClassPathResource("public/index.html"), HttpStatus.OK);
 	}
 
 }

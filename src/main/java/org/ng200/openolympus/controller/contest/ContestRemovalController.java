@@ -33,29 +33,26 @@ import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
 import org.ng200.openolympus.services.ContestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasContestPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasContestPermission.class)
 		})
 })
 @ContestPermissionRequired(ContestPermissionType.delete)
+@RestController
 public class ContestRemovalController {
 
 	@Autowired
 	private ContestService contestService;
 
-	@CacheEvict(value = "contest", key = "#contest.id")
-	@RequestMapping(value = "/api/contest/{contest}/remove",
-	        method = RequestMethod.POST)
+	@RequestMapping(value = "/api/contest/{contest}/remove", method = RequestMethod.POST)
 	public void removeContest(
-	        @PathVariable(value = "contest") Contest contest) {
+			@PathVariable(value = "contest") Contest contest) {
 		Assertions.resourceExists(contest);
 		this.contestService.deleteContest(contest);
 		return;

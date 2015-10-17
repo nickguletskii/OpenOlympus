@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="0,0" last-zoom="0.65"
+<dbmodel pgmodeler-ver="0.8.1" last-position="89,286" last-zoom="0.55"
 	 default-schema="public" default-owner="postgres">
 <database name="openolympus" encoding="UTF8">
 	<role name="postgres"/>
@@ -326,7 +326,7 @@ END;]]></definition>
 <table name="contest_participation">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="0" y="1225.45"/>
+	<position x="43.6364" y="1361.81"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
 	</column>
@@ -460,7 +460,7 @@ END;]]></definition>
 <table name="time_extension">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="350.909" y="1607.27"/>
+	<position x="198.182" y="1601.82"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
 	</column>
@@ -555,7 +555,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32529"/>
+		<type name="public.general_permission_type" dimension="1" precision="32570"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -565,7 +565,7 @@ END;]]></definition>
 <table name="USER">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="780" y="520"/>
+	<position x="980" y="363.636"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -707,12 +707,7 @@ END;]]></definition>
 	 custom-color="#230ee5"
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.time_extension"
-	 src-required="true" dst-required="false">
-	<line>
-		<position x="1143.64" y="929.091"/>
-	<position x="454.909" y="1205.79"/>
-	</line>
-</relationship>
+	 src-required="true" dst-required="false"/>
 
 <relationship name="user_contest_messages" type="rel1n"
 	 src-col-pattern="user_id"
@@ -722,12 +717,7 @@ END;]]></definition>
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.contest_message"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE">
-	<line>
-		<position x="684.26" y="757.6"/>
-	<position x="591.765" y="757.647"/>
-	</line>
-</relationship>
+	del-action="CASCADE"/>
 
 <relationship name="user_solutions" type="rel1n"
 	 src-col-pattern="user_id"
@@ -738,10 +728,6 @@ END;]]></definition>
 	 dst-table="public.solution"
 	 src-required="false" dst-required="false"
 	del-action="CASCADE">
-	<line>
-		<position x="1399.92" y="757.6"/>
-	<position x="1399.92" y="302.055"/>
-	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
@@ -772,10 +758,6 @@ END;]]></definition>
 	 dst-table="public.contest_question"
 	 src-required="true" dst-required="false"
 	del-action="CASCADE">
-	<line>
-		<position x="1026.38" y="854.877"/>
-	<position x="102.136" y="854.877"/>
-	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
@@ -801,7 +783,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32529"/>
+		<type name="public.verdict_status_type" precision="32570"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -842,12 +824,7 @@ END;]]></definition>
 	 src-table="public.solution"
 	 dst-table="public.verdict"
 	 src-required="false" dst-required="false"
-	del-action="CASCADE">
-	<line>
-		<position x="1642.96" y="230.37"/>
-	<position x="1405.82" y="230.518"/>
-	</line>
-</relationship>
+	del-action="CASCADE"/>
 
 <relationship name="contest_tasks" type="relnn"
 	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
@@ -876,12 +853,7 @@ END;]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.contest_message"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE">
-	<line>
-		<position x="737.427" y="1890.42"/>
-	<position x="737.427" y="657.609"/>
-	</line>
-</relationship>
+	del-action="CASCADE"/>
 
 <relationship name="contest_questions" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -891,12 +863,7 @@ END;]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.contest_question"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE">
-	<line>
-		<position x="1132.72" y="1421.29"/>
-	<position x="102.136" y="1421.29"/>
-	</line>
-</relationship>
+	del-action="CASCADE"/>
 
 <relationship name="contest_participations" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -907,10 +874,6 @@ END;]]></definition>
 	 dst-table="public.contest_participation"
 	 src-required="true" dst-required="false"
 	del-action="CASCADE">
-	<line>
-		<position x="1132.72" y="1582.24"/>
-	<position x="202.883" y="1582.24"/>
-	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
@@ -924,12 +887,7 @@ END;]]></definition>
 	 src-table="public.contest"
 	 dst-table="public.time_extension"
 	 src-required="true" dst-required="false"
-	del-action="CASCADE">
-	<line>
-		<position x="1132.72" y="1772.2"/>
-	<position x="454.909" y="1772.2"/>
-	</line>
-</relationship>
+	del-action="CASCADE"/>
 
 <relationship name="task_solutions" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -939,10 +897,6 @@ END;]]></definition>
 	 src-table="public.task"
 	 dst-table="public.solution"
 	 src-required="true" dst-required="false">
-	<line>
-		<position x="1964.12" y="636.421"/>
-	<position x="1773.45" y="636.421"/>
-	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
@@ -1006,14 +960,11 @@ END;]]></definition>
 	 table-name="task_permission"
 	upd-action="NO ACTION"
 	del-action="NO ACTION">
-	<line>
-		<position x="1571.3" y="970.435"/>
-	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32529"/>
+		<type name="public.task_permission_type" precision="32570"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -1329,7 +1280,7 @@ END;]]></definition>
 	<role name="postgres"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32765"/>
+	<type name="public.contest" precision="32767"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp" with-timezone="true"/>
@@ -1388,10 +1339,6 @@ END;]]></definition>
 	 dst-table="public.contest_participation"
 	 src-required="true" dst-required="false"
 	del-action="CASCADE">
-	<line>
-		<position x="1026.38" y="1015.83"/>
-	<position x="202.883" y="1015.83"/>
-	</line>
 	<label ref-type="dst-label">
 		<position x="55.517" y="6.89091"/>
 	</label>
@@ -1435,7 +1382,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32529"/>
+		<type name="public.group_permission_type" precision="32570"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1511,7 +1458,11 @@ END;]]></definition>
 	 dst-table="public.group_users"
 	 src-required="true" dst-required="false"
 	 identifier="true"
-/>
+>
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
 
 <function name="user_immutable_columns"
 		window-func="false"
@@ -1924,7 +1875,7 @@ END;]]></definition>
 	<schema name="public"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32529"/>
+		<type name="public.contest_permission_type" precision="32570"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>
@@ -2105,9 +2056,6 @@ END;
 	 src-table="public.&quot;USER&quot;"
 	 dst-table="public.principal"
 	 src-required="false" dst-required="false">
-	<line>
-		<position x="1442.99" y="757.6"/>
-	</line>
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
 	</label>
@@ -2117,10 +2065,6 @@ END;
 	 src-table="public.&quot;group&quot;"
 	 dst-table="public.principal"
 	 src-required="false" dst-required="false">
-	<line>
-		<position x="1722.22" y="1384.44"/>
-	<position x="1501.82" y="1383.64"/>
-	</line>
 	<label ref-type="src-label">
 		<position x="0" y="0"/>
 	</label>
@@ -2130,9 +2074,6 @@ END;
 	 src-table="public.group_permission"
 	 dst-table="public.principal"
 	 src-required="false" dst-required="false">
-	<line>
-		<position x="2009.48" y="1145.98"/>
-	</line>
 	<label ref-type="dst-label">
 		<position x="9.54" y="-0.2"/>
 	</label>
@@ -2142,9 +2083,6 @@ END;
 	 src-table="public.group_permission"
 	 dst-table="public.&quot;group&quot;"
 	 src-required="false" dst-required="false">
-	<line>
-		<position x="2008.89" y="1617.78"/>
-	</line>
 	<label ref-type="dst-label">
 		<position x="6.34824" y="9.36075"/>
 	</label>
