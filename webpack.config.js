@@ -117,6 +117,7 @@ var config = {
 			"angular": "angular"
 		}),
 		new webpack.optimize.CommonsChunkPlugin({
+			name: "vendor",
 			chunkName: "vendor",
 			filename: "js/vendor.bundle.js",
 			minChunks: function(module) {
