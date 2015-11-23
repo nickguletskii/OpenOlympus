@@ -25,6 +25,8 @@ package org.ng200.openolympus.controller;
 import org.ng200.openolympus.config.RecaptchaConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
+import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +38,7 @@ public class RecaptchaPublicKeyController {
 	@Autowired
 	private RecaptchaConfiguration recaptchaConfiguration;
 
-	@RequestMapping(value = "/api/recaptchaPublicKey", method = RequestMethod.GET)
+	@RequestMapping(value = "/api/recaptchaPublicKey", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public String getKey() {
 		return this.recaptchaConfiguration.isRecaptchaEnabled()
 				? this.recaptchaConfiguration.getRecaptchaPublicKey()
