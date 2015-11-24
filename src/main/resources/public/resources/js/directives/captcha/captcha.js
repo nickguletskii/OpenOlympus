@@ -46,7 +46,7 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 					$element.remove();
 					return;
 				}
-				FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
+				//FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
 				$scope.recaptchaPublicKey = recaptchaPublicKey;
 				$.getScript("//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit");
 
