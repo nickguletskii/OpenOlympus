@@ -64,7 +64,7 @@
                     ng-if="security.hasAnyPermission('remove_user')">
                 </button>
                 <button type="button"
-                    tooltip="{{ 'admin.users.list.user.editButton' | translate }}"
+                    uib-tooltip="{{ 'admin.users.list.user.editButton' | translate }}"
                     class="hidden-print pull-right btn btn-primary btn-xs fa fa-pencil"
                     secref
                     ui-sref="administrativePersonalInfoModificationView({userId: user.id})">
@@ -73,7 +73,7 @@
         </tr>
     </tbody>
 </table>
-<pagination total-items="userCount"
+<uib-pagination total-items="userCount"
     ng-model="page"
     class="pagination-sm"
     previous-text="&lsaquo;"
@@ -81,4 +81,4 @@
     first-text="&laquo;"
     last-text="&raquo;"
     direction-links="true"
-    boundary-links="true"></pagination>
+    boundary-links="true"></uib-pagination>

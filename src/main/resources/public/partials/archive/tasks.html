@@ -23,7 +23,7 @@
 
 -->
 <button type="button"
-    tooltip="{{'archive.list.tasks.add' | translate}}"
+    uib-tooltip="{{'archive.list.tasks.add' | translate}}"
     class="hidden-print btn btn-primary btn-sm fa fa-plus"
     secref
     ui-sref="createTask()"></button>
@@ -49,13 +49,13 @@
             <td>
                 <a ui-sref="taskView({taskId: task.id})">{{task.name}}</a>
                 <button type="button"
-                    tooltip="{{ 'archive.list.task.editButton' | translate }}"
+                    uib-tooltip="{{ 'archive.list.task.editButton' | translate }}"
                     class="hidden-print pull-right btn btn-primary btn-xs fa fa-pencil"
                     secref
                     ui-sref="taskModificationView({taskId: task.id})">
                 </button>
                 <button type="button"
-                    tooltip="{{ 'archive.list.task.rejudgeButton' | translate }}"
+                    uib-tooltip="{{ 'archive.list.task.rejudgeButton' | translate }}"
                     class=" hidden-print pull-right btn btn-warning btn-xs fa fa-refresh "
                     ui-sref=".rejudgeTaskConfirmation({taskId: task.id})"
                     ng-if="security.hasAnyPermission('rejudge_tasks')">
@@ -64,11 +64,11 @@
         </tr>
     </tbody>
 </table>
-<pagination total-items="taskCount"
+<uib-pagination total-items="taskCount"
     ng-model="page"
     previous-text="&lsaquo;"
     next-text="&rsaquo; "
     first-text="&laquo; "
     last-text="&raquo; "
     direction-links="true "
-    boundary-links="true "></pagination>
+    boundary-links="true "></uib-pagination>

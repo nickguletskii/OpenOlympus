@@ -42,7 +42,7 @@
 			<td>
 				<button type="button"
 					
-					tooltip="{{ 'contest.participants.addUserTimeButton' | translate }}"
+					uib-tooltip="{{ 'contest.participants.addUserTimeButton' | translate }}"
 					class=" hidden-print pull-right btn btn-warning btn-xs fa fa-clock-o "
 					ui-sref=".addUserTime({userId: user.id})"> </button>
 				<button class="btn btn-danger btn-xs fa fa-remove pull-right"
@@ -55,7 +55,7 @@
 		</tr>
 	</tbody>
 </table>
-<pagination total-items="userCount"
+<uib-pagination total-items="userCount"
 	ng-model="page"
 	class="pagination-sm"
 	previous-text="&lsaquo;"
@@ -63,4 +63,4 @@
 	first-text="&laquo;"
 	last-text="&raquo;"
 	direction-links="true"
-	boundary-links="true"></pagination>
+	boundary-links="true"></uib-pagination>

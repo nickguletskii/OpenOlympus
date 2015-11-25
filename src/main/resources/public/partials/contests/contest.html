@@ -59,13 +59,13 @@
 			<td>
 				<a ui-sref="taskView({taskId: task.id, contestId: contestId})">{{task.name}}</a>
 				<button type="button"
-					tooltip="{{ 'contest.task.editButton' | translate }}"
+					uib-tooltip="{{ 'contest.task.editButton' | translate }}"
 					class="hidden-print pull-right btn btn-primary btn-xs fa fa-pencil"
 					secref
 					ui-sref="taskModificationView({taskId: task.id, contestId: contestId})">
 				</button>
 				<button type="button"
-					tooltip="{{ 'contest.task.rejudgeButton' | translate }}"
+					uib-tooltip="{{ 'contest.task.rejudgeButton' | translate }}"
 					class=" hidden-print pull-right btn btn-warning btn-xs fa fa-refresh "
 					ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
 				</button>

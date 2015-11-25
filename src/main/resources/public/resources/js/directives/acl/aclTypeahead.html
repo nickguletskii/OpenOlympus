@@ -51,7 +51,7 @@
             typeahead-input-formatter="formatData(model)"
             typeahead-on-select="selectItem($item, $model, $label)">
         <span class="input-group-btn">
-            <button class="btn btn-default" ng-class="{'btn-success': buttonSuccess}" type="submit" ng-disabled="disable || submitButtonModel.disabled || !model.bindable" tooltip="{{tooltip}}" tooltip-trigger="mouseenter">
+            <button class="btn btn-default" ng-class="{'btn-success': buttonSuccess}" type="submit" ng-disabled="disable || submitButtonModel.disabled || !model.bindable" uib-tooltip="{{tooltip}}" tooltip-trigger="mouseenter">
             <i class="fa fa-fw" ng-class="{'fa-plus': !buttonSuccess, 'fa-check': buttonSuccess}"></i>{{buttonText | translate}}</button>
         </span>
     </div>

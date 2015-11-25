@@ -61,7 +61,7 @@
         <tr ng-repeat="user in users">
             <td>
                 <button type="button"
-                    tooltip="{{getTooltipForUser(user)}}"
+                    uib-tooltip="{{getTooltipForUser(user)}}"
                     class="btn btn-xs"
                     ng-class="getButtonClassForUser(user)"
                     ng-click="user.checked=!user.checked">
@@ -76,7 +76,7 @@
         </tr>
     </tbody>
 </table>
-<pagination total-items="userCount"
+<uib-pagination total-items="userCount"
     ng-model="page"
     class="pagination-sm"
     previous-text="&lsaquo;"
@@ -84,4 +84,4 @@
     first-text="&laquo;"
     last-text="&raquo;"
     direction-links="true"
-    boundary-links="true"></pagination>
+    boundary-links="true"></uib-pagination>

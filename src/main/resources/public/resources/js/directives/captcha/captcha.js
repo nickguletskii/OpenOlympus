@@ -58,7 +58,6 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 						vcRecaptchaService.reload($scope.widgetId);
 					}
 				});
-
 			}
 		}
 	};

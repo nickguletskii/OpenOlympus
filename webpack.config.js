@@ -51,13 +51,11 @@ var config = {
 	resolve: {
 		modulesDirectories: [
 			nodeModulesRoot,
-			bowerComponentsRoot,
 			path.resolve(resourceRoot, "js/"),
 			path.resolve(resourceRoot, "sass/")
 		],
 		root: [
 			nodeModulesRoot,
-			bowerComponentsRoot,
 			path.resolve(resourceRoot, "js/"),
 			path.resolve(resourceRoot, "sass/")
 		],
@@ -78,7 +76,7 @@ var config = {
 				/node_modules/,
 				/bower_components/
 			],
-			loader: "ng-annotate?add=true!babel?cacheDirectory&optional=runtime&comments=false",
+			loader: "ng-annotate?add=true!babel?comments=false&presets[]=es2015",
 			include: [
 				path.resolve(resourceRoot, "js/")
 			]
@@ -95,8 +93,7 @@ var config = {
 			test: /\.css$/,
 			loader: ExtractTextPlugin.extract("css?sourceMap"),
 			include: [
-				nodeModulesRoot,
-				bowerComponentsRoot
+				nodeModulesRoot
 			]
 		}, {
 			include: /\.json$/,
@@ -147,6 +144,6 @@ config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "ang
 config.addVendor("angular-ui-router", path.resolve(nodeModulesRoot, "angular-ui-router/release/angular-ui-router.min.js"));
 config.addVendor("angular-form-for", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.js"));
 config.addVendor("angular-form-for-bootstrap", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.bootstrap-templates.js"));
-config.addVendor("angular-recaptcha", path.resolve(bowerComponentsRoot, "angular-recaptcha/release/angular-recaptcha.min.js"));
+config.addVendor("angular-recaptcha", path.resolve(nodeModulesRoot, "angular-recaptcha/release/angular-recaptcha.min.js"));
 config.addVendor("angular-translate", path.resolve(nodeModulesRoot, "angular-translate/dist/angular-translate.min.js"));
 module.exports = config;

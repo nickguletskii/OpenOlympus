@@ -23,7 +23,7 @@
 
 -->
 <button type="button"
-    tooltip="{{'groups.add' | translate}}"
+    uib-tooltip="{{'groups.add' | translate}}"
     class="hidden-print btn btn-primary btn-sm fa fa-plus"
     secref
     ui-sref="createGroup()"></button>
@@ -43,11 +43,11 @@
         </tr>
     </tbody>
 </table>
-<pagination total-items="groupsCount"
+<uib-pagination total-items="groupsCount"
     ng-model="page"
     previous-text="&lsaquo;"
     next-text="&rsaquo; "
     first-text="&laquo; "
     last-text="&raquo; "
     direction-links="true "
-    boundary-links="true "></pagination>
+    boundary-links="true "></uib-pagination>

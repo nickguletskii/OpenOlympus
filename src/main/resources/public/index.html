@@ -23,10 +23,7 @@
 
 -->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:th="http://www.thymeleaf.org"
-    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-
+<html>
 <head>
     <meta http-equiv="Content-Type"
         content="text/html; charset=UTF-8" />
@@ -89,9 +86,9 @@
                     </li>
                     <li class="dropdown"
                         hide-if-doesnt-contain="[ui-sref]"
-                        dropdown="">
+                        uib-dropdown="">
                         <a class="dropdown-toggle"
-                            dropdown-toggle="">
+                            uib-dropdown-toggle="">
                             <span translate="topbar.navigation.archive"></span>
                             <span class="caret"></span>
                         </a>
@@ -115,10 +112,10 @@
                             id="headerSolutionsLink"></a>
                     </li>
                     <li class="dropdown"
-                        dropdown=""
+                        uib-dropdown=""
                         hide-if-doesnt-contain="[ui-sref]">
                         <a class="dropdown-toggle"
-                            dropdown-toggle="">
+                            uib-dropdown-toggle="">
                             <span translate="topbar.navigation.admin"></span>
                             <span class="caret"></span>
                         </a>
@@ -149,8 +146,8 @@
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Right Nav Section -->
                     <li class="dropdown"
-                        dropdown="">
-                        <a dropdown-toggle="">
+                        uib-dropdown="">
+                        <a uib-dropdown-toggle="">
                             <span translate="header.languageMenu"></span>
                             <span class="caret"></span>
                         </a>
@@ -164,7 +161,7 @@
                         <button type="button"
                             class="btn btn-warning navbar-btn"
                             tooltip-placement="bottom"
-                            tooltip="{{'login.administratorApprovalRequired.body' | translate}}"><span class="fa fa-exclamation-triangle"></span></button>
+                            uib-tooltip="{{'login.administratorApprovalRequired.body' | translate}}"><span class="fa fa-exclamation-triangle"></span></button>
                     </li>
                     <li hide-if-doesnt-contain="[ui-sref]">
                         <a secref

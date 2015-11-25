@@ -23,7 +23,7 @@
 
 -->
 <button type="button"
-    tooltip="{{'contests.add' | translate}}"
+    uib-tooltip="{{'contests.add' | translate}}"
     class="hidden-print btn btn-primary btn-sm fa fa-plus"
     secref
     ui-sref="createContest()"></button>
@@ -45,11 +45,11 @@
         </tr>
     </tbody>
 </table>
-<pagination total-items="contestsCount"
+<uib-pagination total-items="contestsCount"
     ng-model="page"
     previous-text="&lsaquo;"
     next-text="&rsaquo; "
     first-text="&laquo; "
     last-text="&raquo; "
     direction-links="true "
-    boundary-links="true "></pagination>
+    boundary-links="true "></uib-pagination>

@@ -23,7 +23,7 @@
 
 -->
 <button type="button"
-    th:attr="tooltip= #{task.editButton}"
+    uib-tooltip="{{'task.editButton' | translate}}"
     class="hidden-print btn btn-primary fa fa-pencil"
     secref
     ui-sref="taskModificationView({taskId: taskId})">
