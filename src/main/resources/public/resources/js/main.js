@@ -68,7 +68,7 @@ angular.module("ool")
 				},
 				"response": function(response) {
 					if (response.status === 401) {
-						$location.path("/login");
+						$location.path("/api/login");
 						return $q.reject(response);
 					}
 

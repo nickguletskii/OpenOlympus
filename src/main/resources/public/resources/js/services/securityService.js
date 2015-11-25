@@ -195,7 +195,7 @@ class SecurityService {
 				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			method: "POST",
-			url: "/login",
+			url: "/api/login",
 			transformRequest: paramTransform,
 			data: {
 				"username": username,
@@ -216,13 +216,15 @@ class SecurityService {
 				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			method: "POST",
-			url: "/logout",
+			url: "/api/logout",
 			transformRequest: paramTransform,
 			data: {}
 		}).then(() => {
 			forceUpdate = true;
+
 			this.$state.go("home", {}, {
-				reload: true
+				reload: true,
+				location: true
 			});
 			this.update();
 		});
