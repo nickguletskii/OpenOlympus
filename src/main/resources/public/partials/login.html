@@ -50,7 +50,8 @@
 			type="password"
 			attribute="password"></text-field>
 		<recaptcha label="{{ 'login.form.labels.captcha' | translate }}"
-			attribute="recaptchaResponse"></recaptcha>
+			attribute="recaptchaResponse"
+			reset-on="formSubmissionRejected"></recaptcha>
 		<submit-button label="{{ 'login.loginButton' | translate }}"
 			button-class="btn btn-default"></submit-button>
 	</form>
