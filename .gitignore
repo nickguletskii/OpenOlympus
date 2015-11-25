@@ -5,7 +5,6 @@ src/main/resources/spring.properties
 /solutions/
 *.class
 /node_modules/
-/bower_components/
 /src/main/resources/public/resources/bundled/
 
 # Mobile Tools for Java (J2ME)

@@ -22,14 +22,12 @@
  */
 var path = require("path");
 var webpack = require("webpack");
-require("bower-webpack-plugin");
 require("chunk-manifest-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var resourceRoot = path.resolve(__dirname, "src/main/resources/public/resources");
 var generatedResourcesRoot = path.resolve(__dirname, "src/main/resources/public/resources/bundled");
 var nodeModulesRoot = path.resolve(__dirname, "node_modules");
-var bowerComponentsRoot = path.resolve(__dirname, "bower_components");
 
 var config = {
 	addVendor: function(name, p) {
@@ -73,8 +71,7 @@ var config = {
 		}, {
 			test: /\.js$/,
 			exclude: [
-				/node_modules/,
-				/bower_components/
+				/node_modules/
 			],
 			loader: "ng-annotate?add=true!babel?comments=false&presets[]=es2015",
 			include: [

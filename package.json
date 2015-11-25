@@ -36,7 +36,6 @@
     "babel-runtime": "^6.2.0",
     "bootstrap-sass": "^3.3.6",
     "bootstrap-sass-loader": "^1.0.9",
-    "bower-webpack-plugin": "^0.1.9",
     "chunk-manifest-webpack-plugin": "0.0.1",
     "codemirror": "^5.9.0",
     "core-js": "^1.2.6",
