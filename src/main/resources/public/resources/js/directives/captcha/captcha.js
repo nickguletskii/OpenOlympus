@@ -32,24 +32,32 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 		template: require("ng-cache!directives/captcha/captcha.html"),
 		scope: {
 			attribute: "@",
-			label: "@"
+			label: "@",
+			onCreate: "&?"
 		},
 		link: function($scope, $element, $attributes, formForController) {
 			FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
 
-			$scope.setWidgetId = function(widgetId) {
+			$scope.onCreateAndSet = function(widgetId) {
 				$scope.widgetId = widgetId;
+
+				if ($scope.onCreate) {
+					$scope.onCreate();
+				}
 			};
 			$http.get("/api/recaptchaPublicKey").then(function(response) {
 				let recaptchaPublicKey = response.data;
 				if (_.isEmpty(recaptchaPublicKey)) {
 					$element.remove();
+
+					if ($scope.onCreate) {
+						$scope.onCreate();
+					}
 					return;
 				}
 				$scope.recaptchaPublicKey = recaptchaPublicKey;
 				$.getScript("//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit");
-
-				$($element[0]).find(".captchaLoading").replaceWith($compile("<div vc-recaptcha key=\"recaptchaPublicKey\" ng-model=\"model.bindable\" on-create=\"setWidgetId(widgetId)\"></div>")($scope));
+				$($element[0]).find(".captchaLoading").replaceWith($compile("<div vc-recaptcha key=\"recaptchaPublicKey\" ng-model=\"model.bindable\" on-create=\"onCreateAndSet(widgetId)\"></div>")($scope));
 			});
 
 			if ($attributes.resetOn) {

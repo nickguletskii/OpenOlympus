@@ -23,10 +23,10 @@
 
 -->
 <h1>{{ 'login.form.heading' | translate }}</h1>
-<spinner ng-show="!logInFormVisible"
+<spinner ng-show="!loginRequired || !ready"
 	class="spinner-large">
 </spinner>
-<div ng-show="!!logInFormVisible">
+<div ng-show="loginRequired && ready">
 	<form name="loginForm"
 		controller="loginFormController"
 		form-for="user"
@@ -51,7 +51,8 @@
 			attribute="password"></text-field>
 		<recaptcha label="{{ 'login.form.labels.captcha' | translate }}"
 			attribute="recaptchaResponse"
-			reset-on="formSubmissionRejected"></recaptcha>
+			reset-on="formSubmissionRejected"
+			on-create="ready=true"></recaptcha>
 		<submit-button label="{{ 'login.loginButton' | translate }}"
 			button-class="btn btn-default"></submit-button>
 	</form>

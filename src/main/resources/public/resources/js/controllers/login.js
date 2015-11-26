@@ -32,7 +32,7 @@ const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $stat
 		if (SecurityService.isLoggedIn) {
 			$state.go("home");
 		} else {
-			$scope.logInFormVisible = true;
+			$scope.loginRequired = true;
 		}
 	});
 
