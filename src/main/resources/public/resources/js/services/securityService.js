@@ -179,13 +179,20 @@ class SecurityService {
 			return this.$q.when(dataInternal);
 		}
 
-		return this.$http.get("/api/security/status").then((r) => {
+		if(!forceUpdate && this.updatePromise){
+			return this.updatePromise;
+		}
+
+		this.updatePromise = this.$http.get("/api/security/status").then((r) => {
 			dataInternal = r.data;
 			this.securityStatusCache.put("data", dataInternal);
 			lastUpdate = moment();
+			this.updatePromise = null;
 			this.$rootScope.$broadcast("securityInfoChanged");
 			return dataInternal;
 		});
+
+		return this.updatePromise;
 	}
 
 	login(username, password, recaptchaResponse) {
