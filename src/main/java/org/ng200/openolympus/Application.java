@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import javax.servlet.MultipartConfigElement;
 
+import org.jooq.conf.Settings;
 import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
 import org.ng200.openolympus.services.StorageService;
 import org.slf4j.Logger;
@@ -111,4 +112,9 @@ public class Application {
 		return pool;
 	}
 
+	@Bean
+	public Settings settings() {
+		return new Settings()
+				.withExecuteLogging(false);
+	}
 }
