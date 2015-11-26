@@ -135,7 +135,7 @@ class SecurityService {
 
 	hasPermissionImmediate(permission) {
 		if (permission === "approved") {
-			return this.hasPrincipal;
+			return this.hasPrincipal && this.user.approved;
 		}
 
 		if (!this.hasPrincipal) {

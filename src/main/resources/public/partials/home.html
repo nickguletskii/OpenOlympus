@@ -23,8 +23,16 @@
 
 -->
 <div class="row">
-	<div class="large-12 large-centered columns text-center">
-		<h1 translate="home.heading"></h1>
-	</div>
+    <div class="large-12 large-centered columns text-center">
+        <h1 translate="home.heading"></h1>
+        <div class="panel panel-warning text-left"
+            ng-if="security.isLoggedIn &amp;&amp; !security.hasPermissionImmediate('approved')">
+            <div class="panel-heading">{{'login.administratorApprovalRequired.title' | translate}}</div>
+            <div class="panel-body text-justify">
+                <p>
+                    {{'login.administratorApprovalRequired.body' | translate}}
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
-

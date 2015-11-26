@@ -26,7 +26,7 @@ var _ = require("lodash");
 
 const controller = /*@ngInject*/ function($q, $scope, $http, $stateParams, $state, SecurityService, $translate) {
 	SecurityService.update();
-	$scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage === "true");
+	$scope.showAdministratorApprovalRequiredMessage = ($stateParams.showAdministratorApprovalRequiredMessage == true);
 
 	SecurityService.update().then(function() {
 		if (SecurityService.isLoggedIn) {
