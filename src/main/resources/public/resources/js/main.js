@@ -33,6 +33,7 @@ require("angular-translate-loader-url");
 require("angular-ui-codemirror");
 require("angular-recaptcha");
 require("angular-animate");
+require("angular-cookies");
 require("angular-form-for");
 require("angular-form-for-bootstrap");
 require("ng-file-upload");
@@ -58,9 +59,11 @@ angular.module("ool")
 
 		$locationProvider.html5Mode(true);
 
-		$httpProvider.interceptors.push( /*@ngInject*/ function($q, $rootScope, $location) {
+		$httpProvider.interceptors.push( /*@ngInject*/ function($q, $rootScope, $location, $cookies) {
 			return {
 				"request": function(config) {
+					config.headers["X-CSRF-TOKEN"] = $cookies.get("X-CSRF-TOKEN");
+
 					if (angular.isDefined($rootScope.authToken)) {
 						config.headers["X-Auth-Token"] = $rootScope.authToken;
 					}
@@ -79,14 +82,14 @@ angular.module("ool")
 						console.error("No response method for response", response);
 					}
 					if (response.status === 500 || !response.config.method) {
-						errorHandler.showConnectionLostError();
+						errorHandler.showUnknownError();
 						$rootScope.$destroy();
 					}
 					var status = response.status;
 					var config = response.config;
 					var method = config.method;
 					var url = config.url;
-					if(_.includes(config.acceptableFailureCodes, status)){
+					if (_.includes(config.acceptableFailureCodes, status)) {
 						return $q.reject(response);
 					}
 					switch (status) {

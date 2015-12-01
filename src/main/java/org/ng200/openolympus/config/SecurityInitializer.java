@@ -1,4 +1,4 @@
-/*
+/**
  * The MIT License
  * Copyright (c) 2014-2015 Nick Guletskii
  *
@@ -20,18 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
+package org.ng200.openolympus.config;
 
-var angular = require("angular");
+import javax.servlet.ServletContext;
 
-require("filters");
-require("services");
-require("directives");
-require("controllers");
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+import org.springframework.web.multipart.support.MultipartFilter;
 
-angular.module("ool", ["pascalprecht.translate", "ui.router",
-	"ui.bootstrap", "ool.filters", "ool.controllers",
-	"ool.services", "ool.directives", "ngFileUpload", "ui.codemirror",
-	"ngAnimate", "formFor", "formFor.bootstrapTemplates", "vcRecaptcha",
-	"ngCookies"
-]);
+public class SecurityInitializer extends
+		AbstractSecurityWebApplicationInitializer {
+
+	@Override
+	protected void beforeSpringSecurityFilterChain(
+			ServletContext servletContext) {
+		insertFilters(servletContext, new MultipartFilter());
+	}
+}

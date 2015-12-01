@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.ng200.openolympus.CsrfHeaderFilter;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationFailureHandler;
 import org.ng200.openolympus.controller.auth.OpenOlympusAuthenticationSuccessHandler;
 import org.ng200.openolympus.controller.auth.RecaptchaAuthenticationFilter;
@@ -55,6 +56,9 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -90,13 +94,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				this.passwordEncoder);
 	}
 
+	@Bean
+	public CsrfTokenRepository csrfTokenRepository() {
+		HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+		repository.setHeaderName("X-CSRF-TOKEN");
+		return repository;
+	}
+
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
 
 		http
-				.csrf().disable()
+				.csrf()
+				.csrfTokenRepository(csrfTokenRepository())
+				.and()
 				.headers()
-				.xssProtection().disable()
+				.xssProtection()
+				.and()
 				.and()
 				.exceptionHandling()
 				.accessDeniedHandler(new AccessDeniedHandlerImpl())
@@ -125,8 +139,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.anyRequest().permitAll().and()
 				.addFilterBefore(this.reCaptchaAuthenticationFilter(),
 						UsernamePasswordAuthenticationFilter.class)
+				.addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class)
 				.httpBasic();
-		//@formatter:on
 	}
 
 	@Bean
