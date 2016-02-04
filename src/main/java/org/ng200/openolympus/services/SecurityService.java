@@ -34,6 +34,7 @@ import org.ng200.openolympus.jooq.tables.pojos.ContestTasks;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
 
 	@Autowired
 	private ContestTasksDao contestTasksDao;
@@ -59,7 +60,7 @@ public class SecurityService {
 	}
 
 	public Contest getCurrentContest() {
-		return this.contestService.getRunningContest();
+		return this.contestTimingService.getRunningContest();
 	}
 
 	public boolean isOnLockdown() {
@@ -68,7 +69,7 @@ public class SecurityService {
 	}
 
 	public boolean isSolutionInCurrentContest(Solution solution) {
-		final Contest runningContest = this.contestService.getRunningContest();
+		final Contest runningContest = this.contestTimingService.getRunningContest();
 		return runningContest == null
 				|| (this.isTaskInContest(
 						this.taskDao.fetchOneById(solution.getTaskId()),
@@ -77,7 +78,7 @@ public class SecurityService {
 
 		runningContest.getStartTime().toInstant()
 				.isBefore(solution.getTimeAdded().toInstant())
-						&& this.contestService
+						&& this.contestTimingService
 								.getContestEndTimeForUser(runningContest,
 										this.userDao.fetchOneById(
 												solution.getUserId()))
@@ -101,14 +102,14 @@ public class SecurityService {
 	}
 
 	public boolean isTaskInCurrentContest(Task task) {
-		final Contest runningContest = this.contestService.getRunningContest();
+		final Contest runningContest = this.contestTimingService.getRunningContest();
 		return runningContest == null
 				|| this.contestTasksDao.exists(new ContestTasks(runningContest
 						.getId(), task.getId()));
 	}
 
 	public boolean noContest() {
-		return this.contestService.getRunningContest() == null;
+		return this.contestTimingService.getRunningContest() == null;
 	}
 
 	public boolean noLockdown() {

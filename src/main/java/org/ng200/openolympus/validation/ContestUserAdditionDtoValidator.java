@@ -25,8 +25,8 @@ package org.ng200.openolympus.validation;
 import org.ng200.openolympus.dto.ContestUserAdditionDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
-import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.services.contest.ContestUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -38,7 +38,7 @@ public class ContestUserAdditionDtoValidator {
 	private UserService userService;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestUsersService contestUsersService;
 
 	public void validate(final ContestUserAdditionDto target,
 			final Contest contest, final Errors errors) {
@@ -57,7 +57,7 @@ public class ContestUserAdditionDtoValidator {
 					"badContest");
 			return;
 		}
-		if (this.contestService.isUserParticipatingIn(user, contest)) {
+		if (this.contestUsersService.isUserParticipatingIn(user, contest)) {
 			errors.rejectValue("username", "",
 					"userAlreadyInContest");
 			return;

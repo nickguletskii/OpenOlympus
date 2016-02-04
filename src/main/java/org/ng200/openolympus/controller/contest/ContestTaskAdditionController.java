@@ -38,8 +38,8 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserCanAddTaskPredicate;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.contest.ContestTasksService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -73,7 +73,7 @@ public class ContestTaskAdditionController {
 	private ContestTaskAdditionDtoValidator contestTaskAdditionDtoValidator;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTasksService contestTasksService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contest/{contest}/addTask")
 	public BindingResponse addTask(final Model model,
@@ -91,7 +91,7 @@ public class ContestTaskAdditionController {
 			throw new BindException(bindingResult);
 		}
 
-		this.contestService
+		this.contestTasksService
 				.addContestTask(contest, this.taskService
 						.getTaskByName(contestTaskAdditionDto.getTaskName()));
 		return new BindingResponse(Status.OK, null, ImmutableMap

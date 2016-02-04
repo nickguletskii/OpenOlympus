@@ -26,8 +26,8 @@ import java.security.Principal;
 
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.model.UserPrincipal;
-import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,7 +73,7 @@ public class SecurityInformationController {
 	private UserService userService;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
 
 	@RequestMapping(value = "/api/security/status", method = RequestMethod.GET)
 	public SecurityInformation securityStatys(Principal principal) {
@@ -84,7 +84,7 @@ public class SecurityInformationController {
 							.getName());
 		}
 		return new SecurityInformation(currentPrincipal,
-				contestService.getRunningContest());
+				contestTimingService.getRunningContest());
 	}
 
 }

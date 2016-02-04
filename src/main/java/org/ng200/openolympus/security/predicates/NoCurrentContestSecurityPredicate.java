@@ -28,24 +28,27 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.DynamicSecurityPredicate;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
 import org.ng200.openolympus.security.annotations.PredicateDocumentation;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
+import org.ng200.openolympus.services.contest.ContestUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
 @PredicateDocumentation({
-	"There is no current contest"
+							"There is no current contest"
 })
 public class NoCurrentContestSecurityPredicate
-        implements DynamicSecurityPredicate {
+		implements DynamicSecurityPredicate {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestUsersService contestUsersService;
+	@Autowired
+	private ContestTimingService contestTimingService;
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType check() {
-		Contest runningContest = contestService.getRunningContest();
+		Contest runningContest = contestTimingService.getRunningContest();
 		if (runningContest == null)
 			return SecurityClearanceType.ANONYMOUS;
 
@@ -57,7 +60,7 @@ public class NoCurrentContestSecurityPredicate
 
 		User user = (User) auth;
 
-		if (contestService.isUserInContest(runningContest, user)) {
+		if (contestUsersService.isUserInContest(runningContest, user)) {
 			return SecurityClearanceType.DENIED;
 		}
 

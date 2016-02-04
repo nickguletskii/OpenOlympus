@@ -35,10 +35,10 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.ui.Model;
@@ -57,7 +57,7 @@ public class SolutionListController {
 	private SolutionService solutionService;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
 
 	@Autowired
 	private UserService userService;
@@ -86,11 +86,11 @@ public class SolutionListController {
 				.getName());
 
 		// TODO: replace with SQL
-		if (this.contestService.getRunningContest() == null) {
+		if (this.contestTimingService.getRunningContest() == null) {
 			return this.solutionService.countUserSolutions(user);
 		}
 		return this.solutionService.countUserSolutionsInContest(user,
-				this.contestService.getRunningContest());
+				this.contestTimingService.getRunningContest());
 	}
 
 	@SecurityOr({
@@ -123,13 +123,13 @@ public class SolutionListController {
 		final User user = this.userService.getUserByUsername(principal
 				.getName());
 		final List<Solution> solutions = new ArrayList<>();
-		final Contest contest = this.contestService.getRunningContest();
+		final Contest contest = this.contestTimingService.getRunningContest();
 		if (contest != null) {
 			solutions
 					.addAll(this.solutionService.getPage(user, pageNumber,
 							SolutionListController.PAGE_SIZE, contest
 									.getStartTime(),
-							this.contestService
+							this.contestTimingService
 									.getContestEndTimeForUser(contest, user)));
 		} else {
 			solutions.addAll(this.solutionService.getPageOutsideOfContest(user,

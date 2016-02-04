@@ -34,7 +34,8 @@ import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
 import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.security.annotations.PredicateDocumentation;
 import org.ng200.openolympus.services.AclService;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestTasksService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +58,9 @@ public class TaskViewSecurityPredicate implements DynamicSecurityPredicate {
 	private AclService aclService;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTasksService contestTasksService;
+	@Autowired
+	private ContestTimingService contestTimingService;
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
@@ -68,14 +71,14 @@ public class TaskViewSecurityPredicate implements DynamicSecurityPredicate {
 			return SecurityClearanceType.APPROVED_USER;
 		}
 
-		Contest runningContest = contestService.getRunningContest();
+		Contest runningContest = contestTimingService.getRunningContest();
 		if (runningContest == null) {
 			if (aclService.hasTaskPermission(task, user,
 					TaskPermissionType.view))
 				return SecurityClearanceType.APPROVED_USER;
 			return SecurityClearanceType.SUPERUSER;
 		}
-		if (contestService.isTaskInContest(task, runningContest)
+		if (contestTasksService.isTaskInContest(task, runningContest)
 				&& (isUserParticipantAndContestInProgress(user, runningContest)
 						|| canUserViewTasksAfterContestStarted(user,
 								runningContest))
@@ -102,7 +105,8 @@ public class TaskViewSecurityPredicate implements DynamicSecurityPredicate {
 			Contest runningContest) {
 		return aclService.hasContestPermission(runningContest, user,
 				ContestPermissionType.participate)
-				&& contestService.isContestInProgressForUser(runningContest,
+				&& contestTimingService.isContestInProgressForUser(
+						runningContest,
 						user);
 	}
 }

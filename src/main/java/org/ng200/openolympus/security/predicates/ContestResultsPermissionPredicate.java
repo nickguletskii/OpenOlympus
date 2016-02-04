@@ -32,7 +32,7 @@ import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
 import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.security.annotations.PredicateDocumentation;
 import org.ng200.openolympus.services.AclService;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,7 @@ public class ContestResultsPermissionPredicate
 	private AclService aclService;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
@@ -56,7 +56,7 @@ public class ContestResultsPermissionPredicate
 		if (aclService.hasContestPermission(contest, user,
 				ContestPermissionType.view_results_during_contest))
 			return SecurityClearanceType.ANONYMOUS;
-		if (contestService.getRunningContest() == null && contestService
+		if (contestTimingService.getRunningContest() == null && contestTimingService
 				.isContestOverIncludingAllTimeExtensions(contest)
 				&& aclService.hasContestPermission(contest, user,
 						ContestPermissionType.view_results_after_contest))

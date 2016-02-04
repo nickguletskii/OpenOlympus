@@ -38,6 +38,7 @@ import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.pojos.Verdict;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 	private DSLContext dslContext;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
 
 	public int countUserSolutions(final User user) {
 		return this.dslContext.selectCount().from(Tables.SOLUTION)
@@ -161,7 +162,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 	public List<Verdict> getVerdictsVisibleDuringContest(
 			final Solution solution) {
 		// TODO: show full tests during contest should be an option
-		if (this.contestService.getRunningContest() == null) {
+		if (this.contestTimingService.getRunningContest() == null) {
 			return this.dslContext.selectFrom(Tables.VERDICT)
 					.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()))
 					.fetchInto(Verdict.class);

@@ -32,7 +32,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestTasksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Profile;
@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContestTaskRemovalController {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTasksService contestTasksService;
 
 	@CacheEvict(value = "contests", key = "#contest.id")
 	@RequestMapping(value = "/api/contest/{contest}/removeTask",
@@ -67,7 +67,7 @@ public class ContestTaskRemovalController {
 		Assertions.resourceExists(contest);
 		Assertions.resourceExists(task);
 
-		this.contestService.removeTaskFromContest(task, contest);
+		this.contestTasksService.removeTaskFromContest(task, contest);
 	}
 
 }

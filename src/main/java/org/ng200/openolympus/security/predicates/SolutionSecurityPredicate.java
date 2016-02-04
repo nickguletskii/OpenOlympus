@@ -29,7 +29,7 @@ import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
 import org.ng200.openolympus.services.AclService;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 public class SolutionSecurityPredicate implements SecurityClearancePredicate {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
 
 	@Autowired
 	private AclService aclService;
@@ -46,7 +46,7 @@ public class SolutionSecurityPredicate implements SecurityClearancePredicate {
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
 		Solution solution = (Solution) obj;
-		Contest runningContest = contestService.getRunningContest();
+		Contest runningContest = contestTimingService.getRunningContest();
 
 		if (solution.getUserId() == user.getId()) {
 			return SecurityClearanceType.APPROVED_USER;

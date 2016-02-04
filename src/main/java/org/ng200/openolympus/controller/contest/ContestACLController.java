@@ -38,7 +38,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestACLService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.BindingResult;
@@ -96,7 +96,7 @@ public class ContestACLController {
 	}
 
 	@Autowired
-	private ContestService contestService;
+	private ContestACLService contestACLService;
 
 	@RequestMapping(value = "/api/contest/{contest}/acl",
 	        method = RequestMethod.PUT)
@@ -104,7 +104,7 @@ public class ContestACLController {
 	        @PathVariable("contest") Contest contest,
 	        @RequestBody Map<String, List<Long>> dto,
 	        final BindingResult bindingResult, final Principal principal) {
-		this.contestService.setContestPermissionsAndPrincipals(contest,
+		this.contestACLService.setContestPermissionsAndPrincipals(contest,
 		        dto.entrySet().stream().collect(
 		                Collectors.toMap(
 		                        e -> ContestPermissionType.valueOf(e.getKey()),
@@ -116,7 +116,7 @@ public class ContestACLController {
 	public Map<ContestPermissionType, ACLItem> getContestACL(
 	        @PathVariable("contest") Contest contest,
 	        final Principal principal) {
-		final Map<ContestPermissionType, List<OlympusPrincipal>> contestPermissionsAndPrincipalData = this.contestService
+		final Map<ContestPermissionType, List<OlympusPrincipal>> contestPermissionsAndPrincipalData = this.contestACLService
 		        .getContestPermissionsAndPrincipalData(contest);
 		return Stream.of(ContestPermissionType.values())
 		        .collect(Collectors.toMap(type -> type,

@@ -31,7 +31,8 @@ import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestCRUDService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,12 +54,15 @@ public class ContestListController {
 	private static final int PAGE_SIZE = 10;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
+	
+	@Autowired
+	private ContestCRUDService contestCRUDService;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contestsCount")
 	@ResponseBody
 	public long contestCount() {
-		return this.contestService.countContests();
+		return this.contestCRUDService.countContests();
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
@@ -70,7 +74,7 @@ public class ContestListController {
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
 		}
-		return this.contestService.getContestsOrderedByTime(pageNumber,
+		return this.contestTimingService.getContestsOrderedByTime(pageNumber,
 		        ContestListController.PAGE_SIZE);
 	}
 

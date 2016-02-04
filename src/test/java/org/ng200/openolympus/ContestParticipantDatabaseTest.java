@@ -40,9 +40,9 @@ import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooq.tables.records.ContestParticipationRecord;
 import org.ng200.openolympus.jooq.tables.records.ContestPermissionRecord;
-import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.GroupService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.services.contest.ContestCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.annotation.Rollback;
@@ -68,7 +68,7 @@ public class ContestParticipantDatabaseTest {
 	private DSLContext dslContext;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestCRUDService contestCRUDService;
 
 	@Autowired
 	private GroupService groupService;
@@ -87,7 +87,7 @@ public class ContestParticipantDatabaseTest {
 	}
 
 	private Contest createContest() {
-		final Contest contest = this.contestService
+		final Contest contest = this.contestCRUDService
 				.insertContest(new Contest()
 						.setDuration(Duration.ofHours(1))
 						.setName("Test")
@@ -97,7 +97,7 @@ public class ContestParticipantDatabaseTest {
 		Assert.assertNotNull("Contest must have an ID after insertion!",
 				contest.getId());
 		Assert.assertNotNull("Contest must exist after insertion!",
-				this.contestService.getContestByName("Test"));
+				this.contestCRUDService.getContestByName("Test"));
 		return contest;
 	}
 

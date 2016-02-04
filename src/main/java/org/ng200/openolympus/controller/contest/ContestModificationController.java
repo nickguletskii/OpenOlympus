@@ -38,7 +38,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestCRUDService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -66,7 +66,7 @@ public class ContestModificationController {
 	private ContestDtoValidator contestDtoValidator;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestCRUDService contestCRUDService;
 
 	@RequestMapping(method = RequestMethod.POST)
 	@Caching(evict = {
@@ -89,7 +89,7 @@ public class ContestModificationController {
 		contest.setStartTime(contestDto.getStartTime());
 		contest.setShowFullTestsDuringContest(contestDto
 				.isShowFullTestsDuringContest());
-		contest = this.contestService.updateContest(contest);
+		contest = this.contestCRUDService.updateContest(contest);
 		return BindingResponse.OK;
 	}
 

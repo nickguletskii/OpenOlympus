@@ -37,7 +37,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.ContestResultsPermissionPredicate;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestResultsService;
 import org.ng200.openolympus.util.Beans;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +119,7 @@ public class ContestResultsController {
 	}
 
 	@Autowired
-	private ContestService contestService;
+	private ContestResultsService contestResultsService;
 
 	@RequestMapping(value = "/api/contest/{contest}/testingFinished",
 	        method = RequestMethod.GET)
@@ -128,7 +128,7 @@ public class ContestResultsController {
 
 		Assertions.resourceExists(contest);
 
-		return this.contestService.hasContestTestingFinished(contest);
+		return this.contestResultsService.hasContestTestingFinished(contest);
 	}
 
 	@RequestMapping(value = "/api/contest/{contest}/completeResults",
@@ -139,7 +139,7 @@ public class ContestResultsController {
 	        final Model model, final Principal principal) {
 		Assertions.resourceExists(contest);
 
-		return this.contestService.getContestResults(contest).stream()
+		return this.contestResultsService.getContestResults(contest).stream()
 		        .map(ranking -> new ContestUserRankingDto(contest, ranking))
 		        .collect(Collectors.toList());
 	}
@@ -159,7 +159,7 @@ public class ContestResultsController {
 
 		Assertions.resourceExists(contest);
 
-		return this.contestService
+		return this.contestResultsService
 		        .getContestResultsPage(contest, pageNumber, 10).stream()
 		        .map(ranking -> new ContestUserRankingDto(contest, ranking))
 		        .collect(Collectors.toList());

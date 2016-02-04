@@ -36,7 +36,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.ui.Model;
@@ -60,7 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContestParticipantsController {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestUsersService contestUsersService;
 
 	@RequestMapping(value = "/api/contest/{contest}/participants",
 	        method = RequestMethod.GET)
@@ -77,7 +77,7 @@ public class ContestParticipantsController {
 
 		Assertions.resourceExists(contest);
 
-		return this.contestService
+		return this.contestUsersService
 		        .getPariticipantsPage(contest, pageNumber, 10);
 	}
 

@@ -25,8 +25,8 @@ package org.ng200.openolympus.validation;
 import org.ng200.openolympus.dto.ContestTaskAdditionDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
-import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.contest.ContestTasksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -38,7 +38,7 @@ public class ContestTaskAdditionDtoValidator {
 	private TaskService taskService;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTasksService contestTasksService;
 
 	public void validate(final Contest contest,
 			final ContestTaskAdditionDto contestTaskAddition,
@@ -53,7 +53,7 @@ public class ContestTaskAdditionDtoValidator {
 					"contest.addTask.form.errors.taskNull");
 			return;
 		}
-		if (this.contestService.getContestTasks(contest).stream().anyMatch(
+		if (this.contestTasksService.getContestTasks(contest).stream().anyMatch(
 				t -> task.getId().equals(t.getId()))) {
 			errors.rejectValue("taskName", "",
 					"contest.addTask.form.errors.taskAlreadyInContest");

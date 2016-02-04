@@ -35,7 +35,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.ng200.openolympus.validation.ContestUserTimeAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -63,7 +63,7 @@ public class ContestUserTimeAdditionController {
 	private ContestUserTimeAdditionDtoValidator contestUserTimeAdditionDtoValidator;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
 
 	@RequestMapping(value = "/api/contest/{contest}/addUserTime",
 	        method = RequestMethod.POST)
@@ -78,7 +78,7 @@ public class ContestUserTimeAdditionController {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
-		this.contestService.extendTimeForUser(contest,
+		this.contestTimingService.extendTimeForUser(contest,
 		        contestUserTimeAdditionDto.getUser(),
 		        contestUserTimeAdditionDto.getTime());
 		return BindingResponse.OK;

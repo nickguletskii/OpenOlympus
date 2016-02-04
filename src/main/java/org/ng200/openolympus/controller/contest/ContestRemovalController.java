@@ -31,7 +31,7 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,13 +48,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContestRemovalController {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestCRUDService contestCRUDService;
 
 	@RequestMapping(value = "/api/contest/{contest}/remove", method = RequestMethod.POST)
 	public void removeContest(
 			@PathVariable(value = "contest") Contest contest) {
 		Assertions.resourceExists(contest);
-		this.contestService.deleteContest(contest);
+		this.contestCRUDService.deleteContest(contest);
 		return;
 	}
 

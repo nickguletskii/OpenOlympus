@@ -36,7 +36,7 @@ import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestCRUDService;
 import org.ng200.openolympus.validation.ContestDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -62,7 +62,7 @@ public class ContestCreationController {
 	private ContestDtoValidator contestDtoValidator;
 
 	@Autowired
-	private ContestService contestService;
+	private ContestCRUDService contestCRUDService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/contests/create")
 	public BindingResponse createContest(@Valid final ContestDto contestDto,
@@ -84,7 +84,7 @@ public class ContestCreationController {
 				.setShowFullTestsDuringContest(
 						contestDto.isShowFullTestsDuringContest())
 				.setStartTime(contestDto.getStartTime());
-		contest = this.contestService.insertContest(contest);
+		contest = this.contestCRUDService.insertContest(contest);
 		return new BindingResponse(Status.OK, null,
 				new ImmutableMap.Builder<String, Object>().put("id",
 						contest.getId()).build());

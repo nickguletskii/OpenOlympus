@@ -24,7 +24,7 @@ package org.ng200.openolympus.validation;
 
 import org.ng200.openolympus.dto.ContestUserTimeAdditionDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -33,7 +33,7 @@ import org.springframework.validation.Errors;
 public class ContestUserTimeAdditionDtoValidator {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestUsersService contestUsersService;
 
 	public void validate(final Contest contest,
 			final ContestUserTimeAdditionDto contestTimeAddition,
@@ -46,7 +46,7 @@ public class ContestUserTimeAdditionDtoValidator {
 					"contest.addUserTime.form.errors.userDoesntExist");
 			return;
 		}
-		if (!this.contestService.isUserParticipatingIn(
+		if (!this.contestUsersService.isUserParticipatingIn(
 				contestTimeAddition.getUser(), contest)) {
 			errors.rejectValue("username", "",
 					"contest.addUserTime.form.errors.userNotInContest");

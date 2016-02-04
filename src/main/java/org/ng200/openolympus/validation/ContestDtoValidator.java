@@ -27,7 +27,8 @@ import java.util.List;
 
 import org.ng200.openolympus.dto.ContestDto;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
-import org.ng200.openolympus.services.ContestService;
+import org.ng200.openolympus.services.contest.ContestCRUDService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -36,7 +37,9 @@ import org.springframework.validation.Errors;
 public class ContestDtoValidator {
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTimingService contestTimingService;
+	@Autowired
+	private ContestCRUDService contestCRUDService;
 
 	public void validate(final ContestDto contestDto, final Contest contest,
 			final Errors errors) {
@@ -45,7 +48,7 @@ public class ContestDtoValidator {
 		}
 
 		if ((contest == null || !contest.getName().equals(contestDto.getName()))
-				&& this.contestService
+				&& this.contestCRUDService
 						.getContestByName(contestDto.getName()) != null) {
 			errors.rejectValue("name", "",
 					"contest.add.form.errors.contestAlreadyExists");
@@ -54,7 +57,7 @@ public class ContestDtoValidator {
 		final OffsetDateTime start = contestDto.getStartTime();
 		final OffsetDateTime end = contestDto.getStartTime()
 				.plus(contestDto.getDuration());
-		final List<Contest> contestsThatIntersect = this.contestService
+		final List<Contest> contestsThatIntersect = this.contestTimingService
 				.getContestsThatIntersect(start, end);
 
 		if (contestsThatIntersect.stream()

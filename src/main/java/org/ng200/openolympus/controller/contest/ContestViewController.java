@@ -37,8 +37,9 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.services.AclService;
-import org.ng200.openolympus.services.ContestService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.services.contest.ContestTasksService;
+import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +140,9 @@ public class ContestViewController {
 	}
 
 	@Autowired
-	private ContestService contestService;
+	private ContestTasksService contestTasksService;
+	@Autowired
+	private ContestTimingService contestTimingService;
 	@Autowired
 	private UserService userService;
 	@Autowired
@@ -152,7 +155,7 @@ public class ContestViewController {
 				ContestPermissionType.list_tasks,
 				ContestPermissionType.manage_acl))
 			return true;
-		if (contestService.isContestInProgressForUser(contest, user)
+		if (contestTimingService.isContestInProgressForUser(contest, user)
 				&& aclService.hasContestPermission(contest, user,
 						ContestPermissionType.participate)) {
 			return true;
@@ -168,14 +171,15 @@ public class ContestViewController {
 				.getUserByUsername(principal.getName());
 
 		final List<Task> tasks = canViewTasks(user, contest)
-				? this.contestService.getContestTasks(contest)
+				? this.contestTasksService.getContestTasks(contest)
 				: null;
 		return new ContestDTO(contest.getName(),
-				new TimingDTO(contestService
+				new TimingDTO(contestTimingService
 						.getContestStartIncludingAllTimeExtensions(contest),
-						contestService.getContestEndIncludingAllTimeExtensions(
-								contest),
-						contestService.getContestStartTimeForUser(contest,
+						contestTimingService
+								.getContestEndIncludingAllTimeExtensions(
+										contest),
+						contestTimingService.getContestStartTimeForUser(contest,
 								user)),
 				tasks);
 	}
