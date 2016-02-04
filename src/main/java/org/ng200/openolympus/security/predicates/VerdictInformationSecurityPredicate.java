@@ -35,7 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class VerdictInformationSecurityPredicate implements SecurityClearancePredicate {
+public class VerdictInformationSecurityPredicate
+		implements SecurityClearancePredicate {
 
 	@Autowired
 	private AclService aclService;
@@ -46,24 +47,29 @@ public class VerdictInformationSecurityPredicate implements SecurityClearancePre
 	@Autowired
 	private SolutionService solutionService;
 
+	@Override
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
-		Verdict verdict = (Verdict) obj;
+		final Verdict verdict = (Verdict) obj;
 
-		Contest runningContest = contestTimingService.getRunningContest();
+		final Contest runningContest = this.contestTimingService
+				.getRunningContest();
 
 		if (runningContest == null) {
-			if (solutionService.getSolutionById(verdict.getSolutionId())
-					.getUserId() == user.getId())
+			if (this.solutionService.getSolutionById(verdict.getSolutionId())
+					.getUserId() == user.getId()) {
 				return SecurityClearanceType.APPROVED_USER;
+			}
 			return SecurityClearanceType.VIEW_ALL_SOLUTIONS;
 		}
-		boolean canViewAllSolutions = aclService.hasContestPermission(
-				runningContest,
-				user, ContestPermissionType.view_all_solutions);
-		boolean canViewSolutionsDuringContest = aclService.hasContestPermission(
-				runningContest, user,
-				ContestPermissionType.view_results_during_contest);
+		final boolean canViewAllSolutions = this.aclService
+				.hasContestPermission(
+						runningContest,
+						user, ContestPermissionType.view_all_solutions);
+		final boolean canViewSolutionsDuringContest = this.aclService
+				.hasContestPermission(
+						runningContest, user,
+						ContestPermissionType.view_results_during_contest);
 
 		if ((verdict.getViewableDuringContest()
 				|| canViewSolutionsDuringContest)
@@ -71,7 +77,7 @@ public class VerdictInformationSecurityPredicate implements SecurityClearancePre
 			return SecurityClearanceType.APPROVED_USER;
 		}
 
-		if (solutionService.getSolutionById(verdict.getSolutionId())
+		if (this.solutionService.getSolutionById(verdict.getSolutionId())
 				.getUserId() == user.getId()
 				&& (verdict.getViewableDuringContest()
 						|| canViewSolutionsDuringContest)) {

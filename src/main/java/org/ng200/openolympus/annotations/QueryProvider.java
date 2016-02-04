@@ -30,6 +30,6 @@ import org.ng200.openolympus.sqlSupport.SqlQueryProvider;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QueryProvider {
 
-	Class<? extends SqlQueryProvider>value();
+	Class<? extends SqlQueryProvider> value();
 
 }

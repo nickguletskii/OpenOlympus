@@ -48,19 +48,22 @@ public class NoCurrentContestSecurityPredicate
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType check() {
-		Contest runningContest = contestTimingService.getRunningContest();
-		if (runningContest == null)
+		final Contest runningContest = this.contestTimingService
+				.getRunningContest();
+		if (runningContest == null) {
 			return SecurityClearanceType.ANONYMOUS;
+		}
 
-		Object auth = SecurityContextHolder.getContext().getAuthentication();
+		final Object auth = SecurityContextHolder.getContext()
+				.getAuthentication();
 
 		if (auth == null || !(auth instanceof User)) {
 			return SecurityClearanceType.DENIED;
 		}
 
-		User user = (User) auth;
+		final User user = (User) auth;
 
-		if (contestUsersService.isUserInContest(runningContest, user)) {
+		if (this.contestUsersService.isUserInContest(runningContest, user)) {
 			return SecurityClearanceType.DENIED;
 		}
 

@@ -33,6 +33,6 @@ public class SecurityInitializer extends
 	@Override
 	protected void beforeSpringSecurityFilterChain(
 			ServletContext servletContext) {
-		insertFilters(servletContext, new MultipartFilter());
+		this.insertFilters(servletContext, new MultipartFilter());
 	}
 }

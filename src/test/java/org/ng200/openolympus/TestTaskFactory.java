@@ -1,3 +1,25 @@
+/**
+ * The MIT License
+ * Copyright (c) 2014-2015 Nick Guletskii
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
 package org.ng200.openolympus;
 
@@ -20,41 +42,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestTaskFactory {
 
-	@Autowired
-	private DSLContext dslContext;
-
-	@Autowired
-	private TaskPermissionDao taskPermissionDao;
-
 	public class TestTaskBuilder {
 
 		private String prefix = "testTask";
 		private List<Pair<TaskPermissionType, Long>> permissions = new ArrayList<>();
 
-		public String getPrefix() {
-			return prefix;
-		}
-
-		public TestTaskBuilder setPrefix(String prefix) {
-			this.prefix = prefix;
-			return this;
-		}
-
-		public List<Pair<TaskPermissionType, Long>> getPermissions() {
-			return permissions;
-		}
-
-		public TestTaskBuilder setPermissions(
-				List<Pair<TaskPermissionType, Long>> permissions) {
-			this.permissions = permissions;
-			return this;
-		}
-
 		public Task build()
 				throws Exception {
-			TaskRecord taskRecord = new TaskRecord();
-			taskRecord.attach(dslContext.configuration());
-			String name = prefix + "_" + TestUtils.generateId();
+			final TaskRecord taskRecord = new TaskRecord();
+			taskRecord.attach(TestTaskFactory.this.dslContext.configuration());
+			final String name = this.prefix + "_" + TestUtils.generateId();
 			taskRecord.setName(name)
 					.setCreatedDate(OffsetDateTime.now())
 					.setDescriptionFile("")
@@ -63,28 +60,55 @@ public class TestTaskFactory {
 
 			taskRecord.refresh();
 
-			taskPermissionDao.insert(permissions.stream()
-					.map(perm -> new TaskPermission()
-							.setPrincipalId(perm.getSecond())
-							.setPermission(perm.getFirst())
-							.setTaskId(taskRecord.getId()))
-					.collect(Collectors.toList()));
+			TestTaskFactory.this.taskPermissionDao
+					.insert(this.permissions.stream()
+							.map(perm -> new TaskPermission()
+									.setPrincipalId(perm.getSecond())
+									.setPermission(perm.getFirst())
+									.setTaskId(taskRecord.getId()))
+							.collect(Collectors.toList()));
 
 			return taskRecord.into(Task.class);
 		}
 
-		public TestTaskBuilder permit(User user,
-				TaskPermissionType perm) {
-			return permit(user.getId(), perm);
+		public List<Pair<TaskPermissionType, Long>> getPermissions() {
+			return this.permissions;
+		}
+
+		public String getPrefix() {
+			return this.prefix;
 		}
 
 		public TestTaskBuilder permit(Long user,
 				TaskPermissionType perm) {
-			permissions.add(new Pair<TaskPermissionType, Long>(perm, user));
+			this.permissions
+					.add(new Pair<TaskPermissionType, Long>(perm, user));
+			return this;
+		}
+
+		public TestTaskBuilder permit(User user,
+				TaskPermissionType perm) {
+			return this.permit(user.getId(), perm);
+		}
+
+		public TestTaskBuilder setPermissions(
+				List<Pair<TaskPermissionType, Long>> permissions) {
+			this.permissions = permissions;
+			return this;
+		}
+
+		public TestTaskBuilder setPrefix(String prefix) {
+			this.prefix = prefix;
 			return this;
 		}
 
 	}
+
+	@Autowired
+	private DSLContext dslContext;
+
+	@Autowired
+	private TaskPermissionDao taskPermissionDao;
 
 	public TestTaskBuilder task() {
 		return new TestTaskBuilder();

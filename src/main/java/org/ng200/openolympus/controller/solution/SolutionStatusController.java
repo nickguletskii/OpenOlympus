@@ -77,18 +77,18 @@ public class SolutionStatusController {
 		}
 
 		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
-		public List<Verdict> getVerdicts() {
-			return this.verdicts;
+		public BigDecimal getMaximumScore() {
+			return this.maximumScore;
 		}
 
 		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
 		public BigDecimal getScore() {
-			return score;
+			return this.score;
 		}
 
 		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
-		public BigDecimal getMaximumScore() {
-			return maximumScore;
+		public List<Verdict> getVerdicts() {
+			return this.verdicts;
 		}
 
 		public void setMaximumScore(BigDecimal maximumScore) {

@@ -23,7 +23,6 @@
 package org.ng200.openolympus.model;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 
 import org.ng200.openolympus.SecurityClearanceType;

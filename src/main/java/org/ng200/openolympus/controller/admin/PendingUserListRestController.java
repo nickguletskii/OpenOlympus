@@ -40,8 +40,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.APPROVE_USER_REGISTRATIONS)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVE_USER_REGISTRATIONS)
 		})
 })
 public class PendingUserListRestController {
@@ -59,7 +59,7 @@ public class PendingUserListRestController {
 
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getPendingUsers(page,
-		        PendingUserListRestController.PAGE_SIZE);
+				PendingUserListRestController.PAGE_SIZE);
 	}
 
 }

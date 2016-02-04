@@ -50,10 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasTaskPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasTaskPermission.class)
 		})
 })
 @TaskPermissionRequired(TaskPermissionType.manage_acl)
@@ -71,7 +69,7 @@ public class TaskACLController {
 		}
 
 		public ACLItem(List<OlympusPrincipal> principals,
-		        TaskPermissionType permission) {
+				TaskPermissionType permission) {
 			this.principals = principals;
 			this.permission = permission;
 		}
@@ -99,26 +97,26 @@ public class TaskACLController {
 
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.PUT)
 	public void getTaskACL(
-	        @PathVariable("task") int id,
-	        @RequestBody Map<String, List<Long>> dto,
-	        final BindingResult bindingResult, final Principal principal) {
+			@PathVariable("task") int id,
+			@RequestBody Map<String, List<Long>> dto,
+			final BindingResult bindingResult, final Principal principal) {
 		this.taskService.setTaskPermissionsAndPrincipals(id,
-		        dto.entrySet().stream().collect(
-		                Collectors.toMap(
-		                        e -> TaskPermissionType.valueOf(e.getKey()),
-		                        e -> e.getValue())));
+				dto.entrySet().stream().collect(
+						Collectors.toMap(
+								e -> TaskPermissionType.valueOf(e.getKey()),
+								e -> e.getValue())));
 	}
 
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.GET)
 	public Map<TaskPermissionType, ACLItem> getTaskACL(
-	        @PathVariable("task") int id, final Principal principal) {
+			@PathVariable("task") int id, final Principal principal) {
 		final Map<TaskPermissionType, List<OlympusPrincipal>> taskPermissionsAndPrincipalData = this.taskService
-		        .getTaskPermissionsAndPrincipalData(id);
+				.getTaskPermissionsAndPrincipalData(id);
 		return Stream.of(TaskPermissionType.values())
-		        .collect(Collectors.toMap(type -> type,
-		                type -> new ACLItem(
-		                        taskPermissionsAndPrincipalData.get(type),
-		                        type)));
+				.collect(Collectors.toMap(type -> type,
+						type -> new ACLItem(
+								taskPermissionsAndPrincipalData.get(type),
+								type)));
 
 	}
 }

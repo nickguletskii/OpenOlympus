@@ -27,5 +27,5 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PredicateDocumentation {
-	public String[]value();
+	public String[] value();
 }

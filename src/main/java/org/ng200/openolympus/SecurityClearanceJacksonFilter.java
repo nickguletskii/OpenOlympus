@@ -85,7 +85,7 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 			return true;
 		}
 
-		return securityClearanceVerificationService
+		return this.securityClearanceVerificationService
 				.doesCurrentSecurityContextHaveClearance(
 						requestedClearance.minimumClearance())
 				&&
@@ -93,7 +93,7 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 						.map(predicateClass -> this.getPredicate(predicateClass)
 								.getRequiredClearanceForObject(user, object))
 						.map(req -> req != SecurityClearanceType.DENIED
-								? securityClearanceVerificationService
+								? this.securityClearanceVerificationService
 										.doesCurrentSecurityContextHaveClearance(
 												req)
 								: false)

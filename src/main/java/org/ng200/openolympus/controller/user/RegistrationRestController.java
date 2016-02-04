@@ -24,9 +24,7 @@ package org.ng200.openolympus.controller.user;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
@@ -185,7 +183,7 @@ public class RegistrationRestController {
 
 		this.userService.insertUser(user);
 
-		if (automaticallyApprove) {
+		if (this.automaticallyApprove) {
 			this.userApprovalService.approveUser(user);
 		}
 

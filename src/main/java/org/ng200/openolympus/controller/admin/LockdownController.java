@@ -36,6 +36,7 @@ public class LockdownController {
 
 	@Autowired
 	private SecurityService securityService;
+
 	@RequestMapping(value = "/admin/lockdown/enabled", method = RequestMethod.POST)
 	public void endLockdown(
 			@RequestParam(value = "enabled", required = true) boolean enabled) {

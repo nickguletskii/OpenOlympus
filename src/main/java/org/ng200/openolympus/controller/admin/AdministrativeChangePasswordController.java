@@ -54,23 +54,23 @@ public class AdministrativeChangePasswordController {
 	private UserService userService;
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(value = SecurityClearanceType.CHANGE_OTHER_USERS_PASSWORD)
+					@SecurityAnd({
+									@SecurityLeaf(value = SecurityClearanceType.CHANGE_OTHER_USERS_PASSWORD)
 			})
 	})
 	@RequestMapping(value = "/api/admin/user/{user}/changePassword", method = RequestMethod.PATCH)
 	public BindingResponse changePassword(
-	        @Valid @RequestBody final PasswordChangeDto passwordChangeDto,
-	        final BindingResult bindingResult,
-	        @PathVariable(value = "user") final User user)
-	                throws BindException {
+			@Valid @RequestBody final PasswordChangeDto passwordChangeDto,
+			final BindingResult bindingResult,
+			@PathVariable(value = "user") final User user)
+					throws BindException {
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 
 		user.setPassword(
-		        this.passwordEncoder.encode(passwordChangeDto.getPassword()));
+				this.passwordEncoder.encode(passwordChangeDto.getPassword()));
 		this.userService.updateUser(user);
 		return BindingResponse.OK;
 	}

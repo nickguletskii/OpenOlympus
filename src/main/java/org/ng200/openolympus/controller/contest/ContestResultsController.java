@@ -33,6 +33,7 @@ import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.model.UserDetailsImpl;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
@@ -54,11 +55,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("web")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = {
-                                                    ContestResultsPermissionPredicate.class
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = {
+																											ContestResultsPermissionPredicate.class
 				})
 		})
 })
@@ -75,7 +74,8 @@ public class ContestResultsController {
 
 		public ContestUserRankingDto(Contest contest, UserRanking ranking) {
 			Beans.copy(ranking, this);
-			logger.info("RANKING {} {}", ranking.getRank(), this.getRank());
+			UserDetailsImpl.logger.info("RANKING {} {}", ranking.getRank(),
+					this.getRank());
 		}
 
 		public List<Pair<Task, BigDecimal>> getTaskScores() {
@@ -94,7 +94,7 @@ public class ContestResultsController {
 		public List<BigDecimal> results;
 
 		public TaskColumn(final String taskName,
-		        final List<BigDecimal> results) {
+				final List<BigDecimal> results) {
 			super();
 			this.taskName = taskName;
 			this.results = results;
@@ -121,37 +121,33 @@ public class ContestResultsController {
 	@Autowired
 	private ContestResultsService contestResultsService;
 
-	@RequestMapping(value = "/api/contest/{contest}/testingFinished",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/contest/{contest}/testingFinished", method = RequestMethod.GET)
 	public boolean hasContestTestingFinished(
-	        @PathVariable(value = "contest") final Contest contest) {
+			@PathVariable(value = "contest") final Contest contest) {
 
 		Assertions.resourceExists(contest);
 
 		return this.contestResultsService.hasContestTestingFinished(contest);
 	}
 
-	@RequestMapping(value = "/api/contest/{contest}/completeResults",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/contest/{contest}/completeResults", method = RequestMethod.GET)
 
 	public List<ContestUserRankingDto> showCompleteResultsPage(
-	        @PathVariable(value = "contest") final Contest contest,
-	        final Model model, final Principal principal) {
+			@PathVariable(value = "contest") final Contest contest,
+			final Model model, final Principal principal) {
 		Assertions.resourceExists(contest);
 
 		return this.contestResultsService.getContestResults(contest).stream()
-		        .map(ranking -> new ContestUserRankingDto(contest, ranking))
-		        .collect(Collectors.toList());
+				.map(ranking -> new ContestUserRankingDto(contest, ranking))
+				.collect(Collectors.toList());
 	}
 
-	@RequestMapping(value = "/api/contest/{contest}/results",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/contest/{contest}/results", method = RequestMethod.GET)
 
 	public List<ContestUserRankingDto> showResultsPage(
-	        @PathVariable(value = "contest") final Contest contest,
-	        @RequestParam(value = "page",
-	                defaultValue = "1") final Integer pageNumber,
-	        final Model model, final Principal principal) {
+			@PathVariable(value = "contest") final Contest contest,
+			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
+			final Model model, final Principal principal) {
 		Assertions.resourceExists(contest);
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
@@ -160,8 +156,8 @@ public class ContestResultsController {
 		Assertions.resourceExists(contest);
 
 		return this.contestResultsService
-		        .getContestResultsPage(contest, pageNumber, 10).stream()
-		        .map(ranking -> new ContestUserRankingDto(contest, ranking))
-		        .collect(Collectors.toList());
+				.getContestResultsPage(contest, pageNumber, 10).stream()
+				.map(ranking -> new ContestUserRankingDto(contest, ranking))
+				.collect(Collectors.toList());
 	}
 }

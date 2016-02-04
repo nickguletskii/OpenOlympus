@@ -50,10 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("web")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.LIST_GROUPS,
-                                     predicates = UserHasGroupPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.LIST_GROUPS, predicates = UserHasGroupPermission.class)
 		})
 })
 @GroupPermissionRequired(GroupPermissionType.view_members)
@@ -63,24 +61,22 @@ public class GroupViewController {
 
 	@RequestMapping(value = "/api/group/{group}", method = RequestMethod.GET)
 	public List<User> getMembers(
-	        @PathVariable(value = "group") final Group group,
-	        @RequestParam(value = "page",
-	                defaultValue = "1") final Integer pageNumber,
-	        final Principal principal) {
+			@PathVariable(value = "group") final Group group,
+			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
+			final Principal principal) {
 		Assertions.resourceExists(group);
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
 		}
 
 		return this.groupService
-		        .getParticipants(group, pageNumber, 10);
+				.getParticipants(group, pageNumber, 10);
 	}
 
-	@RequestMapping(method = RequestMethod.GET,
-	        value = "/api/group/{group}/memberCount")
+	@RequestMapping(method = RequestMethod.GET, value = "/api/group/{group}/memberCount")
 	@ResponseBody
 	public long groupCount(
-	        @PathVariable(value = "group") final Group group) {
+			@PathVariable(value = "group") final Group group) {
 		return this.groupService.countParticipants(group);
 	}
 }

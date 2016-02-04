@@ -26,7 +26,7 @@ public class SecurityAuditCatastrophicFailureException
 		extends RuntimeException {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 2752017105047657359L;
 
@@ -35,10 +35,6 @@ public class SecurityAuditCatastrophicFailureException
 
 	public SecurityAuditCatastrophicFailureException(String message) {
 		super(message);
-	}
-
-	public SecurityAuditCatastrophicFailureException(Throwable cause) {
-		super(cause);
 	}
 
 	public SecurityAuditCatastrophicFailureException(String message,
@@ -50,6 +46,10 @@ public class SecurityAuditCatastrophicFailureException
 			Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	public SecurityAuditCatastrophicFailureException(Throwable cause) {
+		super(cause);
 	}
 
 }

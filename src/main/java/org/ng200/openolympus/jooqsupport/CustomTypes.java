@@ -25,16 +25,14 @@ package org.ng200.openolympus.jooqsupport;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
-import org.jooq.Binding;
 import org.jooq.DataType;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DefaultDataType;
-import org.ng200.openolympus.util.DateTimeBinding;
 
 public class CustomTypes {
 	public static final DataType<OffsetDateTime> OFFSETDATETIME = new DefaultDataType<OffsetDateTime>(
-	        SQLDialect.POSTGRES, OffsetDateTime.class,
-	        "timestamp with time zone");
+			SQLDialect.POSTGRES, OffsetDateTime.class,
+			"timestamp with time zone");
 	public static final DataType<LocalDate> LOCALDATE = new DefaultDataType<LocalDate>(
-	        SQLDialect.POSTGRES, LocalDate.class, "date");
+			SQLDialect.POSTGRES, LocalDate.class, "date");
 }

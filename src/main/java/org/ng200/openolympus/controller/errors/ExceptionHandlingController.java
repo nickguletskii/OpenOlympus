@@ -52,18 +52,18 @@ public class ExceptionHandlingController {
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+	@ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+	public void handleMediaTypeException(
+			HttpMediaTypeNotAcceptableException ex) {
+	}
+
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ExceptionDto> handleMethodArgumentTypeMismatchException(
 			MethodArgumentTypeMismatchException ex) {
 		return new ResponseEntity<ExceptionDto>(
 				new ExceptionDto("Invalid argument."),
 				HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-	@ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-	public void handleMediaTypeException(
-			HttpMediaTypeNotAcceptableException ex) {
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)

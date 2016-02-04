@@ -71,17 +71,17 @@ public class GroupUserAdditionController {
 			@RequestPart("username") String username) throws BindException {
 		Assertions.resourceExists(group);
 
-		User user = userService.getUserByUsername(username);
+		final User user = this.userService.getUserByUsername(username);
 
 		if (user == null) {
 			return Result.NO_SUCH_USER;
 		}
 
-		if (groupService.containsUser(user, group)) {
+		if (this.groupService.containsUser(user, group)) {
 			return Result.USER_ALREADY_IN_GROUP;
 		}
 
-		groupService.addUserToGroup(user, group, false);
+		this.groupService.addUserToGroup(user, group, false);
 
 		return Result.OK;
 	}

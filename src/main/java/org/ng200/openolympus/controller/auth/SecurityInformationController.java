@@ -44,27 +44,27 @@ public class SecurityInformationController {
 
 		private Contest currentContest;
 
-		public UserPrincipal getCurrentPrincipal() {
-			return currentPrincipal;
-		}
-
-		public void setCurrentPrincipal(UserPrincipal currentPrincipal) {
+		public SecurityInformation(UserPrincipal currentPrincipal,
+				Contest currentContest) {
+			super();
 			this.currentPrincipal = currentPrincipal;
+			this.currentContest = currentContest;
 		}
 
 		public Contest getCurrentContest() {
-			return currentContest;
+			return this.currentContest;
+		}
+
+		public UserPrincipal getCurrentPrincipal() {
+			return this.currentPrincipal;
 		}
 
 		public void setCurrentContest(Contest currentContest) {
 			this.currentContest = currentContest;
 		}
 
-		public SecurityInformation(UserPrincipal currentPrincipal,
-				Contest currentContest) {
-			super();
+		public void setCurrentPrincipal(UserPrincipal currentPrincipal) {
 			this.currentPrincipal = currentPrincipal;
-			this.currentContest = currentContest;
 		}
 
 	}
@@ -84,7 +84,7 @@ public class SecurityInformationController {
 							.getName());
 		}
 		return new SecurityInformation(currentPrincipal,
-				contestTimingService.getRunningContest());
+				this.contestTimingService.getRunningContest());
 	}
 
 }

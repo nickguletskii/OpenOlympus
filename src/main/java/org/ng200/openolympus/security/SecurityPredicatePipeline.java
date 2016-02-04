@@ -34,71 +34,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityPredicatePipeline {
 
-	private User user;
-
-	private Decision decision = Decision.NO_DECISION;
-
-	private DSLContext dslContext;
-
-	private SecurityPredicatePipeline(DSLContext dslContext) {
-		this.dslContext = dslContext;
-		user = (User) Optional.ofNullable(SecurityContextHolder.getContext())
-				.map(c -> c.getAuthentication()).map(a -> a.getPrincipal())
-				.filter(p -> p instanceof User)
-				.orElse(null);
-	}
-
-	public SecurityPredicatePipeline defaultSecurity() {
-		if (decision != Decision.NO_DECISION)
-			return this;
-
-		if (user != null && user.getSuperuser())
-			decision = Decision.ACCEPT;
-
-		return this;
-	}
-
-	public SecurityPredicatePipeline matches(
-			Function<User, Boolean> predicate) {
-		if (decision != Decision.NO_DECISION || user == null)
-			return this;
-
-		if (Boolean.TRUE.equals(predicate.apply(user))) {
-			decision = Decision.ACCEPT;
-		}
-
-		return this;
-	}
-
-	public SecurityPredicatePipeline notMatches(
-			Function<User, Boolean> predicate) {
-		if (decision != Decision.NO_DECISION || user == null)
-			return this;
-
-		if (Boolean.TRUE.equals(predicate.apply(user))) {
-			decision = Decision.DENY;
-		}
-
-		return this;
-	}
-
-	public SecurityPredicatePipeline hasPermission(
-			GeneralPermissionType generalPermissionType) {
-		if (decision != Decision.NO_DECISION || user == null)
-			return this;
-
-		if (dslContext.select(
-				DSL.field(Tables.PRINCIPAL.PERMISSIONS
-						.contains(new GeneralPermissionType[] {
-																generalPermissionType
-		})))
-				.from(Tables.PRINCIPAL)
-				.where(Tables.PRINCIPAL.ID.eq(user.getId()))
-				.fetchOne().value1()) {
-			decision = Decision.ACCEPT;
-		}
-
-		return this;
+	private static enum Decision {
+		NO_DECISION, ACCEPT, DENY
 	}
 
 	public static SecurityPredicatePipeline defaultPipeline(
@@ -111,11 +48,80 @@ public class SecurityPredicatePipeline {
 		return new SecurityPredicatePipeline(dslContext);
 	}
 
-	private static enum Decision {
-		NO_DECISION, ACCEPT, DENY
+	private final User user;
+
+	private Decision decision = Decision.NO_DECISION;
+
+	private final DSLContext dslContext;
+
+	private SecurityPredicatePipeline(DSLContext dslContext) {
+		this.dslContext = dslContext;
+		this.user = (User) Optional
+				.ofNullable(SecurityContextHolder.getContext())
+				.map(c -> c.getAuthentication()).map(a -> a.getPrincipal())
+				.filter(p -> p instanceof User)
+				.orElse(null);
+	}
+
+	public SecurityPredicatePipeline defaultSecurity() {
+		if (this.decision != Decision.NO_DECISION) {
+			return this;
+		}
+
+		if (this.user != null && this.user.getSuperuser()) {
+			this.decision = Decision.ACCEPT;
+		}
+
+		return this;
+	}
+
+	public SecurityPredicatePipeline hasPermission(
+			GeneralPermissionType generalPermissionType) {
+		if (this.decision != Decision.NO_DECISION || this.user == null) {
+			return this;
+		}
+
+		if (this.dslContext.select(
+				DSL.field(Tables.PRINCIPAL.PERMISSIONS
+						.contains(new GeneralPermissionType[] {
+																generalPermissionType
+		})))
+				.from(Tables.PRINCIPAL)
+				.where(Tables.PRINCIPAL.ID.eq(this.user.getId()))
+				.fetchOne().value1()) {
+			this.decision = Decision.ACCEPT;
+		}
+
+		return this;
 	}
 
 	public boolean isAllowed() {
-		return decision == Decision.ACCEPT;
+		return this.decision == Decision.ACCEPT;
+	}
+
+	public SecurityPredicatePipeline matches(
+			Function<User, Boolean> predicate) {
+		if (this.decision != Decision.NO_DECISION || this.user == null) {
+			return this;
+		}
+
+		if (Boolean.TRUE.equals(predicate.apply(this.user))) {
+			this.decision = Decision.ACCEPT;
+		}
+
+		return this;
+	}
+
+	public SecurityPredicatePipeline notMatches(
+			Function<User, Boolean> predicate) {
+		if (this.decision != Decision.NO_DECISION || this.user == null) {
+			return this;
+		}
+
+		if (Boolean.TRUE.equals(predicate.apply(this.user))) {
+			this.decision = Decision.DENY;
+		}
+
+		return this;
 	}
 }

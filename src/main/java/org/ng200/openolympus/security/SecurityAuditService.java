@@ -54,13 +54,14 @@ public class SecurityAuditService implements ApplicationContextAware {
 	@Autowired
 	public SecurityAuditService(
 			RequestMappingHandlerMapping handlerMapping) {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		handlerMapping.getHandlerMethods()
 				.forEach((RequestMappingInfo requestMappingInfo,
 						HandlerMethod handlerMethod) -> {
-					processMethod(requestMappingInfo, handlerMethod, builder);
+					this.processMethod(requestMappingInfo, handlerMethod,
+							builder);
 				});
-		logger.info(builder.toString());
+		SecurityAuditService.logger.info(builder.toString());
 	}
 
 	private void processMethod(RequestMappingInfo requestMappingInfo,
@@ -75,10 +76,11 @@ public class SecurityAuditService implements ApplicationContextAware {
 				handlerMethod.getMethod(),
 				SecurityOr.class);
 
-		if (or == null)
+		if (or == null) {
 			or = AnnotationUtils.findAnnotation(
 					handlerMethod.getMethod().getDeclaringClass(),
 					SecurityOr.class);
+		}
 
 		if (or == null) {
 			builder.append("NOT SECURED!!!\n");
@@ -100,16 +102,18 @@ public class SecurityAuditService implements ApplicationContextAware {
 
 		boolean flag1 = false;
 
-		for (SecurityAnd and : or.value()) {
-			if (flag1)
+		for (final SecurityAnd and : or.value()) {
+			if (flag1) {
 				builder.append(" OR\n");
+			}
 			flag1 = true;
 
 			boolean flag2 = false;
 
-			for (SecurityLeaf leaf : and.value()) {
-				if (flag2)
+			for (final SecurityLeaf leaf : and.value()) {
+				if (flag2) {
 					builder.append("  AND\n");
+				}
 
 				flag2 = true;
 
@@ -117,9 +121,9 @@ public class SecurityAuditService implements ApplicationContextAware {
 						.append(leaf.value().toString())
 						.append("\n");
 
-				for (Class<? extends DynamicSecurityPredicate> predicate : leaf
+				for (final Class<? extends DynamicSecurityPredicate> predicate : leaf
 						.predicates()) {
-					PredicateDocumentation documentation = AnnotationUtils
+					final PredicateDocumentation documentation = AnnotationUtils
 							.findAnnotation(predicate,
 									PredicateDocumentation.class);
 					if (documentation == null) {
@@ -130,11 +134,12 @@ public class SecurityAuditService implements ApplicationContextAware {
 
 						boolean flag3 = false;
 
-						for (String val : documentation.value()) {
-							if (flag3)
+						for (final String val : documentation.value()) {
+							if (flag3) {
 								builder.append("   OR ");
-							else
+							} else {
 								builder.append("      ");
+							}
 
 							flag3 = true;
 

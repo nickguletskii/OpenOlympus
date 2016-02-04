@@ -54,6 +54,14 @@ public class AdministrativePrincipalACLController {
 	@Autowired
 	private AclService aclService;
 
+	@RequestMapping(value = "/api/admin/principal/{principal}/generalPermissions", method = RequestMethod.GET)
+	public Map<GeneralPermissionType, Boolean> getGeneralPermissions(
+			@PathVariable(value = "principal") final Principal principal) {
+		Assertions.resourceExists(principal);
+
+		return this.aclService.getPrincipalGeneralPermissions(principal);
+	}
+
 	@RequestMapping(value = "/api/admin/principal/{principal}/generalPermissions", method = RequestMethod.PUT)
 	public BindingResponse setGeneralPermissions(
 			@PathVariable(value = "principal") Principal principal,
@@ -61,17 +69,9 @@ public class AdministrativePrincipalACLController {
 			final BindingResult bindingResult) {
 		Assertions.resourceExists(principal);
 
-		principal = aclService.setPrincipalGeneralPermissions(principal,
+		principal = this.aclService.setPrincipalGeneralPermissions(principal,
 				generalPermissions);
 
 		return BindingResponse.OK;
-	}
-
-	@RequestMapping(value = "/api/admin/principal/{principal}/generalPermissions", method = RequestMethod.GET)
-	public Map<GeneralPermissionType, Boolean> getGeneralPermissions(
-			@PathVariable(value = "principal") final Principal principal) {
-		Assertions.resourceExists(principal);
-
-		return aclService.getPrincipalGeneralPermissions(principal);
 	}
 }

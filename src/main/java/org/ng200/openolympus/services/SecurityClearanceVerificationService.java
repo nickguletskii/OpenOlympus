@@ -36,82 +36,84 @@ public class SecurityClearanceVerificationService {
 	@Autowired
 	private DSLContext dslContext;
 
+	private SecurityPredicatePipeline defaultSecurity() {
+		return SecurityPredicatePipeline.defaultPipeline(this.dslContext);
+	}
+
 	public boolean doesCurrentSecurityContextHaveClearance(
-	        SecurityClearanceType securityClearanceType) {
+			SecurityClearanceType securityClearanceType) {
 		switch (securityClearanceType) {
 		case ANONYMOUS:
 			return true;
 		case ADMINISTRATIVE_USER:
-			return defaultSecurity()
-			        .matches(user -> user.getSuperuser())
-			        .isAllowed();
+			return this.defaultSecurity()
+					.matches(user -> user.getSuperuser())
+					.isAllowed();
 		case APPROVED_USER:
-			return defaultSecurity()
-			        .matches(user -> user.getApproved())
-			        .isAllowed();
+			return this.defaultSecurity()
+					.matches(user -> user.getApproved())
+					.isAllowed();
 		case APPROVE_USER_REGISTRATIONS:
-			return generalPermission(
-			        GeneralPermissionType.approve_user_registrations);
+			return this.generalPermission(
+					GeneralPermissionType.approve_user_registrations);
 		case CHANGE_OTHER_USERS_PASSWORD:
-			return generalPermission(
-			        GeneralPermissionType.change_other_users_password);
+			return this.generalPermission(
+					GeneralPermissionType.change_other_users_password);
 		case CHANGE_OTHER_USERS_PERSONAL_INFO:
-			return generalPermission(
-			        GeneralPermissionType.change_other_users_personal_info);
+			return this.generalPermission(
+					GeneralPermissionType.change_other_users_personal_info);
 		case CONTEST_CREATOR:
-			return generalPermission(
-			        GeneralPermissionType.create_contests);
+			return this.generalPermission(
+					GeneralPermissionType.create_contests);
 		case DELETE_USER:
-			return generalPermission(
-			        GeneralPermissionType.remove_user);
+			return this.generalPermission(
+					GeneralPermissionType.remove_user);
 		case DENIED:
 			return false;
 		case ENUMERATE_ALL_USERS:
-			return generalPermission(GeneralPermissionType.enumerate_all_users);
+			return this.generalPermission(
+					GeneralPermissionType.enumerate_all_users);
 		case INTERNAL:
-			return emptySecurity().matches(user -> user.getUsername()
-			        .equals(NameConstants.SYSTEM_ACCOUNT_NAME))
-			        .isAllowed();
+			return this.emptySecurity().matches(user -> user.getUsername()
+					.equals(NameConstants.SYSTEM_ACCOUNT_NAME))
+					.isAllowed();
 		case LOGGED_IN:
-			return emptySecurity().matches(user -> true).isAllowed();
+			return this.emptySecurity().matches(user -> true).isAllowed();
 		case SUPERUSER:
-			return defaultSecurity().isAllowed();
+			return this.defaultSecurity().isAllowed();
 		case TASK_SUPERVISOR:
-			return generalPermission(
-			        GeneralPermissionType.task_supervisor);
+			return this.generalPermission(
+					GeneralPermissionType.task_supervisor);
 		case VIEW_OTHER_USERS_PERSONAL_INFO:
-			return generalPermission(
-			        GeneralPermissionType.view_other_users_personal_info);
+			return this.generalPermission(
+					GeneralPermissionType.view_other_users_personal_info);
 		case CREATE_GROUP:
-			return generalPermission(
-			        GeneralPermissionType.create_groups);
+			return this.generalPermission(
+					GeneralPermissionType.create_groups);
 		case LIST_GROUPS:
-			return generalPermission(
-			        GeneralPermissionType.list_groups);
+			return this.generalPermission(
+					GeneralPermissionType.list_groups);
 		case MANAGE_PRINCIPAL_PERMISSIONS:
-			return generalPermission(
-			        GeneralPermissionType.manage_principal_permissions);
+			return this.generalPermission(
+					GeneralPermissionType.manage_principal_permissions);
 		case VIEW_ALL_SOLUTIONS:
-			return generalPermission(
-			        GeneralPermissionType.view_all_solutions);
+			return this.generalPermission(
+					GeneralPermissionType.view_all_solutions);
 		case VIEW_ARCHIVE_DURING_CONTEST:
-			return generalPermission(
-			        GeneralPermissionType.view_archive_during_contest);
+			return this.generalPermission(
+					GeneralPermissionType.view_archive_during_contest);
 		}
-		throw new UnsupportedOperationException("An unsupported security clearance was encountered.");
-	}
-
-	private SecurityPredicatePipeline defaultSecurity() {
-		return SecurityPredicatePipeline.defaultPipeline(dslContext);
+		throw new UnsupportedOperationException(
+				"An unsupported security clearance was encountered.");
 	}
 
 	private SecurityPredicatePipeline emptySecurity() {
-		return SecurityPredicatePipeline.emptyPipeline(dslContext);
+		return SecurityPredicatePipeline.emptyPipeline(this.dslContext);
 	}
 
 	private boolean generalPermission(
-	        GeneralPermissionType generalPermissionType) {
-		return defaultSecurity().hasPermission(generalPermissionType)
-		        .isAllowed();
+			GeneralPermissionType generalPermissionType) {
+		return this.defaultSecurity().hasPermission(generalPermissionType)
+				.isAllowed();
 	}
 }

@@ -30,13 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.base.Throwables;
 
 public abstract class GenericCreateUpdateRepository {
-	
+
 	@Autowired
 	private DSLContext dslContext;
 
 	@SuppressWarnings("unchecked")
 	protected <T, R extends UpdatableRecordImpl<?>> T insert(T value,
-	        TableImpl<R> table) {
+			TableImpl<R> table) {
 		try {
 			R record;
 			record = table.getRecordType().newInstance();
@@ -51,7 +51,7 @@ public abstract class GenericCreateUpdateRepository {
 
 	@SuppressWarnings("unchecked")
 	protected <T, R extends UpdatableRecordImpl<?>> T update(T value,
-	        TableImpl<R> table) {
+			TableImpl<R> table) {
 		try {
 			R record;
 			record = table.getRecordType().newInstance();

@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 import org.aopalliance.intercept.MethodInvocation;
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
-import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.FindAnnotation;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
@@ -74,189 +73,22 @@ public class OpenOlympusRootDecisionVoter
 	@Autowired
 	private UserService userService;
 
-	public boolean supports(ConfigAttribute attribute) {
-		return attribute instanceof PreInvocationAttribute;
-	}
-
-	public boolean supports(Class<?> clazz) {
-		return MethodInvocation.class.isAssignableFrom(clazz);
-	}
-
-	@Override
-	public int vote(Authentication authentication, Object object,
-			Collection<ConfigAttribute> attributes) {
-		try {
-			if (!(object instanceof MethodInvocation))
-				return ACCESS_ABSTAIN;
-			MethodInvocation invocation = (MethodInvocation) object;
-
-			int vote1 = Optional.ofNullable(AnnotationUtils.findAnnotation(
-					invocation.getMethod().getDeclaringClass(),
-					SecurityOr.class))
-					.map(x -> (Integer) processSecurityOr(x, invocation))
-					.orElse(ACCESS_ABSTAIN);
-
-			int vote2 = Optional.ofNullable(AnnotationUtils.findAnnotation(
-					invocation.getMethod(),
-					SecurityOr.class))
-					.map(x -> (Integer) processSecurityOr(x, invocation))
-					.orElse(ACCESS_ABSTAIN);
-
-			if (vote1 == ACCESS_DENIED || vote2 == ACCESS_DENIED)
-				return ACCESS_DENIED;
-
-			if (vote1 == ACCESS_GRANTED || vote2 == ACCESS_GRANTED)
-				return ACCESS_GRANTED;
-		} catch (Exception e) {
-			logger.error("SECURITY SYSTEM FAILURE: {}", e);
-			return ACCESS_DENIED;
-		}
-		return ACCESS_DENIED;
-	}
-
-	private int processSecurityOr(SecurityOr securityOr,
-			MethodInvocation invocation) {
-		if (securityOr.allowSuperuser()
-				&& securityClearanceVerificationService
-						.doesCurrentSecurityContextHaveClearance(
-								SecurityClearanceType.SUPERUSER)) {
-			return ACCESS_GRANTED;
-		}
-
-		for (SecurityAnd securityAnd : securityOr.value()) {
-			if (processSecurityAnd(securityAnd, invocation) == ACCESS_GRANTED) {
-				return ACCESS_GRANTED;
-			}
-		}
-		return ACCESS_DENIED;
-	}
-
-	private int processSecurityAnd(SecurityAnd securityAnd,
-			MethodInvocation invocation) {
-		for (SecurityLeaf securityLeaf : securityAnd.value()) {
-			if (processSecurityLeaf(securityLeaf, invocation) == ACCESS_DENIED)
-				return ACCESS_DENIED;
-		}
-		return ACCESS_GRANTED;
-	}
-
 	private final Map<Class<?>, Object> predicateBeans = new HashMap<>();
-
-	private Object getPredicate(
-			Class<?> predicateClass) {
-		return this.predicateBeans.computeIfAbsent(predicateClass,
-				(c) -> this.autowireCapableBeanFactory
-						.createBean(c));
-	}
 
 	private final Map<Method, Map<String, Integer>> methodParameterIndex = new HashMap<>();
 
-	private int processSecurityLeaf(SecurityLeaf securityLeaf,
-			MethodInvocation invocation) {
-		SecurityClearanceType minimal = securityLeaf.value();
-		if (!securityClearanceVerificationService
-				.doesCurrentSecurityContextHaveClearance(minimal)) {
-			// Early exit if minimal conditions not satisfied
-			return ACCESS_DENIED;
-		}
-		for (Class<?> predicate : securityLeaf.predicates()) {
-			for (Method method : predicate.getMethods()) {
-				if (method.getAnnotationsByType(
-						MethodSecurityPredicate.class).length > 0) {
-					if (!SecurityClearanceType.class
-							.isAssignableFrom(method.getReturnType())) {
-						throw new IllegalMethodReturnTypeException(
-								"Methods annotated with @MethodSecurityPredicate are supposed to return SecurityClearanceType.");
-					}
-					try {
-						SecurityClearanceType clearanceType = (SecurityClearanceType) method
-								.invoke(
-										getPredicate(predicate),
-										computeArguments(method, invocation));
-						if (!securityClearanceVerificationService
-								.doesCurrentSecurityContextHaveClearance(
-										clearanceType)) {
-							return ACCESS_DENIED;
-						}
-					} catch (IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException e) {
-						throw new GeneralNestedRuntimeException(
-								"Couldn't execute @MethodSecurityPredicate annotated method! Method: "
-										+ method,
-								e);
-					}
-				}
-			}
-		}
-		return ACCESS_GRANTED;
-	}
-
 	private Object[] computeArguments(Method method,
 			MethodInvocation invocation) {
-		Object[] objs = Stream.<Parameter> of(method.getParameters())
-				.map(parameter -> getObjectForParameter(invocation,
+		final Object[] objs = Stream.<Parameter> of(method.getParameters())
+				.map(parameter -> this.getObjectForParameter(invocation,
 						parameter))
 				.toArray();
 		return objs;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Object getObjectForParameter(MethodInvocation invocation,
-			Parameter parameter) {
-		if (parameter.isAnnotationPresent(FindAnnotation.class)) {
-			return AnnotationExtraUtils.findAnnotation(
-					invocation.getMethod(),
-					invocation.getMethod().getDeclaringClass(),
-					(Class) parameter.getType());
-		}
-		if (parameter.isAnnotationPresent(CurrentUser.class)) {
-			return (User) Optional
-					.ofNullable(SecurityContextHolder.getContext())
-					.map(c -> c.getAuthentication())
-					.map(a -> userService.getUserByUsername(a.getName()))
-					.orElse(null);
-		}
-		if (parameter.isAnnotationPresent(
-				org.ng200.openolympus.security.annotations.Parameter.class)) {
-			String parameterName = AnnotationUtils.findAnnotation(
-					parameter,
-					org.ng200.openolympus.security.annotations.Parameter.class)
-					.value();
-			Object objectForParameterName = getObjectForParameterName(
-					invocation,
-					parameterName);
-			return objectForParameterName;
-		}
-		return getObjectForParameterName(invocation, parameter.getName());
-	}
-
-	private Object getObjectForParameterName(MethodInvocation invocation,
-			String name) {
-		methodParameterIndex.computeIfAbsent(invocation.getMethod(),
-				(x) -> {
-					Parameter[] invokedMethodParameters = invocation.getMethod()
-							.getParameters();
-
-					Map<String, Integer> map = new HashMap<>();
-					for (int i = 0; i < invokedMethodParameters.length; i++) {
-						map.put(getName(invokedMethodParameters[i]), i);
-					}
-
-					return map;
-				});
-		Integer idx = methodParameterIndex.get(invocation.getMethod())
-				.get(name);
-
-		if (idx == null) {
-			throw new IllegalArgumentException(
-					"An argument that isn't present in the invoked method was requested");
-		}
-		return invocation.getArguments()[idx];
-	}
-
 	private String getName(Parameter parameter) {
 		if (parameter.isAnnotationPresent(RequestParam.class)) {
-			RequestParam requestParam = AnnotationUtils.findAnnotation(
+			final RequestParam requestParam = AnnotationUtils.findAnnotation(
 					parameter, RequestParam.class);
 			return requestParam.value() == null
 					? requestParam.name()
@@ -271,6 +103,190 @@ public class OpenOlympusRootDecisionVoter
 					.findAnnotation(parameter, NamedParameter.class).value();
 		}
 		return parameter.getName();
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object getObjectForParameter(MethodInvocation invocation,
+			Parameter parameter) {
+		if (parameter.isAnnotationPresent(FindAnnotation.class)) {
+			return AnnotationExtraUtils.findAnnotation(
+					invocation.getMethod(),
+					invocation.getMethod().getDeclaringClass(),
+					(Class) parameter.getType());
+		}
+		if (parameter.isAnnotationPresent(CurrentUser.class)) {
+			return Optional
+					.ofNullable(SecurityContextHolder.getContext())
+					.map(c -> c.getAuthentication())
+					.map(a -> this.userService.getUserByUsername(a.getName()))
+					.orElse(null);
+		}
+		if (parameter.isAnnotationPresent(
+				org.ng200.openolympus.security.annotations.Parameter.class)) {
+			final String parameterName = AnnotationUtils.findAnnotation(
+					parameter,
+					org.ng200.openolympus.security.annotations.Parameter.class)
+					.value();
+			final Object objectForParameterName = this
+					.getObjectForParameterName(
+							invocation,
+							parameterName);
+			return objectForParameterName;
+		}
+		return this.getObjectForParameterName(invocation, parameter.getName());
+	}
+
+	private Object getObjectForParameterName(MethodInvocation invocation,
+			String name) {
+		this.methodParameterIndex.computeIfAbsent(invocation.getMethod(),
+				(x) -> {
+					final Parameter[] invokedMethodParameters = invocation
+							.getMethod()
+							.getParameters();
+
+					final Map<String, Integer> map = new HashMap<>();
+					for (int i = 0; i < invokedMethodParameters.length; i++) {
+						map.put(this.getName(invokedMethodParameters[i]), i);
+					}
+
+					return map;
+				});
+		final Integer idx = this.methodParameterIndex
+				.get(invocation.getMethod())
+				.get(name);
+
+		if (idx == null) {
+			throw new IllegalArgumentException(
+					"An argument that isn't present in the invoked method was requested");
+		}
+		return invocation.getArguments()[idx];
+	}
+
+	private Object getPredicate(
+			Class<?> predicateClass) {
+		return this.predicateBeans.computeIfAbsent(predicateClass,
+				(c) -> this.autowireCapableBeanFactory
+						.createBean(c));
+	}
+
+	private int processSecurityAnd(SecurityAnd securityAnd,
+			MethodInvocation invocation) {
+		for (final SecurityLeaf securityLeaf : securityAnd.value()) {
+			if (this.processSecurityLeaf(securityLeaf,
+					invocation) == AccessDecisionVoter.ACCESS_DENIED) {
+				return AccessDecisionVoter.ACCESS_DENIED;
+			}
+		}
+		return AccessDecisionVoter.ACCESS_GRANTED;
+	}
+
+	private int processSecurityLeaf(SecurityLeaf securityLeaf,
+			MethodInvocation invocation) {
+		final SecurityClearanceType minimal = securityLeaf.value();
+		if (!this.securityClearanceVerificationService
+				.doesCurrentSecurityContextHaveClearance(minimal)) {
+			// Early exit if minimal conditions not satisfied
+			return AccessDecisionVoter.ACCESS_DENIED;
+		}
+		for (final Class<?> predicate : securityLeaf.predicates()) {
+			for (final Method method : predicate.getMethods()) {
+				if (method.getAnnotationsByType(
+						MethodSecurityPredicate.class).length > 0) {
+					if (!SecurityClearanceType.class
+							.isAssignableFrom(method.getReturnType())) {
+						throw new IllegalMethodReturnTypeException(
+								"Methods annotated with @MethodSecurityPredicate are supposed to return SecurityClearanceType.");
+					}
+					try {
+						final SecurityClearanceType clearanceType = (SecurityClearanceType) method
+								.invoke(
+										this.getPredicate(predicate),
+										this.computeArguments(method,
+												invocation));
+						if (!this.securityClearanceVerificationService
+								.doesCurrentSecurityContextHaveClearance(
+										clearanceType)) {
+							return AccessDecisionVoter.ACCESS_DENIED;
+						}
+					} catch (IllegalAccessException | IllegalArgumentException
+							| InvocationTargetException e) {
+						throw new GeneralNestedRuntimeException(
+								"Couldn't execute @MethodSecurityPredicate annotated method! Method: "
+										+ method,
+								e);
+					}
+				}
+			}
+		}
+		return AccessDecisionVoter.ACCESS_GRANTED;
+	}
+
+	private int processSecurityOr(SecurityOr securityOr,
+			MethodInvocation invocation) {
+		if (securityOr.allowSuperuser()
+				&& this.securityClearanceVerificationService
+						.doesCurrentSecurityContextHaveClearance(
+								SecurityClearanceType.SUPERUSER)) {
+			return AccessDecisionVoter.ACCESS_GRANTED;
+		}
+
+		for (final SecurityAnd securityAnd : securityOr.value()) {
+			if (this.processSecurityAnd(securityAnd,
+					invocation) == AccessDecisionVoter.ACCESS_GRANTED) {
+				return AccessDecisionVoter.ACCESS_GRANTED;
+			}
+		}
+		return AccessDecisionVoter.ACCESS_DENIED;
+	}
+
+	@Override
+	public boolean supports(Class<?> clazz) {
+		return MethodInvocation.class.isAssignableFrom(clazz);
+	}
+
+	@Override
+	public boolean supports(ConfigAttribute attribute) {
+		return attribute instanceof PreInvocationAttribute;
+	}
+
+	@Override
+	public int vote(Authentication authentication, Object object,
+			Collection<ConfigAttribute> attributes) {
+		try {
+			if (!(object instanceof MethodInvocation)) {
+				return AccessDecisionVoter.ACCESS_ABSTAIN;
+			}
+			final MethodInvocation invocation = (MethodInvocation) object;
+
+			final int vote1 = Optional
+					.ofNullable(AnnotationUtils.findAnnotation(
+							invocation.getMethod().getDeclaringClass(),
+							SecurityOr.class))
+					.map(x -> (Integer) this.processSecurityOr(x, invocation))
+					.orElse(AccessDecisionVoter.ACCESS_ABSTAIN);
+
+			final int vote2 = Optional
+					.ofNullable(AnnotationUtils.findAnnotation(
+							invocation.getMethod(),
+							SecurityOr.class))
+					.map(x -> (Integer) this.processSecurityOr(x, invocation))
+					.orElse(AccessDecisionVoter.ACCESS_ABSTAIN);
+
+			if (vote1 == AccessDecisionVoter.ACCESS_DENIED
+					|| vote2 == AccessDecisionVoter.ACCESS_DENIED) {
+				return AccessDecisionVoter.ACCESS_DENIED;
+			}
+
+			if (vote1 == AccessDecisionVoter.ACCESS_GRANTED
+					|| vote2 == AccessDecisionVoter.ACCESS_GRANTED) {
+				return AccessDecisionVoter.ACCESS_GRANTED;
+			}
+		} catch (final Exception e) {
+			OpenOlympusRootDecisionVoter.logger
+					.error("SECURITY SYSTEM FAILURE: {}", e);
+			return AccessDecisionVoter.ACCESS_DENIED;
+		}
+		return AccessDecisionVoter.ACCESS_DENIED;
 	}
 
 }

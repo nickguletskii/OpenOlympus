@@ -45,12 +45,15 @@ public class SolutionScoreSecurityPredicate
 	@Override
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
-		Contest runningContest = contestTimingService.getRunningContest();
-		if (runningContest == null)
+		final Contest runningContest = this.contestTimingService
+				.getRunningContest();
+		if (runningContest == null) {
 			return SecurityClearanceType.APPROVED_USER;
-		if (aclService.hasContestPermission(runningContest, user,
-				ContestPermissionType.view_results_during_contest))
+		}
+		if (this.aclService.hasContestPermission(runningContest, user,
+				ContestPermissionType.view_results_during_contest)) {
 			return SecurityClearanceType.APPROVED_USER;
+		}
 		return SecurityClearanceType.SUPERUSER;
 	}
 

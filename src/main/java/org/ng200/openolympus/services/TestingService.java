@@ -29,7 +29,6 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
@@ -97,7 +96,7 @@ public class TestingService {
 	private SolutionService solutionService;
 
 	@Autowired
-	private TaskContainerCache taskContainerCache;
+	private final TaskContainerCache taskContainerCache;
 
 	@Autowired
 	private SolutionDao solutionDao;
@@ -108,7 +107,7 @@ public class TestingService {
 	@Autowired
 	private VerdictDao verdictDao;
 
-	private StorageService storageService;
+	private final StorageService storageService;
 
 	@Autowired
 	public TestingService(TaskContainerCache taskContainerCache,
@@ -120,43 +119,64 @@ public class TestingService {
 				() -> {
 					Verdict toTest;
 					try {
-						while ((toTest = getAndLockVerdictForTesting(
+						while ((toTest = this.getAndLockVerdictForTesting(
 								dslContext)) != null) {
 							this.processVerdict(toTest);
 						}
-					} catch (Throwable t) {
-						logger.error(
+					} catch (final Throwable t) {
+						TestingService.logger.error(
 								"Couldn't poll database for pending verdicts: {}",
 								t);
 					}
 				} , 0, 100, TimeUnit.MILLISECONDS);
 	}
 
-	private Verdict getAndLockVerdictForTesting(DSLContext dslContext) {
-		SelectForUpdateOfStep<Record1<Long>> view = dslContext
-				.select(Tables.VERDICT.ID)
-				.from(Tables.VERDICT)
-				.where(Tables.VERDICT.STATUS
-						.eq(VerdictStatusType.waiting))
-				.orderBy(
-						Tables.VERDICT.VIEWABLE_DURING_CONTEST
-								.desc(),
-						Tables.VERDICT.SOLUTION_ID.asc(),
-						Tables.VERDICT.ID.asc())
-				.limit(1)
-				.forUpdate();
-		return dslContext
-				.update(Tables.VERDICT)
-				.set(Tables.VERDICT.STATUS,
-						VerdictStatusType.being_tested)
-				.from(view)
-				.where(Tables.VERDICT.ID
-						.eq(view.field(Tables.VERDICT.ID)))
-				.returning(Tables.VERDICT.fields())
-				.fetchOptional()
-				.map(verdictRecord -> verdictRecord
-						.into(Verdict.class))
-				.orElse(null);
+	private CompletableFuture<SolutionJudge> actOnJudge(Verdict verdict,
+			Solution solution,
+			Task task,
+			TaskContainer taskContainer,
+			CompletableFuture<SolutionJudge> futureJudge) {
+		return futureJudge
+				.thenCompose(judge -> {
+					try {
+						if (!judge.isCompiled()) {
+							return this.compileSolution(
+									solution, judge,
+									taskContainer
+											.getProperties());
+						}
+					} catch (final Throwable e) {
+						TestingService.logger.error(
+								"Solution compilation failed "
+										+ "because judge for task "
+										+ "\"{}\"({}) thew an "
+										+ "exception: {}",
+								task.getName(), task.getId(), e);
+						final CompletableFuture<SolutionJudge> ex = new CompletableFuture<>();
+						ex.completeExceptionally(e);
+						return ex;
+					} finally {
+						Janitor.cleanUp(judge);
+					}
+					return CompletableFuture
+							.<SolutionJudge> completedFuture(judge);
+				})
+				.thenApply((judge) -> {
+					try {
+						this.checkVerdict(verdict, judge,
+								taskContainer
+										.getTestFiles(verdict
+												.getPath()),
+								verdict.getMaximumScore(),
+								taskContainer.getProperties());
+						return judge;
+					} catch (final Throwable e) {
+						throw new GeneralNestedRuntimeException(
+								"Couldn't check verdict: ", e);
+					} finally {
+						Janitor.cleanUp(judge);
+					}
+				});
 	}
 
 	private void checkVerdict(final Verdict verdict, final SolutionJudge judge,
@@ -229,8 +249,10 @@ public class TestingService {
 								Duration.ofMillis(result.getRealTime()));
 
 						verdict.setStatus(
-								convertCerberusResultToVerdictStatus(result
-										.getResult()));
+								TestingService.this
+										.convertCerberusResultToVerdictStatus(
+												result
+														.getResult()));
 						switch (result.getResult()) {
 						case OK:
 						case TIME_LIMIT:
@@ -243,11 +265,12 @@ public class TestingService {
 							break;
 						case INTERNAL_ERROR:
 							result.getErrorMessages().forEach(
-									(stage, message) -> internalErrors.put(
-											internalErrorCounter++,
-											new Pair<String, String>(
-													task.getName(),
-													message)));
+									(stage, message) -> TestingService.this.internalErrors
+											.put(
+													TestingService.this.internalErrorCounter++,
+													new Pair<String, String>(
+															task.getName(),
+															message)));
 							break;
 						case COMPILE_ERROR:
 							final String message = result.getErrorMessages()
@@ -262,13 +285,14 @@ public class TestingService {
 							throw new IllegalStateException(
 									"Judge returned result \"waiting\".");
 						}
-					} catch (Throwable t) {
+					} catch (final Throwable t) {
 						verdict.setStatus(VerdictStatusType.internal_error);
-						logger.error(
+						TestingService.logger.error(
 								"Testing system internal error: couldn't commit a verdict: {}",
 								t);
 					} finally {
-						solutionService.updateVerdict(verdict);
+						TestingService.this.solutionService
+								.updateVerdict(verdict);
 					}
 				}
 
@@ -334,7 +358,7 @@ public class TestingService {
 				@Override
 				public void jobReturned(JobEvent event) {
 					try {
-						JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) event
+						final JsonTaskExecutionResult<SolutionJudge> result = ((JacksonSerializationDelegatingTask<SolutionJudge, SolutionCompilationTask>) event
 								.getJob().getResults().getResultTask(0))
 										.getResultOrThrowable();
 						if (result.getError() != null) {
@@ -342,7 +366,7 @@ public class TestingService {
 									.completeExceptionally(result.getError());
 						}
 						completableFuture.complete(result.getResult());
-					} catch (Throwable t) {
+					} catch (final Throwable t) {
 						completableFuture.completeExceptionally(t);
 					}
 				}
@@ -389,56 +413,35 @@ public class TestingService {
 		}
 	}
 
-	public List<Pair<String, String>> getJudgeInternalErrors() {
-		return new ArrayList<>(this.internalErrors.asMap().values());
+	private Verdict getAndLockVerdictForTesting(DSLContext dslContext) {
+		final SelectForUpdateOfStep<Record1<Long>> view = dslContext
+				.select(Tables.VERDICT.ID)
+				.from(Tables.VERDICT)
+				.where(Tables.VERDICT.STATUS
+						.eq(VerdictStatusType.waiting))
+				.orderBy(
+						Tables.VERDICT.VIEWABLE_DURING_CONTEST
+								.desc(),
+						Tables.VERDICT.SOLUTION_ID.asc(),
+						Tables.VERDICT.ID.asc())
+				.limit(1)
+				.forUpdate();
+		return dslContext
+				.update(Tables.VERDICT)
+				.set(Tables.VERDICT.STATUS,
+						VerdictStatusType.being_tested)
+				.from(view)
+				.where(Tables.VERDICT.ID
+						.eq(view.field(Tables.VERDICT.ID)))
+				.returning(Tables.VERDICT.fields())
+				.fetchOptional()
+				.map(verdictRecord -> verdictRecord
+						.into(Verdict.class))
+				.orElse(null);
 	}
 
-	private CompletableFuture<SolutionJudge> actOnJudge(Verdict verdict,
-			Solution solution,
-			Task task,
-			TaskContainer taskContainer,
-			CompletableFuture<SolutionJudge> futureJudge) {
-		return futureJudge
-				.thenCompose(judge -> {
-					try {
-						if (!judge.isCompiled()) {
-							return this.compileSolution(
-									solution, judge,
-									taskContainer
-											.getProperties());
-						}
-					} catch (final Throwable e) {
-						TestingService.logger.error(
-								"Solution compilation failed "
-										+ "because judge for task "
-										+ "\"{}\"({}) thew an "
-										+ "exception: {}",
-								task.getName(), task.getId(), e);
-						CompletableFuture<SolutionJudge> ex = new CompletableFuture<>();
-						ex.completeExceptionally(e);
-						return ex;
-					} finally {
-						Janitor.cleanUp(judge);
-					}
-					return CompletableFuture
-							.<SolutionJudge> completedFuture(judge);
-				})
-				.thenApply((judge) -> {
-					try {
-						this.checkVerdict(verdict, judge,
-								taskContainer
-										.getTestFiles(verdict
-												.getPath()),
-								verdict.getMaximumScore(),
-								taskContainer.getProperties());
-						return judge;
-					} catch (final Throwable e) {
-						throw new GeneralNestedRuntimeException(
-								"Couldn't check verdict: ", e);
-					} finally {
-						Janitor.cleanUp(judge);
-					}
-				});
+	public List<Pair<String, String>> getJudgeInternalErrors() {
+		return new ArrayList<>(this.internalErrors.asMap().values());
 	}
 
 	private void processVerdict(final Verdict verdict) {
@@ -450,7 +453,7 @@ public class TestingService {
 					.getTaskContainerForTask(task);
 
 			taskContainer.applyToJudge(solution,
-					(futureJudge) -> actOnJudge(verdict, solution, task,
+					(futureJudge) -> this.actOnJudge(verdict, solution, task,
 							taskContainer,
 							futureJudge));
 		} catch (final Exception e) {

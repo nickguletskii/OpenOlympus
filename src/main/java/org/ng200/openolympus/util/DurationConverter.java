@@ -35,8 +35,9 @@ public class DurationConverter implements Converter<Long, Duration> {
 
 	@Override
 	public Duration from(Long databaseObject) {
-		if (databaseObject == null)
+		if (databaseObject == null) {
 			return null;
+		}
 		return Duration.ofMillis(databaseObject);
 	}
 
@@ -47,8 +48,9 @@ public class DurationConverter implements Converter<Long, Duration> {
 
 	@Override
 	public Long to(Duration userObject) {
-		if(userObject == null)
+		if (userObject == null) {
 			return null;
+		}
 		return userObject.toMillis();
 	}
 

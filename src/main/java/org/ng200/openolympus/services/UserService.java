@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Table;
-import org.jooq.conf.ParamType;
 import org.jooq.impl.DSL;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Tables;
@@ -45,6 +44,11 @@ import com.google.common.collect.ImmutableList;
 
 @Service
 public class UserService extends GenericCreateUpdateRepository {
+
+	private static final Field<?>[] USER_PRINCIPAL_FIELDS = Stream
+			.concat(Arrays.stream(Tables.USER.fields()),
+					Stream.of(Tables.PRINCIPAL.PERMISSIONS))
+			.toArray(Field<?>[]::new);
 
 	@Autowired
 	private UserDao userDao;
@@ -84,13 +88,16 @@ public class UserService extends GenericCreateUpdateRepository {
 				.from(Tables.USER)
 				.where(
 
-		Tables.USER.USERNAME.like(pattern)
-				.or(Tables.USER.FIRST_NAME_MAIN.like(pattern))
-				.or(Tables.USER.MIDDLE_NAME_MAIN.like(pattern))
-				.or(Tables.USER.LAST_NAME_MAIN.like(pattern))
-				.or(Tables.USER.FIRST_NAME_LOCALISED.like(pattern))
-				.or(Tables.USER.MIDDLE_NAME_LOCALISED.like(pattern))
-				.or(Tables.USER.LAST_NAME_LOCALISED.like(pattern))
+						Tables.USER.USERNAME.like(pattern)
+								.or(Tables.USER.FIRST_NAME_MAIN.like(pattern))
+								.or(Tables.USER.MIDDLE_NAME_MAIN.like(pattern))
+								.or(Tables.USER.LAST_NAME_MAIN.like(pattern))
+								.or(Tables.USER.FIRST_NAME_LOCALISED
+										.like(pattern))
+								.or(Tables.USER.MIDDLE_NAME_LOCALISED
+										.like(pattern))
+								.or(Tables.USER.LAST_NAME_LOCALISED
+										.like(pattern))
 
 		).limit(30).fetchInto(User.class);
 	}
@@ -119,14 +126,15 @@ public class UserService extends GenericCreateUpdateRepository {
 				.add(user_score)
 				.add(
 
-		DSL.rank()
-				.over(DSL.orderBy(DSL.coalesce(
-						DSL.sum(userTasks.field(Tables.SOLUTION.SCORE)),
-						DSL.field("0"))))
-				.as("rank"))
+						DSL.rank()
+								.over(DSL.orderBy(DSL.coalesce(
+										DSL.sum(userTasks
+												.field(Tables.SOLUTION.SCORE)),
+										DSL.field("0"))))
+								.as("rank"))
 				.add(Tables.USER.fields())
 
-		.build();
+				.build();
 		return this.dslContext
 				.select(fields)
 				.from(Tables.USER)
@@ -141,6 +149,16 @@ public class UserService extends GenericCreateUpdateRepository {
 				.where(Tables.USER.APPROVED.eq(false))
 				.limit(pageSize).offset((pageNumber - 1) * pageSize)
 				.fetchInto(User.class);
+	}
+
+	public UserPrincipal getUserAsPrincipalByUsername(String name) {
+		return this.dslContext
+				.select(UserService.USER_PRINCIPAL_FIELDS)
+				.from(Tables.USER)
+				.leftOuterJoin(Tables.PRINCIPAL)
+				.on(Tables.USER.ID.eq(Tables.PRINCIPAL.ID))
+				.where(Tables.USER.USERNAME.eq(name))
+				.fetchOneInto(UserPrincipal.class);
 	}
 
 	public User getUserById(final Long id) {
@@ -167,20 +185,5 @@ public class UserService extends GenericCreateUpdateRepository {
 	@Transactional
 	public User updateUser(User user) {
 		return this.update(user, Tables.USER);
-	}
-
-	private static final Field<?>[] USER_PRINCIPAL_FIELDS = Stream
-			.concat(Arrays.stream(Tables.USER.fields()),
-					Stream.of(Tables.PRINCIPAL.PERMISSIONS))
-			.toArray(Field<?>[]::new);
-
-	public UserPrincipal getUserAsPrincipalByUsername(String name) {
-		return dslContext
-				.select(USER_PRINCIPAL_FIELDS)
-				.from(Tables.USER)
-				.leftOuterJoin(Tables.PRINCIPAL)
-				.on(Tables.USER.ID.eq(Tables.PRINCIPAL.ID))
-				.where(Tables.USER.USERNAME.eq(name))
-				.fetchOneInto(UserPrincipal.class);
 	}
 }

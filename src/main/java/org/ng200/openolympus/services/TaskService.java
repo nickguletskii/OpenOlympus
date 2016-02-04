@@ -30,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -228,7 +227,7 @@ public class TaskService extends GenericCreateUpdateRepository {
 				.from(Tables.TASK_PERMISSION)
 				.where(Tables.TASK_PERMISSION.TASK_ID.eq(taskId))
 				.fetchGroups(Tables.TASK_PERMISSION.PERMISSION,
-						(record) -> aclService
+						(record) -> this.aclService
 								.extractPrincipal(record.value2()));
 	}
 

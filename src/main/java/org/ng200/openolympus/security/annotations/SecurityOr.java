@@ -38,7 +38,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Inherited
 @PreAuthorize("")
 public @interface SecurityOr {
-	public SecurityAnd[]value();
-
 	public boolean allowSuperuser() default true;
+
+	public SecurityAnd[] value();
 }

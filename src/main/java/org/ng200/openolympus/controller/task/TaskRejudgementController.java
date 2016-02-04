@@ -48,10 +48,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasTaskPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasTaskPermission.class)
 		})
 })
 @TaskPermissionRequired(TaskPermissionType.rejudge)
@@ -60,11 +58,10 @@ public class TaskRejudgementController {
 	@Autowired
 	private TaskService taskService;
 
-	@RequestMapping(value = "/api/task/{task}/rejudgeTask",
-	        method = RequestMethod.POST)
+	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void rejudgeTask(@PathVariable(value = "task") final Task task,
-	        final Model model) throws ExecutionException, IOException {
+			final Model model) throws ExecutionException, IOException {
 		Assertions.resourceExists(task);
 
 		this.taskService.rejudgeTask(task);

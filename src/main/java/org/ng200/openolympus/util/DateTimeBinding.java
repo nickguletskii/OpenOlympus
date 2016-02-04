@@ -38,14 +38,23 @@ import org.jooq.BindingSetSQLOutputContext;
 import org.jooq.BindingSetStatementContext;
 import org.jooq.Converter;
 import org.jooq.impl.DSL;
-import org.opensaml.ws.wssecurity.Timestamp;
 
 public class DateTimeBinding
-        implements Binding<OffsetDateTime, OffsetDateTime> {
+		implements Binding<OffsetDateTime, OffsetDateTime> {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -4382283013179240766L;
 
 	@Override
 	public Converter<OffsetDateTime, OffsetDateTime> converter() {
 		return new Converter<OffsetDateTime, OffsetDateTime>() {
+
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = -7152099140751140234L;
 
 			@Override
 			public OffsetDateTime from(OffsetDateTime databaseObject) {
@@ -53,13 +62,13 @@ public class DateTimeBinding
 			}
 
 			@Override
-			public OffsetDateTime to(OffsetDateTime userObject) {
-				return userObject;
+			public Class<OffsetDateTime> fromType() {
+				return OffsetDateTime.class;
 			}
 
 			@Override
-			public Class<OffsetDateTime> fromType() {
-				return OffsetDateTime.class;
+			public OffsetDateTime to(OffsetDateTime userObject) {
+				return userObject;
 			}
 
 			@Override
@@ -71,47 +80,53 @@ public class DateTimeBinding
 	}
 
 	@Override
-	public void sql(BindingSQLContext<OffsetDateTime> ctx) throws SQLException {
-		ctx.render()
-		        .visit(DSL.val(ctx.convert(converter()).value()))
-		        .sql("::TIMESTAMP WITH TIME ZONE");
-	}
-
-	@Override
-	public void register(BindingRegisterContext<OffsetDateTime> ctx)
-	        throws SQLException {
-		ctx.statement().registerOutParameter(ctx.index(),
-		        Types.TIMESTAMP_WITH_TIMEZONE);
-	}
-
-	@Override
-	public void set(BindingSetStatementContext<OffsetDateTime> ctx)
-	        throws SQLException {
-		ctx.statement().setString(ctx.index(),
-		        Objects.toString(ctx.convert(converter()).value(), null));
-	}
-
-	@Override
 	public void get(BindingGetResultSetContext<OffsetDateTime> ctx)
-	        throws SQLException {
-		ctx.convert(converter()).value(OffsetDateTime.parse(ctx.resultSet().getString(ctx.index()), DateUtils.ISO_OFFSET_DATE_TIME));
-	}
-
-	@Override
-	public void get(BindingGetStatementContext<OffsetDateTime> ctx)
-	        throws SQLException {
-		ctx.convert(converter()).value(OffsetDateTime.parse(ctx.statement().getString(ctx.index()), DateUtils.ISO_OFFSET_DATE_TIME));
-	}
-
-	@Override
-	public void set(BindingSetSQLOutputContext<OffsetDateTime> ctx)
-	        throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+			throws SQLException {
+		ctx.convert(this.converter())
+				.value(OffsetDateTime.parse(
+						ctx.resultSet().getString(ctx.index()),
+						DateUtils.ISO_OFFSET_DATE_TIME));
 	}
 
 	@Override
 	public void get(BindingGetSQLInputContext<OffsetDateTime> ctx)
-	        throws SQLException {
+			throws SQLException {
 		throw new SQLFeatureNotSupportedException();
+	}
+
+	@Override
+	public void get(BindingGetStatementContext<OffsetDateTime> ctx)
+			throws SQLException {
+		ctx.convert(this.converter())
+				.value(OffsetDateTime.parse(
+						ctx.statement().getString(ctx.index()),
+						DateUtils.ISO_OFFSET_DATE_TIME));
+	}
+
+	@Override
+	public void register(BindingRegisterContext<OffsetDateTime> ctx)
+			throws SQLException {
+		ctx.statement().registerOutParameter(ctx.index(),
+				Types.TIMESTAMP_WITH_TIMEZONE);
+	}
+
+	@Override
+	public void set(BindingSetSQLOutputContext<OffsetDateTime> ctx)
+			throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+	}
+
+	@Override
+	public void set(BindingSetStatementContext<OffsetDateTime> ctx)
+			throws SQLException {
+		ctx.statement().setString(ctx.index(),
+				Objects.toString(ctx.convert(this.converter()).value(), null));
+	}
+
+	@Override
+	public void sql(BindingSQLContext<OffsetDateTime> ctx) throws SQLException {
+		ctx.render()
+				.visit(DSL.val(ctx.convert(this.converter()).value()))
+				.sql("::TIMESTAMP WITH TIME ZONE");
 	}
 }

@@ -243,36 +243,6 @@ public class ContestParticipantDatabaseTest {
 	@Test
 	@Rollback
 	@Transactional
-	public void testRevokingUserPermissionDoesntRemoveParticipantWhenDuplicate()
-			throws DataAccessException, IOException {
-		Assert.assertNotNull(this.dslContext);
-		final Contest contest = this.createContest();
-
-		final User user = this.getRootUser();
-
-		final Group allUsersGroup = this.getAllUsersGroup();
-
-		this.addContestPermission(contest, allUsersGroup.getId(),
-				ContestPermissionType.participate);
-		this.addContestPermission(contest, user.getId(),
-				ContestPermissionType.participate);
-
-		Assert.assertTrue(
-				"Granting permission 'participant' should add one and one contest participation table row per user only!",
-				this.getContestParticipations(contest, user).size() == 1);
-
-		this.deleteContestPermission(contest, user.getId(),
-				ContestPermissionType.participate)
-				.execute();
-
-		Assert.assertTrue(
-				"Removing one 'participant' permission shouldn't remove contest participation if another remains!",
-				this.getContestParticipations(contest, user).size() == 1);
-	}
-
-	@Test
-	@Rollback
-	@Transactional
 	public void testRevokingGroupPermissionDoesntRemoveParticipantWhenDuplicate()
 			throws DataAccessException, IOException {
 		Assert.assertNotNull(this.dslContext);
@@ -292,6 +262,36 @@ public class ContestParticipantDatabaseTest {
 				this.getContestParticipations(contest, user).size() == 1);
 
 		this.deleteContestPermission(contest, allUsersGroup.getId(),
+				ContestPermissionType.participate)
+				.execute();
+
+		Assert.assertTrue(
+				"Removing one 'participant' permission shouldn't remove contest participation if another remains!",
+				this.getContestParticipations(contest, user).size() == 1);
+	}
+
+	@Test
+	@Rollback
+	@Transactional
+	public void testRevokingUserPermissionDoesntRemoveParticipantWhenDuplicate()
+			throws DataAccessException, IOException {
+		Assert.assertNotNull(this.dslContext);
+		final Contest contest = this.createContest();
+
+		final User user = this.getRootUser();
+
+		final Group allUsersGroup = this.getAllUsersGroup();
+
+		this.addContestPermission(contest, allUsersGroup.getId(),
+				ContestPermissionType.participate);
+		this.addContestPermission(contest, user.getId(),
+				ContestPermissionType.participate);
+
+		Assert.assertTrue(
+				"Granting permission 'participant' should add one and one contest participation table row per user only!",
+				this.getContestParticipations(contest, user).size() == 1);
+
+		this.deleteContestPermission(contest, user.getId(),
 				ContestPermissionType.participate)
 				.execute();
 

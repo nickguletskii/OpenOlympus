@@ -43,13 +43,13 @@ public class UserHasContestPermission implements DynamicSecurityPredicate {
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType vote(
-	        @FindAnnotation ContestPermissionRequired contestPermissionRequired,
-	        @Parameter("contest")   Contest contest,
-	        @CurrentUser User user) {
+			@FindAnnotation ContestPermissionRequired contestPermissionRequired,
+			@Parameter("contest") Contest contest,
+			@CurrentUser User user) {
 
-		return aclService.hasContestPermission(contest, user,
-		        contestPermissionRequired.value())
-		                ? SecurityClearanceType.ANONYMOUS
-		                : SecurityClearanceType.DENIED;
+		return this.aclService.hasContestPermission(contest, user,
+				contestPermissionRequired.value())
+						? SecurityClearanceType.ANONYMOUS
+						: SecurityClearanceType.DENIED;
 	}
 }

@@ -26,7 +26,7 @@ public class ContestTimingService {
 
 	@Autowired
 	private TimeExtensionDao timeExtensionDao;
-	
+
 	@Autowired
 	private DSLContext dslContext;
 
@@ -55,6 +55,16 @@ public class ContestTimingService {
 		return procedure.getReturnValue();
 	}
 
+	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
+			final int pageSize) {
+		return this.dslContext.selectFrom(Tables.CONTEST)
+				.groupBy(Tables.CONTEST.ID)
+				.orderBy(Tables.CONTEST.START_TIME.desc())
+				.limit(pageSize)
+				.offset((pageNumber - 1) * pageSize)
+				.fetchInto(Contest.class);
+	}
+
 	public OffsetDateTime getContestStartIncludingAllTimeExtensions(
 			final Contest contest) {
 		final GetContestStart procedure = new GetContestStart();
@@ -72,16 +82,6 @@ public class ContestTimingService {
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
 		return procedure.getReturnValue();
-	}
-
-	public List<Contest> getContestsOrderedByTime(final Integer pageNumber,
-			final int pageSize) {
-		return this.dslContext.selectFrom(Tables.CONTEST)
-				.groupBy(Tables.CONTEST.ID)
-				.orderBy(Tables.CONTEST.START_TIME.desc())
-				.limit(pageSize)
-				.offset((pageNumber - 1) * pageSize)
-				.fetchInto(Contest.class);
 	}
 
 	public List<Contest> getContestsThatIntersect(
@@ -104,7 +104,7 @@ public class ContestTimingService {
 
 	public boolean isContestInProgressForUser(final Contest contest,
 			final User user) {
-		return dslContext.select(DSL.field(
+		return this.dslContext.select(DSL.field(
 				PostgresSupport.CURRENT_TIMESTAMP.between(
 						Routines.getContestStartForUser(
 								contest.getId(), user.getId()),
@@ -115,7 +115,7 @@ public class ContestTimingService {
 
 	public boolean isContestOverIncludingAllTimeExtensions(
 			final Contest contest) {
-		return dslContext.select(DSL.field(
+		return this.dslContext.select(DSL.field(
 				PostgresSupport.CURRENT_TIMESTAMP.greaterThan(
 						Routines.getContestEnd(
 								contest.getId()))))

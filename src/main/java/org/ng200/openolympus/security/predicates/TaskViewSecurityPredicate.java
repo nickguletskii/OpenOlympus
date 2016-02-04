@@ -62,51 +62,55 @@ public class TaskViewSecurityPredicate implements DynamicSecurityPredicate {
 	@Autowired
 	private ContestTimingService contestTimingService;
 
-	@MethodSecurityPredicate
-	public SecurityClearanceType predicate(@CurrentUser User user,
-			@Parameter("task") Task task) {
-		if (aclService.hasTaskPermission(task, user, TaskPermissionType.modify)
-				|| aclService.hasTaskPermission(task, user,
-						TaskPermissionType.manage_acl)) {
-			return SecurityClearanceType.APPROVED_USER;
-		}
-
-		Contest runningContest = contestTimingService.getRunningContest();
-		if (runningContest == null) {
-			if (aclService.hasTaskPermission(task, user,
-					TaskPermissionType.view))
-				return SecurityClearanceType.APPROVED_USER;
-			return SecurityClearanceType.SUPERUSER;
-		}
-		if (contestTasksService.isTaskInContest(task, runningContest)
-				&& (isUserParticipantAndContestInProgress(user, runningContest)
-						|| canUserViewTasksAfterContestStarted(user,
-								runningContest))
-				&& isUserAllowedToViewTaskAtAll(user, task)) {
-			return SecurityClearanceType.APPROVED_USER;
-		}
-		return SecurityClearanceType.SUPERUSER;
+	private boolean canUserViewTasksAfterContestStarted(User user,
+			Contest runningContest) {
+		return this.aclService.hasContestPermission(runningContest, user,
+				ContestPermissionType.view_tasks_after_contest_started);
 	}
 
 	private boolean isUserAllowedToViewTaskAtAll(User user, Task task) {
-		return aclService.hasTaskPermission(task, user,
+		return this.aclService.hasTaskPermission(task, user,
 				TaskPermissionType.view)
-				|| aclService.hasTaskPermission(task, user,
+				|| this.aclService.hasTaskPermission(task, user,
 						TaskPermissionType.view_during_contest);
-	}
-
-	private boolean canUserViewTasksAfterContestStarted(User user,
-			Contest runningContest) {
-		return aclService.hasContestPermission(runningContest, user,
-				ContestPermissionType.view_tasks_after_contest_started);
 	}
 
 	private boolean isUserParticipantAndContestInProgress(User user,
 			Contest runningContest) {
-		return aclService.hasContestPermission(runningContest, user,
+		return this.aclService.hasContestPermission(runningContest, user,
 				ContestPermissionType.participate)
-				&& contestTimingService.isContestInProgressForUser(
+				&& this.contestTimingService.isContestInProgressForUser(
 						runningContest,
 						user);
+	}
+
+	@MethodSecurityPredicate
+	public SecurityClearanceType predicate(@CurrentUser User user,
+			@Parameter("task") Task task) {
+		if (this.aclService.hasTaskPermission(task, user,
+				TaskPermissionType.modify)
+				|| this.aclService.hasTaskPermission(task, user,
+						TaskPermissionType.manage_acl)) {
+			return SecurityClearanceType.APPROVED_USER;
+		}
+
+		final Contest runningContest = this.contestTimingService
+				.getRunningContest();
+		if (runningContest == null) {
+			if (this.aclService.hasTaskPermission(task, user,
+					TaskPermissionType.view)) {
+				return SecurityClearanceType.APPROVED_USER;
+			}
+			return SecurityClearanceType.SUPERUSER;
+		}
+		if (this.contestTasksService.isTaskInContest(task, runningContest)
+				&& (this.isUserParticipantAndContestInProgress(user,
+						runningContest)
+						|| this.canUserViewTasksAfterContestStarted(user,
+								runningContest))
+				&& this.isUserAllowedToViewTaskAtAll(user, task)) {
+			return SecurityClearanceType.APPROVED_USER;
+		}
+		return SecurityClearanceType.SUPERUSER;
 	}
 }

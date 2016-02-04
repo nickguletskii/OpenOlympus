@@ -48,7 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 })
 @SpringApplicationConfiguration(classes = Application.class)
 public class JacksonSecurityClearanceTests {
-	
+
 	@JsonFilter("simple-strict-security")
 	public static class AnnotatedObject {
 		private String anonymousField = "anonymousFieldValue";

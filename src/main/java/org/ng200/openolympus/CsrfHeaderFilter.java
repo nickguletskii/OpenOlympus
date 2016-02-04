@@ -42,14 +42,16 @@ public class CsrfHeaderFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request,
 			HttpServletResponse response, FilterChain filterChain)
 					throws ServletException, IOException {
-		CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class
+		final CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class
 				.getName());
 		if (csrf != null) {
-			Cookie cookie = WebUtils.getCookie(request, CSRF_TOKEN_COOKIE_NAME);
-			String token = csrf.getToken();
+			Cookie cookie = WebUtils.getCookie(request,
+					CsrfHeaderFilter.CSRF_TOKEN_COOKIE_NAME);
+			final String token = csrf.getToken();
 			if (cookie == null
 					|| token != null && !token.equals(cookie.getValue())) {
-				cookie = new Cookie(CSRF_TOKEN_COOKIE_NAME, token);
+				cookie = new Cookie(CsrfHeaderFilter.CSRF_TOKEN_COOKIE_NAME,
+						token);
 				cookie.setPath("/");
 				response.addCookie(cookie);
 			}

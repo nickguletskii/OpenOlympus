@@ -50,7 +50,7 @@ public class SinglepageController {
 	@ResponseBody
 	public ResponseEntity<Resource> singlepage(HttpServletRequest request)
 			throws ResourceException {
-		if (API_PATH_MATCHER.matches(request)) {
+		if (SinglepageController.API_PATH_MATCHER.matches(request)) {
 			return new ResponseEntity<Resource>(HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<Resource>(

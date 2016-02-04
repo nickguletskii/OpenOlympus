@@ -23,7 +23,6 @@
 package org.ng200.openolympus.controller.contest;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import javax.validation.Valid;
 

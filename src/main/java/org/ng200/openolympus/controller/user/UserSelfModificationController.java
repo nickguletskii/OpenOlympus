@@ -45,9 +45,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.LOGGED_IN)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.LOGGED_IN)
 		})
 })
 public class UserSelfModificationController extends AbstractUserInfoController {
@@ -55,22 +54,20 @@ public class UserSelfModificationController extends AbstractUserInfoController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping(value = "/api/user/personalInfo",
-	        method = RequestMethod.POST)
+	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.POST)
 	public BindingResponse changePersonInfo(
-	        @Valid final UserInfoDto userInfoDto,
-	        final BindingResult bindingResult, final Principal principal)
-	                throws BindException {
+			@Valid final UserInfoDto userInfoDto,
+			final BindingResult bindingResult, final Principal principal)
+					throws BindException {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 		super.copyDtoIntoDatabase(userInfoDto, bindingResult,
-		        this.userService.getUserByUsername(principal.getName()));
+				this.userService.getUserByUsername(principal.getName()));
 		return BindingResponse.OK;
 	}
 
-	@RequestMapping(value = "/api/user/personalInfo",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/user/personalInfo", method = RequestMethod.GET)
 	public User showUserDetailsForm(final Principal principal) {
 		return this.userService.getUserByUsername(principal.getName());
 	}

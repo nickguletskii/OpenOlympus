@@ -37,24 +37,24 @@ public class ContestTasksService {
 				.fetchInto(Task.class);
 	}
 
-	@Transactional
-	public void removeTaskFromContest(Task task, Contest contest) {
-		this.dslContext.delete(Tables.CONTEST_TASKS).where(
-				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId())
-						.and(Tables.CONTEST_TASKS.TASK_ID.eq(task.getId())))
-				.execute();
-	}
-
 	public boolean isTaskInContest(Task task, Contest contest) {
 		return this.dslContext
 				.select(DSL.field(DSL.exists(
-						dslContext.select()
+						this.dslContext.select()
 								.from(Tables.CONTEST_TASKS)
 								.where(Tables.CONTEST_TASKS.TASK_ID
 										.eq(task.getId())
 										.and(Tables.CONTEST_TASKS.CONTEST_ID
 												.eq(contest.getId()))))))
 				.fetchOne().value1();
+	}
+
+	@Transactional
+	public void removeTaskFromContest(Task task, Contest contest) {
+		this.dslContext.delete(Tables.CONTEST_TASKS).where(
+				Tables.CONTEST_TASKS.CONTEST_ID.eq(contest.getId())
+						.and(Tables.CONTEST_TASKS.TASK_ID.eq(task.getId())))
+				.execute();
 	}
 
 }

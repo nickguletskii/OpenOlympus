@@ -59,9 +59,6 @@ import org.springframework.web.bind.annotation.RestController;
 })
 public class ContestViewController {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ContestViewController.class);
-
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = UserKnowsAboutContestSecurityPredicate.class)
 	public static class ContestDTO {
 		private String name;
@@ -139,6 +136,9 @@ public class ContestViewController {
 
 	}
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContestViewController.class);
+
 	@Autowired
 	private ContestTasksService contestTasksService;
 	@Autowired
@@ -149,14 +149,16 @@ public class ContestViewController {
 	private AclService aclService;
 
 	private boolean canViewTasks(User user, Contest contest) {
-		if (user.getSuperuser())
+		if (user.getSuperuser()) {
 			return true;
-		if (aclService.hasContestPermission(contest, user,
+		}
+		if (this.aclService.hasContestPermission(contest, user,
 				ContestPermissionType.list_tasks,
-				ContestPermissionType.manage_acl))
+				ContestPermissionType.manage_acl)) {
 			return true;
-		if (contestTimingService.isContestInProgressForUser(contest, user)
-				&& aclService.hasContestPermission(contest, user,
+		}
+		if (this.contestTimingService.isContestInProgressForUser(contest, user)
+				&& this.aclService.hasContestPermission(contest, user,
 						ContestPermissionType.participate)) {
 			return true;
 		}
@@ -170,16 +172,17 @@ public class ContestViewController {
 		final User user = this.userService
 				.getUserByUsername(principal.getName());
 
-		final List<Task> tasks = canViewTasks(user, contest)
+		final List<Task> tasks = this.canViewTasks(user, contest)
 				? this.contestTasksService.getContestTasks(contest)
 				: null;
 		return new ContestDTO(contest.getName(),
-				new TimingDTO(contestTimingService
+				new TimingDTO(this.contestTimingService
 						.getContestStartIncludingAllTimeExtensions(contest),
-						contestTimingService
+						this.contestTimingService
 								.getContestEndIncludingAllTimeExtensions(
 										contest),
-						contestTimingService.getContestStartTimeForUser(contest,
+						this.contestTimingService.getContestStartTimeForUser(
+								contest,
 								user)),
 				tasks);
 	}

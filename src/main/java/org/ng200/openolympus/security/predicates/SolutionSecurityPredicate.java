@@ -45,8 +45,9 @@ public class SolutionSecurityPredicate implements SecurityClearancePredicate {
 	@Override
 	public SecurityClearanceType getRequiredClearanceForObject(User user,
 			Object obj) {
-		Solution solution = (Solution) obj;
-		Contest runningContest = contestTimingService.getRunningContest();
+		final Solution solution = (Solution) obj;
+		final Contest runningContest = this.contestTimingService
+				.getRunningContest();
 
 		if (solution.getUserId() == user.getId()) {
 			return SecurityClearanceType.APPROVED_USER;
@@ -56,7 +57,7 @@ public class SolutionSecurityPredicate implements SecurityClearancePredicate {
 			return SecurityClearanceType.VIEW_ALL_SOLUTIONS;
 		}
 
-		if (aclService.hasContestPermission(runningContest, user,
+		if (this.aclService.hasContestPermission(runningContest, user,
 				ContestPermissionType.view_all_solutions)) {
 			return SecurityClearanceType.APPROVED_USER;
 		}

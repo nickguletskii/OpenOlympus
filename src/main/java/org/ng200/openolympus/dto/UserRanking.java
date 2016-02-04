@@ -43,23 +43,23 @@ public class UserRanking extends User {
 	public UserRanking() {
 	}
 
-	@Column(name="rank")
+	@Column(name = "rank")
 	public BigInteger getRank() {
 		return this.rank;
 	}
 
-	@Column(name="score")
+	@Column(name = "score")
 	public BigDecimal getScore() {
 		return this.score;
 	}
-	
-	@Column(name="rank")
+
+	@Column(name = "rank")
 	public UserRanking setRank(BigInteger rank) {
 		this.rank = rank;
 		return this;
 	}
 
-	@Column(name="score")
+	@Column(name = "score")
 	public UserRanking setScore(BigDecimal score) {
 		this.score = score;
 		return this;
@@ -69,16 +69,24 @@ public class UserRanking extends User {
 	public String toString() {
 		return String.format(
 				"UserRanking [score=%s, rank=%s, getId()=%s, getUsername()=%s, getFirstNameMain()=%s, getAddressCity()=%s, getAddressCountry()=%s, getAddressLine1()=%s, getAddressLine2()=%s, getAddressState()=%s, getApprovalEmailSent()=%s, getBirthDate()=%s, getEmailAddress()=%s, getEmailConfirmationToken()=%s, getEnabled()=%s, getFirstNameLocalised()=%s, getLandline()=%s, getLastNameLocalised()=%s, getLastNameMain()=%s, getMiddleNameLocalised()=%s, getMiddleNameMain()=%s, getMobile()=%s, getPassword()=%s, getSchool()=%s, getTeacherFirstName()=%s, getTeacherLastName()=%s, getTeacherMiddleName()=%s, getSuperuser()=%s, getApproved()=%s]",
-				score, rank, getId(), getUsername(), getFirstNameMain(),
-				getAddressCity(), getAddressCountry(), getAddressLine1(),
-				getAddressLine2(), getAddressState(), getApprovalEmailSent(),
-				getBirthDate(), getEmailAddress(), getEmailConfirmationToken(),
-				getEnabled(), getFirstNameLocalised(), getLandline(),
-				getLastNameLocalised(), getLastNameMain(),
-				getMiddleNameLocalised(), getMiddleNameMain(), getMobile(),
-				getPassword(), getSchool(), getTeacherFirstName(),
-				getTeacherLastName(), getTeacherMiddleName(), getSuperuser(),
-				getApproved());
+				this.score, this.rank, this.getId(), this.getUsername(),
+				this.getFirstNameMain(),
+				this.getAddressCity(), this.getAddressCountry(),
+				this.getAddressLine1(),
+				this.getAddressLine2(), this.getAddressState(),
+				this.getApprovalEmailSent(),
+				this.getBirthDate(), this.getEmailAddress(),
+				this.getEmailConfirmationToken(),
+				this.getEnabled(), this.getFirstNameLocalised(),
+				this.getLandline(),
+				this.getLastNameLocalised(), this.getLastNameMain(),
+				this.getMiddleNameLocalised(), this.getMiddleNameMain(),
+				this.getMobile(),
+				this.getPassword(), this.getSchool(),
+				this.getTeacherFirstName(),
+				this.getTeacherLastName(), this.getTeacherMiddleName(),
+				this.getSuperuser(),
+				this.getApproved());
 	}
 
 }

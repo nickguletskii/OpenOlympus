@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
-import org.ng200.openolympus.jooq.enums.TaskPermissionType;
-import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.services.AclService;
 import org.ng200.openolympus.services.UserService;
@@ -59,7 +57,7 @@ public class TaskPrincipalPermissionsController {
 			@RequestParam("permission") TaskPermissionType permission)
 					throws BindException {
 
-		return aclService.hasTaskPermission(task, principal, permission);
+		return this.aclService.hasTaskPermission(task, principal, permission);
 	}
 
 	@RequestMapping(value = "/api/task/{task}/permissionsForPrincipal", method = RequestMethod.GET)
@@ -69,8 +67,8 @@ public class TaskPrincipalPermissionsController {
 					throws BindException {
 
 		return Stream
-				.of(TaskPermissionType.values()).filter(perm -> aclService
-						.hasTaskPermission(task, userService
+				.of(TaskPermissionType.values()).filter(perm -> this.aclService
+						.hasTaskPermission(task, this.userService
 								.getUserByUsername(principal.getName()), perm))
 				.collect(Collectors.toList());
 	}

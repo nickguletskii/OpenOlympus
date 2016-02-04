@@ -47,9 +47,8 @@ import com.google.common.collect.ImmutableMap;
 @Profile("web")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.CREATE_GROUP)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.CREATE_GROUP)
 		})
 })
 public class GroupCreationController {
@@ -61,7 +60,7 @@ public class GroupCreationController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/api/groups/create")
 	public BindingResponse createContest(@Valid final Group groupDto,
-	        final BindingResult bindingResult) throws BindException {
+			final BindingResult bindingResult) throws BindException {
 
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
@@ -79,8 +78,8 @@ public class GroupCreationController {
 
 		group = this.groupService.insertGroup(group);
 		return new BindingResponse(Status.OK, null,
-		        new ImmutableMap.Builder<String, Object>().put("id",
-		                group.getId()).build());
+				new ImmutableMap.Builder<String, Object>().put("id",
+						group.getId()).build());
 	}
 
 }

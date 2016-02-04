@@ -579,16 +579,17 @@ public class ContestSecurityTests {
 	@Test
 	@Rollback
 	@Transactional
-	public void testContestTaskAdditionWithPermissionWithoutTaskPermission()
+	public void testContestTaskAdditionWithoutPermissionWithTaskPermission()
 			throws Exception {
+
 		final User user = this.testUserFactory.user()
 				.build();
 
 		final Contest contest = this.testContestFactory.contest()
-				.permit(user, ContestPermissionType.add_task)
 				.build();
 
 		final Task task = this.testTaskFactory.task()
+				.permit(user, TaskPermissionType.add_to_contest)
 				.build();
 
 		this.mockMvc.perform(
@@ -606,17 +607,16 @@ public class ContestSecurityTests {
 	@Test
 	@Rollback
 	@Transactional
-	public void testContestTaskAdditionWithoutPermissionWithTaskPermission()
+	public void testContestTaskAdditionWithPermissionWithoutTaskPermission()
 			throws Exception {
-
 		final User user = this.testUserFactory.user()
 				.build();
 
 		final Contest contest = this.testContestFactory.contest()
+				.permit(user, ContestPermissionType.add_task)
 				.build();
 
 		final Task task = this.testTaskFactory.task()
-				.permit(user, TaskPermissionType.add_to_contest)
 				.build();
 
 		this.mockMvc.perform(

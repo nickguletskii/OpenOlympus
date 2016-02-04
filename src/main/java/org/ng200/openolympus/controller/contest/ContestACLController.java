@@ -51,10 +51,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasContestPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasContestPermission.class)
 		})
 })
 @ContestPermissionRequired(ContestPermissionType.manage_acl)
@@ -72,7 +70,7 @@ public class ContestACLController {
 		}
 
 		public ACLItem(List<OlympusPrincipal> principals,
-		        ContestPermissionType permission) {
+				ContestPermissionType permission) {
 			this.principals = principals;
 			this.permission = permission;
 		}
@@ -98,32 +96,30 @@ public class ContestACLController {
 	@Autowired
 	private ContestACLService contestACLService;
 
-	@RequestMapping(value = "/api/contest/{contest}/acl",
-	        method = RequestMethod.PUT)
-	public void setContestACL(
-	        @PathVariable("contest") Contest contest,
-	        @RequestBody Map<String, List<Long>> dto,
-	        final BindingResult bindingResult, final Principal principal) {
-		this.contestACLService.setContestPermissionsAndPrincipals(contest,
-		        dto.entrySet().stream().collect(
-		                Collectors.toMap(
-		                        e -> ContestPermissionType.valueOf(e.getKey()),
-		                        e -> e.getValue())));
+	@RequestMapping(value = "/api/contest/{contest}/acl", method = RequestMethod.GET)
+	public Map<ContestPermissionType, ACLItem> getContestACL(
+			@PathVariable("contest") Contest contest,
+			final Principal principal) {
+		final Map<ContestPermissionType, List<OlympusPrincipal>> contestPermissionsAndPrincipalData = this.contestACLService
+				.getContestPermissionsAndPrincipalData(contest);
+		return Stream.of(ContestPermissionType.values())
+				.collect(Collectors.toMap(type -> type,
+						type -> new ACLItem(
+								contestPermissionsAndPrincipalData.get(type),
+								type)));
+
 	}
 
-	@RequestMapping(value = "/api/contest/{contest}/acl",
-	        method = RequestMethod.GET)
-	public Map<ContestPermissionType, ACLItem> getContestACL(
-	        @PathVariable("contest") Contest contest,
-	        final Principal principal) {
-		final Map<ContestPermissionType, List<OlympusPrincipal>> contestPermissionsAndPrincipalData = this.contestACLService
-		        .getContestPermissionsAndPrincipalData(contest);
-		return Stream.of(ContestPermissionType.values())
-		        .collect(Collectors.toMap(type -> type,
-		                type -> new ACLItem(
-		                        contestPermissionsAndPrincipalData.get(type),
-		                        type)));
-
+	@RequestMapping(value = "/api/contest/{contest}/acl", method = RequestMethod.PUT)
+	public void setContestACL(
+			@PathVariable("contest") Contest contest,
+			@RequestBody Map<String, List<Long>> dto,
+			final BindingResult bindingResult, final Principal principal) {
+		this.contestACLService.setContestPermissionsAndPrincipals(contest,
+				dto.entrySet().stream().collect(
+						Collectors.toMap(
+								e -> ContestPermissionType.valueOf(e.getKey()),
+								e -> e.getValue())));
 	}
 
 }

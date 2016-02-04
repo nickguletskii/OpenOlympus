@@ -69,15 +69,16 @@ public class SecurityService {
 	}
 
 	public boolean isSolutionInCurrentContest(Solution solution) {
-		final Contest runningContest = this.contestTimingService.getRunningContest();
+		final Contest runningContest = this.contestTimingService
+				.getRunningContest();
 		return runningContest == null
 				|| (this.isTaskInContest(
 						this.taskDao.fetchOneById(solution.getTaskId()),
 						runningContest)
 						&&
 
-		runningContest.getStartTime().toInstant()
-				.isBefore(solution.getTimeAdded().toInstant())
+						runningContest.getStartTime().toInstant()
+								.isBefore(solution.getTimeAdded().toInstant())
 						&& this.contestTimingService
 								.getContestEndTimeForUser(runningContest,
 										this.userDao.fetchOneById(
@@ -102,7 +103,8 @@ public class SecurityService {
 	}
 
 	public boolean isTaskInCurrentContest(Task task) {
-		final Contest runningContest = this.contestTimingService.getRunningContest();
+		final Contest runningContest = this.contestTimingService
+				.getRunningContest();
 		return runningContest == null
 				|| this.contestTasksDao.exists(new ContestTasks(runningContest
 						.getId(), task.getId()));

@@ -45,16 +45,6 @@ public class ContestPrincipalPermissionsController {
 	@Autowired
 	private AclService aclService;
 
-	@RequestMapping(value = "/api/contest/{contest}/hasContestPermission/{principal}", method = RequestMethod.GET)
-	public boolean hasContestPermission(
-			@PathVariable("contest") Contest contest,
-			@PathVariable("principal") Long principal,
-			@RequestParam("permission") ContestPermissionType permission)
-					throws BindException {
-
-		return aclService.hasContestPermission(contest, principal, permission);
-	}
-
 	@RequestMapping(value = "/api/contest/{contest}/permissionsForPrincipal/{principal}", method = RequestMethod.GET)
 	public List<ContestPermissionType> contestPermissions(
 			@PathVariable("contest") Contest contest,
@@ -62,8 +52,20 @@ public class ContestPrincipalPermissionsController {
 					throws BindException {
 
 		return Stream
-				.of(ContestPermissionType.values()).filter(perm -> aclService
+				.of(ContestPermissionType.values())
+				.filter(perm -> this.aclService
 						.hasContestPermission(contest, principal, perm))
 				.collect(Collectors.toList());
+	}
+
+	@RequestMapping(value = "/api/contest/{contest}/hasContestPermission/{principal}", method = RequestMethod.GET)
+	public boolean hasContestPermission(
+			@PathVariable("contest") Contest contest,
+			@PathVariable("principal") Long principal,
+			@RequestParam("permission") ContestPermissionType permission)
+					throws BindException {
+
+		return this.aclService.hasContestPermission(contest, principal,
+				permission);
 	}
 }

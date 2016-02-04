@@ -50,10 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("web")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasContestPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasContestPermission.class)
 		})
 })
 @ContestPermissionRequired(ContestPermissionType.view_participants)
@@ -62,14 +60,12 @@ public class ContestParticipantsController {
 	@Autowired
 	private ContestUsersService contestUsersService;
 
-	@RequestMapping(value = "/api/contest/{contest}/participants",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
 
 	public List<User> showParticipantsPage(
-	        @PathVariable(value = "contest") final Contest contest,
-	        @RequestParam(value = "page",
-	                defaultValue = "1") final Integer pageNumber,
-	        final Model model, final Principal principal) {
+			@PathVariable(value = "contest") final Contest contest,
+			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
+			final Model model, final Principal principal) {
 		Assertions.resourceExists(contest);
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
@@ -78,7 +74,7 @@ public class ContestParticipantsController {
 		Assertions.resourceExists(contest);
 
 		return this.contestUsersService
-		        .getPariticipantsPage(contest, pageNumber, 10);
+				.getPariticipantsPage(contest, pageNumber, 10);
 	}
 
 }

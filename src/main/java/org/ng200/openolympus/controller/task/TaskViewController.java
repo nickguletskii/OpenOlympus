@@ -71,10 +71,8 @@ import com.google.common.collect.ImmutableMap;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = TaskViewSecurityPredicate.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = TaskViewSecurityPredicate.class)
 		})
 })
 @TaskPermissionRequired(TaskPermissionType.view)
@@ -120,60 +118,56 @@ public class TaskViewController {
 	private SolutionSubmissionService solutionSubmissionService;
 
 	@ResponseBody
-	@RequestMapping(value = "/api/task/{task}/data/**",
-	        method = RequestMethod.GET)
+	@RequestMapping(value = "/api/task/{task}/data/**", method = RequestMethod.GET)
 	public FileSystemResource getTaskData(
-	        @PathVariable(value = "task") final Task task,
-	        HttpServletRequest request)
-	                throws IOException,
-	                TaskDescriptionIncorrectFormatException {
+			@PathVariable(value = "task") final Task task,
+			HttpServletRequest request)
+					throws IOException,
+					TaskDescriptionIncorrectFormatException {
 		Assertions.resourceExists(task);
 
 		final String pathWithinHandler = (String) request.getAttribute(
-		        HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+				HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 		final String bestMatchPattern = (String) request
-		        .getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+				.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 
 		final AntPathMatcher apm = new AntPathMatcher();
 		final String relativePath = apm.extractPathWithinPattern(
-		        bestMatchPattern,
-		        pathWithinHandler);
+				bestMatchPattern,
+				pathWithinHandler);
 
 		final Path taskDescriptionDir = this.storageService
-		        .getTaskDescriptionDirectory(task);
+				.getTaskDescriptionDirectory(task);
 		final Path path = taskDescriptionDir.resolve(relativePath);
 
 		if (!path.toAbsolutePath()
-		        .startsWith(taskDescriptionDir.toAbsolutePath())) {
+				.startsWith(taskDescriptionDir.toAbsolutePath())) {
 			throw new ForbiddenException(
-			        "Security: Attempt to serve file outside of current task scope!");
+					"Security: Attempt to serve file outside of current task scope!");
 		}
 
 		if (!FileAccess.exists(path)) {
 			throw new ResourceNotFoundException(
-			        "The requested file doesn't exist!");
+					"The requested file doesn't exist!");
 		}
 
 		return new FileSystemResource(path.toAbsolutePath().toFile());
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/api/task/{task}/name",
-	        method = RequestMethod.GET,
-	        produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/api/task/{task}/name", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public String getTaskName(@PathVariable(value = "task") final Task task,
-	        final Locale locale) throws IOException {
+			final Locale locale) throws IOException {
 		Assertions.resourceExists(task);
 		return task.getName();
 	}
 
-	@RequestMapping(value = "/api/task/{task}/submitSolution",
-	        method = RequestMethod.POST)
+	@RequestMapping(value = "/api/task/{task}/submitSolution", method = RequestMethod.POST)
 	public BindingResponse submitSolution(
-	        @PathVariable("task") final Task task, final Principal principal,
-	        @Valid final SolutionSubmissionDto solutionDto,
-	        final BindingResult bindingResult) throws BindException,
-	                IOException {
+			@PathVariable("task") final Task task, final Principal principal,
+			@Valid final SolutionSubmissionDto solutionDto,
+			final BindingResult bindingResult) throws BindException,
+					IOException {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
@@ -181,7 +175,7 @@ public class TaskViewController {
 		Assertions.resourceExists(task);
 
 		final User user = this.userService.getUserByUsername(principal
-		        .getName());
+				.getName());
 
 		this.solutionDtoValidator.validate(solutionDto, bindingResult);
 
@@ -190,13 +184,13 @@ public class TaskViewController {
 		}
 
 		final Solution solution = this.solutionSubmissionService.submitSolution(
-		        task,
-		        solutionDto, user);
+				task,
+				solutionDto, user);
 
 		final long id = solution.getId();
 
 		return new BindingResponse(Status.OK, null,
-		        new ImmutableMap.Builder<String, Object>().put("id", id)
-		                .build());
+				new ImmutableMap.Builder<String, Object>().put("id", id)
+						.build());
 	}
 }

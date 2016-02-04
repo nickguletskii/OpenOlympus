@@ -43,9 +43,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("web")
 @RequestMapping(value = "/api/taskCompletion")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
 		})
 })
 public class TaskSearchController {
@@ -55,10 +54,10 @@ public class TaskSearchController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody List<String> searchTasks(
-	        @RequestParam(value = "term") final String name) {
+			@RequestParam(value = "term") final String name) {
 		Assertions.resourceExists(name);
 
 		return this.taskService.findAFewTasksWithNameContaining(name).stream()
-		        .map((t) -> t.getName()).collect(Collectors.toList());
+				.map((t) -> t.getName()).collect(Collectors.toList());
 	}
 }

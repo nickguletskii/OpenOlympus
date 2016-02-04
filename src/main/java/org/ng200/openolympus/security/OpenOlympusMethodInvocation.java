@@ -45,10 +45,10 @@ public class OpenOlympusMethodInvocation<T> {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
 				throws Throwable {
-			Parameter[] parameters = methodInvocation.getMethod()
+			final Parameter[] parameters = this.methodInvocation.getMethod()
 					.getParameters();
 
-			String name = method.getName();
+			final String name = method.getName();
 			int ind;
 
 			searchForParameter: {
@@ -63,12 +63,12 @@ public class OpenOlympusMethodInvocation<T> {
 						"This method can't be supplied by method invocation information access proxy.");
 			}
 
-			return methodInvocation.getArguments()[ind];
+			return this.methodInvocation.getArguments()[ind];
 		}
 	}
 
-	private MethodInvocation methodInvocation;
-	private T parameterProxy;
+	private final MethodInvocation methodInvocation;
+	private final T parameterProxy;
 
 	@SuppressWarnings("unchecked")
 	public OpenOlympusMethodInvocation(MethodInvocation methodInvocation,
@@ -81,12 +81,12 @@ public class OpenOlympusMethodInvocation<T> {
 		}, new ParameterGetterInvocationHandler(methodInvocation));
 	}
 
-	public T getParameterProxy() {
-		return parameterProxy;
+	public MethodInvocation getMethodInvocation() {
+		return this.methodInvocation;
 	}
 
-	public MethodInvocation getMethodInvocation() {
-		return methodInvocation;
+	public T getParameterProxy() {
+		return this.parameterProxy;
 	}
 
 }

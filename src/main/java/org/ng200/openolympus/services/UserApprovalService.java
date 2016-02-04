@@ -55,16 +55,10 @@ public class UserApprovalService {
 	@Autowired
 	private UserService userService;
 
-	@Autowired(required=false)
+	@Autowired(required = false)
 	private JavaMailSender javaMailSender;
 
 	private final SecureRandom random = new SecureRandom();
-
-	public String generateToken() {
-		final byte[] bytes = new byte[128];
-		random.nextBytes(bytes);
-		return Base64.getEncoder().encodeToString(bytes);
-	}
 
 	public void approveUser(User user) throws MessagingException,
 			EmailException {
@@ -72,15 +66,15 @@ public class UserApprovalService {
 
 		if (this.emailConfirmationEnabled) {
 
-			user.setEmailConfirmationToken(generateToken());
+			user.setEmailConfirmationToken(this.generateToken());
 
 			final String link = EmailConfirmationController.getUriBuilder()
 					.queryParam("user", user.getId())
 					.queryParam("token", user.getEmailConfirmationToken())
 					.build().encode().toUriString();
 
-			SimpleMailMessage mailMessage = new SimpleMailMessage();
-			mailMessage.setFrom(mailProperties.getUsername());
+			final SimpleMailMessage mailMessage = new SimpleMailMessage();
+			mailMessage.setFrom(this.mailProperties.getUsername());
 			mailMessage.setTo(user.getEmailAddress());
 			mailMessage.setSubject("OpenOlympus registration");
 			mailMessage.setText(
@@ -88,7 +82,7 @@ public class UserApprovalService {
 							"Please follow the following link to complete the registration process.\n\n"
 							+
 							link);
-			javaMailSender.send(mailMessage);
+			this.javaMailSender.send(mailMessage);
 
 			user.setApprovalEmailSent(true);
 			user = this.userService.updateUser(user);
@@ -97,6 +91,12 @@ public class UserApprovalService {
 			user.setEmailConfirmationToken(null);
 			this.userService.updateUser(user);
 		}
+	}
+
+	public String generateToken() {
+		final byte[] bytes = new byte[128];
+		this.random.nextBytes(bytes);
+		return Base64.getEncoder().encodeToString(bytes);
 	}
 
 }

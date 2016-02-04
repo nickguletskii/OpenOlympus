@@ -44,9 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
 		})
 })
 public class ContestListController {
@@ -55,7 +54,7 @@ public class ContestListController {
 
 	@Autowired
 	private ContestTimingService contestTimingService;
-	
+
 	@Autowired
 	private ContestCRUDService contestCRUDService;
 
@@ -68,14 +67,13 @@ public class ContestListController {
 	@RequestMapping(method = RequestMethod.GET, value = "/api/contests")
 	@ResponseBody
 	public List<Contest> contestList(
-	        @RequestParam(value = "page",
-	                defaultValue = "1") Integer pageNumber,
-	        Principal principal) {
+			@RequestParam(value = "page", defaultValue = "1") Integer pageNumber,
+			Principal principal) {
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
 		}
 		return this.contestTimingService.getContestsOrderedByTime(pageNumber,
-		        ContestListController.PAGE_SIZE);
+				ContestListController.PAGE_SIZE);
 	}
 
 }

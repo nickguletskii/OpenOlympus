@@ -47,9 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.LOGGED_IN)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.LOGGED_IN)
 		})
 })
 public class ChangePasswordController {
@@ -63,23 +62,22 @@ public class ChangePasswordController {
 	@Autowired
 	private PasswordChangeDtoValidator passwordChangeDtoValidator;
 
-	@RequestMapping(value = "/api/user/changePassword",
-	        method = RequestMethod.POST)
+	@RequestMapping(value = "/api/user/changePassword", method = RequestMethod.POST)
 	public BindingResponse changePassword(
-	        @Valid final PasswordChangeDto passwordChangeDto,
-	        final BindingResult bindingResult, final Principal principal)
-	                throws BindException {
+			@Valid final PasswordChangeDto passwordChangeDto,
+			final BindingResult bindingResult, final Principal principal)
+					throws BindException {
 		final User user = this.userService.getUserByUsername(principal
-		        .getName());
+				.getName());
 
 		this.passwordChangeDtoValidator.validate(passwordChangeDto, user,
-		        bindingResult);
+				bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
 
 		user.setPassword(this.passwordEncoder.encode(passwordChangeDto
-		        .getPassword()));
+				.getPassword()));
 		this.userService.updateUser(user);
 		return BindingResponse.OK;
 	}

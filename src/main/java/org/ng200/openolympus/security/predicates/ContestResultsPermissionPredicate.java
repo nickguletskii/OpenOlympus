@@ -53,14 +53,17 @@ public class ContestResultsPermissionPredicate
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
 			@Parameter("contest") Contest contest) {
-		if (aclService.hasContestPermission(contest, user,
-				ContestPermissionType.view_results_during_contest))
+		if (this.aclService.hasContestPermission(contest, user,
+				ContestPermissionType.view_results_during_contest)) {
 			return SecurityClearanceType.ANONYMOUS;
-		if (contestTimingService.getRunningContest() == null && contestTimingService
-				.isContestOverIncludingAllTimeExtensions(contest)
-				&& aclService.hasContestPermission(contest, user,
-						ContestPermissionType.view_results_after_contest))
+		}
+		if (this.contestTimingService.getRunningContest() == null
+				&& this.contestTimingService
+						.isContestOverIncludingAllTimeExtensions(contest)
+				&& this.aclService.hasContestPermission(contest, user,
+						ContestPermissionType.view_results_after_contest)) {
 			return SecurityClearanceType.ANONYMOUS;
+		}
 		return SecurityClearanceType.DENIED;
 	}
 }

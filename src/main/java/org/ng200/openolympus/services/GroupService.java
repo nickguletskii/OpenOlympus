@@ -62,6 +62,19 @@ public class GroupService extends GenericCreateUpdateRepository {
 				Tables.GROUP_USERS);
 	}
 
+	public boolean containsUser(User user, Group group) {
+		return this.dslContext
+				.select(DSL.field(
+						DSL.exists(
+								this.dslContext.selectOne()
+										.from(Tables.GROUP_USERS)
+										.where(Tables.GROUP_USERS.GROUP_ID
+												.eq(group.getId())
+												.and(Tables.GROUP_USERS.USER_ID
+														.eq(user.getId()))))))
+				.fetchOne().value1();
+	}
+
 	public int countGroups() {
 		return this.dslContext.selectCount().from(Tables.GROUP).execute();
 	}
@@ -89,6 +102,22 @@ public class GroupService extends GenericCreateUpdateRepository {
 
 	public Group getGroupByName(final String name) {
 		return this.groupDao.fetchOneByName(name);
+	}
+
+	public Map<GroupPermissionType, List<OlympusPrincipal>> getGroupPermissionsAndPrincipalData(
+			Group group) {
+		return this.getGroupPermissionsAndPrincipalData(group.getId());
+	}
+
+	public Map<GroupPermissionType, List<OlympusPrincipal>> getGroupPermissionsAndPrincipalData(
+			long groupId) {
+		return this.dslContext.select(Tables.GROUP_PERMISSION.PERMISSION,
+				Tables.GROUP_PERMISSION.PRINCIPAL_ID)
+				.from(Tables.GROUP_PERMISSION)
+				.where(Tables.GROUP_PERMISSION.GROUP_ID.eq(groupId))
+				.fetchGroups(Tables.GROUP_PERMISSION.PERMISSION,
+						(record) -> this.aclService
+								.extractPrincipal(record.value2()));
 	}
 
 	public List<Group> getGroups(Integer pageNumber, int pageSize) {
@@ -121,29 +150,8 @@ public class GroupService extends GenericCreateUpdateRepository {
 
 	@Transactional
 	public void removeUserFromGroup(User user, Group group) {
-		Routines.removeFromGroup(dslContext.configuration(), user.getId(),
+		Routines.removeFromGroup(this.dslContext.configuration(), user.getId(),
 				group.getId());
-	}
-
-	@Transactional
-	public Group updateGroup(Group group) {
-		return this.update(group, Tables.GROUP);
-	}
-
-	public Map<GroupPermissionType, List<OlympusPrincipal>> getGroupPermissionsAndPrincipalData(
-			long groupId) {
-		return this.dslContext.select(Tables.GROUP_PERMISSION.PERMISSION,
-				Tables.GROUP_PERMISSION.PRINCIPAL_ID)
-				.from(Tables.GROUP_PERMISSION)
-				.where(Tables.GROUP_PERMISSION.GROUP_ID.eq(groupId))
-				.fetchGroups(Tables.GROUP_PERMISSION.PERMISSION,
-						(record) -> aclService
-								.extractPrincipal(record.value2()));
-	}
-
-	public Map<GroupPermissionType, List<OlympusPrincipal>> getGroupPermissionsAndPrincipalData(
-			Group group) {
-		return this.getGroupPermissionsAndPrincipalData(group.getId());
 	}
 
 	@Transactional
@@ -165,17 +173,9 @@ public class GroupService extends GenericCreateUpdateRepository {
 				.execute();
 	}
 
-	public boolean containsUser(User user, Group group) {
-		return dslContext
-				.select(DSL.field(
-						DSL.exists(
-								dslContext.selectOne()
-										.from(Tables.GROUP_USERS)
-										.where(Tables.GROUP_USERS.GROUP_ID
-												.eq(group.getId())
-												.and(Tables.GROUP_USERS.USER_ID
-														.eq(user.getId()))))))
-				.fetchOne().value1();
+	@Transactional
+	public Group updateGroup(Group group) {
+		return this.update(group, Tables.GROUP);
 	}
 
 }

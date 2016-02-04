@@ -40,8 +40,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.ENUMERATE_ALL_USERS)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.ENUMERATE_ALL_USERS)
 		})
 })
 public class AdminUserListRestController {
@@ -59,7 +59,7 @@ public class AdminUserListRestController {
 
 	public List<User> getUsers(@RequestParam("page") Integer page) {
 		return this.userService.getUsersAlphabetically(page,
-		        AdminUserListRestController.PAGE_SIZE);
+				AdminUserListRestController.PAGE_SIZE);
 	}
 
 }

@@ -69,6 +69,11 @@ public class DaoConfig {
 	}
 
 	@Bean
+	public ContestPermissionDao contestPermissionDao() {
+		return new ContestPermissionDao(this.dslContext.configuration());
+	}
+
+	@Bean
 	public ContestTasksDao contestTasksDao() {
 		return new ContestTasksDao(this.dslContext.configuration());
 	}
@@ -81,6 +86,11 @@ public class DaoConfig {
 	@Bean
 	public GroupUsersDao groupUsersDao() {
 		return new GroupUsersDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public PrincipalDao principalDao() {
+		return new PrincipalDao(this.dslContext.configuration());
 	}
 
 	@Bean
@@ -99,23 +109,13 @@ public class DaoConfig {
 	}
 
 	@Bean
-	public TimeExtensionDao timeExtensionDao() {
-		return new TimeExtensionDao(this.dslContext.configuration());
-	}
-
-	@Bean
-	public PrincipalDao principalDao() {
-		return new PrincipalDao(this.dslContext.configuration());
-	}
-
-	@Bean
-	public ContestPermissionDao contestPermissionDao() {
-		return new ContestPermissionDao(this.dslContext.configuration());
-	}
-
-	@Bean
 	public TaskPermissionDao taskPermissionDao() {
 		return new TaskPermissionDao(this.dslContext.configuration());
+	}
+
+	@Bean
+	public TimeExtensionDao timeExtensionDao() {
+		return new TimeExtensionDao(this.dslContext.configuration());
 	}
 
 	@Bean

@@ -22,12 +22,8 @@
  */
 package org.ng200.openolympus.config;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.ng200.openolympus.CsrfHeaderFilter;
@@ -45,7 +41,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
@@ -94,19 +89,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				this.passwordEncoder);
 	}
 
-	@Bean
-	public CsrfTokenRepository csrfTokenRepository() {
-		HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
-		repository.setHeaderName("X-CSRF-TOKEN");
-		return repository;
-	}
-
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
 
 		http
 				.csrf()
-				.csrfTokenRepository(csrfTokenRepository())
+				.csrfTokenRepository(this.csrfTokenRepository())
 				.and()
 				.headers()
 				.xssProtection()
@@ -144,16 +132,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public LogoutSuccessHandler logoutSuccessHandler() {
-		return new LogoutSuccessHandler() {
-			@Override
-			public void onLogoutSuccess(HttpServletRequest request,
-					HttpServletResponse response,
-					Authentication authentication)
-							throws IOException, ServletException {
-				response.setStatus(HttpStatus.OK.value());
-			}
-		};
+	public CsrfTokenRepository csrfTokenRepository() {
+		final HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+		repository.setHeaderName("X-CSRF-TOKEN");
+		return repository;
 	}
 
 	public BasicAuthenticationFilter getBasicAuthenticationFilter()
@@ -162,6 +144,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		final BasicAuthenticationFilter filter = new BasicAuthenticationFilter(
 				this.authenticationManager());
 		return filter;
+	}
+
+	@Bean
+	public LogoutSuccessHandler logoutSuccessHandler() {
+		return (request, response, authentication) -> response
+				.setStatus(HttpStatus.OK.value());
 	}
 
 	@Bean

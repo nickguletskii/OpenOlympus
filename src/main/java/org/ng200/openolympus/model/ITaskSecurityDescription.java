@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.model;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import org.ng200.openolympus.SecurityClearanceType;

@@ -69,35 +69,33 @@ public class AclService extends GenericCreateUpdateRepository {
 								.fetchOneInto(User.class));
 	}
 
-	public boolean hasContestPermission(Contest contest, User user,
-			ContestPermissionType... values) {
-		return hasContestPermission(contest, user.getId(), values);
+	public Map<GeneralPermissionType, Boolean> getPrincipalGeneralPermissions(
+			Principal principal) {
+		final Set<GeneralPermissionType> permissionTypes = ImmutableSet
+				.copyOf(principal.getPermissions());
+		return Stream.of(GeneralPermissionType.values()).collect(
+				Collectors
+						.<GeneralPermissionType, GeneralPermissionType, Boolean> toMap(
+								(type) -> type,
+								(type) -> permissionTypes.contains(type)));
 	}
 
 	public boolean hasContestPermission(Contest contest, Long user,
 			ContestPermissionType... values) {
-		return Stream.of(values).anyMatch(value -> dslContext
+		return Stream.of(values).anyMatch(value -> this.dslContext
 				.select(Routines.hasContestPermission(contest.getId(),
 						user, value))
 				.fetchOne().value1());
 	}
 
-	public boolean hasTaskPermission(Task task, Long principal,
-			TaskPermissionType... values) {
-		return Stream.of(values).anyMatch(value -> dslContext
-				.select(Routines.hasTaskPermission(task.getId(),
-						principal, value))
-				.fetchOne().value1());
-	}
-
-	public boolean hasTaskPermission(Task task, User user,
-			TaskPermissionType... values) {
-		return hasTaskPermission(task, user.getId(), values);
+	public boolean hasContestPermission(Contest contest, User user,
+			ContestPermissionType... values) {
+		return this.hasContestPermission(contest, user.getId(), values);
 	}
 
 	public boolean hasGroupPermission(Group group, Long principal,
 			GroupPermissionType... values) {
-		return Stream.of(values).anyMatch(value -> dslContext
+		return Stream.of(values).anyMatch(value -> this.dslContext
 				.select(Routines.hasGroupPermission(group.getId(),
 						principal, value))
 				.fetchOne().value1());
@@ -105,7 +103,20 @@ public class AclService extends GenericCreateUpdateRepository {
 
 	public boolean hasGroupPermission(Group group, User user,
 			GroupPermissionType... values) {
-		return hasGroupPermission(group, user.getId(), values);
+		return this.hasGroupPermission(group, user.getId(), values);
+	}
+
+	public boolean hasTaskPermission(Task task, Long principal,
+			TaskPermissionType... values) {
+		return Stream.of(values).anyMatch(value -> this.dslContext
+				.select(Routines.hasTaskPermission(task.getId(),
+						principal, value))
+				.fetchOne().value1());
+	}
+
+	public boolean hasTaskPermission(Task task, User user,
+			TaskPermissionType... values) {
+		return this.hasTaskPermission(task, user.getId(), values);
 	}
 
 	@Transactional
@@ -116,29 +127,19 @@ public class AclService extends GenericCreateUpdateRepository {
 						.entrySet().stream()
 						.filter(entry -> Boolean.TRUE
 								.equals(entry.getValue()))
-						.map(entry -> (GeneralPermissionType) entry
+						.map(entry -> entry
 								.getKey())
 						.toArray(size -> new GeneralPermissionType[size]));
 
-		return update(principal, Tables.PRINCIPAL);
-	}
-
-	public Map<GeneralPermissionType, Boolean> getPrincipalGeneralPermissions(
-			Principal principal) {
-		Set<GeneralPermissionType> permissionTypes = ImmutableSet
-				.copyOf(principal.getPermissions());
-		return Stream.of(GeneralPermissionType.values()).collect(
-				Collectors
-						.<GeneralPermissionType, GeneralPermissionType, Boolean> toMap(
-								(type) -> type,
-								(type) -> permissionTypes.contains(type)));
+		return this.update(principal, Tables.PRINCIPAL);
 	}
 
 	public boolean solutionIsModeratedByUser(Solution solution, User user) {
-		return dslContext.select(
+		return this.dslContext.select(
 				DSL.field(
 						DSL.exists(
-								dslContext.select().from(Tables.CONTEST_TASKS)
+								this.dslContext.select()
+										.from(Tables.CONTEST_TASKS)
 										.join(Tables.CONTEST_PERMISSION)
 										.on(Tables.CONTEST_TASKS.CONTEST_ID
 												.eq(Tables.CONTEST_PERMISSION.CONTEST_ID)

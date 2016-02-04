@@ -46,10 +46,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserHasContestPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasContestPermission.class)
 		})
 })
 @ContestPermissionRequired(ContestPermissionType.remove_task)
@@ -59,11 +57,10 @@ public class ContestTaskRemovalController {
 	private ContestTasksService contestTasksService;
 
 	@CacheEvict(value = "contests", key = "#contest.id")
-	@RequestMapping(value = "/api/contest/{contest}/removeTask",
-	        method = RequestMethod.DELETE)
+	@RequestMapping(value = "/api/contest/{contest}/removeTask", method = RequestMethod.DELETE)
 	public void removeTask(
-	        @PathVariable(value = "contest") final Contest contest,
-	        @RequestParam(value = "task") final Task task, final Model model) {
+			@PathVariable(value = "contest") final Contest contest,
+			@RequestParam(value = "task") final Task task, final Model model) {
 		Assertions.resourceExists(contest);
 		Assertions.resourceExists(task);
 

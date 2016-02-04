@@ -45,8 +45,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.DELETE_USER)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.DELETE_USER)
 		})
 })
 public class DeleteUserController {
@@ -58,8 +58,8 @@ public class DeleteUserController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void deleteUser(@RequestBody List<Long> userIds) {
 		final List<User> users = userIds.stream()
-		        .map(this.userService::getUserById)
-		        .collect(Collectors.toList());
+				.map(this.userService::getUserById)
+				.collect(Collectors.toList());
 		users.forEach(Assertions::resourceExists);
 		this.userService.deleteUsers(users);
 	}

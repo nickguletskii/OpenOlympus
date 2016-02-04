@@ -89,7 +89,7 @@ public class BinderAdvice implements ApplicationContextAware {
 		public void setAsText(String text) throws IllegalArgumentException {
 			try {
 				this.setValue(this.dao.call("fetchOneById", text).get());
-			} catch (ReflectException e) {
+			} catch (final ReflectException e) {
 				if (e.getCause() instanceof InvocationTargetException) {
 					throw new IllegalArgumentException(e.getCause().getCause());
 				}

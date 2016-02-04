@@ -47,7 +47,7 @@ public class UserHasGroupPermission implements DynamicSecurityPredicate {
 			@Parameter("group") Group group,
 			@CurrentUser User user) {
 
-		return aclService.hasGroupPermission(group, user,
+		return this.aclService.hasGroupPermission(group, user,
 				groupPermissionRequired.value())
 						? SecurityClearanceType.ANONYMOUS
 						: SecurityClearanceType.DENIED;

@@ -48,10 +48,39 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
+	public static class MTD
+			extends AbstractMethodSecurityMetadataSource {
+
+		public MTD() {
+		}
+
+		@Override
+		public Collection<ConfigAttribute> getAllConfigAttributes() {
+			return null;
+		}
+
+		@Override
+		public Collection<ConfigAttribute> getAttributes(Method method,
+				Class<?> targetClass) {
+			if (method.getDeclaringClass() == Object.class) {
+				return Collections.emptyList();
+			}
+
+			final SecurityOr preAuthorize = AnnotationExtraUtils.findAnnotation(
+					method, targetClass,
+					SecurityOr.class);
+
+			if (preAuthorize == null) {
+				return Collections.emptyList();
+			}
+			return Lists.from(new OlmpusConfigAttribute());
+		}
+	}
+
 	public static class OlmpusConfigAttribute implements ConfigAttribute {
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -3135156204059260315L;
 
@@ -62,44 +91,11 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
 	}
 
-	public static class MTD
-			extends AbstractMethodSecurityMetadataSource {
-
-		public MTD() {
-		}
-
-		@Override
-		public Collection<ConfigAttribute> getAttributes(Method method,
-				Class<?> targetClass) {
-			if (method.getDeclaringClass() == Object.class) {
-				return Collections.emptyList();
-			}
-
-			SecurityOr preAuthorize = AnnotationExtraUtils.findAnnotation(method, targetClass,
-					SecurityOr.class);
-
-			if (preAuthorize == null) {
-				return Collections.emptyList();
-			}
-			return Lists.from(new OlmpusConfigAttribute());
-		}
-
-		@Override
-		public Collection<ConfigAttribute> getAllConfigAttributes() {
-			return null;
-		}
-	}
-
-	@Bean
-	public OpenOlympusRootDecisionVoter rootDecisionVoter() {
-		return new OpenOlympusRootDecisionVoter();
-	}
-
 	@Override
 	protected AccessDecisionManager accessDecisionManager() {
 
-		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<>();
-		decisionVoters.add(rootDecisionVoter());
+		final List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<>();
+		decisionVoters.add(this.rootDecisionVoter());
 
 		return new AffirmativeBased(decisionVoters);
 	}
@@ -108,5 +104,10 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 	protected MethodSecurityMetadataSource customMethodSecurityMetadataSource() {
 		return new DelegatingMethodSecurityMetadataSource(
 				Lists.from(new MTD()));
+	}
+
+	@Bean
+	public OpenOlympusRootDecisionVoter rootDecisionVoter() {
+		return new OpenOlympusRootDecisionVoter();
 	}
 }

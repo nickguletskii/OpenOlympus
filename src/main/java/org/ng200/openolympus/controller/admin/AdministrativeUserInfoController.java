@@ -45,18 +45,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(value = SecurityClearanceType.VIEW_OTHER_USERS_PERSONAL_INFO),
-                             @SecurityLeaf(value = SecurityClearanceType.CHANGE_OTHER_USERS_PERSONAL_INFO)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.VIEW_OTHER_USERS_PERSONAL_INFO),
+								@SecurityLeaf(value = SecurityClearanceType.CHANGE_OTHER_USERS_PERSONAL_INFO)
 		})
 })
 public class AdministrativeUserInfoController extends
-        AbstractUserInfoController {
+		AbstractUserInfoController {
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.PATCH)
 	public BindingResponse changePersonInfo(final Model model,
-	        @Valid @RequestBody final UserInfoDto userInfoDto,
-	        final BindingResult bindingResult,
-	        @PathVariable(value = "user") final User user) {
+			@Valid @RequestBody final UserInfoDto userInfoDto,
+			final BindingResult bindingResult,
+			@PathVariable(value = "user") final User user) {
 		Assertions.resourceExists(user);
 		super.copyDtoIntoDatabase(userInfoDto, bindingResult, user);
 		return BindingResponse.OK;
@@ -64,7 +64,7 @@ public class AdministrativeUserInfoController extends
 
 	@RequestMapping(value = "/api/admin/user/{user}/personalInfo", method = RequestMethod.GET)
 	public UserInfoDto showUserDetailsForm(
-	        @PathVariable(value = "user") final User user) {
+			@PathVariable(value = "user") final User user) {
 		final UserInfoDto userInfoDto = new UserInfoDto();
 		super.initialiseDTO(userInfoDto, user);
 		return userInfoDto;

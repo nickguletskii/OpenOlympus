@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.ng200.openolympus.jooq.enums.GroupPermissionType;
-import org.ng200.openolympus.jooq.enums.GroupPermissionType;
-import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.jooq.tables.pojos.Group;
 import org.ng200.openolympus.services.AclService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +45,6 @@ public class GroupPrincipalPermissionsController {
 	@Autowired
 	private AclService aclService;
 
-	@RequestMapping(value = "/api/group/{group}/hasGroupPermission/{principal}", method = RequestMethod.GET)
-	public boolean hasGroupPermission(
-			@PathVariable("group") Group group,
-			@PathVariable("principal") Long principal,
-			@RequestParam("permission") GroupPermissionType permission)
-					throws BindException {
-
-		return aclService.hasGroupPermission(group, principal, permission);
-	}
-	
 	@RequestMapping(value = "/api/group/{group}/permissionsForPrincipal/{principal}", method = RequestMethod.GET)
 	public List<GroupPermissionType> groupPermissions(
 			@PathVariable("group") Group group,
@@ -64,8 +52,18 @@ public class GroupPrincipalPermissionsController {
 					throws BindException {
 
 		return Stream
-				.of(GroupPermissionType.values()).filter(perm -> aclService
+				.of(GroupPermissionType.values()).filter(perm -> this.aclService
 						.hasGroupPermission(group, principal, perm))
 				.collect(Collectors.toList());
+	}
+
+	@RequestMapping(value = "/api/group/{group}/hasGroupPermission/{principal}", method = RequestMethod.GET)
+	public boolean hasGroupPermission(
+			@PathVariable("group") Group group,
+			@PathVariable("principal") Long principal,
+			@RequestParam("permission") GroupPermissionType permission)
+					throws BindException {
+
+		return this.aclService.hasGroupPermission(group, principal, permission);
 	}
 }

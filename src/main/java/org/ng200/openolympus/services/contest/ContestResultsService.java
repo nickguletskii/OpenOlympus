@@ -27,9 +27,6 @@ import com.google.common.collect.ImmutableList;
 @Service
 public class ContestResultsService {
 
-	@Autowired
-	private DSLContext dslContext;
-
 	private static final SelectField<?>[] CONTEST_RANK_SELECT_FIELDS = ImmutableList
 			.<SelectField<?>> builder()
 			.add(
@@ -45,6 +42,9 @@ public class ContestResultsService {
 					Tables.USER.fields())
 			.build().toArray(new SelectField<?>[0]);
 
+	@Autowired
+	private DSLContext dslContext;
+
 	public List<UserRanking> getContestResults(Contest contest) {
 		return this.getContestResultsQuery(contest)
 				.fetchInto(UserRanking.class);
@@ -59,7 +59,7 @@ public class ContestResultsService {
 	private SelectConditionStep<Record> getContestResultsQuery(
 			Contest contest) {
 		return this.dslContext
-				.select(CONTEST_RANK_SELECT_FIELDS)
+				.select(ContestResultsService.CONTEST_RANK_SELECT_FIELDS)
 				.from(Tables.CONTEST_PARTICIPATION)
 				.rightOuterJoin(Tables.USER)
 				.on(Tables.CONTEST_PARTICIPATION.USER_ID.eq(Tables.USER.ID))

@@ -41,5 +41,5 @@ import org.ng200.openolympus.security.SecurityClearancePredicate;
 public @interface SecurityClearanceRequired {
 	SecurityClearanceType minimumClearance() default SecurityClearanceType.ANONYMOUS;
 
-	Class<? extends SecurityClearancePredicate>[]predicates() default {};
+	Class<? extends SecurityClearancePredicate>[] predicates() default {};
 }

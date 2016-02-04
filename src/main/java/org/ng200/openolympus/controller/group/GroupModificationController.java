@@ -50,10 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/group/{group}/edit")
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.LIST_GROUPS,
-                                     predicates = UserHasGroupPermission.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.LIST_GROUPS, predicates = UserHasGroupPermission.class)
 		})
 })
 @GroupPermissionRequired(GroupPermissionType.edit)
@@ -67,9 +65,9 @@ public class GroupModificationController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public BindingResponse editGroup(
-	        @PathVariable("group") Group group,
-	        @Valid final Group groupDto,
-	        final BindingResult bindingResult) throws BindException {
+			@PathVariable("group") Group group,
+			@Valid final Group groupDto,
+			final BindingResult bindingResult) throws BindException {
 		Assertions.resourceExists(group);
 
 		this.groupDtoValidator.validate(groupDto, group, bindingResult);
@@ -84,7 +82,7 @@ public class GroupModificationController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public Group showGroupEditingForm(
-	        @PathVariable("group") final Group group) {
+			@PathVariable("group") final Group group) {
 		return group;
 	}
 }

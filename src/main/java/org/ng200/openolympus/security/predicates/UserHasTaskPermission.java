@@ -44,7 +44,7 @@ public class UserHasTaskPermission implements DynamicSecurityPredicate {
 			@Parameter("task") Task task,
 			@CurrentUser User user) {
 
-		return aclService.hasTaskPermission(task, user,
+		return this.aclService.hasTaskPermission(task, user,
 				taskPermissionRequired.value())
 						? SecurityClearanceType.ANONYMOUS
 						: SecurityClearanceType.DENIED;

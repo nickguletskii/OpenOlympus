@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ContestCRUDService extends GenericCreateUpdateRepository {
-	
+
 	@Autowired
 	private ContestDao contestDao;
 

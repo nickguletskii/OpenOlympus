@@ -33,5 +33,5 @@ import java.lang.annotation.Target;
 })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SecurityAnd {
-	public SecurityLeaf[]value();
+	public SecurityLeaf[] value();
 }

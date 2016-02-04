@@ -50,9 +50,8 @@ public class GroupListController {
 	private GroupService groupService;
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(
-	                                     value = SecurityClearanceType.LIST_GROUPS)
+					@SecurityAnd({
+									@SecurityLeaf(value = SecurityClearanceType.LIST_GROUPS)
 			})
 	})
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupsCount")
@@ -62,22 +61,20 @@ public class GroupListController {
 	}
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(
-	                                     value = SecurityClearanceType.LIST_GROUPS)
+					@SecurityAnd({
+									@SecurityLeaf(value = SecurityClearanceType.LIST_GROUPS)
 			})
 	})
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groups")
 	@ResponseBody
 	public List<Group> groupList(
-	        @RequestParam(value = "page",
-	                defaultValue = "1") Integer pageNumber,
-	        Principal principal) {
+			@RequestParam(value = "page", defaultValue = "1") Integer pageNumber,
+			Principal principal) {
 		if (pageNumber < 1) {
 			throw new ResourceNotFoundException();
 		}
 		return this.groupService.getGroups(pageNumber,
-		        GroupListController.PAGE_SIZE);
+				GroupListController.PAGE_SIZE);
 	}
 
 }

@@ -140,6 +140,10 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				false).map(record -> record.into(Verdict.class));
 	}
 
+	public Solution getSolutionById(long solutionId) {
+		return this.solutionDao.fetchOneById(solutionId);
+	}
+
 	public long getSolutionCount() {
 		return this.solutionDao.count();
 	}
@@ -178,9 +182,5 @@ public class SolutionService extends GenericCreateUpdateRepository {
 	@Transactional
 	public synchronized Verdict updateVerdict(Verdict verdict) {
 		return this.update(verdict, Tables.VERDICT);
-	}
-
-	public Solution getSolutionById(long solutionId) {
-		return solutionDao.fetchOneById(solutionId);
 	}
 }

@@ -49,16 +49,15 @@ public class GroupGeneralInformationController {
 	private GroupService groupService;
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(
-	                                     value = SecurityClearanceType.LIST_GROUPS)
+					@SecurityAnd({
+									@SecurityLeaf(value = SecurityClearanceType.LIST_GROUPS)
 			})
 	})
 	@RequestMapping(method = RequestMethod.GET, value = "/api/group")
 	public @ResponseBody Group getGroup(
-	        @RequestParam(value = "id", required = false) final Long id,
-	        @RequestParam(value = "name", required = false) final String name)
-	                throws MissingServletRequestParameterException {
+			@RequestParam(value = "id", required = false) final Long id,
+			@RequestParam(value = "name", required = false) final String name)
+					throws MissingServletRequestParameterException {
 		if (name != null) {
 			return this.groupService.getGroupByName(name);
 		}
@@ -69,15 +68,13 @@ public class GroupGeneralInformationController {
 	}
 
 	@SecurityOr({
-	              @SecurityAnd({
-	                             @SecurityLeaf(
-	                                     value = SecurityClearanceType.LIST_GROUPS)
+					@SecurityAnd({
+									@SecurityLeaf(value = SecurityClearanceType.LIST_GROUPS)
 			})
 	})
 	@RequestMapping(method = RequestMethod.GET, value = "/api/groupCompletion")
 	public @ResponseBody List<Group> searchGroups(
-	        @RequestParam(value = "term",
-	                defaultValue = "") final String name) {
+			@RequestParam(value = "term", defaultValue = "") final String name) {
 		Assertions.resourceExists(name);
 
 		return this.groupService.findAFewGroupsWithNameContaining(name);

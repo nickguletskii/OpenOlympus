@@ -47,8 +47,9 @@ public class SolutionIsInContestModeratedByCurrentUserSecurityPredicate
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
 			@Parameter("solution") Solution solution) {
-		if (aclService.solutionIsModeratedByUser(solution, user))
+		if (this.aclService.solutionIsModeratedByUser(solution, user)) {
 			return SecurityClearanceType.ANONYMOUS;
+		}
 		return SecurityClearanceType.DENIED;
 	}
 }

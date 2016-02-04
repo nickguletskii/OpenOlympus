@@ -23,14 +23,14 @@
 package org.ng200.openolympus.rest;
 
 import java.time.OffsetDateTime;
-import java.util.Date;
 
 public class TaskApiObject {
 	private Long id;
 	private String name;
 	private OffsetDateTime timeAdded;
 
-	public TaskApiObject(final Long id, final String name, final OffsetDateTime added) {
+	public TaskApiObject(final Long id, final String name,
+			final OffsetDateTime added) {
 		super();
 		this.id = id;
 		this.name = name;

@@ -1,3 +1,25 @@
+/**
+ * The MIT License
+ * Copyright (c) 2014-2015 Nick Guletskii
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.ng200.openolympus;
 
 import java.util.stream.Stream;
@@ -15,15 +37,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestUserFactory {
 
-	@Autowired
-	private DSLContext dslContext;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private PrincipalDao principalDao;
-
 	public class TestUserBuilder {
 
 		private String prefix = "testUser";
@@ -31,21 +44,47 @@ public class TestUserFactory {
 		private boolean superuser = false;
 		private GeneralPermissionType[] permissions = {};
 
+		public User build()
+				throws Exception {
+			final UserRecord userRecord = new UserRecord();
+			userRecord.attach(TestUserFactory.this.dslContext.configuration());
+			final String username = this.prefix + "_" + TestUtils.generateId();
+			userRecord
+					.setUsername(username)
+					.setPassword(TestUserFactory.this.passwordEncoder
+							.encode("password"))
+					.setApproved(this.approved)
+					.setSuperuser(this.superuser)
+					.setApprovalEmailSent(false)
+					.setEnabled(true);
+			userRecord.insert();
+
+			userRecord.refresh();
+
+			final Principal principal = TestUserFactory.this.principalDao
+					.findById(userRecord.getId());
+
+			principal.setPermissions(this.permissions);
+
+			TestUserFactory.this.principalDao.update(principal);
+
+			return userRecord.into(User.class);
+		}
+
 		public GeneralPermissionType[] getPermissions() {
-			return permissions;
+			return this.permissions;
 		}
 
 		public String getPrefix() {
-			return prefix;
-		}
-
-		public TestUserBuilder setPrefix(String prefix) {
-			this.prefix = prefix;
-			return this;
+			return this.prefix;
 		}
 
 		public boolean isApproved() {
-			return approved;
+			return this.approved;
+		}
+
+		public boolean isSuperuser() {
+			return this.superuser;
 		}
 
 		public TestUserBuilder setApproved(boolean approved) {
@@ -53,18 +92,13 @@ public class TestUserFactory {
 			return this;
 		}
 
-		public boolean isSuperuser() {
-			return superuser;
+		public TestUserBuilder setPrefix(String prefix) {
+			this.prefix = prefix;
+			return this;
 		}
 
 		public TestUserBuilder setSuperuser(boolean superuser) {
 			this.superuser = superuser;
-			return this;
-		}
-
-		public TestUserBuilder withPermissions(
-				GeneralPermissionType... generalPermissionTypes) {
-			this.permissions = generalPermissionTypes;
 			return this;
 		}
 
@@ -77,31 +111,21 @@ public class TestUserFactory {
 			return this;
 		}
 
-		public User build()
-				throws Exception {
-			UserRecord userRecord = new UserRecord();
-			userRecord.attach(dslContext.configuration());
-			String username = prefix + "_" + TestUtils.generateId();
-			userRecord
-					.setUsername(username)
-					.setPassword(passwordEncoder.encode("password"))
-					.setApproved(approved)
-					.setSuperuser(superuser)
-					.setApprovalEmailSent(false)
-					.setEnabled(true);
-			userRecord.insert();
-
-			userRecord.refresh();
-
-			Principal principal = principalDao.findById(userRecord.getId());
-
-			principal.setPermissions(permissions);
-
-			principalDao.update(principal);
-
-			return userRecord.into(User.class);
+		public TestUserBuilder withPermissions(
+				GeneralPermissionType... generalPermissionTypes) {
+			this.permissions = generalPermissionTypes;
+			return this;
 		}
 	}
+
+	@Autowired
+	private DSLContext dslContext;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private PrincipalDao principalDao;
 
 	public TestUserBuilder user() {
 		return new TestUserBuilder();

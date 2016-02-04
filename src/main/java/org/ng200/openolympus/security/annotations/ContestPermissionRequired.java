@@ -30,8 +30,8 @@ import java.lang.annotation.Target;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 
 @Target({
-          ElementType.METHOD,
-          ElementType.TYPE
+			ElementType.METHOD,
+			ElementType.TYPE
 })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ContestPermissionRequired {

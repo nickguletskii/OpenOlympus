@@ -33,8 +33,8 @@ public class ServletCustomizer implements EmbeddedServletContainerCustomizer {
 
 	@Override
 	public void customize(ConfigurableEmbeddedServletContainer container) {
-		
-		MimeMappings mappings = new MimeMappings(MimeMappings.DEFAULT);
+
+		final MimeMappings mappings = new MimeMappings(MimeMappings.DEFAULT);
 		mappings.add("woff", "application/x-font-woff");
 		mappings.add("ico", "image/x-icon");
 		mappings.add("png", MediaType.IMAGE_PNG_VALUE);

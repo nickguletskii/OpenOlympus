@@ -99,6 +99,12 @@ public class Application {
 	}
 
 	@Bean
+	public Settings settings() {
+		return new Settings()
+				.withExecuteLogging(false);
+	}
+
+	@Bean
 	public StorageService storageService() {
 		return new StorageService();
 	}
@@ -110,11 +116,5 @@ public class Application {
 		pool.setMaxPoolSize(10);
 		pool.setWaitForTasksToCompleteOnShutdown(true);
 		return pool;
-	}
-
-	@Bean
-	public Settings settings() {
-		return new Settings()
-				.withExecuteLogging(false);
 	}
 }

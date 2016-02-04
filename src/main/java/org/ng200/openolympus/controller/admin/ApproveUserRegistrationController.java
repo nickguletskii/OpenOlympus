@@ -56,13 +56,6 @@ import org.springframework.web.bind.annotation.RestController;
 })
 public class ApproveUserRegistrationController {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ApproveUserRegistrationController.class);
-
-	public static enum ResultType {
-		SUCCESS, FAILURE
-	}
-
 	public static class Result extends User {
 		/**
 		 *
@@ -79,22 +72,29 @@ public class ApproveUserRegistrationController {
 			Beans.copy(user, this);
 		}
 
+		public ResultType getResultType() {
+			return this.resultType;
+		}
+
 		public String getStatusMessage() {
 			return this.statusMessage;
-		}
-
-		public void setStatusMessage(String statusMessage) {
-			this.statusMessage = statusMessage;
-		}
-
-		public ResultType getResultType() {
-			return resultType;
 		}
 
 		public void setResultType(ResultType resultType) {
 			this.resultType = resultType;
 		}
+
+		public void setStatusMessage(String statusMessage) {
+			this.statusMessage = statusMessage;
+		}
 	}
+
+	public static enum ResultType {
+		SUCCESS, FAILURE
+	}
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(ApproveUserRegistrationController.class);
 
 	@Autowired
 	private UserService userService;
@@ -108,7 +108,7 @@ public class ApproveUserRegistrationController {
 		return userIds.stream().map(id -> this.userService.getUserById(id))
 				.map(u -> {
 					try {
-						userApprovalService.approveUser(u);
+						this.userApprovalService.approveUser(u);
 						return new Result(u, ResultType.SUCCESS, "OK");
 					} catch (MailException | MessagingException
 							| EmailException e) {

@@ -29,7 +29,6 @@ import org.jooq.impl.DSL;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
-import org.ng200.openolympus.jooq.tables.daos.ContestDao;
 import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.ContestParticipation;
@@ -41,13 +40,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ContestUsersService {
 
-	
 	@Autowired
 	private ContestParticipationDao contestParticipationDao;
 
 	@Autowired
 	private DSLContext dslContext;
-
 
 	@Transactional
 	public void addContestParticipant(final Contest contest, final User user) {
@@ -66,6 +63,12 @@ public class ContestUsersService {
 						.getId()))
 				.limit(pageSize)
 				.offset((pageNumber - 1) * pageSize).fetchInto(User.class);
+	}
+
+	public boolean isUserInContest(Contest contest, User user) {
+		return Routines.hasContestPermission(this.dslContext.configuration(),
+				contest.getId(), user.getId(),
+				ContestPermissionType.participate);
 	}
 
 	public boolean isUserParticipatingIn(final User user,
@@ -105,12 +108,6 @@ public class ContestUsersService {
 								contest.getId(), user.getId(),
 								ContestPermissionType.manage_acl)
 						.booleanValue();
-	}
-
-	public boolean isUserInContest(Contest contest, User user) {
-		return Routines.hasContestPermission(this.dslContext.configuration(),
-				contest.getId(), user.getId(),
-				ContestPermissionType.participate);
 	}
 
 }

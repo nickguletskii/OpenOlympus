@@ -63,7 +63,7 @@ public class GroupUserRemovalController {
 			@RequestParam("user") User user) throws BindException {
 		Assertions.resourceExists(group);
 
-		groupService.removeUserFromGroup(user, group);
+		this.groupService.removeUserFromGroup(user, group);
 	}
 
 }

@@ -49,21 +49,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.APPROVED_USER,
-                                     predicates = UserIsOwnerOfSolutionSecurityPredicate.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserIsOwnerOfSolutionSecurityPredicate.class)
 		}),
 
-		      @SecurityAnd({
-		                     @SecurityLeaf(
-		                             value = SecurityClearanceType.ANONYMOUS,
-		                             predicates = SolutionIsInContestModeratedByCurrentUserSecurityPredicate.class)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.ANONYMOUS, predicates = SolutionIsInContestModeratedByCurrentUserSecurityPredicate.class)
 		}),
 
-		      @SecurityAnd({
-		                     @SecurityLeaf(
-		                             value = SecurityClearanceType.VIEW_ALL_SOLUTIONS)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.VIEW_ALL_SOLUTIONS)
 		})
 
 })
@@ -77,16 +72,16 @@ public class SolutionDownloadController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<FileSystemResource> solutionDownload(
-	        final HttpServletRequest request, final Model model,
-	        @RequestParam(value = "id") final Solution solution,
-	        final Principal principal) {
+			final HttpServletRequest request, final Model model,
+			@RequestParam(value = "id") final Solution solution,
+			final Principal principal) {
 		Assertions.resourceExists(solution);
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.setContentDispositionFormData("attachment", this.storageService
-		        .getSolutionFile(solution).getFileName().toString());
+				.getSolutionFile(solution).getFileName().toString());
 		return new ResponseEntity<FileSystemResource>(new FileSystemResource(
-		        this.storageService.getSolutionFile(solution).toFile()),
-		        headers, HttpStatus.OK);
+				this.storageService.getSolutionFile(solution).toFile()),
+				headers, HttpStatus.OK);
 	}
 }

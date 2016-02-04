@@ -43,9 +43,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("web")
 @SecurityOr({
-              @SecurityAnd({
-                             @SecurityLeaf(
-                                     value = SecurityClearanceType.LOGGED_IN)
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.LOGGED_IN)
 		})
 })
 public class UserGeneralInformationController {
@@ -55,10 +54,9 @@ public class UserGeneralInformationController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/user")
 	public @ResponseBody User getUser(
-	        @RequestParam(value = "id", required = false) final Long id,
-	        @RequestParam(value = "username",
-	                required = false) final String name)
-	                        throws MissingServletRequestParameterException {
+			@RequestParam(value = "id", required = false) final Long id,
+			@RequestParam(value = "username", required = false) final String name)
+					throws MissingServletRequestParameterException {
 		if (name != null) {
 			return this.userService.getUserByUsername(name);
 		}
@@ -70,8 +68,7 @@ public class UserGeneralInformationController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/api/userCompletion")
 	public @ResponseBody List<User> searchUsers(
-	        @RequestParam(value = "term",
-	                defaultValue = "") final String name) {
+			@RequestParam(value = "term", defaultValue = "") final String name) {
 		Assertions.resourceExists(name);
 
 		return this.userService.findAFewUsersWithNameContaining(name);
