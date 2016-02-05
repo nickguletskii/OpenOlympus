@@ -1,12 +1,19 @@
 -- Database generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler  version: 0.8.1
--- PostgreSQL version: 9.4
+-- pgModeler  version: 0.8.2-beta1
+-- PostgreSQL version: 9.5
 -- Project Site: pgmodeler.com.br
 -- Model Author: ---
 
 SET check_function_bodies = false;
 -- ddl-end --
 
+-- -- object: openolympus | type: ROLE --
+-- -- DROP ROLE IF EXISTS openolympus;
+-- CREATE ROLE openolympus WITH 
+-- 	LOGIN
+-- 	UNENCRYPTED PASSWORD 'somesecretpassword';
+-- -- ddl-end --
+-- 
 
 -- Database creation must be done outside an multicommand file.
 -- These commands were put in this file only for convenience.
@@ -15,7 +22,7 @@ SET check_function_bodies = false;
 -- CREATE DATABASE openolympus
 -- 	ENCODING = 'UTF8'
 -- 	TABLESPACE = pg_default
--- 	OWNER = postgres
+-- 	OWNER = openolympus
 -- ;
 -- -- ddl-end --
 -- 
@@ -43,7 +50,7 @@ FROM contest
 WHERE contest.id = contest_id
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_contest_end(integer) OWNER TO postgres;
+ALTER FUNCTION public.get_contest_end(integer) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.get_contest_end_for_user | type: FUNCTION --
@@ -69,7 +76,7 @@ FROM contest
 WHERE contest.id = contest_id 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_contest_end_for_user(IN integer,IN bigint) OWNER TO postgres;
+ALTER FUNCTION public.get_contest_end_for_user(IN integer,IN bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.get_contest_start | type: FUNCTION --
@@ -85,7 +92,7 @@ CREATE FUNCTION public.get_contest_start ( contest_id integer)
  SELECT contest.start_time FROM contest WHERE contest.id = contest_id
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_contest_start(integer) OWNER TO postgres;
+ALTER FUNCTION public.get_contest_start(integer) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.get_contest_start_for_user | type: FUNCTION --
@@ -101,7 +108,7 @@ CREATE FUNCTION public.get_contest_start_for_user ( contest_id integer,  user_id
  SELECT contest.start_time FROM contest WHERE contest.id = contest_id 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_contest_start_for_user(integer,bigint) OWNER TO postgres;
+ALTER FUNCTION public.get_contest_start_for_user(integer,bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.get_solution_author | type: FUNCTION --
@@ -117,7 +124,7 @@ CREATE FUNCTION public.get_solution_author ( solution_id bigint)
  SELECT user_id FROM solution WHERE solution.id = solution_id
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_solution_author(bigint) OWNER TO postgres;
+ALTER FUNCTION public.get_solution_author(bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.get_solution_time_added | type: FUNCTION --
@@ -133,7 +140,7 @@ CREATE FUNCTION public.get_solution_time_added ( solution_id bigint)
  SELECT time_added FROM solution WHERE solution.id = solution_id 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_solution_time_added(bigint) OWNER TO postgres;
+ALTER FUNCTION public.get_solution_time_added(bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.maintain_contest_rank | type: FUNCTION --
@@ -149,7 +156,7 @@ CREATE FUNCTION public.maintain_contest_rank ()
  BEGIN IF (TG_OP = 'UPDATE') THEN PERFORM update_contest(NEW.id); END IF; RETURN NULL; END; 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.maintain_contest_rank() OWNER TO postgres;
+ALTER FUNCTION public.maintain_contest_rank() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.maintain_contest_rank_with_task | type: FUNCTION --
@@ -165,7 +172,7 @@ CREATE FUNCTION public.maintain_contest_rank_with_task ()
  BEGIN IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_contest(NEW.contests_id); END IF; IF (TG_OP = 'DELETE') THEN PERFORM update_contest(OLD.contests_id); END IF; RETURN NULL; END; 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.maintain_contest_rank_with_task() OWNER TO postgres;
+ALTER FUNCTION public.maintain_contest_rank_with_task() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.maintain_contest_rank_with_time_extensions | type: FUNCTION --
@@ -181,7 +188,7 @@ CREATE FUNCTION public.maintain_contest_rank_with_time_extensions ()
  BEGIN IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_user_in_contest(NEW.user_id, NEW.contest_id); END IF; IF (TG_OP = 'DELETE') THEN PERFORM update_user_in_contest(OLD.user_id, OLD.contest_id); END IF; RETURN NULL; END; 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.maintain_contest_rank_with_time_extensions() OWNER TO postgres;
+ALTER FUNCTION public.maintain_contest_rank_with_time_extensions() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.maintain_solution_score | type: FUNCTION --
@@ -197,7 +204,7 @@ CREATE FUNCTION public.maintain_solution_score ()
  BEGIN IF (TG_OP = 'DELETE') THEN PERFORM update_solution(OLD.solution_id); END IF; IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_solution(NEW.solution_id); END IF; RETURN NULL; END; 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.maintain_solution_score() OWNER TO postgres;
+ALTER FUNCTION public.maintain_solution_score() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.update_contest | type: FUNCTION --
@@ -222,7 +229,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.update_contest(IN integer) OWNER TO postgres;
+ALTER FUNCTION public.update_contest(IN integer) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.update_solution | type: FUNCTION --
@@ -256,7 +263,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.update_solution(IN bigint) OWNER TO postgres;
+ALTER FUNCTION public.update_solution(IN bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.update_user_in_contest | type: FUNCTION --
@@ -272,7 +279,7 @@ CREATE FUNCTION public.update_user_in_contest ( _param1 bigint,  _param2 bigint)
  UPDATE solutions SET score=(SELECT coalesce(sum(verdicts.score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), maximum_score=(SELECT coalesce(sum(verdicts.maximum_score), 0) FROM verdicts WHERE verdicts.solution_id=solutions.id), tested=(SELECT coalesce(every(verdicts.tested), TRUE) FROM verdicts WHERE verdicts.solution_id=solutions.id) WHERE id=$1; UPDATE contest_participation SET score = ( SELECT coalesce(sum(sols.score), 0) FROM( SELECT DISTINCT ON(solutions.task_id) score FROM solutions RIGHT OUTER JOIN contest_tasks ON contest_tasks.tasks_id = solutions.task_id AND contest_tasks.contests_id=contest_participation.contest_id WHERE solutions.user_id=contest_participation.user_id AND ( solutions.time_added BETWEEN (SELECT get_contest_start_for_user(contest_participation.contest_id,contest_participation.user_id)) AND (SELECT get_contest_end_for_user(contest_participation.contest_id,contest_participation.user_id)) ) ORDER BY solutions.task_id asc, solutions.time_added desc ) AS sols ) WHERE contest_participation.user_id = $1 AND contest_participation.contest_id = $2 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.update_user_in_contest(bigint,bigint) OWNER TO postgres;
+ALTER FUNCTION public.update_user_in_contest(bigint,bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.general_permission_type | type: TYPE --
@@ -280,7 +287,7 @@ ALTER FUNCTION public.update_user_in_contest(bigint,bigint) OWNER TO postgres;
 CREATE TYPE public.general_permission_type AS
  ENUM ('create_contests','remove_contests','create_tasks','remove_tasks','view_others_user_details','remove_user','approve_user_registrations','change_other_users_password','change_other_users_personal_info','enumerate_all_users','task_supervisor','view_other_users_personal_info','create_groups','list_groups','manage_principal_permissions','view_all_solutions','view_archive_during_contest','rejudge_tasks');
 -- ddl-end --
-ALTER TYPE public.general_permission_type OWNER TO postgres;
+ALTER TYPE public.general_permission_type OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.contest_participation | type: TABLE --
@@ -294,7 +301,7 @@ CREATE TABLE public.contest_participation(
 
 );
 -- ddl-end --
-ALTER TABLE public.contest_participation OWNER TO postgres;
+ALTER TABLE public.contest_participation OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.contest_question | type: TABLE --
@@ -309,7 +316,7 @@ CREATE TABLE public.contest_question(
 
 );
 -- ddl-end --
-ALTER TABLE public.contest_question OWNER TO postgres;
+ALTER TABLE public.contest_question OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.persistent_logins | type: TABLE --
@@ -323,7 +330,7 @@ CREATE TABLE public.persistent_logins(
 
 );
 -- ddl-end --
-ALTER TABLE public.persistent_logins OWNER TO postgres;
+ALTER TABLE public.persistent_logins OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.property | type: TABLE --
@@ -338,7 +345,7 @@ CREATE TABLE public.property(
 
 );
 -- ddl-end --
-ALTER TABLE public.property OWNER TO postgres;
+ALTER TABLE public.property OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.solution | type: TABLE --
@@ -356,7 +363,7 @@ CREATE TABLE public.solution(
 
 );
 -- ddl-end --
-ALTER TABLE public.solution OWNER TO postgres;
+ALTER TABLE public.solution OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.time_extension | type: TABLE --
@@ -371,7 +378,7 @@ CREATE TABLE public.time_extension(
 
 );
 -- ddl-end --
-ALTER TABLE public.time_extension OWNER TO postgres;
+ALTER TABLE public.time_extension OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.contest | type: TABLE --
@@ -387,7 +394,7 @@ CREATE TABLE public.contest(
 
 );
 -- ddl-end --
-ALTER TABLE public.contest OWNER TO postgres;
+ALTER TABLE public.contest OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.task | type: TABLE --
@@ -403,7 +410,7 @@ CREATE TABLE public.task(
 
 );
 -- ddl-end --
-ALTER TABLE public.task OWNER TO postgres;
+ALTER TABLE public.task OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.principal_sequence | type: SEQUENCE --
@@ -417,7 +424,7 @@ CREATE SEQUENCE public.principal_sequence
 	NO CYCLE
 	OWNED BY NONE;
 -- ddl-end --
-ALTER SEQUENCE public.principal_sequence OWNER TO postgres;
+ALTER SEQUENCE public.principal_sequence OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.principal | type: TABLE --
@@ -429,7 +436,7 @@ CREATE TABLE public.principal(
 
 );
 -- ddl-end --
-ALTER TABLE public.principal OWNER TO postgres;
+ALTER TABLE public.principal OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public."USER" | type: TABLE --
@@ -467,7 +474,7 @@ CREATE TABLE public."USER"(
 
 );
 -- ddl-end --
-ALTER TABLE public."USER" OWNER TO postgres;
+ALTER TABLE public."USER" OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public."group" | type: TABLE --
@@ -480,7 +487,7 @@ CREATE TABLE public."group"(
 
 );
 -- ddl-end --
-ALTER TABLE public."group" OWNER TO postgres;
+ALTER TABLE public."group" OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.contest_message | type: TABLE --
@@ -495,7 +502,7 @@ CREATE TABLE public.contest_message(
 
 );
 -- ddl-end --
-ALTER TABLE public.contest_message OWNER TO postgres;
+ALTER TABLE public.contest_message OWNER TO openolympus;
 -- ddl-end --
 
 -- object: "USER_fk" | type: CONSTRAINT --
@@ -549,7 +556,7 @@ ON DELETE CASCADE ON UPDATE CASCADE;
 CREATE TYPE public.verdict_status_type AS
  ENUM ('waiting','being_tested','ok','wrong_answer','runtime_error','cpu_time_limit_exceeded','real_time_limit_exceeded','memory_limit_exceeded','disk_limit_exceeded','security_violated','internal_error','presentation_error','output_limit_exceeded','compile_error');
 -- ddl-end --
-ALTER TYPE public.verdict_status_type OWNER TO postgres;
+ALTER TYPE public.verdict_status_type OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.verdict | type: TABLE --
@@ -570,7 +577,7 @@ CREATE TABLE public.verdict(
 
 );
 -- ddl-end --
-ALTER TABLE public.verdict OWNER TO postgres;
+ALTER TABLE public.verdict OWNER TO openolympus;
 -- ddl-end --
 
 -- object: solution_fk | type: CONSTRAINT --
@@ -644,7 +651,7 @@ ON DELETE RESTRICT ON UPDATE CASCADE;
 CREATE TYPE public.task_permission_type AS
  ENUM ('view','view_during_contest','modify','manage_acl','rejudge','add_to_contest');
 -- ddl-end --
-ALTER TYPE public.task_permission_type OWNER TO postgres;
+ALTER TYPE public.task_permission_type OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.acl_permission_type | type: TYPE --
@@ -652,7 +659,7 @@ ALTER TYPE public.task_permission_type OWNER TO postgres;
 CREATE TYPE public.acl_permission_type AS
  ENUM ('manage_acl','write','read','manage_participants','answer_questions','make_announcements');
 -- ddl-end --
-ALTER TYPE public.acl_permission_type OWNER TO postgres;
+ALTER TYPE public.acl_permission_type OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.contest_permission_type | type: TYPE --
@@ -660,7 +667,7 @@ ALTER TYPE public.acl_permission_type OWNER TO postgres;
 CREATE TYPE public.contest_permission_type AS
  ENUM ('edit','view_tasks_before_contest_started','delete','add_task','list_tasks','extend_time','know_about','manage_acl','participate','view_participants','remove_task','view_results_during_contest','view_results_after_contest','view_all_solutions','view_tasks_after_contest_started');
 -- ddl-end --
-ALTER TYPE public.contest_permission_type OWNER TO postgres;
+ALTER TYPE public.contest_permission_type OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.keep_user_as_principal | type: FUNCTION --
@@ -687,7 +694,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.keep_user_as_principal() OWNER TO postgres;
+ALTER FUNCTION public.keep_user_as_principal() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.task_permission | type: TABLE --
@@ -767,7 +774,7 @@ END IF;
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.keep_user_as_member_of_groups() OWNER TO postgres;
+ALTER FUNCTION public.keep_user_as_member_of_groups() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.keep_group_as_principal | type: FUNCTION --
@@ -794,11 +801,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.keep_group_as_principal() OWNER TO postgres;
+ALTER FUNCTION public.keep_group_as_principal() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: keep_group_as_principal_trigger | type: TRIGGER --
--- DROP TRIGGER IF EXISTS keep_group_as_principal_trigger ON public."group"  ON public."group" CASCADE;
+-- DROP TRIGGER IF EXISTS keep_group_as_principal_trigger ON public."group" CASCADE;
 CREATE TRIGGER keep_group_as_principal_trigger
 	BEFORE INSERT OR DELETE OR UPDATE
 	ON public."group"
@@ -835,7 +842,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.has_general_permission(IN bigint,IN public.general_permission_type) OWNER TO postgres;
+ALTER FUNCTION public.has_general_permission(IN bigint,IN public.general_permission_type) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.has_contest_permission | type: FUNCTION --
@@ -860,7 +867,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.has_contest_permission(IN integer,IN bigint,IN public.contest_permission_type) OWNER TO postgres;
+ALTER FUNCTION public.has_contest_permission(IN integer,IN bigint,IN public.contest_permission_type) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.group_permission_type | type: TYPE --
@@ -868,7 +875,7 @@ ALTER FUNCTION public.has_contest_permission(IN integer,IN bigint,IN public.cont
 CREATE TYPE public.group_permission_type AS
  ENUM ('view_members','add_member','remove_member','know_about','edit','manage_acl');
 -- ddl-end --
-ALTER TYPE public.group_permission_type OWNER TO postgres;
+ALTER TYPE public.group_permission_type OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.has_task_permission | type: FUNCTION --
@@ -893,7 +900,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.has_task_permission(IN integer,IN bigint,IN public.task_permission_type) OWNER TO postgres;
+ALTER FUNCTION public.has_task_permission(IN integer,IN bigint,IN public.task_permission_type) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.permission_applies_to_principal | type: FUNCTION --
@@ -913,7 +920,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.permission_applies_to_principal(IN bigint,IN bigint) OWNER TO postgres;
+ALTER FUNCTION public.permission_applies_to_principal(IN bigint,IN bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.raise_contest_intersects_error | type: FUNCTION --
@@ -973,11 +980,11 @@ RETURN NULL;
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.raise_contest_intersects_error() OWNER TO postgres;
+ALTER FUNCTION public.raise_contest_intersects_error() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: contest_intersection_consistency_check | type: TRIGGER --
--- DROP TRIGGER IF EXISTS contest_intersection_consistency_check ON public.contest  ON public.contest CASCADE;
+-- DROP TRIGGER IF EXISTS contest_intersection_consistency_check ON public.contest CASCADE;
 CREATE TRIGGER contest_intersection_consistency_check
 	AFTER INSERT OR UPDATE
 	ON public.contest
@@ -999,7 +1006,7 @@ CREATE FUNCTION public.get_contests_that_intersect (IN time_range_start timestam
 SELECT * FROM contest WHERE tstzrange(get_contest_start(contest.id), get_contest_end(contest.id)) && tstzrange(time_range_start, time_range_end)
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_contests_that_intersect(IN timestamp with time zone,IN timestamp with time zone) OWNER TO postgres;
+ALTER FUNCTION public.get_contests_that_intersect(IN timestamp with time zone,IN timestamp with time zone) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: pg_trgm | type: EXTENSION --
@@ -1030,7 +1037,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.has_group_permission(IN bigint,IN bigint,IN public.group_permission_type) OWNER TO postgres;
+ALTER FUNCTION public.has_group_permission(IN bigint,IN bigint,IN public.group_permission_type) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: "USER_fk" | type: CONSTRAINT --
@@ -1041,7 +1048,7 @@ ON DELETE CASCADE ON UPDATE CASCADE;
 -- ddl-end --
 
 -- object: keep_user_as_principal_trigger | type: TRIGGER --
--- DROP TRIGGER IF EXISTS keep_user_as_principal_trigger ON public."USER"  ON public."USER" CASCADE;
+-- DROP TRIGGER IF EXISTS keep_user_as_principal_trigger ON public."USER" CASCADE;
 CREATE TRIGGER keep_user_as_principal_trigger
 	BEFORE INSERT OR DELETE OR UPDATE
 	ON public."USER"
@@ -1050,7 +1057,7 @@ CREATE TRIGGER keep_user_as_principal_trigger
 -- ddl-end --
 
 -- object: keep_user_as_member_of_groups_trigger | type: TRIGGER --
--- DROP TRIGGER IF EXISTS keep_user_as_member_of_groups_trigger ON public."USER"  ON public."USER" CASCADE;
+-- DROP TRIGGER IF EXISTS keep_user_as_member_of_groups_trigger ON public."USER" CASCADE;
 CREATE TRIGGER keep_user_as_member_of_groups_trigger
 	AFTER INSERT OR UPDATE
 	ON public."USER"
@@ -1059,21 +1066,21 @@ CREATE TRIGGER keep_user_as_member_of_groups_trigger
 -- ddl-end --
 
 -- object: user_keep_principal_insert | type: RULE --
--- DROP RULE IF EXISTS user_keep_principal_insert ON public."USER"  ON public."USER" CASCADE;
+-- DROP RULE IF EXISTS user_keep_principal_insert ON public."USER" CASCADE;
 CREATE RULE user_keep_principal_insert AS ON INSERT
 	TO public."USER"
 	DO ALSO (INSERT INTO principal(id) VALUES (NEW.id));
 -- ddl-end --
 
 -- object: user_keep_principal_update | type: RULE --
--- DROP RULE IF EXISTS user_keep_principal_update ON public."USER"  ON public."USER" CASCADE;
+-- DROP RULE IF EXISTS user_keep_principal_update ON public."USER" CASCADE;
 CREATE RULE user_keep_principal_update AS ON UPDATE
 	TO public."USER"
 	DO ALSO (UPDATE principal SET (id) = (NEW.id) WHERE principal.id=OLD.id);
 -- ddl-end --
 
 -- object: user_keep_principal_delete | type: RULE --
--- DROP RULE IF EXISTS user_keep_principal_delete ON public."USER"  ON public."USER" CASCADE;
+-- DROP RULE IF EXISTS user_keep_principal_delete ON public."USER" CASCADE;
 CREATE RULE user_keep_principal_delete AS ON DELETE
 	TO public."USER"
 	DO ALSO (DELETE FROM principal WHERE principal.id = OLD.id);
@@ -1089,7 +1096,7 @@ CREATE TABLE public.group_permission(
 
 );
 -- ddl-end --
-ALTER TABLE public.group_permission OWNER TO postgres;
+ALTER TABLE public.group_permission OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.get_participants_group_id_from_contest_id | type: FUNCTION --
@@ -1113,7 +1120,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_participants_group_id_from_contest_id(IN integer) OWNER TO postgres;
+ALTER FUNCTION public.get_participants_group_id_from_contest_id(IN integer) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.group_users | type: TABLE --
@@ -1125,6 +1132,8 @@ CREATE TABLE public.group_users(
 	CONSTRAINT group_users_pk PRIMARY KEY (group_id,user_id)
 
 );
+-- ddl-end --
+ALTER TABLE public.group_users OWNER TO openolympus;
 -- ddl-end --
 
 -- object: group_fk | type: CONSTRAINT --
@@ -1157,11 +1166,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.user_immutable_columns() OWNER TO postgres;
+ALTER FUNCTION public.user_immutable_columns() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: user_immutable_columns | type: TRIGGER --
--- DROP TRIGGER IF EXISTS user_immutable_columns ON public."USER"  ON public."USER" CASCADE;
+-- DROP TRIGGER IF EXISTS user_immutable_columns ON public."USER" CASCADE;
 CREATE TRIGGER user_immutable_columns
 	BEFORE UPDATE
 	ON public."USER"
@@ -1185,11 +1194,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.group_immutable_columns() OWNER TO postgres;
+ALTER FUNCTION public.group_immutable_columns() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: group_immutable_columns | type: TRIGGER --
--- DROP TRIGGER IF EXISTS group_immutable_columns ON public."group"  ON public."group" CASCADE;
+-- DROP TRIGGER IF EXISTS group_immutable_columns ON public."group" CASCADE;
 CREATE TRIGGER group_immutable_columns
 	BEFORE UPDATE
 	ON public."group"
@@ -1213,7 +1222,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.principal_immutable_columns() OWNER TO postgres;
+ALTER FUNCTION public.principal_immutable_columns() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.group_users_immutable_columns | type: FUNCTION --
@@ -1233,11 +1242,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.group_users_immutable_columns() OWNER TO postgres;
+ALTER FUNCTION public.group_users_immutable_columns() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: group_users_immutable_columns | type: TRIGGER --
--- DROP TRIGGER IF EXISTS group_users_immutable_columns ON public.group_users  ON public.group_users CASCADE;
+-- DROP TRIGGER IF EXISTS group_users_immutable_columns ON public.group_users CASCADE;
 CREATE TRIGGER group_users_immutable_columns
 	BEFORE UPDATE
 	ON public.group_users
@@ -1246,7 +1255,7 @@ CREATE TRIGGER group_users_immutable_columns
 -- ddl-end --
 
 -- object: principal_immutable_columns | type: TRIGGER --
--- DROP TRIGGER IF EXISTS principal_immutable_columns ON public.principal  ON public.principal CASCADE;
+-- DROP TRIGGER IF EXISTS principal_immutable_columns ON public.principal CASCADE;
 CREATE TRIGGER principal_immutable_columns
 	BEFORE UPDATE
 	ON public.principal
@@ -1272,11 +1281,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.contest_participation_immutable_columns() OWNER TO postgres;
+ALTER FUNCTION public.contest_participation_immutable_columns() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: contest_participation_immutable_columns | type: TRIGGER --
--- DROP TRIGGER IF EXISTS contest_participation_immutable_columns ON public.contest_participation  ON public.contest_participation CASCADE;
+-- DROP TRIGGER IF EXISTS contest_participation_immutable_columns ON public.contest_participation CASCADE;
 CREATE TRIGGER contest_participation_immutable_columns
 	BEFORE UPDATE
 	ON public.contest_participation
@@ -1301,7 +1310,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.check_immutability(IN text,IN anyelement,IN anyelement) OWNER TO postgres;
+ALTER FUNCTION public.check_immutability(IN text,IN anyelement,IN anyelement) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.keep_group_member_in_contest_participations_list | type: FUNCTION --
@@ -1346,11 +1355,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.keep_group_member_in_contest_participations_list() OWNER TO postgres;
+ALTER FUNCTION public.keep_group_member_in_contest_participations_list() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: keep_group_member_in_contest_participants_list | type: TRIGGER --
--- DROP TRIGGER IF EXISTS keep_group_member_in_contest_participants_list ON public.group_users  ON public.group_users CASCADE;
+-- DROP TRIGGER IF EXISTS keep_group_member_in_contest_participants_list ON public.group_users CASCADE;
 CREATE TRIGGER keep_group_member_in_contest_participants_list
 	AFTER INSERT OR DELETE 
 	ON public.group_users
@@ -1386,7 +1395,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.get_user_total_score_in_contest(IN integer,IN bigint) OWNER TO postgres;
+ALTER FUNCTION public.get_user_total_score_in_contest(IN integer,IN bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.purge_gargabe_contest_participations | type: FUNCTION --
@@ -1406,7 +1415,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.purge_gargabe_contest_participations(IN integer) OWNER TO postgres;
+ALTER FUNCTION public.purge_gargabe_contest_participations(IN integer) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.insert_new_contest_participations | type: FUNCTION --
@@ -1429,7 +1438,7 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.insert_new_contest_participations(IN integer) OWNER TO postgres;
+ALTER FUNCTION public.insert_new_contest_participations(IN integer) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.trgr_verdict_update | type: FUNCTION --
@@ -1455,11 +1464,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.trgr_verdict_update() OWNER TO postgres;
+ALTER FUNCTION public.trgr_verdict_update() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: trgr_verdict_maintain_totals | type: TRIGGER --
--- DROP TRIGGER IF EXISTS trgr_verdict_maintain_totals ON public.verdict  ON public.verdict CASCADE;
+-- DROP TRIGGER IF EXISTS trgr_verdict_maintain_totals ON public.verdict CASCADE;
 CREATE TRIGGER trgr_verdict_maintain_totals
 	AFTER INSERT OR DELETE OR UPDATE
 	ON public.verdict
@@ -1501,11 +1510,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.trgr_solution_updated() OWNER TO postgres;
+ALTER FUNCTION public.trgr_solution_updated() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: trgr_solution_updated | type: TRIGGER --
--- DROP TRIGGER IF EXISTS trgr_solution_updated ON public.solution  ON public.solution CASCADE;
+-- DROP TRIGGER IF EXISTS trgr_solution_updated ON public.solution CASCADE;
 CREATE TRIGGER trgr_solution_updated
 	AFTER INSERT OR UPDATE
 	ON public.solution
@@ -1529,11 +1538,11 @@ BEGIN
 END;
 $$;
 -- ddl-end --
-ALTER FUNCTION public.trgr_contest_updated() OWNER TO postgres;
+ALTER FUNCTION public.trgr_contest_updated() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: trgr_contest_updated | type: TRIGGER --
--- DROP TRIGGER IF EXISTS trgr_contest_updated ON public.contest  ON public.contest CASCADE;
+-- DROP TRIGGER IF EXISTS trgr_contest_updated ON public.contest CASCADE;
 CREATE TRIGGER trgr_contest_updated
 	AFTER UPDATE
 	ON public.contest
@@ -1621,11 +1630,11 @@ END;
 
 $$;
 -- ddl-end --
-ALTER FUNCTION public.trgr_contest_permissions_changed() OWNER TO postgres;
+ALTER FUNCTION public.trgr_contest_permissions_changed() OWNER TO openolympus;
 -- ddl-end --
 
 -- object: trgr_contest_permissions_changed | type: TRIGGER --
--- DROP TRIGGER IF EXISTS trgr_contest_permissions_changed ON public.contest_permission  ON public.contest_permission CASCADE;
+-- DROP TRIGGER IF EXISTS trgr_contest_permissions_changed ON public.contest_permission CASCADE;
 CREATE TRIGGER trgr_contest_permissions_changed
 	AFTER INSERT OR DELETE 
 	ON public.contest_permission
@@ -1647,7 +1656,7 @@ INSERT INTO group_users(group_id, "user_id",can_add_others_to_group) VALUES
 	(group_id_p, user_id_p, FALSE)
 $$;
 -- ddl-end --
-ALTER FUNCTION public.add_to_group(IN bigint,IN bigint) OWNER TO postgres;
+ALTER FUNCTION public.add_to_group(IN bigint,IN bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.remove_from_group | type: FUNCTION --
@@ -1665,7 +1674,7 @@ DELETE FROM group_users
 	AND group_users.group_id=group_id_p
 $$;
 -- ddl-end --
-ALTER FUNCTION public.remove_from_group(IN bigint,IN bigint) OWNER TO postgres;
+ALTER FUNCTION public.remove_from_group(IN bigint,IN bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: user_principal_id_mapping | type: CONSTRAINT --

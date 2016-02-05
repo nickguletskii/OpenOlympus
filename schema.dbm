@@ -3,10 +3,16 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="570,0" last-zoom="0.55"
-	 default-schema="public" default-owner="postgres">
+<dbmodel pgmodeler-ver="0.8.1" last-position="118,860" last-zoom="0.75"
+	 default-schema="public" default-owner="openolympus">
+<role name="openolympus"
+      login="true"
+      password="somesecretpassword"
+      sql-disabled="true">
+</role>
+
 <database name="openolympus" encoding="UTF8">
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<tablespace name="pg_default"/>
 </database>
 
@@ -22,7 +28,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
@@ -52,7 +58,7 @@ WHERE contest.id = contest_id]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
@@ -85,7 +91,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
@@ -105,7 +111,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
@@ -128,7 +134,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="bigint"/>
@@ -148,7 +154,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
@@ -168,7 +174,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -185,7 +191,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -202,7 +208,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -219,7 +225,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -236,7 +242,7 @@ WHERE contest.id = contest_id ]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -265,7 +271,7 @@ END;]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -303,7 +309,7 @@ END;]]></definition>
 		execution-cost="100"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -319,13 +325,13 @@ END;]]></definition>
 
 <usertype name="general_permission_type" configuration="enumeration">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<enumeration values="create_contests,remove_contests,create_tasks,remove_tasks,view_others_user_details,remove_user,approve_user_registrations,change_other_users_password,change_other_users_personal_info,enumerate_all_users,task_supervisor,view_other_users_personal_info,create_groups,list_groups,manage_principal_permissions,view_all_solutions,view_archive_during_contest,rejudge_tasks"/>
 </usertype>
 
 <table name="contest_participation">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="43.6364" y="1361.81"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
@@ -350,7 +356,7 @@ END;]]></definition>
 
 <table name="contest_question">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="3.63636" y="905.455"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
@@ -377,7 +383,7 @@ END;]]></definition>
 
 <table name="persistent_logins">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="60" y="300"/>
 	<column name="username" not-null="true">
 		<type name="character varying" length="64"/>
@@ -398,7 +404,7 @@ END;]]></definition>
 
 <table name="property">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="360" y="300"/>
 	<column name="id" not-null="true">
 		<type name="bigint"/>
@@ -422,7 +428,7 @@ END;]]></definition>
 
 <table name="solution">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="1605.45" y="225.455"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
@@ -459,7 +465,7 @@ END;]]></definition>
 
 <table name="time_extension">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="198.182" y="1601.82"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
@@ -487,7 +493,7 @@ END;]]></definition>
 
 <table name="contest">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="893.835" y="1827.82"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
@@ -514,7 +520,7 @@ END;]]></definition>
 
 <table name="task">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="1806.62" y="915.188"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
@@ -544,18 +550,18 @@ END;]]></definition>
 	 min-value="0" max-value="2147483647"
 	 cache="1" cycle="false">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 </sequence>
 
 <table name="principal">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="1260.99" y="1120.28"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32564"/>
+		<type name="public.general_permission_type" dimension="1" precision="32603"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -564,7 +570,7 @@ END;]]></definition>
 
 <table name="USER">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="980" y="363.636"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
@@ -657,7 +663,7 @@ END;]]></definition>
 
 <table name="group">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="1550.8" y="1585.52"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
@@ -675,7 +681,7 @@ END;]]></definition>
 
 <table name="contest_message">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="243.636" y="610.909"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
@@ -765,13 +771,13 @@ END;]]></definition>
 
 <usertype name="verdict_status_type" configuration="enumeration">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<enumeration values="waiting,being_tested,ok,wrong_answer,runtime_error,cpu_time_limit_exceeded,real_time_limit_exceeded,memory_limit_exceeded,disk_limit_exceeded,security_violated,internal_error,presentation_error,output_limit_exceeded,compile_error"/>
 </usertype>
 
 <table name="verdict">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="838.182" y="141.818"/>
 	<column name="id" not-null="true">
 		<type name="bigserial"/>
@@ -783,7 +789,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32564"/>
+		<type name="public.verdict_status_type" precision="32603"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -904,19 +910,19 @@ END;]]></definition>
 
 <usertype name="task_permission_type" configuration="enumeration">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<enumeration values="view,view_during_contest,modify,manage_acl,rejudge,add_to_contest"/>
 </usertype>
 
 <usertype name="acl_permission_type" configuration="enumeration">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<enumeration values="manage_acl,write,read,manage_participants,answer_questions,make_announcements"/>
 </usertype>
 
 <usertype name="contest_permission_type" configuration="enumeration">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<enumeration values="edit,view_tasks_before_contest_started,delete,add_task,list_tasks,extend_time,know_about,manage_acl,participate,view_participants,remove_task,view_results_during_contest,view_results_after_contest,view_all_solutions,view_tasks_after_contest_started"/>
 </usertype>
 
@@ -929,7 +935,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -964,7 +970,7 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32564"/>
+		<type name="public.task_permission_type" precision="32603"/>
 	</column>
 	<special-pk-cols indexes="0"/>
 </relationship>
@@ -978,7 +984,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1034,7 +1040,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1068,7 +1074,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
@@ -1107,7 +1113,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
@@ -1135,7 +1141,7 @@ END;]]></definition>
 
 <usertype name="group_permission_type" configuration="enumeration">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<enumeration values="view_members,add_member,remove_member,know_about,edit,manage_acl"/>
 </usertype>
 
@@ -1148,7 +1154,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
@@ -1183,7 +1189,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
@@ -1210,7 +1216,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1277,10 +1283,10 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="1">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32767"/>
+	<type name="public.contest" precision="32766"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp" with-timezone="true"/>
@@ -1304,7 +1310,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
@@ -1373,7 +1379,7 @@ END;]]></definition>
 
 <table name="group_permission">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<position x="1830.48" y="1330.96"/>
 	<column name="principal_id" not-null="true">
 		<type name="bigint"/>
@@ -1382,7 +1388,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32564"/>
+		<type name="public.group_permission_type" precision="32603"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1398,7 +1404,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="bigint"/>
@@ -1419,6 +1425,7 @@ END;]]></definition>
 
 <table name="group_users">
 	<schema name="public"/>
+	<role name="openolympus"/>
 	<position x="967.026" y="1276.27"/>
 	<column name="can_add_others_to_group" not-null="true" default-value="false">
 		<type name="bool"/>
@@ -1473,7 +1480,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1499,7 +1506,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1525,7 +1532,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1545,7 +1552,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1578,7 +1585,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1606,7 +1613,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -1636,7 +1643,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1688,7 +1695,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="numeric" length="19" precision="2"/>
@@ -1726,7 +1733,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -1750,7 +1757,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -1777,7 +1784,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1810,7 +1817,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1854,7 +1861,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1875,7 +1882,7 @@ END;]]></definition>
 	<schema name="public"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32564"/>
+		<type name="public.contest_permission_type" precision="32603"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>
@@ -1897,7 +1904,7 @@ END;]]></definition>
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="plpgsql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
@@ -1976,7 +1983,7 @@ END;
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -2000,7 +2007,7 @@ END;
 		execution-cost="1"
 		row-amount="0">
 	<schema name="public"/>
-	<role name="postgres"/>
+	<role name="openolympus"/>
 	<language name="sql" protected="true" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
@@ -2094,7 +2101,11 @@ END;
 <relationship name="rel_contest_permission_contest" type="relfk"
 	 src-table="public.contest_permission"
 	 dst-table="public.contest"
-	 src-required="false" dst-required="false"/>
+	 src-required="false" dst-required="false">
+	<label ref-type="dst-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
 
 <relationship name="rel_contest_permission_principal" type="relfk"
 	 src-table="public.contest_permission"
