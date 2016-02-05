@@ -38,7 +38,8 @@ import org.eclipse.jgit.transport.resolver.ServiceNotEnabledException;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.services.StorageService;
-import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.task.TaskACLService;
+import org.ng200.openolympus.services.task.TaskCRUDService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,10 @@ public class OpenOlympusGitRepositoryResolver
 			.compile("^tasks/([0-9]+)$");
 
 	@Autowired
-	private TaskService taskService;
+	private TaskACLService taskACLService;
+
+	@Autowired
+	private TaskCRUDService taskCRUDService;
 
 	@Autowired
 	private StorageService storageService;
@@ -82,9 +86,9 @@ public class OpenOlympusGitRepositoryResolver
 
 		final int id = Integer.valueOf(matcher.group(1));
 
-		final Task task = this.taskService.getById(id);
+		final Task task = this.taskCRUDService.getById(id);
 
-		if (!this.taskService.canModifyTask(task, user)) {
+		if (!this.taskACLService.canModifyTask(task, user)) {
 			throw new ServiceMayNotContinueException(
 					"The user doesn't have the permissions required to access this repository.");
 		}
