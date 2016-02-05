@@ -30,7 +30,7 @@ import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.task.TaskCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,14 +50,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskSearchController {
 
 	@Autowired
-	private TaskService taskService;
+	private TaskCRUDService taskCRUDService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody List<String> searchTasks(
 			@RequestParam(value = "term") final String name) {
 		Assertions.resourceExists(name);
 
-		return this.taskService.findAFewTasksWithNameContaining(name).stream()
+		return this.taskCRUDService.findAFewTasksWithNameContaining(name)
+				.stream()
 				.map((t) -> t.getName()).collect(Collectors.toList());
 	}
 }

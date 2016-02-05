@@ -38,8 +38,8 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.UserCanAddTaskPredicate;
 import org.ng200.openolympus.security.predicates.UserHasContestPermission;
-import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.contest.ContestTasksService;
+import org.ng200.openolympus.services.task.TaskCRUDService;
 import org.ng200.openolympus.validation.ContestTaskAdditionDtoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -68,7 +68,7 @@ import com.google.common.collect.ImmutableMap;
 public class ContestTaskAdditionController {
 
 	@Autowired
-	private TaskService taskService;
+	private TaskCRUDService taskCRUDService;
 	@Autowired
 	private ContestTaskAdditionDtoValidator contestTaskAdditionDtoValidator;
 
@@ -92,7 +92,7 @@ public class ContestTaskAdditionController {
 		}
 
 		this.contestTasksService
-				.addContestTask(contest, this.taskService
+				.addContestTask(contest, this.taskCRUDService
 						.getTaskByName(contestTaskAdditionDto.getTaskName()));
 		return new BindingResponse(Status.OK, null, ImmutableMap
 				.<String, Object> builder()

@@ -37,7 +37,7 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
 import org.ng200.openolympus.security.predicates.UserHasTaskPermission;
-import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.task.TaskACLService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.BindingResult;
@@ -93,14 +93,14 @@ public class TaskACLController {
 	}
 
 	@Autowired
-	private TaskService taskService;
+	private TaskACLService taskACLService;
 
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.PUT)
 	public void getTaskACL(
 			@PathVariable("task") int id,
 			@RequestBody Map<String, List<Long>> dto,
 			final BindingResult bindingResult, final Principal principal) {
-		this.taskService.setTaskPermissionsAndPrincipals(id,
+		this.taskACLService.setTaskPermissionsAndPrincipals(id,
 				dto.entrySet().stream().collect(
 						Collectors.toMap(
 								e -> TaskPermissionType.valueOf(e.getKey()),
@@ -110,7 +110,7 @@ public class TaskACLController {
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.GET)
 	public Map<TaskPermissionType, ACLItem> getTaskACL(
 			@PathVariable("task") int id, final Principal principal) {
-		final Map<TaskPermissionType, List<OlympusPrincipal>> taskPermissionsAndPrincipalData = this.taskService
+		final Map<TaskPermissionType, List<OlympusPrincipal>> taskPermissionsAndPrincipalData = this.taskACLService
 				.getTaskPermissionsAndPrincipalData(id);
 		return Stream.of(TaskPermissionType.values())
 				.collect(Collectors.toMap(type -> type,

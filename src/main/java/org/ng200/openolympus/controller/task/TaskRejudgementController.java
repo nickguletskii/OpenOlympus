@@ -34,7 +34,7 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
 import org.ng200.openolympus.security.predicates.UserHasTaskPermission;
-import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.task.TaskSolutionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskRejudgementController {
 
 	@Autowired
-	private TaskService taskService;
+	private TaskSolutionsService taskSolutionsService;
 
 	@RequestMapping(value = "/api/task/{task}/rejudgeTask", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
@@ -64,6 +64,6 @@ public class TaskRejudgementController {
 			final Model model) throws ExecutionException, IOException {
 		Assertions.resourceExists(task);
 
-		this.taskService.rejudgeTask(task);
+		this.taskSolutionsService.rejudgeTask(task);
 	}
 }

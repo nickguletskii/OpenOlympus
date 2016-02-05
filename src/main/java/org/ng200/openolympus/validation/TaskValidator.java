@@ -25,7 +25,7 @@ package org.ng200.openolympus.validation;
 import java.io.IOException;
 
 import org.ng200.openolympus.dto.UploadableTask;
-import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.task.TaskCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -35,7 +35,7 @@ public class TaskValidator {
 
 	public static final int DESCRIPTION_SIZE_LIMIT = 5 * 1024 * 1024;
 	@Autowired
-	private TaskService taskService;
+	private TaskCRUDService taskCRUDService;
 
 	public void validate(final UploadableTask task, final Errors errors,
 			final String prevName, final boolean ignoreEmptyFiles)
@@ -44,7 +44,7 @@ public class TaskValidator {
 			return;
 		}
 		if (!task.getName().equals(prevName)
-				&& this.taskService.getTaskByName(task.getName()) != null) {
+				&& this.taskCRUDService.getTaskByName(task.getName()) != null) {
 			errors.rejectValue("name", "", "task.add.form.errors.name.exists");
 		}
 		if (!ignoreEmptyFiles && (task.getJudgeFile() == null

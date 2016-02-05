@@ -36,9 +36,9 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.services.SolutionService;
-import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.services.contest.ContestTimingService;
+import org.ng200.openolympus.services.task.TaskCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.ui.Model;
@@ -63,7 +63,7 @@ public class SolutionListController {
 	private UserService userService;
 
 	@Autowired
-	private TaskService taskService;
+	private TaskCRUDService taskCRUDService;
 
 	@SecurityOr({
 					@SecurityAnd({
@@ -105,7 +105,7 @@ public class SolutionListController {
 		return this.solutionService
 				.getPage(pageNumber, SolutionListController.PAGE_SIZE)
 				.stream()
-				.map(solution -> new SolutionDto(solution, this.taskService
+				.map(solution -> new SolutionDto(solution, this.taskCRUDService
 						.getById(solution.getTaskId())))
 				.collect(Collectors.toList());
 	}
@@ -138,7 +138,7 @@ public class SolutionListController {
 
 		return solutions
 				.stream()
-				.map(solution -> new SolutionDto(solution, this.taskService
+				.map(solution -> new SolutionDto(solution, this.taskCRUDService
 						.getById(solution.getTaskId())))
 				.map(dto -> {
 					if (contest != null) {

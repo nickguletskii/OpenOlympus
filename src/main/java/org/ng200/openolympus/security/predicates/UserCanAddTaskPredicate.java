@@ -32,7 +32,7 @@ import org.ng200.openolympus.security.annotations.CurrentUser;
 import org.ng200.openolympus.security.annotations.MethodSecurityPredicate;
 import org.ng200.openolympus.security.annotations.Parameter;
 import org.ng200.openolympus.services.AclService;
-import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.task.TaskCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class UserCanAddTaskPredicate implements DynamicSecurityPredicate {
@@ -41,13 +41,13 @@ public class UserCanAddTaskPredicate implements DynamicSecurityPredicate {
 	private AclService aclService;
 
 	@Autowired
-	private TaskService taskService;
+	private TaskCRUDService taskCRUDService;
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType vote(
 			@Parameter("contestTaskAdditionDto") ContestTaskAdditionDto contestTaskAdditionDto,
 			@CurrentUser User user) {
-		final Task task = this.taskService
+		final Task task = this.taskCRUDService
 				.getTaskByName(contestTaskAdditionDto.getTaskName());
 		if (this.aclService.hasTaskPermission(task, user,
 				TaskPermissionType.add_to_contest)) {

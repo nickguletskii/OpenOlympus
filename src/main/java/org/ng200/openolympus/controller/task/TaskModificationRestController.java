@@ -37,7 +37,7 @@ import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.annotations.TaskPermissionRequired;
 import org.ng200.openolympus.security.predicates.UserHasTaskPermission;
-import org.ng200.openolympus.services.TaskService;
+import org.ng200.openolympus.services.task.TaskUploadService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -62,7 +62,7 @@ public class TaskModificationRestController {
 	private TaskValidator taskValidator;
 
 	@Autowired
-	private TaskService taskService;
+	private TaskUploadService taskCRUDService;
 
 	@RequestMapping(value = "/api/task/{task}/edit", method = RequestMethod.GET)
 	public TaskModificationDto getTask(@PathVariable("task") final Task task)
@@ -88,7 +88,7 @@ public class TaskModificationRestController {
 				throw new BindException(bindingResult);
 			}
 
-			this.taskService.patchTask(task, taskModificationDto);
+			this.taskCRUDService.patchTask(task, taskModificationDto);
 			return BindingResponse.OK;
 		};
 

@@ -38,8 +38,8 @@ import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
-import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.services.task.TaskUploadService;
 import org.ng200.openolympus.validation.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -59,7 +59,7 @@ public class TaskCreationController {
 	private TaskValidator taskValidator;
 
 	@Autowired
-	private TaskService taskService;
+	private TaskUploadService taskCRUDService;
 
 	@Autowired
 	private UserService userService;
@@ -84,7 +84,7 @@ public class TaskCreationController {
 		final User owner = this.userService
 				.getUserByUsername(principal.getName());
 
-		final Task task = this.taskService.uploadTask(taskCreationDto,
+		final Task task = this.taskCRUDService.uploadTask(taskCreationDto,
 				bindingResult,
 				owner);
 

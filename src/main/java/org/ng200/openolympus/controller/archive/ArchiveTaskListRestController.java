@@ -34,8 +34,9 @@ import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
 import org.ng200.openolympus.security.annotations.SecurityOr;
 import org.ng200.openolympus.security.predicates.NoCurrentContestSecurityPredicate;
-import org.ng200.openolympus.services.TaskService;
 import org.ng200.openolympus.services.UserService;
+import org.ng200.openolympus.services.task.TaskCRUDService;
+import org.ng200.openolympus.services.task.TaskSolutionsService;
 import org.ng200.openolympus.util.Beans;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -91,7 +92,9 @@ public class ArchiveTaskListRestController {
 	private static final int PAGE_SIZE = 10;
 
 	@Autowired
-	private TaskService taskService;
+	private TaskCRUDService taskCRUDService;
+	@Autowired
+	private TaskSolutionsService taskSolutionsService;
 
 	@Autowired
 	private UserService userService;
@@ -99,7 +102,7 @@ public class ArchiveTaskListRestController {
 	@RequestMapping(value = "/api/archive/tasksCount", method = RequestMethod.GET)
 
 	public Long countUsers() {
-		return this.taskService.countTasks();
+		return this.taskCRUDService.countTasks();
 	}
 
 	@RequestMapping(value = "/api/archive/tasks", method = RequestMethod.GET)
@@ -107,7 +110,7 @@ public class ArchiveTaskListRestController {
 	public List<TaskDto> getTasks(@RequestParam("page") Integer page,
 			Principal principal) {
 
-		return this.taskService
+		return this.taskCRUDService
 				.findTasksNewestFirstAndAuthorized(page,
 						ArchiveTaskListRestController.PAGE_SIZE, principal)
 				.stream()
@@ -117,10 +120,11 @@ public class ArchiveTaskListRestController {
 						final User user = this.userService
 								.getUserByUsername(principal.getName());
 						if (user != null) {
-							score = this.taskService.getScore(task, user);
+							score = this.taskSolutionsService.getScore(task,
+									user);
 						}
 					}
-					return new TaskDto(task, score, this.taskService
+					return new TaskDto(task, score, this.taskSolutionsService
 							.getMaximumScore(task));
 				}).collect(Collectors.toList());
 	}
