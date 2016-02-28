@@ -38,6 +38,7 @@ import org.jooq.BindingSetSQLOutputContext;
 import org.jooq.BindingSetStatementContext;
 import org.jooq.Converter;
 import org.jooq.impl.DSL;
+import org.postgresql.jdbc.PgResultSet;
 
 public class DateTimeBinding
 		implements Binding<OffsetDateTime, OffsetDateTime> {
@@ -83,9 +84,9 @@ public class DateTimeBinding
 	public void get(BindingGetResultSetContext<OffsetDateTime> ctx)
 			throws SQLException {
 		ctx.convert(this.converter())
-				.value(OffsetDateTime.parse(
-						ctx.resultSet().getString(ctx.index()),
-						DateUtils.ISO_OFFSET_DATE_TIME));
+				.value(
+						ctx.resultSet().unwrap(PgResultSet.class)
+								.getObject(ctx.index(), OffsetDateTime.class));
 	}
 
 	@Override
@@ -98,9 +99,9 @@ public class DateTimeBinding
 	public void get(BindingGetStatementContext<OffsetDateTime> ctx)
 			throws SQLException {
 		ctx.convert(this.converter())
-				.value(OffsetDateTime.parse(
-						ctx.statement().getString(ctx.index()),
-						DateUtils.ISO_OFFSET_DATE_TIME));
+				.value(
+						ctx.statement().getObject(ctx.index(),
+								OffsetDateTime.class));
 	}
 
 	@Override

@@ -41,12 +41,13 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<skipTests>true</skipTests>
-		<jooq.version>3.7.0</jooq.version>
+		<jooq.version>3.7.2</jooq.version>
+		<postgresql.version>9.4.1208</postgresql.version>
 	</properties>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.3.0.M2</version>
+		<version>1.3.3.RELEASE</version>
 	</parent>
 
 
@@ -236,7 +237,7 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
-				<version>1.3.0.M2</version>
+				<version>1.3.3.RELEASE</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -251,7 +252,7 @@
 					<plugin>
 						<groupId>org.jooq</groupId>
 						<artifactId>jooq-codegen-maven</artifactId>
-						<version>${jooq.version}-SNAPSHOT</version>
+						<version>${jooq.version}</version>
 
 
 						<executions>
@@ -303,7 +304,7 @@
 									<forcedTypes>
 										<forcedType>
 											<name>org.ng200.openolympus.jooqsupport.CustomTypes.OFFSETDATETIME</name>
-											<types>timestamp.*</types>
+											<types>timestamp\ with\ time\ zone</types>
 										</forcedType>
 										<forcedType>
 											<name>java.time.LocalDate</name>

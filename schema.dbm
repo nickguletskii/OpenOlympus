@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1" last-position="118,860" last-zoom="0.75"
+<dbmodel pgmodeler-ver="0.8.2-beta1" last-position="572,0" last-zoom="0.55"
 	 default-schema="public" default-owner="openolympus">
 <role name="openolympus"
       login="true"
@@ -29,7 +29,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
 	</return-type>
@@ -59,7 +59,7 @@ WHERE contest.id = contest_id]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
 	</return-type>
@@ -92,7 +92,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
 	</return-type>
@@ -112,7 +112,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
 	</return-type>
@@ -135,7 +135,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="bigint"/>
 	</return-type>
@@ -155,7 +155,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="timestamp" with-timezone="true"/>
 	</return-type>
@@ -175,7 +175,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -192,7 +192,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -209,7 +209,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -226,7 +226,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -243,7 +243,7 @@ WHERE contest.id = contest_id ]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -272,7 +272,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -310,7 +310,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -521,7 +521,7 @@ END;]]></definition>
 <table name="task">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="1806.62" y="915.188"/>
+	<position x="1862.92" y="899.632"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
 	</column>
@@ -561,7 +561,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32603"/>
+		<type name="public.general_permission_type" dimension="1" precision="32681"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -789,7 +789,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32603"/>
+		<type name="public.verdict_status_type" precision="32681"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -831,25 +831,6 @@ END;]]></definition>
 	 dst-table="public.verdict"
 	 src-required="false" dst-required="false"
 	del-action="CASCADE"/>
-
-<relationship name="contest_tasks" type="relnn"
-	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
-	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
-	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
-	 pk-col-pattern="id"
-	 custom-color="#bec171"
-	 src-table="public.contest"
-	 dst-table="public.task"
-	 src-required="false" dst-required="false"
-	 table-name="contest_tasks">
-	<line>
-		<position x="2320" y="1897.14"/>
-	<position x="2325.71" y="962.857"/>
-	</line>
-	<label ref-type="name-label">
-		<position x="0" y="0"/>
-	</label>
-</relationship>
 
 <relationship name="contest_messages" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -936,7 +917,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -954,27 +935,6 @@ END;]]></definition>
 END;]]></definition>
 </function>
 
-<relationship name="task_permission" type="relnn"
-	 src-col-pattern="{st}_{sc}" dst-col-pattern="{dt}_{sc}"
-	 pk-pattern="{gt}_pk" uq-pattern="{gt}_uq"
-	 src-fk-pattern="{st}_fk" dst-fk-pattern="{dt}_fk"
-	 pk-col-pattern="id"
-	 custom-color="#d07b5e"
-	 src-table="public.task"
-	 dst-table="public.principal"
-	 src-required="false" dst-required="false"
-	 table-name="task_permission"
-	upd-action="NO ACTION"
-	del-action="NO ACTION">
-	<label ref-type="name-label">
-		<position x="0" y="0"/>
-	</label>
-	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32603"/>
-	</column>
-	<special-pk-cols indexes="0"/>
-</relationship>
-
 <function name="keep_user_as_member_of_groups"
 		window-func="false"
 		returns-setof="false"
@@ -985,7 +945,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1041,7 +1001,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1075,7 +1035,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1114,7 +1074,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1155,7 +1115,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1190,7 +1150,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1217,7 +1177,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1284,9 +1244,9 @@ END;]]></definition>
 		row-amount="1">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32766"/>
+	<type name="public.contest" precision="32764"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
 		<type name="timestamp" with-timezone="true"/>
@@ -1311,7 +1271,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1388,7 +1348,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32603"/>
+		<type name="public.group_permission_type" precision="32681"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1405,7 +1365,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="bigint"/>
 	</return-type>
@@ -1481,7 +1441,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1507,7 +1467,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1533,7 +1493,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1553,7 +1513,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1586,7 +1546,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1614,7 +1574,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -1644,7 +1604,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1696,7 +1656,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="numeric" length="19" precision="2"/>
 	</return-type>
@@ -1734,7 +1694,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -1758,7 +1718,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -1785,7 +1745,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1818,7 +1778,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1862,7 +1822,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1880,9 +1840,10 @@ END;]]></definition>
 
 <table name="contest_permission">
 	<schema name="public"/>
+	<role name="openolympus"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32603"/>
+		<type name="public.contest_permission_type" precision="32681"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>
@@ -1905,7 +1866,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
@@ -1984,7 +1945,7 @@ END;
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -2008,7 +1969,7 @@ END;
 		row-amount="0">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<language name="sql" protected="true" sql-disabled="true"/>
+	<language name="sql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -2022,6 +1983,85 @@ END;
 	WHERE group_users.user_id = user_id_p
 	AND group_users.group_id=group_id_p]]></definition>
 </function>
+
+<table name="task_permission">
+	<schema name="public"/>
+	<role name="openolympus"/>
+	<position x="1887.73" y="1116.99"/>
+	<column name="permission" not-null="true">
+		<type name="public.task_permission_type" precision="32681"/>
+	</column>
+	<constraint name="task_permission_pk" type="pk-constr" table="public.task_permission">
+		<columns names="permission" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="principal_id" index="2"/>
+		<object name="task_id" index="1"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="principal_fk" index="2"/>
+		<object name="task_fk" index="1"/>
+	</customidxs>
+</table>
+
+<relationship name="task_has_many_task_permission" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.task"
+	 dst-table="public.task_permission"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+<relationship name="principal_has_many_task_permission" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.principal"
+	 dst-table="public.task_permission"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+<table name="contest_tasks">
+	<schema name="public"/>
+	<role name="openolympus"/>
+	<position x="2194.74" y="1825.54"/>
+
+	<customidxs object-type="column">
+		<object name="contest_id" index="0"/>
+		<object name="task_id" index="1"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="contest_fk" index="1"/>
+		<object name="contest_tasks_pk" index="0"/>
+		<object name="task_fk" index="2"/>
+	</customidxs>
+</table>
+
+<relationship name="contest_has_many_contest_tasks" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.contest"
+	 dst-table="public.contest_tasks"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+<relationship name="task_has_many_contest_tasks" type="rel1n"
+	 src-col-pattern="{st}_{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 src-table="public.task"
+	 dst-table="public.contest_tasks"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

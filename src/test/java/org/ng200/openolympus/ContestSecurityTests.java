@@ -22,6 +22,8 @@
  */
 package org.ng200.openolympus;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
 import java.time.Duration;
 import java.time.OffsetDateTime;
 
@@ -37,14 +39,13 @@ import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -57,16 +58,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@WebIntegrationTest
 @TestPropertySource(value = {
 								"classpath:test-web.properties",
 								"file:secret.properties"
 })
-@SpringApplicationConfiguration(classes = Application.class)
-@WebAppConfiguration
+@SpringApplicationConfiguration(Application.class)
 @EnableTransactionManagement
 @Transactional
-@TransactionConfiguration
+@Rollback
 public class ContestSecurityTests {
+
 	@Autowired
 	private WebApplicationContext wac;
 	private MockMvc mockMvc;
@@ -111,6 +113,8 @@ public class ContestSecurityTests {
 								.build()))
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -140,6 +144,8 @@ public class ContestSecurityTests {
 								.build()))
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -162,7 +168,8 @@ public class ContestSecurityTests {
 						.param("startTime", time.toString())
 						.param("showFullTestsDuringContest", "false")
 						.accept(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(
@@ -180,16 +187,21 @@ public class ContestSecurityTests {
 				.build();
 
 		final OffsetDateTime time = OffsetDateTime.now();
-		this.mockMvc.perform(
-				MockMvcRequestBuilders.fileUpload("/api/contests/create")
-						.param("name", "testContest" + TestUtils.generateId())
-						.param("duration",
-								Duration.ofMinutes(5).toMillis() + "")
-						.param("startTime", time.toString())
-						.param("showFullTestsDuringContest", "false")
-						.accept(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(SecurityMockMvcRequestPostProcessors.user(user)))
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders
+								.fileUpload("/api/contests/create")
+								.param("name",
+										"testContest" + TestUtils.generateId())
+								.param("duration",
+										Duration.ofMinutes(5).toMillis() + "")
+								.param("startTime", time.toString())
+								.param("showFullTestsDuringContest", "false")
+								.accept(MediaType.APPLICATION_JSON)
+
+								.with(csrf())
+								.with(SecurityMockMvcRequestPostProcessors
+										.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
 	}
@@ -211,6 +223,8 @@ public class ContestSecurityTests {
 						.param("name", "test")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -234,6 +248,8 @@ public class ContestSecurityTests {
 						.param("name", "test")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -257,6 +273,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -281,6 +299,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -300,6 +320,8 @@ public class ContestSecurityTests {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders
 						.post("/api/contest/{contest}/remove", contest.getId())
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user))
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
@@ -322,6 +344,8 @@ public class ContestSecurityTests {
 				MockMvcRequestBuilders
 						.post("/api/contest/{contest}/remove", contest.getId())
 						.accept(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -347,6 +371,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -372,6 +398,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -397,6 +425,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -422,6 +452,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -447,6 +479,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -471,6 +505,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -495,6 +531,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -519,6 +557,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -544,6 +584,8 @@ public class ContestSecurityTests {
 						.param("page", "1")
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
@@ -571,6 +613,8 @@ public class ContestSecurityTests {
 						.param("name", task.getName())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -599,6 +643,8 @@ public class ContestSecurityTests {
 						.param("name", task.getName())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -626,6 +672,8 @@ public class ContestSecurityTests {
 						.param("name", task.getName())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -654,6 +702,8 @@ public class ContestSecurityTests {
 						.param("name", task.getName())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -682,6 +732,8 @@ public class ContestSecurityTests {
 						.param("task", task.getId().toString())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isForbidden())
 				.andReturn();
@@ -710,6 +762,8 @@ public class ContestSecurityTests {
 						.param("task", task.getId().toString())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
+
+						.with(csrf())
 						.with(SecurityMockMvcRequestPostProcessors.user(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andReturn();
