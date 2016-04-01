@@ -28,7 +28,7 @@ import java.util.Locale;
 import javax.servlet.MultipartConfigElement;
 
 import org.jooq.conf.Settings;
-import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
+import org.ng200.openolympus.resourceresolvers.OpenOlympusMessageSource;
 import org.ng200.openolympus.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

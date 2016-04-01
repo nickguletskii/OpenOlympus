@@ -25,7 +25,7 @@ package org.ng200.openolympus.annotations;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import org.ng200.openolympus.sqlSupport.SqlQueryProvider;
+import org.ng200.openolympus.sqlsupport.SqlQueryProvider;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QueryProvider {

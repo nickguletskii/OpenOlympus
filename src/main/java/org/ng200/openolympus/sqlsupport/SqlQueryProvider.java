@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.sqlSupport;
+package org.ng200.openolympus.sqlsupport;
 
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;

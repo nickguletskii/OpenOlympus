@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.ng200.openolympus.gitSupport;
+package org.ng200.openolympus.gitsupport;
 
 import java.util.Enumeration;
 

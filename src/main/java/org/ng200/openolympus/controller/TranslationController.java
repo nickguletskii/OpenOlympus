@@ -27,7 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.ng200.openolympus.resourceResolvers.OpenOlympusMessageSource;
+import org.ng200.openolympus.resourceresolvers.OpenOlympusMessageSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestMapping;
