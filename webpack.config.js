@@ -121,8 +121,6 @@ var config = {
 		new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en,ru/),
 		new webpack.PrefetchPlugin("lodash"),
 		new webpack.PrefetchPlugin("angular"),
-		new webpack.PrefetchPlugin("angular-ui-bootstrap"),
-		new webpack.PrefetchPlugin("angular-ui-bootstrap-tpls"),
 		new webpack.PrefetchPlugin("moment"),
 		new webpack.PrefetchPlugin("moment-timezone"),
 		new ExtractTextPlugin("bundle.css"),
@@ -136,8 +134,6 @@ config.addVendor("moment", path.resolve(nodeModulesRoot, "moment/moment.js"));
 config.addVendor("moment-timezone", path.resolve(nodeModulesRoot, "moment-timezone/index.js"));
 config.addVendor("angular", path.resolve(nodeModulesRoot, "angular/angular.min.js"));
 config.addVendor("angular-animate", path.resolve(nodeModulesRoot, "angular-animate/angular-animate.min.js"));
-config.addVendor("angular-ui-bootstrap", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap.js"));
-config.addVendor("angular-ui-bootstrap-tpls", path.resolve(nodeModulesRoot, "angular-ui-bootstrap/ui-bootstrap-tpls.js"));
 config.addVendor("angular-ui-router", path.resolve(nodeModulesRoot, "angular-ui-router/release/angular-ui-router.min.js"));
 config.addVendor("angular-form-for", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.js"));
 config.addVendor("angular-form-for-bootstrap", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.bootstrap-templates.js"));

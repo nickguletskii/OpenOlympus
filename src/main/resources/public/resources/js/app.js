@@ -24,6 +24,20 @@
 
 var angular = require("angular");
 
+import errorHandler from "errorHandler";
+import accordion from "angular-ui-bootstrap/src/accordion";
+import buttons from "angular-ui-bootstrap/src/buttons";
+import dateparser from "angular-ui-bootstrap/src/dateparser";
+import datepicker from "angular-ui-bootstrap/src/datepicker";
+import debounce from "angular-ui-bootstrap/src/debounce";
+import pager from "angular-ui-bootstrap/src/pager";
+import paging from "angular-ui-bootstrap/src/paging";
+import popover from "angular-ui-bootstrap/src/popover";
+import progressbar from "angular-ui-bootstrap/src/progressbar";
+import timepicker from "angular-ui-bootstrap/src/timepicker";
+import tooltip from "angular-ui-bootstrap/src/tooltip";
+import typeahead from "angular-ui-bootstrap/src/typeahead";
+
 require("filters");
 require("services");
 require("directives");
@@ -33,5 +47,18 @@ angular.module("ool", ["pascalprecht.translate", "ui.router",
 	"ui.bootstrap", "ool.filters", "ool.controllers",
 	"ool.services", "ool.directives", "ngFileUpload", "ui.codemirror",
 	"ngAnimate", "formFor", "formFor.bootstrapTemplates", "vcRecaptcha",
-	"ngCookies"
+	"ngCookies",
+	errorHandler,
+	accordion,
+	buttons,
+	dateparser,
+	datepicker,
+	debounce,
+	pager,
+	paging,
+	popover,
+	progressbar,
+	timepicker,
+	tooltip,
+	typeahead
 ]);

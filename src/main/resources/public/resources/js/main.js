@@ -22,12 +22,10 @@
  */
 require("font-awesome-webpack");
 
-var angular = require("angular");
-var _ = require("lodash");
-var errorHandler = require("errorHandler");
+import angular from "angular";
+import _ from "lodash";
+
 require("angular-ui-router");
-require("angular-ui-bootstrap");
-require("angular-ui-bootstrap-tpls");
 require("angular-translate");
 require("angular-translate-loader-url");
 require("angular-ui-codemirror");
