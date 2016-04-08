@@ -25,13 +25,16 @@ package org.ng200.openolympus;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
+import org.ng200.openolympus.TestTaskFactory.TestTaskBuilder;
 import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
+import org.ng200.openolympus.jooq.enums.TaskPermissionType;
 import org.ng200.openolympus.jooq.tables.daos.ContestPermissionDao;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.ContestPermission;
@@ -137,15 +140,38 @@ public class TestContestFactory {
 		}
 
 		public TestContestBuilder permit(Long user,
-				ContestPermissionType perm) {
+				ContestPermissionType... perm) {
 			this.permissions
-					.add(new Pair<ContestPermissionType, Long>(perm, user));
+					.addAll(Arrays.stream(perm).map(
+							x -> new Pair<ContestPermissionType, Long>(x, user))
+							.collect(Collectors.toList()));
 			return this;
 		}
 
 		public TestContestBuilder permit(User user,
-				ContestPermissionType perm) {
-			return this.permit(user.getId(), perm);
+				ContestPermissionType... perm) {
+			this.permit(user.getId(), perm);
+			return this;
+		}
+
+		public TestContestBuilder deny(Long user,
+				ContestPermissionType... perm) {
+			List<ContestPermissionType> perms = Arrays.asList(perm);
+			this.permissions
+					.addAll(Arrays.stream(ContestPermissionType.values())
+							.filter(x -> !perms.contains(x))
+							.map(
+									x -> new Pair<ContestPermissionType, Long>(
+											x,
+											user))
+							.collect(Collectors.toList()));
+			return this;
+		}
+
+		public TestContestBuilder deny(User user,
+				ContestPermissionType... perm) {
+			deny(user.getId(), perm);
+			return this;
 		}
 
 		public void setDuration(Duration duration) {

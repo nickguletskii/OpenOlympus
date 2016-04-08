@@ -24,6 +24,7 @@ package org.ng200.openolympus;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,8 @@ import org.ng200.openolympus.jooq.tables.records.TaskRecord;
 import org.ng200.openolympus.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.test.web.servlet.setup.AbstractMockMvcBuilder;
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 
 @Component
 public class TestTaskFactory {
@@ -79,16 +82,20 @@ public class TestTaskFactory {
 		}
 
 		public TestTaskBuilder permit(Long user,
-				TaskPermissionType perm) {
+				TaskPermissionType... perm) {
 			this.permissions
-					.add(new Pair<TaskPermissionType, Long>(perm, user));
+					.addAll(Arrays.stream(perm).map(
+							x -> new Pair<TaskPermissionType, Long>(x, user))
+							.collect(Collectors.toList()));
 			return this;
 		}
 
 		public TestTaskBuilder permit(User user,
-				TaskPermissionType perm) {
-			return this.permit(user.getId(), perm);
+				TaskPermissionType... perm) {
+			this.permit(user.getId(), perm);
+			return this;
 		}
+
 
 		public TestTaskBuilder setPermissions(
 				List<Pair<TaskPermissionType, Long>> permissions) {
@@ -98,6 +105,25 @@ public class TestTaskFactory {
 
 		public TestTaskBuilder setPrefix(String prefix) {
 			this.prefix = prefix;
+			return this;
+		}
+
+		public TestTaskBuilder deny(Long user,
+				TaskPermissionType... perm) {
+			List<TaskPermissionType> perms = Arrays.asList(perm);
+			this.permissions
+					.addAll(Arrays.stream(TaskPermissionType.values())
+							.filter(x->!perms.contains(x))
+							.map(
+									x -> new Pair<TaskPermissionType, Long>(x,
+											user))
+							.collect(Collectors.toList()));
+			return this;
+		}
+
+		public TestTaskBuilder deny(User user,
+				TaskPermissionType... perm) {
+			deny(user.getId(), perm);
 			return this;
 		}
 
