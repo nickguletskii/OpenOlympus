@@ -56,7 +56,6 @@ import org.springframework.web.bind.annotation.RestController;
 		})
 })
 @TaskPermissionRequired(TaskPermissionType.modify)
-@RequestMapping(value = "/api/task/create", method = RequestMethod.POST)
 public class TaskModificationRestController {
 	@Autowired
 	private TaskValidator taskValidator;

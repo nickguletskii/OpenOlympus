@@ -58,10 +58,8 @@ import org.springframework.transaction.annotation.Transactional;
 								"file:secret.properties"
 })
 @SpringApplicationConfiguration(classes = Application.class)
-
 @EnableTransactionManagement
 @Transactional
-@TransactionConfiguration
 public class ContestParticipantDatabaseTest {
 
 	@Autowired

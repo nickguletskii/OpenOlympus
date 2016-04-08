@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.jooq.enums.TaskPermissionType;
+import org.ng200.openolympus.jooq.tables.pojos.Task;
 import org.ng200.openolympus.model.OlympusPrincipal;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
@@ -97,10 +98,10 @@ public class TaskACLController {
 
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.PUT)
 	public void getTaskACL(
-			@PathVariable("task") int id,
+			@PathVariable("task") Task task,
 			@RequestBody Map<String, List<Long>> dto,
 			final BindingResult bindingResult, final Principal principal) {
-		this.taskACLService.setTaskPermissionsAndPrincipals(id,
+		this.taskACLService.setTaskPermissionsAndPrincipals(task.getId(),
 				dto.entrySet().stream().collect(
 						Collectors.toMap(
 								e -> TaskPermissionType.valueOf(e.getKey()),
@@ -109,9 +110,9 @@ public class TaskACLController {
 
 	@RequestMapping(value = "/api/task/{task}/acl", method = RequestMethod.GET)
 	public Map<TaskPermissionType, ACLItem> getTaskACL(
-			@PathVariable("task") int id, final Principal principal) {
+			@PathVariable("task") Task task, final Principal principal) {
 		final Map<TaskPermissionType, List<OlympusPrincipal>> taskPermissionsAndPrincipalData = this.taskACLService
-				.getTaskPermissionsAndPrincipalData(id);
+				.getTaskPermissionsAndPrincipalData(task.getId());
 		return Stream.of(TaskPermissionType.values())
 				.collect(Collectors.toMap(type -> type,
 						type -> new ACLItem(
