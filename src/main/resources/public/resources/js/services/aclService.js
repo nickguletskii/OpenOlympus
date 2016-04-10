@@ -20,25 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var angular = require("angular");
-var _ = require("lodash");
-angular.module("ool.services")
-	.service("ACLService", /*@ngInject*/ function($http) {
-		this.cannonicalPermissionForm = (permissions) => {
-			var data = {};
-			_.forEach(permissions, (p) => {
-				data[p.permission] = _(p.principals).sortBy("id").map("id").values();
-			});
-			return data;
-		};
-		this.getACL = (url) => $http.get(url, {});
-		this.setACL = (url, permissions) => {
-			return $http.put(url, this.cannonicalPermissionForm(permissions));
-		};
-		this.getGeneralPermissions = (prinicpalId) => {
-			return $http.get("/api/admin/principal/" + prinicpalId + "/generalPermissions", {});
-		};
-		this.setGeneralPermissions = (prinicpalId, permissions) => {
-			return $http.put("/api/admin/principal/" + prinicpalId + "/generalPermissions", permissions);
-		};
-	});
+import {
+	each as _each
+} from "lodash";
+import { services } from "app";
+
+import flow from "lodash/fp/flow";
+import sortBy from "lodash/fp/sortBy";
+import map from "lodash/fp/map";
+class ACLService {
+	/* @ngInject*/
+	constructor($http) {
+		this.$http = $http;
+	}
+
+	cannonicalPermissionForm(permissions) {
+		const data = {};
+		_each(permissions, (p) => {
+			data[p.permission] = flow(
+				sortBy("id"),
+				map("id")
+			)(p.principals);
+		});
+		return data;
+	}
+	getACL(url) {
+		return this.$http.get(url, {});
+	}
+	setACL(url, permissions) {
+		return this.$http.put(url, this.cannonicalPermissionForm(permissions));
+	}
+	getGeneralPermissions(prinicpalId) {
+		return this.$http.get(
+			`/api/admin/principal/${prinicpalId}/generalPermissions`, {});
+	}
+	setGeneralPermissions(prinicpalId, permissions) {
+		return this.$http.put(
+			`/api/admin/principal/${prinicpalId}/generalPermissions`,
+			permissions);
+	}
+}
+
+services
+	.service("ACLService", ACLService);

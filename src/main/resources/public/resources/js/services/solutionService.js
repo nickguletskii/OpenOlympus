@@ -20,34 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var _ = require("lodash");
-var angular = require("angular");
-var app = require("app");
-angular.module('ool.services').factory('SolutionService', /*@ngInject*/ function($http) {
-    return {
-        countUserSolutions: function() {
-            return $http.get('api/user/solutionsCount').then(_.property("data"));
-        },
-        getUserSolutionsPage: function(page) {
-            return $http.get('api/user/solutions', {
-                params: {
-                    page: page
-                }
-            }).then(_.property("data"));
-        },
-        countSolutions: function() {
-            return $http.get('api/admin/solutionsCount').then(_.property("data"));
-        },
-        getSolutionsPage: function(page) {
-            return $http.get('api/admin/solutions', {
-                params: {
-                    page: page
-                }
-            }).then(_.property("data"));
-        },
-        getVerdicts: function(solutionId) {
-            return $http.get("/api/solution/" + solutionId).then(_.property("data"));
-        }
-    };
-});
+import { services } from "app";
+import {
+	property as _property
+} from "lodash";
+
+class SolutionService {
+	/* @ngInject*/
+	constructor($http) {
+		this.$http = $http;
+	}
+	countUserSolutions() {
+		return this.$http.get("api/user/solutionsCount")
+			.then(_property("data"));
+	}
+	getUserSolutionsPage(page) {
+		return this.$http.get("api/user/solutions", {
+			params: {
+				page
+			}
+		}).then(_property("data"));
+	}
+	countSolutions() {
+		return this.$http.get("api/admin/solutionsCount")
+			.then(_property("data"));
+	}
+	getSolutionsPage(page) {
+		return this.$http.get("api/admin/solutions", {
+			params: {
+				page
+			}
+		}).then(_property("data"));
+	}
+	getVerdicts(solutionId) {
+		return this.$http.get(`/api/solution/${solutionId}`)
+			.then(_property("data"));
+	}
+}
+
+services
+	.service("SolutionService", SolutionService);

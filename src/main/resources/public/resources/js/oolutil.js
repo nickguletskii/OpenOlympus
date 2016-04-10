@@ -20,32 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var _ = require("lodash");
-var angular = require("angular");
-
-var removeAngularElements = function(obj) {
-	if (!angular.isObject(obj)) {
-		return obj;
-	}
-	return _.mapValues(_.pick(obj, function(name) {
-		if (angular.isString(name)) {
-			return name.substring(0, 1) === "$";
+import {
+	mapValues as _mapValues,
+	pick as _pick,
+	isString as _isString,
+	isObject as _isObject,
+	isEqual as _isEqual
+} from "lodash";
+export default class OpenOlympusUtils {
+	static removeAngularElements(obj) {
+		if (!_isObject(obj)) {
+			return obj;
 		}
-		return true;
-	}), removeAngularElements);
-};
-
-module.exports = {
-	emptyToNull: function(obj) {
-		return _.mapValues(obj, function(value) {
+		return _mapValues(_pick(obj, (name) => {
+			if (_isString(name)) {
+				return name.substring(0, 1) === "$";
+			}
+			return true;
+		}), OpenOlympusUtils.removeAngularElements);
+	}
+	static emptyToNull(obj) {
+		return _mapValues(obj, (value) => {
 			if (value === "") {
 				return null;
 			}
 			return value;
 		});
-	},
-	removeAngularElements: removeAngularElements,
-	equalsWithoutAngular: function(obj1, obj2) {
-		return _.isEqual(removeAngularElements(obj1), removeAngularElements(obj2));
 	}
-};
+
+	static equalsWithoutAngular(obj1, obj2) {
+		return _isEqual(OpenOlympusUtils.removeAngularElements(obj1),
+			OpenOlympusUtils.removeAngularElements(obj2));
+	}
+}

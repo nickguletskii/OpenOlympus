@@ -20,49 +20,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
+const controller =
+	/* @ngInject*/
+	($scope, $stateParams, users, userCount, ContestService) => {
+		function updateParticipants() {
+			ContestService.getContestParticipantsPage($stateParams.contestId,
+					$stateParams.page)
+				.then((users) => {
+					$scope.users = users;
+				});
+			ContestService.countContestParticipants($stateParams.contestId)
+				.then((userCount) => {
+					$scope.userCount = userCount;
+				});
+		}
 
-const controller = /*@ngInject*/ function($scope, $stateParams, users, userCount, ContestService) {
-	function updateParticipants() {
-		ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page).then(function(users) {
-			$scope.users = users;
-		});
-		ContestService.countContestParticipants($stateParams.contestId).then(function(userCount) {
-			$scope.userCount = userCount;
-		});
-	}
+		$scope.removeUser = (user) => {
+			ContestService.removeParticipant($stateParams.contestId, user.id)
+				.then(updateParticipants);
+		};
 
-	$scope.removeUser = function(user) {
-		ContestService.removeParticipant($stateParams.contestId, user.id).then(updateParticipants);
+		$scope.page = $stateParams.page;
+
+		$scope.users = users;
+		$scope.userCount = userCount;
 	};
 
-	$scope.page = $stateParams.page;
-
-	$scope.users = users;
-	$scope.userCount = userCount;
-};
-
-module.exports = {
+export default {
 	"name": "contestParticipantsList",
 	"url": "/contest/{contestId:[0-9]+}/participants?userId",
 	"templateUrl": "/partials/contests/contest/participants.html",
-	"controller": controller,
+	controller,
 	"params": {
 		"page": "1"
 	},
 	"resolve": {
-		"users": function(ContestService, $stateParams) {
-			return ContestService.getContestParticipantsPage($stateParams.contestId, $stateParams.page);
-		},
-		"userCount": function(ContestService, $stateParams) {
-			return ContestService.countContestParticipants($stateParams.contestId);
-		}
+		"users": (ContestService, $stateParams) =>
+			ContestService.getContestParticipantsPage(
+				$stateParams.contestId,
+				$stateParams.page),
+		"userCount": (ContestService, $stateParams) =>
+			ContestService.countContestParticipants($stateParams.contestId)
 	},
 	"data": {
-		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
-			return PromiseUtils.and(
+		canAccess: /* @ngInject*/ ($refStateParams, PromiseUtils,
+				SecurityService) =>
+			PromiseUtils.and(
 				SecurityService.hasPermission("approved"),
-				SecurityService.hasContestPermission($refStateParams.contestId, "view_participants"));
-		}
+				SecurityService.hasContestPermission($refStateParams.contestId,
+					"view_participants"))
 	}
 };

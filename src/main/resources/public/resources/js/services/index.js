@@ -1,0 +1,14 @@
+import "services/aclService";
+import "services/securityService";
+import "services/serversideFormErrorReporter";
+import "services/validationService";
+import "services/modalState";
+import "services/userService";
+import "services/solutionService";
+import "services/taskService";
+import "services/contestService";
+import "services/timeService";
+import "services/aclService";
+import "services/formDefaultHelperService";
+import "services/groupService";
+import "services/promiseService";

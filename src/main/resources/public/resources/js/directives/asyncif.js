@@ -20,26 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
-
-var angular = require("angular");
 
 
-angular.module("ool.directives").directive("asyncIf", /*@ngInject*/ function($animate, $state, $injector, $rootScope, PromiseUtils) {
-	return {
+import {
+	directives
+} from "app";
+import buildNgIf from "directives/angularInternal/ngIf";
+
+directives.directive("asyncIf",
+	/* @ngInject*/
+	($animate, $state, $injector, $rootScope, PromiseUtils) => ({
 		multiElement: true,
 		transclude: "element",
 		priority: 601,
 		terminal: true,
 		restrict: "A",
 		$$tlb: true,
-		link: function($scope, $element, $attr, ctrl, $transclude) {
-			let ngIf = require("directives/angularInternal/ngIf")($element, $attr, $transclude, $animate);
+		link: ($scope, $element, $attr, ctrl, $transclude) => {
+			const ngIf = buildNgIf($element, $attr, $transclude, $animate);
 
 			function ngIfWatchAction() {
-
-				let allowed = $scope.$eval($attr.asyncIf, {
-					PromiseUtils: PromiseUtils
+				const allowed = $scope.$eval($attr.asyncIf, {
+					PromiseUtils
 				});
 
 				if (!allowed) {
@@ -54,5 +56,4 @@ angular.module("ool.directives").directive("asyncIf", /*@ngInject*/ function($an
 			$rootScope.$on("securityInfoChanged", ngIfWatchAction);
 			$scope.$watch($attr.uiSref, ngIfWatchAction);
 		}
-	};
-});
+	}));

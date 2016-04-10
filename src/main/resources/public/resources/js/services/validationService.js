@@ -20,10 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var _ = require("lodash");
-var angular = require("angular");
+import {
+	map as _map,
+	each as _each,
+	filter as _filter,
+	flow as _flow,
+	has as _has
+} from "lodash";
+import flow from "lodash/fp/flow";
+import groupBy from "lodash/fp/groupBy";
+import flatten from "lodash/fp/flatten";
+import values from "lodash/fp/values";
+import mapValues from "lodash/fp/mapValues";
+import map from "lodash/fp/map";
+import join from "lodash/fp/join";
+
+import { services } from "app";
 
 function ValidationException(message, data) {
 	this.message = message;
@@ -31,110 +44,127 @@ function ValidationException(message, data) {
 	this.name = "ValidationException";
 }
 
-angular.module("ool.services").factory("ValidationService", /*@ngInject*/ function($injector, $q, $translate) {
-	return {
-		toTranslationPromise: function(func) {
-			return _.flow(func, (key) => {
-				let deferred = $q.defer();
-				if (key) {
-					$translate(key)
-						.then(translation =>
-							deferred.reject(translation), (msg) =>
-							deferred.reject("No translation available: " + msg));
-				} else {
-					deferred.resolve();
-				}
-				return deferred.promise;
-			});
-		},
-		report: function(reporter, form, errors) {
-			_.map(_.filter(form, function(element) {
-				return _.has(element, "$setValidity");
-			}), function(element) {
-				return element.$name;
-			}).forEach(function(field) {
-				reporter.report(form[field], field, errors);
-			});
-		},
-		transformBindingResultsIntoFormForMap: function(errors) {
-			var deferred = $q.defer();
+class ValidationService {
+	constructor($injector, $q, $translate) {
+		this.$injector = $injector;
+		this.$q = $q;
+		this.$translate = $translate;
+	}
 
-			var fieldMessageMap = _.chain(errors)
-				.groupBy("field")
-				.indexBy((group) => group[0].field)
-				.mapValues((group) =>
-					_.chain(group).map(
-						(validationResult) => validationResult.defaultMessage
-					).value())
-				.value();
+	toTranslationPromise(func) {
+		return _flow(func, (key) => {
+			const deferred = this.$q.defer();
+			if (key) {
+				this.$translate(key)
+					.then(translation =>
+						deferred.reject(translation), (msg) =>
+						deferred.reject(`No translation available: ${msg}`));
+			} else {
+				deferred.resolve();
+			}
+			return deferred.promise;
+		});
+	}
 
-			var shortKeyToLongKey = x => "validation.failed." + x;
+	report(reporter, form, errors) {
+		const fields = _map(_filter(form, (element) => _has(element, "$setValidity")),
+			"name");
+		_each(fields, (field) => {
+			reporter.report(form[field], field, errors);
+		});
+	}
 
-			var messages = _.chain(fieldMessageMap).values().flatten().map(shortKeyToLongKey).value();
-			$translate(messages).then(function(translations) {
+	transformBindingResultsIntoFormForMap(errors) {
+		const deferred = this.$q.defer();
+
+		const fieldMessageMap =
+			flow(
+				groupBy("field"),
+				mapValues(fieldObj => _map(fieldObj, "defaultMessage"))
+			)(errors);
+
+		const shortKeyToLongKey = x => `validation.failed.${x}`;
+
+		const messages = flow(
+			values,
+			flatten,
+			map(shortKeyToLongKey)
+		)(fieldMessageMap);
+
+		this.$translate(messages)
+			.then((translations) => {
 				deferred.resolve(
-					_.chain(fieldMessageMap).mapValues(
-						(group) =>
-						_.chain(group)
-						.map((message) => translations[shortKeyToLongKey(message)])
-						.join("\n")
-						.value()
-					)
-					.value()
+					mapValues(
+						flow(
+							map((message) => translations[shortKeyToLongKey(message)]),
+							join("\n")
+						)
+					)(fieldMessageMap)
 				);
 			});
-			return deferred.promise;
-		},
-		postToServer: function(path, data, progressListener, fieldTransformationMap) {
-			var deferred = $q.defer();
-			var formData = new FormData();
-			_.forEach(data, (value, key) => {
-				if (value instanceof FileList) {
-					if (value.length !== 1 && value.length !== 0) {
-						throw new Error("TODO: multiple file upload support");
-					}
-					formData.append(key, value[0]); // TODO: Multiple file upload support
-				} else {
-					formData.append(key, value);
+		return deferred.promise;
+	}
+
+	postToServer(path, data, progressListener, fieldTransformationMap) {
+		const deferred = this.$q.defer();
+		const formData = new FormData();
+		_each(data, (value, key) => {
+			if (value instanceof FileList) {
+				if (value.length !== 1 && value.length !== 0) {
+					throw new Error("TODO: multiple file upload support");
 				}
-			});
-			$injector.invoke(function($rootScope, Upload, ValidationService) {
-				Upload.http({
-					method: "POST",
-					url: path,
-					headers: {
-						"X-Auth-Token": $rootScope.authToken,
-						"Content-Type": undefined
-					},
-					data: formData,
-					transformRequest: angular.identity
-				}).progress(function(evt) {
+				formData.append(key, value[0]); // TODO: Multiple file upload support
+			} else {
+				formData.append(key, value);
+			}
+		});
+		this.$injector.invoke(($rootScope, Upload) => {
+			Upload.http({
+				method: "POST",
+				url: path,
+				headers: {
+					"X-Auth-Token": $rootScope.authToken,
+					"Content-Type": undefined
+				},
+				data: formData,
+				transformRequest: angular.identity
+			})
+				.progress((evt) => {
 					progressListener(evt);
-				}).success(function(response) {
+				})
+				.success((response) => {
 					if (response.status === "BINDING_ERROR") {
 						if (fieldTransformationMap) {
-							_.forEach(response.fieldErrors, (error) => {
+							_each(response.fieldErrors, (error) => {
 								if (fieldTransformationMap[error.field]) {
 									error.field = fieldTransformationMap[error.field];
 								}
 							});
 						}
 
-						ValidationService.transformBindingResultsIntoFormForMap(response.fieldErrors).then(function(msg) {
-							deferred.reject(
-								msg
-							);
-						});
+						this.transformBindingResultsIntoFormForMap(
+								response.fieldErrors)
+							.then((msg) => {
+								deferred.reject(
+									msg
+								);
+							});
 					} else if (response.status === "OK") {
 						deferred.resolve(response);
 					} else {
-						throw new ValidationException("Validation failed unexpectedly due to an unknown response", data);
+						throw new ValidationException(
+							"Validation failed unexpectedly due to an unknown response",
+							data);
 					}
-				}).error(function(errorData) {
-					throw new ValidationException("Validation failed unexpectedly", errorData);
+				})
+				.error((errorData) => {
+					throw new ValidationException("Validation failed unexpectedly",
+						errorData);
 				});
-			});
-			return deferred.promise;
-		}
-	};
-});
+		});
+		return deferred.promise;
+	}
+}
+
+services
+	.service("ValidationService", ValidationService);

@@ -20,23 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-angular.module("ool.directives").directive("datepickerField",
-	/*@ngInject*/
-	function(FieldHelper) {
-		return {
-			restrict: "E",
-			require: "^formFor",
-			template: require("ng-cache!directives/date/datepicker.html"),
-			scope: {
-				attribute: "@",
-				label: "@"
-			},
-			link: function($scope, $element, $attributes, formForController) {
-				FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
-				$scope.label = $attributes.label;
-			}
-		};
-	});
+import angular from "angular";
+
+import {
+	directives
+} from "app";
+
+directives.directive("datepickerField",
+	/* @ngInject*/
+	(FieldHelper) => ({
+		restrict: "E",
+		require: "^formFor",
+		template: require("ng-cache!directives/date/datepicker.html"),
+		scope: {
+			attribute: "@",
+			label: "@"
+		},
+		link: ($scope, $element, $attributes, formForController) => {
+			FieldHelper.manageFieldRegistration($scope, $attributes,
+				formForController);
+			$scope.label = $attributes.label;
+		}
+	}));

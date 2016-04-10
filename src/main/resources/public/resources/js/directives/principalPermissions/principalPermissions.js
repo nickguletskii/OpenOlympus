@@ -20,57 +20,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-var _ = require("lodash");
+import {
+	mapValues as _mapValues,
+	isEqual as _isEqual,
+	clone as _clone
+} from "lodash";
+import {
+	directives
+} from "app";
 
-angular.module("ool.directives")
-	.directive("principalPermissionsEditor", /*@ngInject*/ function(ACLService) {
-
-		function link($scope, $element, $attributes) {
-			$scope.permissions = {};
-
-			const trueElseFalse = (obj) => _.mapValues(obj, (val) => val === true);
-
-			function updateStatus() {
-				$scope.changesCommitted =
-					_.isEqual(
-						trueElseFalse($scope.permissions),
-						$scope.origPermissions
-					);
-			}
-
-			$scope.collapsed = true;
-
-			$scope.$watchCollection(() => $scope.permissions, updateStatus);
-			$scope.$watchCollection(() => $scope.origPermissions, updateStatus);
-
-			$scope.refresh = () =>
-				ACLService.getGeneralPermissions($attributes.principalId).success((permissions) => {
-					$scope.permissions = _.clone(permissions);
-					$scope.origPermissions = _.clone(permissions);
-				});
-
-			$scope.commit = () => {
-				$scope.committing = true;
-				ACLService.setGeneralPermissions($attributes.principalId, trueElseFalse($scope.permissions))
-					.then(() => {
-						$scope.refresh();
-						$scope.committing = false;
-					});
-			};
-
-			$scope.refresh();
-		}
-
-		return {
+directives
+	.directive("principalPermissionsEditor",
+		/* @ngInject*/
+		(ACLService) => ({
 			restrict: "E",
-			template: require("ng-cache!directives/principalPermissions/principalPermissions.html"),
+			template: require(
+				"ng-cache!directives/principalPermissions/principalPermissions.html"),
 			scope: {
 				aclGetter: "@",
 				aclSetter: "@"
 			},
-			link: link
-		};
-	});
+			link: ($scope, $element, $attributes) => {
+				$scope.permissions = {};
+
+				const trueElseFalse = (obj) => _mapValues(obj, (val) => val === true);
+
+				function updateStatus() {
+					$scope.changesCommitted =
+						_isEqual(
+							trueElseFalse($scope.permissions),
+							$scope.origPermissions
+						);
+				}
+
+				$scope.collapsed = true;
+
+				$scope.$watchCollection(() => $scope.permissions, updateStatus);
+				$scope.$watchCollection(() => $scope.origPermissions, updateStatus);
+
+				$scope.refresh = () =>
+					ACLService.getGeneralPermissions($attributes.principalId)
+					.success((permissions) => {
+						$scope.permissions = _clone(permissions);
+						$scope.origPermissions = _clone(permissions);
+					});
+
+				$scope.commit = () => {
+					$scope.committing = true;
+					ACLService.setGeneralPermissions($attributes.principalId, trueElseFalse(
+							$scope.permissions))
+						.then(() => {
+							$scope.refresh();
+							$scope.committing = false;
+						});
+				};
+
+				$scope.refresh();
+			}
+		})
+	);

@@ -1,0 +1,51 @@
+{
+    "extends": ["airbnb/base", angular],
+    "parser": "babel-eslint",
+    "ecmaFeatures": {
+        "modules": true
+    },
+    "rules": {
+        "indent": [2, "tab"],
+        "quotes": [
+            2,
+            "double"
+        ],
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "quote-props": 0,
+        "angular/on-watch": 0,
+        "angular/module-getter": 0,
+        "angular/module-setter": 0,
+        "angular/no-service-method": 0,
+        "no-param-reassign": [
+            2,
+            {
+                "props": false
+            }
+        ],
+        "no-unused-vars": [
+            "warn",
+            {
+                "vars": "all",
+                "args": "all"
+            }
+        ],
+        "max-len": [
+            "error",
+            100, 4,
+            {
+                "ignoreUrls": true
+            }
+        ],
+        comma-dangle: ["error", "never"],
+        dot-notation: 0,
+        "no-shadow": 0
+    },
+    "env": {
+        "es6": true,
+        "browser": true,
+        "node": true
+    }
+}

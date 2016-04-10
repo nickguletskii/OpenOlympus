@@ -20,45 +20,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var _ = require("lodash");
-var angular = require("angular");
-angular.module("ool.services").factory("TaskService", /*@ngInject*/ function($http, $rootScope, $q) {
-	return {
-		getTaskIndexPage: function(taskId) {
-			let deferred = $q.defer();
-			$http.get(
-					"/api/task/" + taskId + "/data/localisation.json", {
-						acceptableFailureCodes: [404]
-					}
-				)
-				.then((response) => {
-					let path = response.data[$rootScope.currentLanguage] ||
-						response.data.default;
-					if (!path) {
-						deferred.reject(404);
-					} else {
-						deferred.resolve(path);
-					}
-				}, (response) => deferred.reject(response.status));
-			return deferred.promise;
-		},
-		getTaskName: function(taskId) {
-			return $http.get("/api/task/" + taskId + "/name").then(_.property("data"));
-		},
-		getTaskEditData: function(taskId) {
-			return $http.get("/api/task/" + taskId + "/edit").then(_.property("data"));
-		},
-		getArchiveTasksPage: function(page) {
-			return $http.get("api/archive/tasks", {
-				params: {
-					page: page
+import { services } from "app";
+import {
+	property as _property
+} from "lodash";
+
+class TaskService {
+	/* @ngInject*/
+	constructor($http, $rootScope, $q) {
+		this.$http = $http;
+		this.$rootScope = $rootScope;
+		this.$q = $q;
+	}
+	getTaskIndexPage(taskId) {
+		const deferred = this.$q.defer();
+		this.$http.get(
+				`/api/task/${taskId}/data/localisation.json`, {
+					acceptableFailureCodes: [404]
 				}
-			}).then(_.property("data"));
-		},
-		countArchiveTasks: function() {
-			return $http.get("api/archive/tasksCount").then(_.property("data"));
-		}
-	};
-});
+			)
+			.then((response) => {
+				const path = response.data[this.$rootScope.currentLanguage] ||
+					response.data.default;
+				if (!path) {
+					deferred.reject(404);
+				} else {
+					deferred.resolve(path);
+				}
+			}, (response) => deferred.reject(response.status));
+		return deferred.promise;
+	}
+	getTaskName(taskId) {
+		return this.$http.get(`/api/task/${taskId}/name`)
+			.then(_property("data"));
+	}
+	getTaskEditData(taskId) {
+		return this.$http.get(`/api/task/${taskId}/edit`)
+			.then(_property("data"));
+	}
+	getArchiveTasksPage(page) {
+		return this.$http.get("api/archive/tasks", {
+			params: {
+				page
+			}
+		})
+			.then(_property("data"));
+	}
+	countArchiveTasks() {
+		return this.$http.get("api/archive/tasksCount")
+			.then(_property("data"));
+	}
+}
+
+services.service("TaskService", TaskService);

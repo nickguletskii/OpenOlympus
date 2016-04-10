@@ -45,7 +45,7 @@ var config = {
 		filename: "js/bundle.js"
 	},
 	cache: true,
-	devtool: "eval",
+	devtool: "source-map",
 	resolve: {
 		modulesDirectories: [
 			nodeModulesRoot,
@@ -73,7 +73,7 @@ var config = {
 			exclude: [
 				/node_modules/
 			],
-			loader: "ng-annotate?add=true!babel?comments=false&presets[]=es2015",
+			loader: "ng-annotate?add=true!babel",
 			include: [
 				path.resolve(resourceRoot, "js/")
 			]
@@ -132,11 +132,6 @@ var config = {
 config.addVendor("jquery", path.resolve(nodeModulesRoot, "jquery/dist/jquery.min.js"));
 config.addVendor("moment", path.resolve(nodeModulesRoot, "moment/moment.js"));
 config.addVendor("moment-timezone", path.resolve(nodeModulesRoot, "moment-timezone/index.js"));
-config.addVendor("angular", path.resolve(nodeModulesRoot, "angular/angular.min.js"));
-config.addVendor("angular-animate", path.resolve(nodeModulesRoot, "angular-animate/angular-animate.min.js"));
-config.addVendor("angular-ui-router", path.resolve(nodeModulesRoot, "angular-ui-router/release/angular-ui-router.min.js"));
 config.addVendor("angular-form-for", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.js"));
 config.addVendor("angular-form-for-bootstrap", path.resolve(nodeModulesRoot, "angular-form-for/dist/form-for.bootstrap-templates.js"));
-config.addVendor("angular-recaptcha", path.resolve(nodeModulesRoot, "angular-recaptcha/release/angular-recaptcha.min.js"));
-config.addVendor("angular-translate", path.resolve(nodeModulesRoot, "angular-translate/dist/angular-translate.min.js"));
 module.exports = config;

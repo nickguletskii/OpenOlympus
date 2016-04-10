@@ -1,0 +1,16 @@
+import "directives/date/datepickerLocaldate";
+import "directives/date/datepicker";
+import "directives/reallyClick";
+import "directives/lang";
+import "directives/dynamic";
+import "directives/captcha/captcha";
+import "directives/simple/simpleDirectives";
+import "directives/acl/acl";
+import "directives/fileInput/fileInput";
+import "directives/fileInput/fileNgModel";
+import "directives/typeahead/typeahead";
+import "directives/form/defaultFormDirectives";
+import "directives/principalPermissions/principalPermissions";
+import "directives/secref";
+import "directives/asyncif";
+import "directives/hideIfDoesntContain";

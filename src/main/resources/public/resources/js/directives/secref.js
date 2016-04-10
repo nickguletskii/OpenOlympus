@@ -20,9 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
+import angular from "angular";
 
 /*
 
@@ -60,7 +59,8 @@ function parseStateRef(ref, current) {
 	if (preparsed) {
 		ref = current + "(" + preparsed[1] + ")";
 	}
-	parsed = ref.replace(/\n/g, " ").match(/^([^(]+?)\s*(\((.*)\))?$/);
+	parsed = ref.replace(/\n/g, " ")
+		.match(/^([^(]+?)\s*(\((.*)\))?$/);
 	if (!parsed || parsed.length !== 4) {
 		throw new Error("Invalid state ref '" + ref + "'");
 	}
@@ -76,26 +76,34 @@ END CODE FROM ANGULARUI ROUTER
 
 */
 
-angular.module("ool.directives").directive("secref", /*@ngInject*/ function($animate, $state, $injector, $rootScope) {
-	return {
+import {
+	directives
+} from "app";
+
+import ngIfBuilder from "directives/angularInternal/ngIf";
+
+directives.directive("secref",
+	/* @ngInject*/
+	($animate, $state, $injector, $rootScope) => ({
 		multiElement: true,
 		transclude: "element",
 		priority: 601,
 		terminal: true,
 		restrict: "A",
 		$$tlb: true,
-		link: function($scope, $element, $attr, ctrl, $transclude) {
-			let ngIf = require("directives/angularInternal/ngIf")($element, $attr, $transclude, $animate);
+		link: ($scope, $element, $attr, ctrl, $transclude) => {
+			const ngIf = ngIfBuilder($element, $attr,
+				$transclude, $animate);
 
 			function ngIfWatchAction() {
+				const ref = parseStateRef($attr.uiSref, $state.current.name);
 
-				let ref = parseStateRef($attr.uiSref, $state.current.name);
+				const state = $state.get(ref.state, $state.current.name);
 
-				let state = $state.get(ref.state, $state.current.name);
-
-				let allowed = !angular.isObject(state.data) || !(state.data.canAccess) || $injector.invoke(state.data.canAccess, null, {
-					"$refStateParams": $scope.$eval(ref.paramExpr)
-				});
+				const allowed = !angular.isObject(state.data) || !(state.data.canAccess) ||
+					$injector.invoke(state.data.canAccess, null, {
+						"$refStateParams": $scope.$eval(ref.paramExpr)
+					});
 
 				if (!allowed) {
 					ngIf(false);
@@ -109,5 +117,4 @@ angular.module("ool.directives").directive("secref", /*@ngInject*/ function($ani
 			$rootScope.$on("securityInfoChanged", ngIfWatchAction);
 			$scope.$watch($attr.uiSref, ngIfWatchAction);
 		}
-	};
-});
+	}));

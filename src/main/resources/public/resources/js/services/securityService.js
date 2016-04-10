@@ -20,12 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-var moment = require("moment");
-var _ = require("lodash");
-var $ = require("jquery");
+import { services } from "app";
+import moment from "moment";
+import {
+	property as _property,
+	includes as _includes,
+	some as _some
+} from "lodash";
+import $ from "jquery";
 
 
 let dataInternal = null;
@@ -37,7 +40,8 @@ function paramTransform(data) {
 }
 
 class SecurityService {
-	constructor($rootScope, $http, $timeout, $state, $q, $cacheFactory, PromiseUtils) {
+	constructor($rootScope, $http, $timeout, $state, $q, $cacheFactory,
+		PromiseUtils) {
 		this.$rootScope = $rootScope;
 		this.$http = $http;
 		this.$timeout = $timeout;
@@ -49,26 +53,27 @@ class SecurityService {
 	}
 
 	permissionFunc(url, permission) {
-		let deferred = this.$q.defer();
-		this.update().then(
-			() => {
-				if (this.isSuperUserImmediate) {
-					deferred.resolve(true);
-					return;
-				}
-				if(!this.hasPrincipal){
-					deferred.resolve(false);
-					return;
-				}
-				this.$http.get(url(this.user.id), {
+		const deferred = this.$q.defer();
+		this.update()
+			.then(
+				() => {
+					if (this.isSuperUserImmediate) {
+						deferred.resolve(true);
+						return;
+					}
+					if (!this.hasPrincipal) {
+						deferred.resolve(false);
+						return;
+					}
+					this.$http.get(url(this.user.id), {
 						params: {
-							"permission": permission
+							permission
 						}
 					})
-					.then(_.property("data"))
-					.then((val) => deferred.resolve(val));
-			}
-		);
+						.then(_property("data"))
+						.then((val) => deferred.resolve(val));
+				}
+			);
 		return deferred.promise;
 	}
 
@@ -100,7 +105,8 @@ class SecurityService {
 	}
 
 	get isSuperUser() {
-		return this.update().then(() => this.isSuperUserImmediate);
+		return this.update()
+			.then(() => this.isSuperUserImmediate);
 	}
 
 	get isSuperUserImmediate() {
@@ -111,26 +117,32 @@ class SecurityService {
 	}
 
 	hasContestPermission(contestId, permission) {
-		return this.permissionFunc((principalId) => "/api/contest/" + contestId + "/hasContestPermission/" + principalId, permission);
+		return this.permissionFunc((principalId) =>
+			`/api/contest/${contestId}/hasContestPermission/${principalId}`,
+			permission);
 	}
 
 	hasTaskPermission(taskId, permission) {
-		return this.permissionFunc((principalId) => "/api/task/" + taskId + "/hasTaskPermission/" + principalId, permission);
+		return this.permissionFunc((principalId) =>
+			`/api/task/${taskId}/hasTaskPermission/${principalId}`, permission);
 	}
 
 	hasGroupPermission(groupId, permission) {
-		return this.permissionFunc((principalId) => "/api/group/" + groupId + "/hasGroupPermission/" + principalId, permission);
+		return this.permissionFunc((principalId) =>
+			`/api/group/${groupId}/hasGroupPermission/${principalId}`, permission);
 	}
 
 	isUserInCurrentContestOrNoContest() {
-		return this.update().then(function(data) {
-			// TODO: implement
-			return true;
-		});
+		return this.update()
+			.then((data) => {
+				// TODO: implement
+				return true;
+			});
 	}
 
 	hasPermission(permission) {
-		return this.update().then(() => this.hasPermissionImmediate(permission));
+		return this.update()
+			.then(() => this.hasPermissionImmediate(permission));
 	}
 
 	hasPermissionImmediate(permission) {
@@ -145,16 +157,18 @@ class SecurityService {
 		if (this.isSuperUserImmediate) {
 			return true;
 		}
-		return _.includes(this.user.permissions, permission);
+		return _includes(this.user.permissions, permission);
 	}
 
-	hasAnyPermissionImmediate() {
-		return _.some(arguments, (permission) => this.hasPermissionImmediate(permission));
+	hasAnyPermissionImmediate(...args) {
+		return _some(args, (permission) => this.hasPermissionImmediate(
+			permission));
 	}
 
 
 	noCurrentContest() {
-		return this.update().then(() => this.noCurrentContestImmediate);
+		return this.update()
+			.then(() => this.noCurrentContestImmediate);
 	}
 
 	noCurrentContestImmediate() {
@@ -169,7 +183,8 @@ class SecurityService {
 
 	update() {
 		if (forceUpdate ||
-			(lastUpdate && lastUpdate.isBefore(moment().subtract(5, "seconds")))) {
+			(lastUpdate && lastUpdate.isBefore(moment()
+				.subtract(5, "seconds")))) {
 			this.securityStatusCache.removeAll();
 		}
 
@@ -179,24 +194,24 @@ class SecurityService {
 			return this.$q.when(dataInternal);
 		}
 
-		if(!forceUpdate && this.updatePromise){
+		if (!forceUpdate && this.updatePromise) {
 			return this.updatePromise;
 		}
 
-		this.updatePromise = this.$http.get("/api/security/status").then((r) => {
-			dataInternal = r.data;
-			this.securityStatusCache.put("data", dataInternal);
-			lastUpdate = moment();
-			this.updatePromise = null;
-			this.$rootScope.$broadcast("securityInfoChanged");
-			return dataInternal;
-		});
+		this.updatePromise = this.$http.get("/api/security/status")
+			.then((r) => {
+				dataInternal = r.data;
+				this.securityStatusCache.put("data", dataInternal);
+				lastUpdate = moment();
+				this.updatePromise = null;
+				this.$rootScope.$broadcast("securityInfoChanged");
+				return dataInternal;
+			});
 
 		return this.updatePromise;
 	}
 
 	login(username, password, recaptchaResponse) {
-
 		return this.$http({
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
@@ -205,19 +220,19 @@ class SecurityService {
 			url: "/api/login",
 			transformRequest: paramTransform,
 			data: {
-				"username": username,
-				"password": password,
-				"recaptchaResponse": recaptchaResponse
+				username,
+				password,
+				recaptchaResponse
 			}
-		}).then((x) => {
-			forceUpdate = true;
-			this.update();
-			return x;
-		});
+		})
+			.then((x) => {
+				forceUpdate = true;
+				this.update();
+				return x;
+			});
 	}
 
 	logout() {
-
 		this.$http({
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
@@ -226,27 +241,31 @@ class SecurityService {
 			url: "/api/logout",
 			transformRequest: paramTransform,
 			data: {}
-		}).then(() => {
-			forceUpdate = true;
+		})
+			.then(() => {
+				forceUpdate = true;
 
-			this.$state.go("home", {}, {
-				reload: true,
-				location: true
+				this.$state.go("home", {}, {
+					reload: true,
+					location: true
+				});
+				this.update();
 			});
-			this.update();
-		});
 	}
 
 }
-SecurityService.$inject = ["$rootScope", "$http", "$timeout", "$state", "$q", "$cacheFactory", "PromiseUtils"];
+SecurityService.$inject = ["$rootScope", "$http", "$timeout", "$state", "$q",
+	"$cacheFactory", "PromiseUtils"
+];
 
-angular.module("ool.services")
+services
 	.service("SecurityService", SecurityService)
-	.run( /* @ngInject */ function(SecurityService, $timeout) {
+	.run(/* @ngInject */ (SecurityService, $timeout) => {
 		function poller() {
-			SecurityService.update().then(function() {
-				$timeout(poller, 60000);
-			});
+			SecurityService.update()
+				.then(() => {
+					$timeout(poller, 60000);
+				});
 		}
 		poller();
 	});

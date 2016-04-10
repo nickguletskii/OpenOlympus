@@ -20,23 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var _ = require("lodash");
-var angular = require("angular");
-angular.module("ool.services").factory("PromiseUtils", /*@ngInject*/ function($q) {
+import {
+	map as _map,
+	reduce as _reduce
+} from "lodash";
+import {
+	services
+} from "app";
+services.factory("PromiseUtils", /* @ngInject*/ ($q) => {
 	return {
-		and: function() {
-			return $q.all(
-					_.map(arguments, arg => $q.when(arg)))
-				.then(all =>
-					_.reduce(all, (flattened, other) => flattened && other,
-						true));
-		},
-		or: function() {
-			return $q.all(
-					_.map(arguments, arg => $q.when(arg)))
-				.then(all =>
-					_.reduce(all, (flattened, other) => flattened || other,
-						false));
-		}
+		and: () => $q.all(
+				_map(arguments, arg => $q.when(arg))
+			)
+			.then(all =>
+				_reduce(all,
+					(flattened, other) => flattened && other, true)),
+		or: () => $q.all(
+				_map(arguments, arg => $q.when(arg))
+			)
+			.then(all =>
+				_reduce(all,
+					(flattened, other) => flattened || other, false))
 	};
 });

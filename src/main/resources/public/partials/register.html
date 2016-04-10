@@ -23,10 +23,7 @@
 
 -->
 <h1>{{ 'register.form.heading' | translate }}</h1>
-<spinner ng-show="!ready"
-    class="spinner-large">
-</spinner>
-<form ng-show="ready"
+<form
     name="userForm"
     controller="userFormController"
     form-for="user"

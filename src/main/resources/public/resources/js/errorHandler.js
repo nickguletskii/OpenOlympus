@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-let $ = require("jquery");
+import $ from "jquery";
 
 class Handler {
 	removeAngular() {

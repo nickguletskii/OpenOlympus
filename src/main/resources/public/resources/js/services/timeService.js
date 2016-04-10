@@ -20,26 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var moment = require("moment");
-var angular = require("angular");
-angular.module("ool.services").factory("datetime", /*@ngInject*/ function($timeout, $http) {
+import moment from "moment";
+import { services } from "app";
 
-	var offset = 0;
+services.factory("datetime", /* @ngInject*/ ($http) => {
+	let offset = 0;
 
-	$http.get("/api/time").then(
-		function(response) {
-			offset = moment(response.data).diff(moment());
-		}
-	);
+	$http.get("/api/time")
+		.then(
+			(response) => {
+				offset = moment(response.data)
+					.diff(moment());
+			}
+		);
 
 	function currentServerTimeOffset() {
 		return offset;
 	}
 
 	function timeTo(referenceTime) {
-		var currentTime = moment().add(currentServerTimeOffset());
-		var from = moment(referenceTime);
-		var dur = moment.duration(from.diff(currentTime), "milliseconds");
+		const currentTime = moment()
+			.add(currentServerTimeOffset());
+		const from = moment(referenceTime);
+		const dur = moment.duration(from.diff(currentTime), "milliseconds");
 		return {
 			days: dur.days(),
 			hours: dur.hours(),
@@ -49,13 +52,14 @@ angular.module("ool.services").factory("datetime", /*@ngInject*/ function($timeo
 	}
 
 	function currentServerTime() {
-		return moment().add(currentServerTimeOffset());
+		return moment()
+			.add(currentServerTimeOffset());
 	}
 
 
 	return {
-		timeTo: timeTo,
-		currentServerTime: currentServerTime,
-		currentServerTimeOffset: currentServerTimeOffset
+		timeTo,
+		currentServerTime,
+		currentServerTimeOffset
 	};
 });

@@ -20,26 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var angular = require("angular");
+import angular from "angular";
 
-angular.module("ool.directives").directive("fileNgModel", /*@ngInject*/ function() {
-	return {
+import {
+	directives
+} from "app";
+
+directives.directive("fileNgModel",
+	/* @ngInject*/
+	() => ({
 		require: "ngModel",
 		restrict: "A",
-		link: function($scope, element, attrs, ngModel) {
-			element.bind("change", function(event) {
-				var files = event.target.files;
+		link: ($scope, element, attrs, ngModel) => {
+			element.bind("change", (event) => {
+				const files = event.target.files;
 
 				ngModel.$setViewValue(files);
 				element.triggerHandler("fileSelectionChanged");
 
 				$scope.$apply();
 			});
-			$scope.$watch(() => ngModel.$viewValue, function(value) {
+			$scope.$watch(() => ngModel.$viewValue, (value) => {
 				if (!value) {
 					element.val(null);
 				}
 			});
 		}
-	};
-});
+	}));

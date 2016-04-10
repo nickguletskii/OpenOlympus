@@ -20,36 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var angular = require("angular");
+import {
+	directives
+} from "app";
 
-angular.module("ool.directives").directive("datepickerLocaldate", /*@ngInject*/ function() {
+directives.directive("datepickerLocaldate", /* @ngInject*/ () => {
 	function link(scope, element, attr, ctrls) {
-		var ngModelController = ctrls[0];
+		const ngModelController = ctrls[0];
 
 		// called with a JavaScript Date object when picked from the datepicker
-		ngModelController.$parsers.push(function(viewValue) {
+		ngModelController.$parsers.push((viewValue) => {
 			// undo the timezone adjustment we did during the formatting
 			viewValue.setMinutes(viewValue.getMinutes() - viewValue.getTimezoneOffset());
 			// we just want a local date in ISO format
-			return viewValue.toISOString().substring(0, 10);
+			return viewValue.toISOString()
+				.substring(0, 10);
 		});
 
 		// called with a 'yyyy-mm-dd' string to format
-		ngModelController.$formatters.push(function(modelValue) {
+		ngModelController.$formatters.push((modelValue) => {
 			if (!modelValue) {
 				return undefined;
 			}
 			// date constructor will apply timezone deviations from UTC (i.e. if locale is behind UTC 'dt' will be one day behind)
-			var dt = new Date(modelValue);
+			const dt = new Date(modelValue);
 			// 'undo' the timezone offset again (so we end up on the original date again)
 			dt.setMinutes(dt.getMinutes() + dt.getTimezoneOffset());
 			return dt;
 		});
 	}
-	var directive = {
+	const directive = {
 		restrict: "A",
 		require: ["ngModel"],
-		link: link
+		link
 	};
 	return directive;
 });

@@ -20,45 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
+import angular from "angular";
+import "angular-ui-bootstrap";
 
-import errorHandler from "errorHandler";
-import accordion from "angular-ui-bootstrap/src/accordion";
-import buttons from "angular-ui-bootstrap/src/buttons";
-import dateparser from "angular-ui-bootstrap/src/dateparser";
-import datepicker from "angular-ui-bootstrap/src/datepicker";
-import debounce from "angular-ui-bootstrap/src/debounce";
-import pager from "angular-ui-bootstrap/src/pager";
-import paging from "angular-ui-bootstrap/src/paging";
-import popover from "angular-ui-bootstrap/src/popover";
-import progressbar from "angular-ui-bootstrap/src/progressbar";
-import timepicker from "angular-ui-bootstrap/src/timepicker";
-import tooltip from "angular-ui-bootstrap/src/tooltip";
-import typeahead from "angular-ui-bootstrap/src/typeahead";
-
-require("filters");
-require("services");
-require("directives");
-require("controllers");
-
-angular.module("ool", ["pascalprecht.translate", "ui.router",
-	"ui.bootstrap", "ool.filters", "ool.controllers",
+export default angular.module("ool", ["pascalprecht.translate", "ui.router",
+	"ui.bootstrap", "ool.filters", "ool.states",
 	"ool.services", "ool.directives", "ngFileUpload", "ui.codemirror",
 	"ngAnimate", "formFor", "formFor.bootstrapTemplates", "vcRecaptcha",
-	"ngCookies",
-	errorHandler,
-	accordion,
-	buttons,
-	dateparser,
-	datepicker,
-	debounce,
-	pager,
-	paging,
-	popover,
-	progressbar,
-	timepicker,
-	tooltip,
-	typeahead
+	"ngCookies"
+]);
+export const services = angular.module("ool.services", []);
+export const filters = angular.module("ool.filters", ["ool.services"]);
+export const directives = angular.module("ool.directives", [
+	"ool.services",
+	"ool.filters"
+]);
+export const states = angular.module("ool.states", [
+	"ool.services",
+	"ool.directives",
+	"ool.filters"
 ]);

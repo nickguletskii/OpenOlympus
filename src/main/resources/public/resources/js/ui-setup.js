@@ -20,129 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-var moment = require("moment");
-require("app");
-require("angular-animate");
-require("angular-ui-bootstrap");
+import "angular-animate";
+import "angular-ui-bootstrap";
+import module from "app";
 
-angular
-	.module("template/pagination/pagination.html", [])
-	.run(
-		/*@ngInject*/
-		function($templateCache) {
-			$templateCache
-				.put(
-					"template/pagination/pagination.html",
-					require("ng-cache!directives/pagination.html"));
-		}
-	);
 
-angular.module("ool")
-	.run(function($rootScope, $timeout) {
+export function initialiseTemplates() {
+	angular
+		.module("template/pagination/pagination.html", [])
+		.run(
+			/*@ngInject*/
+			function($templateCache) {
+				$templateCache
+					.put(
+						"template/pagination/pagination.html",
+						require("ng-cache!directives/pagination.html"));
+			}
+		);
+};
+
+export function scheduleRemovalOfLoadingOverlay() {
+	module.run(function($rootScope, $timeout) {
 		$timeout(function() {
 			$rootScope.hideResourcesLoading = true;
 		}, 0);
-	})
-	.run( /*@ngInject*/ function($rootScope, $stateParams, SecurityService, $location, $timeout, $state, $http, $translate, $window, FormForConfiguration, $injector) {
-		// Make state parameters easily accessible
-		$rootScope.stateParams = $stateParams;
-
-		// Make sure that locales are synchronised across libraries
-		$rootScope.$on("$translateChangeSuccess",
-			function(event, language) {
-				$rootScope.currentLanguage = language.language;
-				moment.locale(language.language);
-			});
-
-		$rootScope.availableLanguages = ["en", "ru"]; // TODO: Make this dynamic
-		$rootScope.changeLanguage = $translate.use; // Expose $translate.use to the language change menu
+	});
+}
 
 
-		$rootScope.$on("$stateNotFound",
-			function(event, unfoundState, fromState, fromParams) {
-				console.error("Couldn't find state: ", unfoundState);
-				throw new Error("Couldn't find state: " + unfoundState.to);
-			});
-		$rootScope.$on("$stateChangeStart",
-			function(event, toState, toParams, fromState, fromParams) {
-				if ($rootScope.showErrorModal) {
-					event.preventDefault();
-					console.log("Trying to recover from failure state by reloading!");
-					$window.location.reload(true); // Refresh the page to prevent broken templates getting stuck in the page
-					$state.go(toState, toParams, {
-						reload: true,
-						notify: false,
-						inherit: false
-					});
-				} else {
-					$rootScope.stateParams = toParams; // Make state parameters easily accessible
-				}
-			});
-		$rootScope.$on("$stateChangeStart",
-			function(event, toState, toParams) {
-				let allowed = !angular.isObject(toState.data) || !(toState.data.canAccess) || $injector.invoke(toState.data.canAccess, null, {
-					"$refStateParams": toParams
-				});
-				if (!allowed) {
-					event.preventDefault();
-					$location.path("/forbidden");
-				} else if (allowed.then) {
-					allowed.then(function(val) {
-						if (!val) {
-							$location.path("/forbidden");
-						}
-					});
-				}
-			});
-		$rootScope.$on("$stateChangeSuccess",
-			function(event, toState, toParams, fromState, fromParams) {
-				$rootScope.stateConfig = toState;
-			});
-		$rootScope.$on("$stateChangeError",
-			function(event, toState, toParams, fromState, fromParams, error) {
-				console.error(error);
-				if (error.status === 403) {
-					event.preventDefault();
-					$location.path("/forbidden");
-				} else {
-					$rootScope.showErrorModal = true;
-				}
-			});
-
+export function initialiseFullScreenManagement() {
+	module.run( /*@ngInject*/ function($rootScope) {
 		$rootScope.toggleFullscreen = function(fullScreen) {
 			$rootScope.fullScreen = fullScreen;
 		};
-
-		$translate(["validation.failed.custom", "validation.failed.email", "validation.failed.integer",
-			"validation.failed.maxCollectionSize", "validation.failed.maximum", "validation.failed.maxLength",
-			"validation.failed.minimum", "validation.failed.minCollectionSize", "validation.failed.minLength",
-			"validation.failed.negative", "validation.failed.nonNegative", "validation.failed.numeric",
-			"validation.failed.pattern", "validation.failed.positive", "validation.failed.empty"
-		]).then(function(translations) {
-			FormForConfiguration.setValidationFailedForCustomMessage(translations["validation.failed.custom"]);
-			FormForConfiguration.setValidationFailedForEmailTypeMessage(translations["validation.failed.email"]);
-			FormForConfiguration.setValidationFailedForIntegerTypeMessage(translations["validation.failed.integer"]);
-			FormForConfiguration.setValidationFailedForMaxCollectionSizeMessage(translations["validation.failed.maxCollectionSize"]);
-			FormForConfiguration.setValidationFailedForMaximumMessage(translations["validation.failed.maximum"]);
-			FormForConfiguration.setValidationFailedForMaxLengthMessage(translations["validation.failed.maxLength"]);
-			FormForConfiguration.setValidationFailedForMinimumMessage(translations["validation.failed.minimum"]);
-			FormForConfiguration.setValidationFailedForMinCollectionSizeMessage(translations["validation.failed.minCollectionSize"]);
-			FormForConfiguration.setValidationFailedForMinLengthMessage(translations["validation.failed.minLength"]);
-			FormForConfiguration.setValidationFailedForNegativeTypeMessage(translations["validation.failed.negative"]);
-			FormForConfiguration.setValidationFailedForNonNegativeTypeMessage(translations["validation.failed.nonNegative"]);
-			FormForConfiguration.setValidationFailedForNumericTypeMessage(translations["validation.failed.numeric"]);
-			FormForConfiguration.setValidationFailedForPatternMessage(translations["validation.failed.pattern"]);
-			FormForConfiguration.setValidationFailedForPositiveTypeMessage(translations["validation.failed.positive"]);
-			FormForConfiguration.setValidationFailedForRequiredMessage(translations["validation.failed.empty"]);
-			FormForConfiguration.disableAutoTrimValues();
-		});
-
 	});
+}
 
-
-
-
-angular.bootstrap(document, ["ool"]);
+export function bootstrap() {
+	angular.bootstrap(document, ["ool"]);
+}

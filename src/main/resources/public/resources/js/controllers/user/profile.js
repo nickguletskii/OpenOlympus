@@ -20,14 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
+import personalInfoValidationRules from "states/user/userInfoValidation";
 
-module.exports = /*@ngInject*/ function($scope, FormDefaultHelperService, ValidationService, personalInfoPatchUrl, requireExistingPassword, existingPersonalInfo, passwordPatchUrl, enablePermissionsEditor, principalId) {
+export default
+/* @ngInject*/
+($scope, FormDefaultHelperService, ValidationService,
+	personalInfoPatchUrl, requireExistingPassword, existingPersonalInfo,
+	passwordPatchUrl, enablePermissionsEditor, principalId) => {
 	$scope.principalId = principalId;
 	$scope.requireExistingPassword = requireExistingPassword;
 	$scope.enablePermissionsEditor = enablePermissionsEditor;
 
-	const personalInfoValidationRules = require("controllers/user/userInfoValidation");
 
 	const passwordFormValidationRules = {
 		password: {
@@ -35,10 +38,11 @@ module.exports = /*@ngInject*/ function($scope, FormDefaultHelperService, Valida
 		},
 		passwordConfirmation: {
 			required: true,
-			custom: ValidationService.toTranslationPromise(function(value, model) {
+			custom: ValidationService.toTranslationPromise((value, model) => {
 				if (value !== model.password) {
 					return "user.passwordForm.validation.passwordsDontMatch";
 				}
+				return null;
 			})
 		}
 	};

@@ -20,13 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var $ = require("jquery");
-var _ = require("lodash");
-var angular = require("angular");
-angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(FieldHelper, $http, $compile, vcRecaptchaService) {
-	return {
+import $ from "jquery";
+import {
+	isEmpty as _isEmpty
+} from "lodash";
+
+import {
+	directives
+} from "app";
+
+directives.directive("recaptcha",
+	/* @ngInject*/
+	(FieldHelper, $http, $compile, vcRecaptchaService) => ({
 		restrict: "E",
 		require: "^formFor",
 		template: require("ng-cache!directives/captcha/captcha.html"),
@@ -35,30 +41,38 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 			label: "@",
 			onCreate: "&?"
 		},
-		link: function($scope, $element, $attributes, formForController) {
-			FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
+		link: ($scope, $element, $attributes, formForController) => {
+			FieldHelper.manageFieldRegistration($scope, $attributes,
+				formForController);
 
-			$scope.onCreateAndSet = function(widgetId) {
+			$scope.onCreateAndSet = (widgetId) => {
 				$scope.widgetId = widgetId;
 
 				if ($scope.onCreate) {
 					$scope.onCreate();
 				}
 			};
-			$http.get("/api/recaptchaPublicKey").then(function(response) {
-				let recaptchaPublicKey = response.data;
-				if (_.isEmpty(recaptchaPublicKey)) {
-					$element.remove();
+			$http.get("/api/recaptchaPublicKey")
+				.then((response) => {
+					const recaptchaPublicKey = response.data;
+					if (_isEmpty(recaptchaPublicKey)) {
+						$element.remove();
 
-					if ($scope.onCreate) {
-						$scope.onCreate();
+						if ($scope.onCreate) {
+							$scope.onCreate();
+						}
+						return;
 					}
-					return;
-				}
-				$scope.recaptchaPublicKey = recaptchaPublicKey;
-				$.getScript("//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit");
-				$($element[0]).find(".captchaLoading").replaceWith($compile("<div vc-recaptcha key=\"recaptchaPublicKey\" ng-model=\"model.bindable\" on-create=\"onCreateAndSet(widgetId)\"></div>")($scope));
-			});
+					$scope.recaptchaPublicKey = recaptchaPublicKey;
+					$.getScript(
+						"//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit"
+					);
+					$($element[0])
+						.find(".captchaLoading")
+						.replaceWith($compile(
+							"<div vc-recaptcha key=\"recaptchaPublicKey\" ng-model=\"model.bindable\" on-create=\"onCreateAndSet(widgetId)\"></div>"
+						)($scope));
+				});
 
 			if ($attributes.resetOn) {
 				$scope.$parent.$on($attributes.resetOn, () => {
@@ -68,5 +82,4 @@ angular.module("ool.directives").directive("recaptcha", /*@ngInject*/ function(F
 				});
 			}
 		}
-	};
-});
+	}));

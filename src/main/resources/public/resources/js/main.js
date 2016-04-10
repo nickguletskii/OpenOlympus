@@ -20,113 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require("font-awesome-webpack");
+import "font-awesome-webpack";
 
-import angular from "angular";
-import _ from "lodash";
 
-require("angular-ui-router");
-require("angular-translate");
-require("angular-translate-loader-url");
-require("angular-ui-codemirror");
-require("angular-recaptcha");
-require("angular-animate");
-require("angular-cookies");
-require("angular-form-for");
-require("angular-form-for-bootstrap");
-require("ng-file-upload");
+import "angular-ui-router";
+import "angular-translate";
+import "angular-translate-loader-url";
+import "angular-ui-codemirror";
+import "angular-recaptcha";
+import "angular-animate";
+import "angular-cookies";
+import "angular-form-for";
+import "angular-form-for-bootstrap";
+import "ng-file-upload";
 
-require("app");
+import "app";
 
-angular.module("ool")
-	.factory("missingTranslationHandler", function() {
-		return function(translationId) {
-			let orig = angular.fromJson(localStorage.getItem("missingTranslations") || "[]");
-			let unified = _.union(orig, [translationId]);
-			localStorage.setItem("missingTranslations", angular.toJson(unified));
-		};
-	})
-	.config( /*@ngInject*/ function($translateProvider) {
-		$translateProvider.useSanitizeValueStrategy("escape");
-		$translateProvider.useUrlLoader("/translation");
-		$translateProvider.preferredLanguage("ru");
-		// $translateProvider.translationNotFoundIndicator("$$");
-		$translateProvider.useMissingTranslationHandler("missingTranslationHandler");
-	})
-	.config( /*@ngInject*/ function($httpProvider, $locationProvider) {
+import "services";
+import "filters";
+import "directives";
+import "registerStates";
 
-		$locationProvider.html5Mode(true);
+import {
+	initialiseTemplates,
+	scheduleRemovalOfLoadingOverlay,
+	initialiseFullScreenManagement,
+	bootstrap
+} from "ui-setup";
+import { registerExceptionHandler } from "config/exceptionHandler";
+import { startListeningToSecurityEvents } from "config/security";
+import { initialiseRouterLogic } from "config/router";
+import { installTranslation } from "config/translation";
+import { addHttpInterceptors } from "config/http";
 
-		$httpProvider.interceptors.push( /*@ngInject*/ function($q, $rootScope, $location, $cookies) {
-			return {
-				"request": function(config) {
-					config.headers["X-CSRF-TOKEN"] = $cookies.get("X-CSRF-TOKEN");
-
-					if (angular.isDefined($rootScope.authToken)) {
-						config.headers["X-Auth-Token"] = $rootScope.authToken;
-					}
-					return config || $q.when(config);
-				},
-				"response": function(response) {
-					if (response.status === 401) {
-						$location.path("/api/login");
-						return $q.reject(response);
-					}
-
-					return response;
-				},
-				"responseError": function(response) {
-					if (!_.has(response, "config.method")) {
-						console.error("No response method for response", response);
-					}
-					if (response.status === 500 || !response.config.method) {
-						errorHandler.showUnknownError();
-						$rootScope.$destroy();
-					}
-					var status = response.status;
-					var config = response.config;
-					var method = config.method;
-					var url = config.url;
-					if (_.includes(config.acceptableFailureCodes, status)) {
-						return $q.reject(response);
-					}
-					switch (status) {
-						case -1:
-							errorHandler.showConnectionLostError();
-							$rootScope.$destroy();
-							return null;
-						case 403:
-							$location.path("/forbidden");
-							$rootScope.forbidden = true;
-							break;
-						case 401:
-							$location.path("/login");
-							break;
-						default:
-							throw new Error(method + " on " + url + " failed with status " + status);
-					}
-
-					return $q.reject(response);
-				}
-			};
-		});
-
-	}).factory("$exceptionHandler", /*@ngInject*/ function($injector) {
-		return function(exception) {
-			var $rootScope = $injector.get("$rootScope");
-			if (!$rootScope.forbidden) {
-				errorHandler.showUnknownError();
-			}
-			console.error(exception);
-			//	throw exception;
-			$rootScope.$destroy();
-		};
-	})
-	.run( /*@ngInject*/ function($rootScope, SecurityService) {
-		$rootScope.security = SecurityService;
-
-		$rootScope.$on("securityInfoChanged", function() {
-			$rootScope.security = SecurityService;
-		});
-	});
-require("ui-setup");
+registerExceptionHandler();
+startListeningToSecurityEvents();
+addHttpInterceptors();
+initialiseTemplates();
+scheduleRemovalOfLoadingOverlay();
+installTranslation();
+initialiseRouterLogic();
+initialiseFullScreenManagement();
+bootstrap();

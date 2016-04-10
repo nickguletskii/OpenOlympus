@@ -20,87 +20,110 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var Util = require("oolutil");
-var _ = require("lodash");
-var angular = require("angular");
-angular.module("ool.services").factory("UserService", /*@ngInject*/ function($http, $q, Upload, $rootScope) {
-	return {
-		getCurrentUser: function() {
-			return $http.get("api/user/personalInfo", {}).then(_.property("data"));
-		},
-		changePassword: function(passwordObj, userId) {
-			var passwordPatchUrl = !userId ? "/api/user/changePassword" : "/api/admin/user/" + userId + "/changePassword";
-			return $http({
-				method: "PATCH",
-				url: passwordPatchUrl,
-				data: _.omit(Util.emptyToNull(passwordObj), "passwordConfirmation")
-			}).then(_.property("data"));
-		},
-		countPendingUsers: function() {
-			return $http.get("api/admin/pendingUsersCount").then(_.property("data"));
-		},
-		getPendingUsersPage: function(page) {
-			return $http.get("api/admin/pendingUsers", {
-				params: {
-					page: page
-				}
-			}).then(_.property("data"));
-		},
-		countUsers: function() {
-			return $http.get("api/admin/usersCount").then(_.property("data"));
-		},
-		getUsersPage: function(page) {
-			return $http.get("api/admin/users", {
-				params: {
-					page: page
-				}
-			}).then(_.property("data"));
-		},
-		approveUsers: function(users) {
-			return $http.post("/api/admin/users/approve", users).then(_.property("data"));
-		},
-		deleteUsers: function(users) {
-			return $http.post("/api/admin/users/deleteUsers", users).then(_.property("data"));
-		},
-		countArchiveUsers: function() {
-			return $http.get("api/archive/rankCount").then(_.property("data"));
-		},
-		getArchiveRankPage: function(page) {
-			return $http.get("api/archive/rank", {
-				params: {
-					page: page
-				}
-			}).then(_.property("data"));
-		},
-		addUserToGroup: function(groupId, username) {
-			let deferred = $q.defer();
+import Util from "oolutil";
+import {
+	property as _property,
+	omit as _omit
+} from "lodash";
+import { services } from "app";
 
-			let formData = new FormData();
-			formData.append("username", username);
+class UserService {
+	/* @ngInject*/
+	constructor($http, $q, Upload, $rootScope) {
+		this.$http = $http;
+		this.$q = $q;
+		this.$rootScope = $rootScope;
+		this.Upload = Upload;
+	}
+	getCurrentUser() {
+		return this.$http.get("api/user/personalInfo", {})
+			.then(_property("data"));
+	}
+	changePassword(passwordObj, userId) {
+		const passwordPatchUrl = !userId ? "/api/user/changePassword" :
+			`/api/admin/user/${userId}/changePassword`;
+		return this.$http({
+			method: "PATCH",
+			url: passwordPatchUrl,
+			data: _omit(Util.emptyToNull(passwordObj), "passwordConfirmation")
+		})
+			.then(_property("data"));
+	}
+	countPendingUsers() {
+		return this.$http.get("api/admin/pendingUsersCount")
+			.then(_property("data"));
+	}
+	getPendingUsersPage(page) {
+		return this.$http.get("api/admin/pendingUsers", {
+			params: {
+				page
+			}
+		})
+			.then(_property("data"));
+	}
+	countUsers() {
+		return this.$http.get("api/admin/usersCount")
+			.then(_property("data"));
+	}
+	getUsersPage(page) {
+		return this.$http.get("api/admin/users", {
+			params: {
+				page
+			}
+		})
+			.then(_property("data"));
+	}
+	approveUsers(users) {
+		return this.$http.post("/api/admin/users/approve", users)
+			.then(_property("data"));
+	}
+	deleteUsers(users) {
+		return this.$http.post("/api/admin/users/deleteUsers", users)
+			.then(_property("data"));
+	}
+	countArchiveUsers() {
+		return this.$http.get("api/archive/rankCount")
+			.then(_property("data"));
+	}
+	getArchiveRankPage(page) {
+		return this.$http.get("api/archive/rank", {
+			params: {
+				page
+			}
+		})
+			.then(_property("data"));
+	}
+	addUserToGroup(groupId, username) {
+		const deferred = this.$q.defer();
 
-			Upload.http({
-				method: "POST",
-				url: "/api/group/" + groupId + "/addUser",
-				headers: {
-					"X-Auth-Token": $rootScope.authToken,
-					"Content-Type": undefined
-				},
-				data: formData,
-				transformRequest: angular.identity
-			}).success(function(data) {
+		const formData = new FormData();
+		formData.append("username", username);
+
+		this.Upload.http({
+			method: "POST",
+			url: `/api/group/${groupId}/addUser`,
+			headers: {
+				"Content-Type": undefined,
+				"X-Auth-Token": this.$rootScope.authToken
+			},
+			data: formData,
+			transformRequest: angular.identity
+		})
+			.success((data) => {
 				deferred.resolve(data);
 			});
 
-			return deferred.promise;
-		},
-		removeUserFromGroup: function(groupId, userId) {
-			return $http.delete("/api/group/" + groupId + "/removeUser", {
-				params: {
-					user: userId
-				}
-			}).then(_.property("data"));
-		}
-	};
-});
+		return deferred.promise;
+	}
+	removeUserFromGroup(groupId, userId) {
+		return this.$http.delete(`/api/group/${groupId}/removeUser`, {
+			params: {
+				user: userId
+			}
+		})
+			.then(_property("data"));
+	}
+}
+
+services.service("UserService", UserService);

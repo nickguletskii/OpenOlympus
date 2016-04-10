@@ -20,21 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-
-var module = angular.module("ool.directives");
+import {
+	directives
+} from "app";
 
 function defineSimpleDirective(name, template) {
-	module.directive(name, /*@ngInject*/ function() {
-		return {
+	directives.directive(name,
+		/* @ngInject*/
+		() => ({
 			restrict: "E",
-			template: template,
+			template,
 			scope: {},
 			link: () => {}
-		};
-	});
+		}));
 }
 
-defineSimpleDirective("spinner", require("ng-cache!directives/simple/spinner.html"));
+defineSimpleDirective("spinner", require(
+	"ng-cache!directives/simple/spinner.html"));

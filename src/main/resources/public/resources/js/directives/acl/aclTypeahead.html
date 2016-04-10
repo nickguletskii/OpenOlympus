@@ -44,7 +44,7 @@
             placeholder="{{placeholder}}"
             form-for-debounce="{{debounce}}"
             ng-disabled="disable || model.disabled"
-            typeahead="item for items in optionGetter($viewValue)"
+            uib-typeahead="item for items in optionGetter($viewValue)"
             typeahead-loading="loading"
             class="form-control"
             typeahead-template-url="{{typeaheadTemplate}}"

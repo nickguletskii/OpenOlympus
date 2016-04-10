@@ -20,15 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
+import {
+	directives
+} from "app";
 
-angular.module("ool.directives").directive("lang", /*@ngInject*/ function($rootScope) {
-	return {
+directives.directive("lang",
+	/* @ngInject*/
+	($rootScope) => ({
 		restrict: "AE",
-		link: function(scope, element, attrs) {
-			var name = attrs.lang;
+		link: (scope, element, attrs) => {
+			const name = attrs.lang;
 
 			function changeTranslation() {
 				if (name && name !== $rootScope.currentLanguage) {
@@ -40,5 +42,4 @@ angular.module("ool.directives").directive("lang", /*@ngInject*/ function($rootS
 			changeTranslation();
 			$rootScope.$watch("currentLanguage", changeTranslation);
 		}
-	};
-});
+	}));

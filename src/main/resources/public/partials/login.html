@@ -23,10 +23,10 @@
 
 -->
 <h1>{{ 'login.form.heading' | translate }}</h1>
-<spinner ng-show="!loginRequired || !ready"
+<spinner ng-show="!loginRequired"
 	class="spinner-large">
 </spinner>
-<div ng-show="loginRequired && ready">
+<div ng-show="loginRequired">
 	<form name="loginForm"
 		controller="loginFormController"
 		form-for="user"
@@ -34,7 +34,7 @@
 		submit-with="login(user)"
 		novalidate>
 		<div class="panel panel-success"
-			ng-if="showAdministratorApprovalRequiredMessage">
+			ng-if="showAdministratorApprovalRequiredMessage == true">
 			<div class="panel-heading">
 				<h3 class="panel-title"
 					translate="login.administratorApprovalRequired.title"></h3>

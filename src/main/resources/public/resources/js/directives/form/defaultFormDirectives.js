@@ -20,55 +20,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-angular.module("ool.directives").directive("formAutoconfig", /*@ngInject*/
-	function($compile) {
-		return {
+import {
+	directives
+} from "app";
+
+directives.directive("formAutoconfig", /* @ngInject*/
+		($compile) => ({
 			restrict: "A",
 			priority: 100000,
 			terminal: true,
 			scope: false,
-			compile: function() {
-				return {
-					post: function($scope, $element, $attributes) {
-						let root = $attributes.formAutoconfig;
-						$attributes.$set("name", root + ".form");
-						$attributes.$set("controller", root + ".formController");
-						$attributes.$set("formFor", root + ".data");
-						$attributes.$set("validationRules", root + ".validationRules");
-						$attributes.$set("submitWith", root + ".submit()");
-						$attributes.$set("disable", root + ".submitting");
-						$attributes.$set("disable", root + ".submitting");
-						$compile($element, null, 100000)($scope);
-					}
-				};
-			}
-		};
-	}).directive("formProgressPanel", /*@ngInject*/ function() {
-	return {
+			compile: () => ({
+				post: ($scope, $element, $attributes) => {
+					const root = $attributes.formAutoconfig;
+					$attributes.$set("name", `${root}.form`);
+					$attributes.$set("controller", `${root}.formController`);
+					$attributes.$set("formFor", `${root}.data`);
+					$attributes.$set("validationRules", `${root}.validationRules`);
+					$attributes.$set("submitWith", `${root}.submit()`);
+					$attributes.$set("disable", `${root}.submitting`);
+					$attributes.$set("disable", `${root}.submitting`);
+					$compile($element, null, 100000)($scope);
+				}
+			})
+		})
+	)
+	.directive("formProgressPanel", /* @ngInject*/ () => ({
 		restrict: "E",
 		template: require("ng-cache!directives/form/formProgressPanel.html"),
 		scope: {
 			localisationNamespace: "@",
 			form: "="
 		},
-		link: function() {}
-	};
-}).directive("labelTranslate", /*@ngInject*/ function($compile) {
-	return {
+		link: () => {}
+	}))
+	.directive("labelTranslate", /* @ngInject*/ ($compile) => ({
 		restrict: "A",
 		priority: 100000,
 		terminal: true,
 		scope: false,
-		compile: function() {
-			return {
-				post: function($scope, $element, $attributes) {
-					$attributes.$set("label", $attributes.labelTranslate);
-					$compile($element, null, 100000)($scope);
-				}
-			};
-		}
-	};
-});
+		compile: () => ({
+			post: ($scope, $element, $attributes) => {
+				$attributes.$set("label", $attributes.labelTranslate);
+				$compile($element, null, 100000)($scope);
+			}
+		})
+	}));

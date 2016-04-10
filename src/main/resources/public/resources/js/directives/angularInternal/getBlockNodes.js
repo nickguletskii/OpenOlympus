@@ -50,7 +50,7 @@ THE SOFTWARE.
 
 */
 
-let angular = require("angular");
+import angular from "angular";
 
 module.exports = function (nodes) {
 	var node = nodes[0];

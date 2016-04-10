@@ -20,19 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
+import {
+	directives
+} from "app";
 
-angular.module("ool.directives").directive("dynamic", /*@ngInject*/ function($compile) {
-	return {
+directives.directive("dynamic",
+	/* @ngInject*/
+	($compile) => ({
 		restrict: "A",
 		replace: true,
-		link: function(scope, element, attrs) {
-			scope.$watch(attrs.dynamic, function(html) {
+		link: (scope, element, attrs) => {
+			scope.$watch(attrs.dynamic, (html) => {
 				element.html(html);
 				$compile(element.contents())(scope);
 			});
 		}
-	};
-});
+	}));

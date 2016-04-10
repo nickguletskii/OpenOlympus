@@ -20,33 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var _ = require("lodash");
-var angular = require("angular");
-var app = require("app");
-angular.module('ool.services').provider('modalState', /*@ngInject*/ function($stateProvider) {
-    var provider = this;
-    this.$get = function() {
-        return provider;
-    };
-    this.state = function(stateName, options) {
-        var modalInstance;
-        $stateProvider.state(stateName, {
-            url: options.url,
-            onEnter: function($modal, $state) {
-                modalInstance = $modal.open(options);
-                modalInstance.result['finally'](function() {
-                    modalInstance = null;
-                    if ($state.$current.name === stateName) {
-                        $state.go('^');
-                    }
-                });
-            },
-            onExit: function() {
-                if (modalInstance) {
-                    modalInstance.close();
-                }
-            }
-        });
-    };
-});
+import { services } from "app";
+services
+	.provider("modalState", /* @ngInject*/ function modalState($stateProvider) {
+		const provider = this;
+		this.$get = () => provider;
+
+		this.state = (stateName, options) => {
+			let modalInstance;
+			$stateProvider.state(stateName, {
+				url: options.url,
+				onEnter: ($modal, $state) => {
+					modalInstance = $modal.open(options);
+					modalInstance.result["finally"](() => {
+						modalInstance = null;
+						if ($state.$current.name === stateName) {
+							$state.go("^");
+						}
+					});
+				},
+				onExit: () => {
+					if (modalInstance) {
+						modalInstance.close();
+					}
+				}
+			});
+		};
+	});

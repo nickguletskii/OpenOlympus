@@ -20,22 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-var $ = require("jquery");
+import angular from "angular";
+import $ from "jquery";
 
-angular.module("ool.directives").directive("hideIfDoesntContain", /*@ngInject*/ function() {
-	return {
+import {
+	directives
+} from "app";
+
+directives.directive("hideIfDoesntContain",
+	/* @ngInject*/
+	() => ({
 		restrict: "A",
-		link: function($scope, $element, $attr) {
-			$scope.$watch(() => $($element[0]).find($attr.hideIfDoesntContain).length, function(val) {
-				if (val === 0) {
-					$element.addClass("hideIfDoesntContain");
-				} else {
-					$element.removeClass("hideIfDoesntContain");
-				}
-			});
+		link: ($scope, $element, $attr) => {
+			$scope.$watch(() => $($element[0])
+				.find($attr.hideIfDoesntContain)
+				.length,
+				(val) => {
+					if (val === 0) {
+						$element.addClass("hideIfDoesntContain");
+					} else {
+						$element.removeClass("hideIfDoesntContain");
+					}
+				});
 		}
-	};
-});
+	}));

@@ -20,43 +20,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Util = require("oolutil");
-var _ = require("lodash");
-var angular = require("angular");
-var app = require("app");
-angular.module('ool.services').factory('ServersideFormErrorReporter', /*@ngInject*/ function() {
-    return function(fieldMap) {
-        return {
-            existingErrorKeys: {},
-            report: function(ctrl, field, errors) {
-                if (!ctrl) {
-                    return;
-                }
-                var self = this;
-                if (!_.has(self.existingErrorKeys, field))
-                    self.existingErrorKeys[field] = [];
-                var errorsToAdd = [];
-                _.forEach(errors, function(error) {
-                    if (error.field === field || (!!fieldMap ? _.contains(fieldMap[error.field], field) : false)) {
-                        errorsToAdd.push(error);
-                    }
-                });
-                _.forEach(self.existingErrorKeys[field], function(errorKey) {
-                    if (_(errorsToAdd).map(function(error) {
-                            return error.defaultMessage;
-                        }).contains(errorKey))
-                        return;
-                    ctrl.$setValidity(errorKey, true);
-                });
+import { services } from "app";
+import {
+	has as _has,
+	each as _each,
+	map as _map,
+	contains as _contains
+} from "lodash";
+services
+	.factory("ServersideFormErrorReporter", () => (fieldMap) => ({
+		existingErrorKeys: {},
+		report: (ctrl, field, errors) => {
+			if (!ctrl) {
+				return;
+			}
+			const self = this;
+			if (!_has(self.existingErrorKeys, field)) {
+				self.existingErrorKeys[field] = [];
+			}
+			const errorsToAdd = [];
+			_each(errors, (error) => {
+				if (error.field === field || (fieldMap ? _contains(fieldMap[error.field],
+						field) : false)) {
+					errorsToAdd.push(error);
+				}
+			});
+			_each(self.existingErrorKeys[field], (errorKey) => {
+				if (_contains(_map(errorsToAdd, "defaultMessage"), errorKey)) {
+					return;
+				}
+				ctrl.$setValidity(errorKey, true);
+			});
 
-                self.existingErrorKeys[field].length = 0;
+			self.existingErrorKeys[field].length = 0;
 
-                _.forEach(errorsToAdd, function(error) {
-                    ctrl.$setValidity(error.defaultMessage, false);
-                    self.existingErrorKeys[field].push(error.defaultMessage);
-                });
-                ctrl.$setDirty();
-            }
-        };
-    };
-});
+			_each(errorsToAdd, (error) => {
+				ctrl.$setValidity(error.defaultMessage, false);
+				self.existingErrorKeys[field].push(error.defaultMessage);
+			});
+			ctrl.$setDirty();
+		}
+	}));

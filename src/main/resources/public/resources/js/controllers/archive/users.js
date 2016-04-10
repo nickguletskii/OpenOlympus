@@ -20,46 +20,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
+const controller =
+	/* @ngInject*/
+	($scope, $http, $stateParams) => {
+		const page = $stateParams.page;
 
-const controller = /*@ngInject*/ function($scope, $http, $stateParams) {
+		$scope.page = $stateParams.page;
 
-	var page = $stateParams.page;
+		$http
+			.get("api/archive/rank", {
+				params: {
+					page
+				}
+			})
+			.then((users) => {
+				$scope.users = users.data;
+			});
+		$http
+			.get("api/archive/rankCount")
+			.then((response) => {
+				$scope.userCount = response.data;
+			});
+	};
 
-	$scope.page = $stateParams.page;
-
-	$http.get("api/archive/rank", {
-		params: {
-			page: page
-		}
-	}).then(function(users) {
-		$scope.users = users.data;
-	});
-	$http.get("api/archive/rankCount")
-		.then(function(response) {
-			$scope.userCount = response.data;
-		});
-};
-module.exports = {
+export default {
 	"name": "archiveRank",
 	"url": "/archive/users?page",
 	"templateUrl": "/partials/archive/users.html",
-	"controller": controller,
+	controller,
 	"params": {
 		"page": "1"
 	},
 	"resolve": {
-		"users": function(UserService, $stateParams) {
-			return UserService.getArchiveRankPage($stateParams.page);
-		},
-		"userCount": function(UserService) {
-			return UserService.countArchiveUsers();
-		}
+		"users": (UserService, $stateParams) =>
+			UserService.getArchiveRankPage($stateParams.page),
+		"userCount": (UserService) =>
+			UserService.countArchiveUsers()
 	},
 	"data": {
-		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
-			return PromiseUtils.or(SecurityService.hasPermission("view_archive_during_contest"),
-				PromiseUtils.and(SecurityService.hasPermission("approved"), SecurityService.isUserInCurrentContestOrNoContest()));
-		}
+		canAccess: /* @ngInject*/ (PromiseUtils, SecurityService) =>
+			PromiseUtils.or(SecurityService.hasPermission(
+					"view_archive_during_contest"),
+				PromiseUtils.and(SecurityService.hasPermission("approved"),
+					SecurityService.isUserInCurrentContestOrNoContest()))
 	}
 };

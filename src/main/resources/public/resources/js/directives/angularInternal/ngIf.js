@@ -50,7 +50,7 @@ THE SOFTWARE.
 
 */
 
-let getBlockNodes = require("directives/angularInternal/getBlockNodes");
+import getBlockNodes from "directives/angularInternal/getBlockNodes";
 
 module.exports = function($element, $attr, $transclude, $animate) {
 	var block, childScope, previousElements;

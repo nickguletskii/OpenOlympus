@@ -20,13 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var $ = require("jquery");
-var angular = require("angular");
+import $ from "jquery";
+import angular from "angular";
 
-angular.module("ool.directives").directive("fileInput", /*@ngInject*/ function(FieldHelper) {
-	return {
+import {
+	directives
+} from "app";
+
+directives.directive("fileInput",
+	/* @ngInject*/
+	(FieldHelper) => ({
 		restrict: "E",
 		require: "^formFor",
 		template: require("ng-cache!directives/fileInput/fileInput.html"),
@@ -35,12 +39,13 @@ angular.module("ool.directives").directive("fileInput", /*@ngInject*/ function(F
 			label: "@",
 			multiple: "@"
 		},
-		link: function($scope, $element, $attributes, formForController) {
-			FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
-			let bindableFix = $scope.$watch(() => $scope.model.bindable, function() {
+		link: ($scope, $element, $attributes, formForController) => {
+			FieldHelper.manageFieldRegistration($scope, $attributes,
+				formForController);
+			const bindableFix = $scope.$watch(() => $scope.model.bindable, () => {
 				Object.defineProperty($scope.model, "bindable", {
 					set: (value) => {
-						//Hide bindable from Angular's shitty built-in validation that somehow casts the files to string.
+						// Hide bindable from Angular's shitty built-in validation that somehow casts the files to string.
 						if (angular.isString(value)) {
 							return;
 						}
@@ -49,13 +54,14 @@ angular.module("ool.directives").directive("fileInput", /*@ngInject*/ function(F
 					get: () => this.hideYoBindable
 				});
 			});
-			let watcher = $scope.$watch($attributes.multiple, function(val) {
-				$($element[0]).find(".directive-main-element").attr("multiple", val);
+			const watcher = $scope.$watch($attributes.multiple, (val) => {
+				$($element[0])
+					.find(".directive-main-element")
+					.attr("multiple", val);
 			});
 			$scope.$on("$destroy", () => {
 				watcher();
 				bindableFix();
 			});
 		}
-	};
-});
+	}));

@@ -20,26 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var angular = require("angular");
-var _ = require("lodash");
+import angular from "angular";
 
-let builtinGroups = ["superusers", "allUsers"]; // TODO: move to service
+const builtinGroups = ["superusers", "allUsers"]; // TODO: move to service
+import {
+	filter as _filter,
+	map as _map,
+	curryRight as _curryRight,
+	assign as _assign,
+	set as _set,
+	cloneDeep as _cloneDeep,
+	isEqual as _isEqual,
+	find as _find,
+	concat as _concat,
+	findIndex as _findIndex,
+	each as _each
+} from "lodash";
+import { directives } from "app";
 
-angular.module("ool.directives")
-	.run( /*@ngInject*/ function($templateCache) {
-		$templateCache.put("directives/aclEditor/typeaheadUserItem.html", require("ng-cache!directives/acl/aclTypeaheadItemUser.html"));
-		$templateCache.put("directives/aclEditor/typeaheadGroupItem.html", require("ng-cache!directives/acl/aclTypeaheadItemGroup.html"));
+directives
+	.run(/* @ngInject*/ ($templateCache) => {
+		$templateCache.put("directives/aclEditor/typeaheadUserItem.html", require(
+			"ng-cache!directives/acl/aclTypeaheadItemUser.html"));
+		$templateCache.put("directives/aclEditor/typeaheadGroupItem.html", require(
+			"ng-cache!directives/acl/aclTypeaheadItemGroup.html"));
 	})
-	.directive("aclEditor", /*@ngInject*/ function(ACLService, $q, $http, $translate) {
-
+	.directive("aclEditor", (ACLService, $q, $http, $translate) => {
 		// Returns a promise that rejects with an object where attribute = translated key
 		function translateAndReject(attribute, key) {
-			var deferred = $q.defer();
+			const deferred = $q.defer();
 			$translate([key])
 				.then((map) =>
-					deferred.reject(_.set({}, attribute, map[key]))
+					deferred.reject(_set({}, attribute, map[key]))
 				);
 			return deferred.promise;
 		}
@@ -47,7 +60,7 @@ angular.module("ool.directives")
 		function link($scope, $element, $attributes) {
 			function updateStatus() {
 				$scope.changesCommitted =
-					_.isEqual(
+					_isEqual(
 						ACLService.cannonicalPermissionForm($scope.permissions),
 						$scope.origPermissions
 					);
@@ -56,22 +69,25 @@ angular.module("ool.directives")
 			$scope.collapsed = true;
 
 			$scope.refresh = () =>
-				ACLService.getACL($attributes.aclGetter).then((response) => {
-					let permissions = response.data;
-					$scope.permissions = _.map(permissions, perm => _.assign(perm, {
+				ACLService.getACL($attributes.aclGetter)
+				.then((response) => {
+					const permissions = response.data;
+					$scope.permissions = _map(permissions, perm => _assign(perm, {
 						user: {}, // Form data object for adding users
 						group: {} // Form data object for adding groups
 					}));
-					$scope.origPermissions = ACLService.cannonicalPermissionForm(_.cloneDeep($scope.permissions));
+					$scope.origPermissions = ACLService.cannonicalPermissionForm(_cloneDeep(
+						$scope.permissions));
 					updateStatus();
 				});
 
 			$scope.commit = () => {
 				$scope.committing = true;
-				ACLService.setACL($attributes.aclSetter, $scope.permissions).then(() => {
-					$scope.refresh();
-					$scope.committing = false;
-				});
+				ACLService.setACL($attributes.aclSetter, $scope.permissions)
+					.then(() => {
+						$scope.refresh();
+						$scope.committing = false;
+					});
 			};
 
 
@@ -87,56 +103,66 @@ angular.module("ool.directives")
 			$scope.userOptions = [];
 
 			// Attempts to add principal using its string identification.
-			function addPrincipalUsingIdentifier(permission, form, paramName, attributeName, providerURL, objectConsumer) {
-				var deferred = $q.defer();
+			function addPrincipalUsingIdentifier(permission, form, paramName,
+				attributeName, providerURL, objectConsumer) {
+				const deferred = $q.defer();
 				$http.get(providerURL, {
-					params: _.set({}, paramName, form[attributeName])
-				}).then((response) => {
-					// The objectConsumer is a function that processes form data. Essentially, this method exists solely to provide the objectConsumer with a workable formData.
-					objectConsumer(
-							permission,
-							_.set({}, attributeName, response.data)
-						)
-						.then( // Escape double promise
-							(success) => deferred.resolve(success),
+					params: _set({}, paramName, form[attributeName])
+				})
+					.then((response) => {
+						// The objectConsumer is a function that processes form data. Essentially,
+						// this method exists solely to provide the objectConsumer with a workable
+						// formData.
+						objectConsumer(
+								permission,
+								_set({}, attributeName, response.data)
+							)
+							.then( // Escape double promise
+								(success) => deferred.resolve(success),
 
-							(failure) => deferred.reject(failure)
-						);
-				});
+								(failure) => deferred.reject(failure)
+							);
+					});
 				return deferred.promise;
 			}
 
 			// Get principal suggestions from server
 			function loadCompletion(filterText, url) {
-				var deferred = $q.defer();
+				const deferred = $q.defer();
 				$http.get(url, {
 					params: {
 						term: filterText
 					}
-				}).then((response) => {
-					deferred.resolve(response.data);
-				}, () => {
-					deferred.reject();
-					throw new Error("Principal completion failed.");
-				});
+				})
+					.then((response) => {
+						deferred.resolve(response.data);
+					}, () => {
+						deferred.reject();
+						throw new Error("Principal completion failed.");
+					});
 				return deferred.promise;
 			}
 
 			// Add user from form data.
-			$scope.addUser = function(permission, userForm) {
-
+			$scope.addUser = (permission, userForm) => {
 				if (!userForm.user) {
-					return translateAndReject("user", $attributes.localisationNamespace + ".form.validation.noUserSelected");
+					return translateAndReject("user",
+						`${$attributes.localisationNamespace}.form.validation.noUserSelected`);
 				}
 
 				// Can't deal with this form right now, need to load the user from the server.
 				if (angular.isString(userForm.user)) {
-					return addPrincipalUsingIdentifier(permission, userForm, "username", "user", "/api/user", $scope.addUser);
+					return addPrincipalUsingIdentifier(permission, userForm, "username",
+						"user", "/api/user", $scope.addUser);
 				}
 
 				// User is already in the permission list.
-				if (_.find(permission.principals, (val) => val.id === userForm.user.id)) {
-					return translateAndReject("user", $attributes.localisationNamespace + ".form.validation.userAlreadyInACL");
+				if (_find(permission.principals, {
+					id: userForm.user.id
+				})) {
+					return translateAndReject("user",
+						`${$attributes.localisationNamespace}.form.validation.userAlreadyInACL`
+					);
 				}
 
 				if (!permission.principals) {
@@ -149,21 +175,27 @@ angular.module("ool.directives")
 				return $q.when(null);
 			};
 
-			$scope.addGroup = function(permission, groupForm) {
-
+			$scope.addGroup = (permission, groupForm) => {
 				if (!groupForm.group) {
-					return translateAndReject("group", $attributes.localisationNamespace + ".form.validation.noGroupSelected");
+					return translateAndReject("group",
+						`${$attributes.localisationNamespace}.form.validation.noGroupSelected`
+					);
 				}
 
 				// Can't deal with this form right now, need to load the group from the server.
 				if (angular.isString(groupForm.group)) {
-					return addPrincipalUsingIdentifier(permission, groupForm, "name", "group",
+					return addPrincipalUsingIdentifier(permission, groupForm, "name",
+						"group",
 						"/api/group", $scope.addGroup);
 				}
 
 				// Group is already in the permission list.
-				if (_.find(permission.principals, (val) => val.id === groupForm.group.id)) {
-					return translateAndReject("group", $attributes.localisationNamespace + ".form.validation.groupAlreadyInACL");
+				if (_find(permission.principals, {
+					id: groupForm.group.id
+				})) {
+					return translateAndReject("group",
+						`${$attributes.localisationNamespace}.form.validation.groupAlreadyInACL`
+					);
 				}
 
 				if (!permission.principals) {
@@ -176,13 +208,16 @@ angular.module("ool.directives")
 				return $q.when(null);
 			};
 
-			$scope.removePrincipal = function(permission, toRemove) {
-				permission.principals.splice(_.findIndex(permission.principals, (principal) => principal.id === toRemove), 1);
+			$scope.removePrincipal = (permission, toRemove) => {
+				permission.principals.splice(
+					_findIndex(permission.principals, {
+						id: toRemove
+					}), 1);
 				updateStatus();
 			};
 
 
-			var groupCache = {};
+			const groupCache = {};
 
 			function getGroup(name) {
 				if (groupCache[name]) {
@@ -190,48 +225,52 @@ angular.module("ool.directives")
 				}
 				return $http.get("/api/group", {
 					params: {
-						name: name
+						name
 					}
-				}).then((response) => {
-					groupCache[name] = response.data;
-					return response.data;
-				});
+				})
+					.then((response) => {
+						groupCache[name] = response.data;
+						return response.data;
+					});
 			}
 
-			$scope.userOptionProvider = _.curryRight(loadCompletion)("/api/userCompletion");
-			$scope.groupOptionProvider = function(text) {
-				var contains = (str) => str.indexOf(text) > -1;
-				var deferred = $q.defer();
-				loadCompletion(text, "/api/groupCompletion").then(
-					(suggestions) => {
-						var additionalNames =
-							_(builtinGroups)
-							.filter(group =>
-								// Check if the builtin group matches the filter string
-								(contains(group) || $translate.instant("builtinGroups." + group)) &&
-								// Skip if this group was already suggested by the server-side suggestion engine
-								!_.find(suggestions, (suggestion) => suggestion.name === "#{" + group + "}"))
+			$scope.userOptionProvider = _curryRight(loadCompletion)(
+				"/api/userCompletion");
+			$scope.groupOptionProvider = (text) => {
+				const contains = (str) => str.indexOf(text) > -1;
+				const deferred = $q.defer();
+				const handleGroupCompletion = (suggestions) => {
+					const additionalNames =
+						_filter(builtinGroups,
+							group =>
+							// Check if the builtin group matches the filter string
+							(contains(group) || $translate.instant(`builtinGroups.${group}`)) &&
+							// Skip if this group was already suggested by the server-side
+							// suggestion engine
+							!_find(suggestions, (suggestion) => suggestion.name === `#{${group}}`)
+						);
 
-						.value();
-
-						$q.all(
-							_([])
-							.concat(
+					$q.all(
+							_concat([],
 								// Load builtin groups from the server
-								_.map(additionalNames, name => getGroup("#{" + name + "}")),
+								_map(additionalNames, name => getGroup(`#{${name}}`)),
 
-								// Server-side suggestions were already loaded, but wrap them in a promise
-								_(suggestions).map(group => $q.when(group)).value()
+								// Server-side suggestions were already loaded, but wrap them in a
+								// promise
+								_map(suggestions, group => $q.when(group))
 							)
-							.value()
-						).then((val) => {
+						)
+						.then((val) => {
 							deferred.resolve(val);
 						});
-					}
-				);
+				};
+				loadCompletion(text, "/api/groupCompletion")
+					.then(
+						handleGroupCompletion
+					);
 				return deferred.promise;
 			};
-			_(builtinGroups).forEach(group => getGroup("#{" + group + "}"));
+			_each(builtinGroups, group => getGroup(`#{${group}}"`));
 		}
 
 		return {
@@ -241,11 +280,11 @@ angular.module("ool.directives")
 				aclGetter: "@",
 				aclSetter: "@"
 			},
-			link: link
+			link
 		};
 	})
-	.directive("aclTypeahead", /*@ngInject*/ function(FieldHelper, groupNameFilter) {
-		return {
+	.directive("aclTypeahead", (FieldHelper, groupNameFilter) => (
+		{
 			require: "^formFor",
 			restrict: "EA",
 			template: require("ng-cache!directives/acl/aclTypeahead.html"),
@@ -262,13 +301,14 @@ angular.module("ool.directives")
 				buttonText: "@?",
 				buttonSuccess: "=?"
 			},
-			link: function($scope, $element, $attributes, formForController) {
-				FieldHelper.manageFieldRegistration($scope, $attributes, formForController);
+			link: ($scope, $element, $attributes, formForController) => {
+				FieldHelper.manageFieldRegistration($scope, $attributes,
+					formForController);
 				formForController.registerSubmitButton($scope);
-				$scope.selectItem = function(item) {
+				$scope.selectItem = (item) => {
 					$scope.model.bindable = item;
 				};
-				$scope.formatData = function(model) {
+				$scope.formatData = (model) => {
 					if (angular.isString(model)) {
 						return model;
 					}
@@ -278,5 +318,5 @@ angular.module("ool.directives")
 					return model.bindable.username || groupNameFilter(model.bindable.name);
 				};
 			}
-		};
-	});
+		})
+	);

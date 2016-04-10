@@ -20,58 +20,64 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
+import {
+	toInteger as _toInteger
+} from "lodash";
 
-const controller = /*@ngInject*/ function($scope, $rootScope, $stateParams, FormDefaultHelperService, ValidationService) {
-	const validationRules = {
-		time: {
-			required: true,
-			custom: ValidationService.toTranslationPromise(function(value) {
-				var val = parseInt(value);
-				if (val < 1) {
-					return "contest.addUserTime.timeNotPositive";
-				}
-			})
+const controller =
+	/* @ngInject*/
+	($scope, $rootScope, $stateParams, FormDefaultHelperService, ValidationService) => {
+		const validationRules = {
+			time: {
+				required: true,
+				custom: ValidationService.toTranslationPromise((value) => {
+					const val = _toInteger(value);
+					if (val < 1) {
+						return "contest.addUserTime.timeNotPositive";
+					}
+					return null;
+				})
+			}
+		};
+
+		class ContestAddUserTimeForm extends FormDefaultHelperService.FormClass {
+			constructor() {
+				super($scope, "contest.addUser");
+				this.submitUrl = `/api/contest/${$stateParams.contestId}/addUserTime`;
+			}
+
+			transformDataForServer(data) {
+				return {
+					"user": $stateParams.userId,
+					"time": data.time * (60 * 1000)
+				};
+			}
+
+			postSubmit(response) {
+				super.postSubmit(response);
+				$rootScope.$emit("userTimeExtendedInContest");
+			}
+
+			get validationRules() {
+				return validationRules;
+			}
 		}
+
+		$scope.form = new ContestAddUserTimeForm();
 	};
 
-	class ContestAddUserTimeForm extends FormDefaultHelperService.FormClass {
-		constructor() {
-			super($scope, "contest.addUser");
-			this.submitUrl = "/api/contest/" + $stateParams.contestId + "/addUserTime";
-		}
-
-		transformDataForServer(data) {
-			return {
-				"user": $stateParams.userId,
-				"time": data.time * (60 * 1000)
-			};
-		}
-
-		postSubmit(response) {
-			super.postSubmit(response);
-			$rootScope.$emit("userTimeExtendedInContest");
-		}
-
-		get validationRules() {
-			return validationRules;
-		}
-	}
-
-	$scope.form = new ContestAddUserTimeForm();
-};
-
-module.exports = {
+export default {
 	"parent": "contestParticipantsList",
 	"name": "contestParticipantsList.addUserTime",
 	"templateUrl": "/partials/contests/contest/addUserTime.html",
-	"controller": controller,
+	controller,
 	"backdrop": true,
 	"data": {
-		canAccess: /*@ngInject*/ function($refStateParams, PromiseUtils, SecurityService) {
-			return PromiseUtils.and(
+		canAccess: /* @ngInject*/
+			($refStateParams, PromiseUtils, SecurityService) =>
+			PromiseUtils.and(
 				SecurityService.hasPermission("approved"),
-				SecurityService.hasContestPermission($refStateParams.contestId, "extend_time"));
-		}
+				SecurityService.hasContestPermission($refStateParams.contestId,
+					"extend_time"))
 	}
 };

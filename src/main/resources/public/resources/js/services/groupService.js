@@ -20,36 +20,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-"use strict";
 
-var _ = require("lodash");
-var angular = require("angular");
-angular.module("ool.services").factory("GroupService", /*@ngInject*/ function($http) {
-	return {
-		getGroupsPage: function(page) {
-			return $http.get("/api/groups", {
-				params: {
-					page: page
-				}
-			}).then(_.property("data"));
-		},
-		countGroups: function() {
-			return $http.get("/api/groupsCount").then(_.property("data"));
-		},
-		getMembersPage: function(contestId, page) {
-			return $http.get("/api/group/" + contestId, {
-				params: {
-					page: page
-				}
-			}).then(_.property("data"));
-		},
-		countMembers: function(contestId) {
-			return $http.get("/api/group/" + contestId + "/memberCount").then(_.property("data"));
-		},
-		getGroupEditData: function(groupId) {
-			return $http
-				.get("/api/group/" + groupId + "/edit")
-				.then(_.property("data"));
-		}
-	};
-});
+import angular from "angular";
+import {
+	property as _property
+} from "lodash";
+import { services } from "app";
+class GroupService {
+	/* @ngInject*/
+	constructor($http) {
+		this.$http = $http;
+	}
+	getGroupsPage(page) {
+		return this.$http.get("/api/groups", {
+			params: {
+				page
+			}
+		}).then(_property("data"));
+	}
+	countGroups() {
+		return this.$http.get("/api/groupsCount")
+			.then(_property("data"));
+	}
+	getMembersPage(contestId, page) {
+		return this.$http.get(`/api/group/${contestId}`, {
+			params: {
+				page
+			}
+		}).then(_property("data"));
+	}
+	countMembers(contestId) {
+		return this.$http.get(`/api/group/${contestId}/memberCount`)
+			.then(_property("data"));
+	}
+	getGroupEditData(groupId) {
+		return this.$http
+			.get(`/api/group/${groupId}/edit`)
+			.then(_property("data"));
+	}
+}
+services
+	.service("GroupService", GroupService);
