@@ -27,7 +27,7 @@ const controller =
 
 		$scope.page = $stateParams.page;
 
-		$http.get("api/archive/rank", {
+		$http.get("/api/archive/rank", {
 				params: {
 					page
 				}
@@ -35,7 +35,7 @@ const controller =
 			.then((users) => {
 				$scope.users = users.data;
 			});
-		$http.get("api/archive/rankCount")
+		$http.get("/api/archive/rankCount")
 			.then((response) => {
 				$scope.userCount = response.data;
 			});

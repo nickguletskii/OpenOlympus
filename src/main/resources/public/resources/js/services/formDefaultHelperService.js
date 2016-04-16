@@ -21,7 +21,9 @@
  * THE SOFTWARE.
  */
 import angular from "angular";
-import { services } from "app";
+import {
+	services
+} from "app";
 import Util from "oolutil";
 import {
 	pickBy as _pickBy,
@@ -30,7 +32,8 @@ import {
 } from "lodash";
 
 services
-	.factory("FormDefaultHelperService", /* @ngInject*/ (ValidationService, $q) => {
+	.factory("FormDefaultHelperService", /* @ngInject*/ (ValidationService, $q,
+		$timeout) => {
 		const validationRules = {};
 		return {
 			FormClass: class FormClass {
@@ -41,6 +44,7 @@ services
 						throw new Error("Incorrect constructor parameters");
 					}
 
+					this.$scope = $scope;
 					this.submitting = false;
 					this.uploadProgress = null;
 					this.localisationNamespace = localisationNamespace;
@@ -171,10 +175,10 @@ services
 
 				postSubmit(serverResponse) {
 					this.resetProgress();
-					this.justSubmitted = true;
+					this.setUpData();
 					this.form.$setPristine();
 					this.formController.resetFields();
-					this.setUpData();
+					this.justSubmitted = true;
 				}
 
 				transformDataForServer(data) {
@@ -203,10 +207,11 @@ services
 					ValidationService.postToServer(this.submitUrl, transformedData, (
 							progress) => {
 						this.progress = progress;
-					}).then((response) => {
-						this.postSubmit(response);
-						deferred.resolve(this.transformSuccessResponse(response));
-					}, (response) => deferred.reject(this.transformFailureResponse(
+					})
+						.then((response) => {
+							this.postSubmit(response);
+							deferred.resolve(this.transformSuccessResponse(response));
+						}, (response) => deferred.reject(this.transformFailureResponse(
 							response)));
 					return deferred.promise;
 				}

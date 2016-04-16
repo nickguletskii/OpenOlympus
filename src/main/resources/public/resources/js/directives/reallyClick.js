@@ -27,14 +27,14 @@ import {
 
 directives.directive("ngReallyClick",
 	/* @ngInject*/
-	($modal) => {
-		const ModalInstanceCtrl = ($scope, $modalInstance) => {
+	($uibModal) => {
+		const ModalInstanceCtrl = ($scope, $uibModalInstance) => {
 			$scope.ok = () => {
-				$modalInstance.close();
+				$uibModalInstance.close();
 			};
 
 			$scope.cancel = () => {
-				$modalInstance.dismiss("cancel");
+				$uibModalInstance.dismiss("cancel");
 			};
 		};
 
@@ -58,7 +58,7 @@ directives.directive("ngReallyClick",
 							</button>
 						</div>`;
 
-					const modalInstance = $modal.open({
+					const modalInstance = $uibModal.open({
 						template: modalHtml,
 						controller: ModalInstanceCtrl
 					});

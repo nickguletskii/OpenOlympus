@@ -24,7 +24,6 @@ import "services/aclService";
 import "services/securityService";
 import "services/serversideFormErrorReporter";
 import "services/validationService";
-import "services/modalState";
 import "services/userService";
 import "services/solutionService";
 import "services/taskService";

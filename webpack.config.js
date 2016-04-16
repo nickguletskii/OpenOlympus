@@ -20,16 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var path = require("path");
-var webpack = require("webpack");
+const path = require("path");
+const webpack = require("webpack");
 require("chunk-manifest-webpack-plugin");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-var resourceRoot = path.resolve(__dirname, "src/main/resources/public/resources");
-var generatedResourcesRoot = path.resolve(__dirname, "src/main/resources/public/resources/bundled");
-var nodeModulesRoot = path.resolve(__dirname, "node_modules");
+const resourceRoot = path.resolve(__dirname, "src/main/resources/public/resources");
+const generatedResourcesRoot = path.resolve(__dirname, "src/main/resources/public/resources/bundled");
+const nodeModulesRoot = path.resolve(__dirname, "node_modules");
 
-var config = {
+const config = {
 	addVendor: function(name, p) {
 		this.resolve.alias[name] = p;
 	},

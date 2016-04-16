@@ -29,13 +29,86 @@ import find from "lodash/fp/find";
 import assign from "lodash/fp/assign";
 
 const controller = /* @ngInject*/ ($scope, $stateParams, UserService,
-	users, userCount, $translate) => {
+	users, userCount, $translate, $q) => {
 	const page = $stateParams.page;
 
 	$scope.page = $stateParams.page;
 
 	$scope.users = users;
 	$scope.userCount = userCount;
+
+	const getUserInfoFromServer = () => $q.all({
+		users: UserService.getPendingUsersPage(page),
+		count: UserService.countPendingUsers()
+	});
+
+	const indicateLoading = (action) => {
+		$scope.loading = true;
+		action()
+			.finally(() => {
+				$scope.loading = false;
+			});
+	}
+
+	const addUserApprovalResponseInfo = (userApprovals) =>
+		({
+			users,
+			count
+		}) =>
+		({
+			users: map((user) => {
+				const oldUser = find({
+					id: user.id
+				})($scope.users);
+				if(oldUser) {
+					user = oldUser;
+				}
+				const userResponse = find({
+					id: user.id
+				})(userApprovals);
+				if(!userResponse) {
+					return user;
+				}
+				return assign({
+					"checked": true,
+					"statusMessage": userResponse.statusMessage,
+					"resultType": userResponse.resultType
+				})(user);
+			})(users),
+			count
+		});
+
+	const commitUsers = ({
+		users,
+		count
+	}) => {
+		$scope.users = users;
+		$scope.userCount = count;
+	};
+
+	const updateUsers = () =>
+		getUserInfoFromServer()
+		.then(commitUsers);
+
+	const handleApprovalResponse = (userApprovals) =>
+		getUserInfoFromServer()
+		.then(addUserApprovalResponseInfo)
+		.then(commitUsers);
+
+	const approveUsers = (usersToBeApproved) =>
+		indicateLoading(
+			() =>
+			UserService.approveUsers(usersToBeApproved)
+			.then(handleApprovalResponse)
+		);
+
+	const deleteUsers = (usersToBeDeleted) =>
+		indicateLoading(
+			() =>
+			UserService.deleteUsers(usersToBeDeleted)
+			.then(updateUsers)
+		);
+
 
 	const tooltipKeys = {
 		"approvalEmailAlreadySent": "admin.unapprovedUsers.approvalEmailAlreadySent",
@@ -57,119 +130,68 @@ const controller = /* @ngInject*/ ($scope, $stateParams, UserService,
 
 
 	$scope.getTooltipForUser = (user) => {
-		if (user.statusMessage) {
+		if(user.statusMessage) {
 			return user.statusMessage;
 		}
-		if (user.approvalEmailSent) {
-			if (user.checked) {
+		if(user.approvalEmailSent) {
+			if(user.checked) {
 				return tooltips[tooltipKeys["resendApprovalEmail"]];
 			}
 			return tooltips[tooltipKeys["approvalEmailAlreadySent"]];
 		}
 
-		if (user.checked) {
+		if(user.checked) {
 			return tooltips[tooltipKeys["sendApprovalEmail"]];
 		}
 		return "";
 	};
 
-	function updateUsers() {
-		UserService.getPendingUsersPage(page)
-			.then((users) => {
-				$scope.users = users;
-			});
-		UserService.countPendingUsers()
-			.then((count) => {
-				$scope.userCount = count;
-			});
-	}
 
-	function handleApprovalResponse(userApprovals) {
-		UserService.getPendingUsersPage(page)
-			.then((users) => {
-				$scope.users = map((user) => {
-					const oldUser = find({
-						id: user.id
-					})($scope.users);
-					if (oldUser) {
-						user = oldUser;
-					}
-					const userResponse = find({
-						id: user.id
-					})(userApprovals);
-					if (!userResponse) {
-						return user;
-					}
-					return assign({
-						"checked": true,
-						"statusMessage": userResponse.statusMessage,
-						"resultType": userResponse.resultType
-					})(user);
-				})(users);
-				$scope.loading = false;
-			});
-		UserService.countPendingUsers()
-			.then((count) => {
-				$scope.userCount = count;
-			});
-	}
-	$scope.approveUsers = () => {
-		$scope.loading = true;
-		UserService.approveUsers(
-				flow(
-					filter({
-						"checked": true
-					}),
-					map("id")
-				)($scope.users))
-			.then(handleApprovalResponse);
-	};
+	$scope.approveUsers = () =>
+		approveUsers(flow(
+			filter("checked"),
+			map("id")
+		)($scope.users));
 
-	$scope.retryApprovingFailedUsers = () => {
-		$scope.loading = true;
-		UserService.approveUsers(
-				flow(
-					filter("error"),
-					map("id")
-				)($scope.users)
-			)
-			.then(handleApprovalResponse);
-	};
+	$scope.retryApprovingFailedUsers = () =>
+		approveUsers(flow(
+			flow(
+				filter("error"),
+				map("id")
+			)($scope.users)
+		)($scope.users));
 
 	$scope.deleteUsersWithErrors = () => {
-		UserService.deleteUsers(
-				flow(
-					filter((user) => user.checked && !!user.error),
-					map((user) => user.id)
-				)($scope.users)
-			)
-			.then(updateUsers);
+		deleteUsers(flow(
+			filter((user) => user.checked && !!user.error),
+			map((user) => user.id)
+		)($scope.users));
 	};
 
 	$scope.getButtonClassForUser = (user) => {
-		if (user.resultType === "FAILURE") {
+		if(user.resultType === "FAILURE") {
 			return "btn-danger";
 		}
-		if (user.resultType === "SUCCESS") {
+		if(user.resultType === "SUCCESS") {
 			return "btn-success";
 		}
-		if (user.approvalEmailSent) {
+		if(user.approvalEmailSent) {
 			return "btn-warning";
 		}
-		if (user.checked) {
+		if(user.checked) {
 			return "btn-info";
 		}
 		return "btn-default";
 	};
 
 	$scope.getButtonIconClassForUser = (user) => {
-		if (user.approvalEmailSent) {
-			if (user.checked) {
+		if(user.approvalEmailSent) {
+			if(user.checked) {
 				return "fa-refresh";
 			}
 			return "fa-hourglass-o";
 		}
-		if (user.checked) {
+		if(user.checked) {
 			return "fa-check-square";
 		}
 		return "fa-square-o";

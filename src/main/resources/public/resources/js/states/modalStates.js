@@ -43,4 +43,5 @@ export const TaskRejudgeModalState = {
 
 export { default as rejudgeWorkerModal } from "states/archive/tasks/rejudgeWorker";
 export { default as addTaskModal } from "states/contests/contest/addTask";
-export { default as asaddUserTimeModal } from "states/contests/contest/addUserTime";
+export { default as changeUserTimeExtensionModal } from
+	"states/contests/contest/changeUserTimeExtension";

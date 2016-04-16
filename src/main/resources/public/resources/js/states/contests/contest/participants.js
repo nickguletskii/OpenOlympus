@@ -22,26 +22,23 @@
  */
 const controller =
 	/* @ngInject*/
-	($scope, $stateParams, users, userCount, ContestService) => {
-		function updateParticipants() {
-			ContestService.getContestParticipantsPage($stateParams.contestId,
-					$stateParams.page)
-				.then((users) => {
+	($scope, $stateParams, $rootScope, $q, users, userCount, ContestService) => {
+		const updateParticipants = () => {
+			$q.all({
+				users: ContestService.getContestParticipantsPage($stateParams.contestId,
+						$stateParams.page),
+				count: ContestService.countContestParticipants($stateParams.contestId)
+			})
+				.then(({
+					users,
+					count
+				}) => {
 					$scope.users = users;
+					$scope.userCount = count;
 				});
-			ContestService.countContestParticipants($stateParams.contestId)
-				.then((userCount) => {
-					$scope.userCount = userCount;
-				});
-		}
-
-		$scope.removeUser = (user) => {
-			ContestService.removeParticipant($stateParams.contestId, user.id)
-				.then(updateParticipants);
 		};
-
+		$rootScope.$on("userTimeExtendedInContest", updateParticipants);
 		$scope.page = $stateParams.page;
-
 		$scope.users = users;
 		$scope.userCount = userCount;
 	};

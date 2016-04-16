@@ -31,22 +31,22 @@ class SolutionService {
 		this.$http = $http;
 	}
 	countUserSolutions() {
-		return this.$http.get("api/user/solutionsCount")
+		return this.$http.get("/api/user/solutionsCount")
 			.then(_property("data"));
 	}
 	getUserSolutionsPage(page) {
-		return this.$http.get("api/user/solutions", {
+		return this.$http.get("/api/user/solutions", {
 			params: {
 				page
 			}
 		}).then(_property("data"));
 	}
 	countSolutions() {
-		return this.$http.get("api/admin/solutionsCount")
+		return this.$http.get("/api/admin/solutionsCount")
 			.then(_property("data"));
 	}
 	getSolutionsPage(page) {
-		return this.$http.get("api/admin/solutions", {
+		return this.$http.get("/api/admin/solutions", {
 			params: {
 				page
 			}

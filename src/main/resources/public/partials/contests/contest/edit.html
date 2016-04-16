@@ -22,7 +22,7 @@
     THE SOFTWARE.
 
 -->
-<h1>{{'contest.editForm.labels.heading'|translate}}</h1>
+<h1>{{ 'contest.editForm.labels.heading' | translate: originalContest }}</h1>
 <acl-editor acl-getter="/api/contest/{{contestId}}/acl"
     acl-setter="/api/contest/{{contestId}}/acl"
     localisation-namespace="contest.permissions"

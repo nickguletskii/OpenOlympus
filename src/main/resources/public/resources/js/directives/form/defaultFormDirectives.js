@@ -55,15 +55,18 @@ directives.directive("formAutoconfig", /* @ngInject*/
 		},
 		link: () => {}
 	}))
-	.directive("labelTranslate", /* @ngInject*/ ($compile) => ({
-		restrict: "A",
-		priority: 100000,
-		terminal: true,
-		scope: false,
-		compile: () => ({
-			post: ($scope, $element, $attributes) => {
-				$attributes.$set("label", $attributes.labelTranslate);
-				$compile($element, null, 100000)($scope);
+	.directive("labelTranslate", /* @ngInject*/ ($compile, $rootScope, $translate) =>
+		({
+			restrict: "A",
+			priority: -100000,
+			scope: false,
+			link: ($scope, $element, $attributes) => {
+				$rootScope.$on("$translateChangeSuccess",
+					() => {
+						$attributes.$set("label",
+							$translate.instant($attributes.labelTranslate));
+					});
+				$attributes.$set("label",
+					$translate.instant($attributes.labelTranslate));
 			}
-		})
-	}));
+		}));

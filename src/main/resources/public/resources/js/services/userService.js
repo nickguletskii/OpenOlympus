@@ -26,7 +26,9 @@ import {
 	property as _property,
 	omit as _omit
 } from "lodash";
-import { services } from "app";
+import {
+	services
+} from "app";
 
 class UserService {
 	/* @ngInject*/
@@ -37,7 +39,7 @@ class UserService {
 		this.Upload = Upload;
 	}
 	getCurrentUser() {
-		return this.$http.get("api/user/personalInfo", {})
+		return this.$http.get("/api/user/personalInfo", {})
 			.then(_property("data"));
 	}
 	changePassword(passwordObj, userId) {
@@ -51,11 +53,11 @@ class UserService {
 			.then(_property("data"));
 	}
 	countPendingUsers() {
-		return this.$http.get("api/admin/pendingUsersCount")
+		return this.$http.get("/api/admin/pendingUsersCount")
 			.then(_property("data"));
 	}
 	getPendingUsersPage(page) {
-		return this.$http.get("api/admin/pendingUsers", {
+		return this.$http.get("/api/admin/pendingUsers", {
 			params: {
 				page
 			}
@@ -63,17 +65,27 @@ class UserService {
 			.then(_property("data"));
 	}
 	countUsers() {
-		return this.$http.get("api/admin/usersCount")
+		return this.$http.get("/api/admin/usersCount")
 			.then(_property("data"));
 	}
 	getUsersPage(page) {
-		return this.$http.get("api/admin/users", {
+		return this.$http.get("/api/admin/users", {
 			params: {
 				page
 			}
 		})
 			.then(_property("data"));
 	}
+
+	getUserById(id) {
+		return this.$http.get("/api/user", {
+			params: {
+				id
+			}
+		})
+			.then(_property("data"));
+	}
+
 	approveUsers(users) {
 		return this.$http.post("/api/admin/users/approve", users)
 			.then(_property("data"));
@@ -83,11 +95,11 @@ class UserService {
 			.then(_property("data"));
 	}
 	countArchiveUsers() {
-		return this.$http.get("api/archive/rankCount")
+		return this.$http.get("/api/archive/rankCount")
 			.then(_property("data"));
 	}
 	getArchiveRankPage(page) {
-		return this.$http.get("api/archive/rank", {
+		return this.$http.get("/api/archive/rank", {
 			params: {
 				page
 			}

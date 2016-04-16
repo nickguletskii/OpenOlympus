@@ -23,9 +23,10 @@
 
 import angular from "angular";
 import "angular-ui-bootstrap";
+import "angular-ui-router-uib-modal/src/angular-ui-router-uib-modal";
 
 export default angular.module("ool", ["pascalprecht.translate", "ui.router",
-	"ui.bootstrap", "ool.filters", "ool.states",
+	"ui.bootstrap", "ui.router.modal", "ool.filters", "ool.states",
 	"ool.services", "ool.directives", "ngFileUpload", "ui.codemirror",
 	"ngAnimate", "formFor", "formFor.bootstrapTemplates", "vcRecaptcha",
 	"ngCookies"

@@ -26,6 +26,7 @@ import contestValidation from "states/contests/contestValidation";
 const controller = /* @ngInject*/ ($scope, $stateParams,
 	FormDefaultHelperService, ValidationService, contest) => {
 	$scope.contestId = $stateParams.contestId;
+	$scope.originalContest = contest;
 	const validationRules = contestValidation(ValidationService, moment);
 
 	class ContestModificationForm extends FormDefaultHelperService.FormClass {

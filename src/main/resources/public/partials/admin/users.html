@@ -59,9 +59,9 @@
                 <button class="btn btn-danger btn-xs fa fa-remove pull-right"
                     ng-really-click="deleteUser(item)"
                     item="user"
-                    ng-really-yes-button="{{'admin.users.list.user.deleteConfirmationButton'|translate}}"
-                    ng-really-message="{{'admin.users.list.user.deleteConfirmation' |translate}}"
-                    ng-if="security.hasAnyPermission('remove_user')">
+                    ng-really-yes-button="{{'admin.users.list.user.deleteConfirmationButton' | translate }}"
+                    ng-really-message="{{'admin.users.list.user.deleteConfirmation' | translate: user }}"
+                    ng-if="security.hasPermissionImmediate('remove_user')">
                 </button>
                 <button type="button"
                     uib-tooltip="{{ 'admin.users.list.user.editButton' | translate }}"

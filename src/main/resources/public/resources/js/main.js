@@ -20,12 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import "font-awesome-webpack";
-
 
 import "angular-ui-router";
 import "angular-translate";
-import "angular-translate-loader-url";
+import "angular-translate-loader-static-files";
 import "angular-ui-codemirror";
 import "angular-recaptcha";
 import "angular-animate";

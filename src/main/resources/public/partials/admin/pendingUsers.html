@@ -43,8 +43,8 @@
     ng-disabled="loading">
     <span class="fa fa-trash"></span> {{'admin.unapprovedUsers.list.deleteUsersWithErrors' | translate}}
 </button>
-<div class="spinner"
-    ng-if="loading"></div>
+<span id="pendingUsersSpinner"
+    ng-show="loading">Working...</span>
 <table class="table table-striped table-bordered table-hover"
     id="userTable"
     ng-if="!loading">

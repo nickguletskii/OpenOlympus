@@ -22,7 +22,9 @@
  */
 import moment from "moment";
 import module from "app";
-import { union as _union } from "lodash";
+import {
+	union as _union
+} from "lodash";
 
 export function installTranslation() {
 	module
@@ -37,7 +39,10 @@ export function installTranslation() {
 	module
 		.config(/* @ngInject*/ ($translateProvider) => {
 			$translateProvider.useSanitizeValueStrategy("escape");
-			$translateProvider.useUrlLoader("/translation");
+			$translateProvider.useStaticFilesLoader({
+				prefix: "/translation/",
+				suffix: ""
+			});
 			$translateProvider.preferredLanguage("ru");
 			// $translateProvider.translationNotFoundIndicator("$$");
 			$translateProvider.useMissingTranslationHandler(

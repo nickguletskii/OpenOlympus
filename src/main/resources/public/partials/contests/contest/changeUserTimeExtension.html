@@ -28,12 +28,12 @@
         ng-click="$dismiss('cancel')">
         <span>&times;</span>
     </button>
-    <h4 class="modal-title"> {{'contest.addUserTime.title' | translate}}</h4>
+    <h4 class="modal-title"> {{'contest.changeUserTimeExtension.title' | translate: user}}</h4>
 </div>
 <div class="modal-body">
     <form form-autoconfig="form"
         novalidate>
-        <text-field label-translate="contest.addUserTime.time"
+        <text-field label-translate="contest.changeUserTimeExtension.time"
             type="number"
             attribute="time"></text-field>
         <submit-button label="{{ form.submitButtonText | translate: form.lastUserAdded }}"
@@ -44,5 +44,5 @@
 <div class="modal-footer">
     <button type="button"
         class="btn btn-default"
-        ng-click="$dismiss('close')">{{'contest.addUserTime.closeButton' | translate}}</button>
+        ng-click="$dismiss('close')">{{'contest.changeUserTimeExtension.closeButton' | translate}}</button>
 </div>

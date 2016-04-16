@@ -60,7 +60,7 @@ class TaskService {
 			.then(_property("data"));
 	}
 	getArchiveTasksPage(page) {
-		return this.$http.get("api/archive/tasks", {
+		return this.$http.get("/api/archive/tasks", {
 			params: {
 				page
 			}
@@ -68,7 +68,7 @@ class TaskService {
 			.then(_property("data"));
 	}
 	countArchiveTasks() {
-		return this.$http.get("api/archive/tasksCount")
+		return this.$http.get("/api/archive/tasksCount")
 			.then(_property("data"));
 	}
 }

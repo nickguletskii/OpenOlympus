@@ -60,6 +60,7 @@ export default {
 	"templateUrl": "/partials/contests/contest/addTask.html",
 	controller,
 	"backdrop": true,
+	"modal": true,
 	"data": {
 		canAccess: /* @ngInject*/ ($refStateParams, PromiseUtils,
 				SecurityService) =>

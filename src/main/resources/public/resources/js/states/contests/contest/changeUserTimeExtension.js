@@ -26,31 +26,36 @@ import {
 
 const controller =
 	/* @ngInject*/
-	($scope, $rootScope, $stateParams, FormDefaultHelperService, ValidationService) => {
+	($scope, $rootScope, $stateParams, FormDefaultHelperService, ValidationService, user) => {
 		const validationRules = {
 			time: {
-				required: true,
+				type: "positive number",
 				custom: ValidationService.toTranslationPromise((value) => {
 					const val = _toInteger(value);
 					if (val < 1) {
-						return "contest.addUserTime.timeNotPositive";
+						return "contest.changeUserTimeExtension.timeNotPositive";
 					}
 					return null;
 				})
 			}
 		};
 
-		class ContestAddUserTimeForm extends FormDefaultHelperService.FormClass {
+		class ContestChangeUserTimeExtensionForm extends FormDefaultHelperService.FormClass {
 			constructor() {
-				super($scope, "contest.addUser");
-				this.submitUrl = "/api/contest/" + $stateParams.contestId +
-					"/addUserTime";
+				super($scope, "contest.changeUserTimeExtension");
+				this.submitUrl = `/api/contest/${$stateParams.contestId}/addUserTime`;
 			}
 
 			transformDataForServer(data) {
 				return {
 					"user": $stateParams.userId,
 					"time": data.time * (60 * 1000)
+				};
+			}
+
+			setUpData() {
+				this.data = {
+					time: 0
 				};
 			}
 
@@ -63,23 +68,31 @@ const controller =
 				return validationRules;
 			}
 		}
-
-		$scope.form = new ContestAddUserTimeForm();
+		$scope.user = user;
+		$scope.form = new ContestChangeUserTimeExtensionForm();
 	};
 
 export default {
-	"parent": "contestParticipantsList",
-	"name": "contestParticipantsList.addUserTime",
-	"templateUrl": "/partials/contests/contest/addUserTime.html",
+	"name": "contestParticipantsList.changeUserTimeExtension",
+	"url": "/changeUserTimeExtension/{userId}",
+	"templateUrl": "/partials/contests/contest/changeUserTimeExtension.html",
 	controller,
-	"backdrop": true,
+	"modal": true,
+	"resolve": {
+		user: /* @ngInject*/ (UserService, $stateParams) => UserService.getUserById(
+			$stateParams.userId)
+	},
 	"data": {
 		canAccess: /* @ngInject*/
-			($refStateParams, PromiseUtils, SecurityService) => {
-				return PromiseUtils.and(
-					SecurityService.hasPermission("approved"),
-					SecurityService.hasContestPermission($refStateParams.contestId,
-						"extend_time"));
-			}
+			($refStateParams, PromiseUtils, SecurityService) =>
+			PromiseUtils.and(
+				SecurityService.hasPermission("approved"),
+				SecurityService.hasContestPermission($refStateParams.contestId,
+					"extend_time"))
+	},
+	params: {
+		userId: {
+			squash: false
+		}
 	}
 };

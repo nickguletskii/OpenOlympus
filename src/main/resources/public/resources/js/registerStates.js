@@ -45,24 +45,16 @@ const WIDTH_CLASS_MAP = {
 const takeStates = states => _values(_pickBy(states, state =>
 	state.name));
 
-const stateList = _concat(takeStates(normalStates), takeStates(plainStates));
+const stateList = _concat(takeStates(normalStates), takeStates(plainStates),
+	takeStates(modalStates));
 
-const modalStateList = takeStates(modalStates);
-
-states.config(/* @ngInject*/ ($stateProvider, modalStateProvider) => {
+states.config(/* @ngInject*/ ($stateProvider) => {
 	_each(stateList, (state) => {
 		const stateConfig = _clone(state);
 		if (state.customWidth && WIDTH_CLASS_MAP[state.customWidth]) {
 			stateConfig.customWidth = WIDTH_CLASS_MAP[state.customWidth];
 		}
-		$stateProvider.state(stateConfig);
-	});
-	_each(modalStateList, (state) => {
-		const stateConfig = _clone(state);
-		if (state.customWidth && WIDTH_CLASS_MAP[state.customWidth]) {
-			stateConfig.customWidth = WIDTH_CLASS_MAP[state.customWidth];
-		}
-		modalStateProvider.state(stateConfig.name, stateConfig);
+		$stateProvider.state(stateConfig.name, stateConfig);
 	});
 });
 

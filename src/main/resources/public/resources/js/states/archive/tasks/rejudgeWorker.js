@@ -37,6 +37,7 @@ export default {
 	"templateUrl": "/partials/archive/tasks/rejudgeTask/working.html",
 	controller,
 	"backdrop": true,
+	"modal": true,
 	"data": {
 		canAccess: /* @ngInject*/ ($refStateParams, SecurityService) =>
 			SecurityService.hasTaskPermission($refStateParams.taskId, "rejudge")
