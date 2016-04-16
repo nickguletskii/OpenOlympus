@@ -23,7 +23,7 @@
 import { filters } from "app";
 import map from "lodash/fp/map";
 import flow from "lodash/fp/flow";
-import join from "lodash/fp/flow";
+import join from "lodash/fp/join";
 
 filters.filter("renderFileList", () => (input) => {
 	if (!input) {

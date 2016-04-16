@@ -42,17 +42,19 @@ directives.directive("fileInput",
 		link: ($scope, $element, $attributes, formForController) => {
 			FieldHelper.manageFieldRegistration($scope, $attributes,
 				formForController);
+			let localBindable;
+
 			const bindableFix = $scope.$watch(() => $scope.model.bindable, () => {
-				let hideYoBindable;
 				Object.defineProperty($scope.model, "bindable", {
 					set: (value) => {
 						// Hide bindable from Angular's shitty built-in validation that somehow casts the files to string.
 						if (angular.isString(value)) {
 							return;
 						}
-						hideYoBindable = value;
+
+						localBindable = value;
 					},
-					get: () => hideYoBindable
+					get: () => localBindable
 				});
 			});
 			const watcher = $scope.$watch($attributes.multiple, (val) => {
