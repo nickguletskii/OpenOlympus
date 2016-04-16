@@ -27,90 +27,6 @@ SET check_function_bodies = false;
 -- -- ddl-end --
 -- 
 
--- object: public.get_contest_end | type: FUNCTION --
--- DROP FUNCTION IF EXISTS public.get_contest_end(integer) CASCADE;
-CREATE FUNCTION public.get_contest_end ( contest_id integer)
-	RETURNS timestamp with time zone
-	LANGUAGE sql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100
-	AS $$
- SELECT
-(contest.start_time + (contest.duration * INTERVAL '1 MILLISECOND') +
-(SELECT
-(COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
-FROM (
-SELECT COALESCE (sum(time_extension.duration), 0) as duration
-FROM time_extension
-WHERE time_extension.contest_id = contest.id
-GROUP BY time_extension.user_id ) AS extensions_per_user ) )
-FROM contest
-WHERE contest.id = contest_id
-$$;
--- ddl-end --
-ALTER FUNCTION public.get_contest_end(integer) OWNER TO openolympus;
--- ddl-end --
-
--- object: public.get_contest_end_for_user | type: FUNCTION --
--- DROP FUNCTION IF EXISTS public.get_contest_end_for_user(IN integer,IN bigint) CASCADE;
-CREATE FUNCTION public.get_contest_end_for_user (IN contest_id integer, IN user_id bigint)
-	RETURNS timestamp with time zone
-	LANGUAGE sql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100
-	AS $$
-SELECT
-(contest.start_time +
-(contest.duration * INTERVAL '1 MILLISECOND') +
-(SELECT (COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
-FROM ( SELECT COALESCE (sum(time_extension.duration), 0) as duration
-FROM time_extension
-WHERE time_extension.contest_id = contest.id
-AND time_extension.user_id = user_id
-GROUP BY time_extension.user_id ) AS extensions_per_user ) )
-FROM contest
-WHERE contest.id = contest_id 
-$$;
--- ddl-end --
-ALTER FUNCTION public.get_contest_end_for_user(IN integer,IN bigint) OWNER TO openolympus;
--- ddl-end --
-
--- object: public.get_contest_start | type: FUNCTION --
--- DROP FUNCTION IF EXISTS public.get_contest_start(integer) CASCADE;
-CREATE FUNCTION public.get_contest_start ( contest_id integer)
-	RETURNS timestamp with time zone
-	LANGUAGE sql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100
-	AS $$
- SELECT contest.start_time FROM contest WHERE contest.id = contest_id
-$$;
--- ddl-end --
-ALTER FUNCTION public.get_contest_start(integer) OWNER TO openolympus;
--- ddl-end --
-
--- object: public.get_contest_start_for_user | type: FUNCTION --
--- DROP FUNCTION IF EXISTS public.get_contest_start_for_user(integer,bigint) CASCADE;
-CREATE FUNCTION public.get_contest_start_for_user ( contest_id integer,  user_id bigint)
-	RETURNS timestamp with time zone
-	LANGUAGE sql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	COST 100
-	AS $$
- SELECT contest.start_time FROM contest WHERE contest.id = contest_id 
-$$;
--- ddl-end --
-ALTER FUNCTION public.get_contest_start_for_user(integer,bigint) OWNER TO openolympus;
--- ddl-end --
-
 -- object: public.get_solution_author | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS public.get_solution_author(bigint) CASCADE;
 CREATE FUNCTION public.get_solution_author ( solution_id bigint)
@@ -185,7 +101,19 @@ CREATE FUNCTION public.maintain_contest_rank_with_time_extensions ()
 	SECURITY INVOKER
 	COST 100
 	AS $$
- BEGIN IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_user_in_contest(NEW.user_id, NEW.contest_id); END IF; IF (TG_OP = 'DELETE') THEN PERFORM update_user_in_contest(OLD.user_id, OLD.contest_id); END IF; RETURN NULL; END; 
+BEGIN
+   IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE')
+   THEN
+       PERFORM update_user_in_contest(NEW.user_id, NEW.contest_id);
+   END IF;
+
+   IF (TG_OP = 'DELETE')
+   THEN
+       PERFORM update_user_in_contest(OLD.user_id, OLD.contest_id);
+   END IF;
+
+   RETURN NULL;
+END;
 $$;
 -- ddl-end --
 ALTER FUNCTION public.maintain_contest_rank_with_time_extensions() OWNER TO openolympus;
@@ -285,7 +213,7 @@ ALTER FUNCTION public.update_user_in_contest(bigint,bigint) OWNER TO openolympus
 -- object: public.general_permission_type | type: TYPE --
 -- DROP TYPE IF EXISTS public.general_permission_type CASCADE;
 CREATE TYPE public.general_permission_type AS
- ENUM ('create_contests','remove_contests','create_tasks','remove_tasks','view_others_user_details','remove_user','approve_user_registrations','change_other_users_password','change_other_users_personal_info','enumerate_all_users','task_supervisor','view_other_users_personal_info','create_groups','list_groups','manage_principal_permissions','view_all_solutions','view_archive_during_contest','rejudge_tasks');
+ ENUM ('approve_user_registrations','change_other_users_password','change_other_users_personal_info','create_contests','create_groups','enumerate_all_users','list_groups','manage_principal_permissions','rejudge_tasks','remove_contests','remove_user','task_supervisor','view_all_solutions','view_archive_during_contest','view_other_users_personal_info');
 -- ddl-end --
 ALTER TYPE public.general_permission_type OWNER TO openolympus;
 -- ddl-end --
@@ -297,6 +225,7 @@ CREATE TABLE public.contest_participation(
 	score numeric(19,2),
 	user_id bigint NOT NULL,
 	contest_id integer NOT NULL,
+	time_extension bigint NOT NULL DEFAULT 0,
 	CONSTRAINT contest_participation_pkey PRIMARY KEY (id)
 
 );
@@ -364,21 +293,6 @@ CREATE TABLE public.solution(
 );
 -- ddl-end --
 ALTER TABLE public.solution OWNER TO openolympus;
--- ddl-end --
-
--- object: public.time_extension | type: TABLE --
--- DROP TABLE IF EXISTS public.time_extension CASCADE;
-CREATE TABLE public.time_extension(
-	id bigserial NOT NULL,
-	duration bigint,
-	reason text,
-	user_id bigint NOT NULL,
-	contest_id integer NOT NULL,
-	CONSTRAINT time_extension_pkey PRIMARY KEY (id)
-
-);
--- ddl-end --
-ALTER TABLE public.time_extension OWNER TO openolympus;
 -- ddl-end --
 
 -- object: public.contest | type: TABLE --
@@ -506,13 +420,6 @@ ALTER TABLE public.contest_message OWNER TO openolympus;
 -- ddl-end --
 
 -- object: "USER_fk" | type: CONSTRAINT --
--- ALTER TABLE public.time_extension DROP CONSTRAINT IF EXISTS "USER_fk" CASCADE;
-ALTER TABLE public.time_extension ADD CONSTRAINT "USER_fk" FOREIGN KEY (user_id)
-REFERENCES public."USER" (id) MATCH FULL
-ON DELETE RESTRICT ON UPDATE CASCADE;
--- ddl-end --
-
--- object: "USER_fk" | type: CONSTRAINT --
 -- ALTER TABLE public.contest_message DROP CONSTRAINT IF EXISTS "USER_fk" CASCADE;
 ALTER TABLE public.contest_message ADD CONSTRAINT "USER_fk" FOREIGN KEY (user_id)
 REFERENCES public."USER" (id) MATCH FULL
@@ -587,30 +494,6 @@ REFERENCES public.solution (id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
 -- ddl-end --
 
--- object: public.contest_tasks | type: TABLE --
--- DROP TABLE IF EXISTS public.contest_tasks CASCADE;
-CREATE TABLE public.contest_tasks(
-	contest_id integer,
-	task_id integer,
-	CONSTRAINT contest_tasks_pk PRIMARY KEY (contest_id,task_id)
-
-);
--- ddl-end --
-
--- object: contest_fk | type: CONSTRAINT --
--- ALTER TABLE public.contest_tasks DROP CONSTRAINT IF EXISTS contest_fk CASCADE;
-ALTER TABLE public.contest_tasks ADD CONSTRAINT contest_fk FOREIGN KEY (contest_id)
-REFERENCES public.contest (id) MATCH FULL
-ON DELETE RESTRICT ON UPDATE CASCADE;
--- ddl-end --
-
--- object: task_fk | type: CONSTRAINT --
--- ALTER TABLE public.contest_tasks DROP CONSTRAINT IF EXISTS task_fk CASCADE;
-ALTER TABLE public.contest_tasks ADD CONSTRAINT task_fk FOREIGN KEY (task_id)
-REFERENCES public.task (id) MATCH FULL
-ON DELETE RESTRICT ON UPDATE CASCADE;
--- ddl-end --
-
 -- object: contest_fk | type: CONSTRAINT --
 -- ALTER TABLE public.contest_message DROP CONSTRAINT IF EXISTS contest_fk CASCADE;
 ALTER TABLE public.contest_message ADD CONSTRAINT contest_fk FOREIGN KEY (contest_id)
@@ -628,13 +511,6 @@ ON DELETE CASCADE ON UPDATE CASCADE;
 -- object: contest_fk | type: CONSTRAINT --
 -- ALTER TABLE public.contest_participation DROP CONSTRAINT IF EXISTS contest_fk CASCADE;
 ALTER TABLE public.contest_participation ADD CONSTRAINT contest_fk FOREIGN KEY (contest_id)
-REFERENCES public.contest (id) MATCH FULL
-ON DELETE CASCADE ON UPDATE CASCADE;
--- ddl-end --
-
--- object: contest_fk | type: CONSTRAINT --
--- ALTER TABLE public.time_extension DROP CONSTRAINT IF EXISTS contest_fk CASCADE;
-ALTER TABLE public.time_extension ADD CONSTRAINT contest_fk FOREIGN KEY (contest_id)
 REFERENCES public.contest (id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
 -- ddl-end --
@@ -695,31 +571,6 @@ END;
 $$;
 -- ddl-end --
 ALTER FUNCTION public.keep_user_as_principal() OWNER TO openolympus;
--- ddl-end --
-
--- object: public.task_permission | type: TABLE --
--- DROP TABLE IF EXISTS public.task_permission CASCADE;
-CREATE TABLE public.task_permission(
-	task_id integer,
-	principal_id bigint,
-	permission public.task_permission_type NOT NULL,
-	CONSTRAINT task_permission_pk PRIMARY KEY (task_id,principal_id,permission)
-
-);
--- ddl-end --
-
--- object: task_fk | type: CONSTRAINT --
--- ALTER TABLE public.task_permission DROP CONSTRAINT IF EXISTS task_fk CASCADE;
-ALTER TABLE public.task_permission ADD CONSTRAINT task_fk FOREIGN KEY (task_id)
-REFERENCES public.task (id) MATCH FULL
-ON DELETE NO ACTION ON UPDATE NO ACTION;
--- ddl-end --
-
--- object: principal_fk | type: CONSTRAINT --
--- ALTER TABLE public.task_permission DROP CONSTRAINT IF EXISTS principal_fk CASCADE;
-ALTER TABLE public.task_permission ADD CONSTRAINT principal_fk FOREIGN KEY (principal_id)
-REFERENCES public.principal (id) MATCH FULL
-ON DELETE NO ACTION ON UPDATE NO ACTION;
 -- ddl-end --
 
 -- object: public.keep_user_as_member_of_groups | type: FUNCTION --
@@ -823,9 +674,9 @@ CREATE FUNCTION public.has_general_permission (IN principal_id_p bigint, IN perm
 	SECURITY INVOKER
 	COST 1
 	AS $$
-BEGIN 
+BEGIN
 	IF (SELECT 1 FROM principal
-		WHERE 
+		WHERE
 		(
 			principal.id = principal_id_p
 			OR
@@ -855,7 +706,7 @@ CREATE FUNCTION public.has_contest_permission (IN contest_id_p integer, IN princ
 	SECURITY INVOKER
 	COST 1
 	AS $$
-BEGIN 
+BEGIN
 	IF EXISTS (SELECT 1 FROM contest_permission WHERE
 		permission_applies_to_principal(principal_id_p, contest_permission.principal_id) AND
 		contest_permission.contest_id=contest_id_p AND
@@ -888,7 +739,7 @@ CREATE FUNCTION public.has_task_permission (IN task_id_p integer, IN principal_i
 	SECURITY INVOKER
 	COST 1
 	AS $$
-BEGIN 
+BEGIN
 	IF EXISTS (SELECT 1 FROM task_permission WHERE
 		permission_applies_to_principal(principal_id_p, task_permission.principal_id) AND
 		task_permission.task_id=task_id_p AND
@@ -933,50 +784,33 @@ CREATE FUNCTION public.raise_contest_intersects_error ()
 	SECURITY INVOKER
 	COST 1
 	AS $$
-DECLARE end_time timestamp WITH time ZONE;
+DECLARE
+   end_time   timestamp WITH TIME ZONE;
 BEGIN
-    end_time = (
-        SELECT (
-                NEW.start_time + (
-                    NEW.duration * interval '1 MILLISECOND' )
-            + (
-                SELECT (
-                        COALESCE (
-                            max (
-                                extensions_per_user.duration ),
-                        0 )
-            * interval '1 MILLISECOND' )
-FROM (
-        SELECT
-            COALESCE (
-                sum (
-                    time_extension.duration ),
-            0 ) AS duration
-FROM
-    time_extension
-WHERE
-    time_extension.contest_id = NEW.id
-GROUP BY
-    time_extension.user_id ) AS extensions_per_user ) ) );
-RAISE NOTICE 'end time is %', end_time;
-IF EXISTS (
-    SELECT
-        1
-    FROM
-        contest
-    WHERE
-        tstzrange (
-            get_contest_start (
-                contest.id ),
-        get_contest_end (
-            contest.id ) )
-&& tstzrange (
-    NEW.start_time,
-    end_time )
-AND contest.id != NEW.id )
-THEN RAISE EXCEPTION 'contest intersects';
-END IF;
-RETURN NULL;
+   IF TG_OP = 'UPDATE'
+   THEN
+      end_time =
+           NEW.start_time
+         + (NEW.duration * INTERVAL '1 MILLISECOND')
+         + (SELECT (  max (contest_participation.time_extension)
+                    * INTERVAL '1 MILLISECOND')
+             WHERE contest_participation.contest_id = NEW.id);
+   ELSE
+      end_time = NEW.start_time + (NEW.duration * INTERVAL '1 MILLISECOND');
+   END IF;
+
+   IF EXISTS
+         (SELECT *
+            FROM contest
+           WHERE         tstzrange (get_contest_start (contest.id),
+                                    get_contest_end (contest.id))
+                     && tstzrange (NEW.start_time, end_time)
+                 AND contest.id != NEW.id)
+   THEN
+       RAISE EXCEPTION 'contest intersects';
+   END IF;
+
+   RETURN NEW;
 END;
 $$;
 -- ddl-end --
@@ -986,7 +820,7 @@ ALTER FUNCTION public.raise_contest_intersects_error() OWNER TO openolympus;
 -- object: contest_intersection_consistency_check | type: TRIGGER --
 -- DROP TRIGGER IF EXISTS contest_intersection_consistency_check ON public.contest CASCADE;
 CREATE TRIGGER contest_intersection_consistency_check
-	AFTER INSERT OR UPDATE
+	BEFORE INSERT OR UPDATE
 	ON public.contest
 	FOR EACH ROW
 	EXECUTE PROCEDURE public.raise_contest_intersects_error();
@@ -1025,7 +859,7 @@ CREATE FUNCTION public.has_group_permission (IN group_id_p bigint, IN principal_
 	SECURITY INVOKER
 	COST 1
 	AS $$
-BEGIN 
+BEGIN
 	IF EXISTS (SELECT 1 FROM group_permission WHERE
 		permission_applies_to_principal(principal_id_p, group_permission.principal_id) AND
 		group_permission.group_id=group_id_p AND
@@ -1560,6 +1394,8 @@ CREATE TABLE public.contest_permission(
 
 );
 -- ddl-end --
+ALTER TABLE public.contest_permission OWNER TO openolympus;
+-- ddl-end --
 
 -- object: public.trgr_contest_permissions_changed | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS public.trgr_contest_permissions_changed() CASCADE;
@@ -1675,6 +1511,142 @@ DELETE FROM group_users
 $$;
 -- ddl-end --
 ALTER FUNCTION public.remove_from_group(IN bigint,IN bigint) OWNER TO openolympus;
+-- ddl-end --
+
+-- object: public.task_permission | type: TABLE --
+-- DROP TABLE IF EXISTS public.task_permission CASCADE;
+CREATE TABLE public.task_permission(
+	permission public.task_permission_type NOT NULL,
+	task_id integer,
+	principal_id bigint,
+	CONSTRAINT task_permission_pk PRIMARY KEY (permission,task_id,principal_id)
+
+);
+-- ddl-end --
+ALTER TABLE public.task_permission OWNER TO openolympus;
+-- ddl-end --
+
+-- object: task_fk | type: CONSTRAINT --
+-- ALTER TABLE public.task_permission DROP CONSTRAINT IF EXISTS task_fk CASCADE;
+ALTER TABLE public.task_permission ADD CONSTRAINT task_fk FOREIGN KEY (task_id)
+REFERENCES public.task (id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+-- object: principal_fk | type: CONSTRAINT --
+-- ALTER TABLE public.task_permission DROP CONSTRAINT IF EXISTS principal_fk CASCADE;
+ALTER TABLE public.task_permission ADD CONSTRAINT principal_fk FOREIGN KEY (principal_id)
+REFERENCES public.principal (id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+-- object: public.contest_tasks | type: TABLE --
+-- DROP TABLE IF EXISTS public.contest_tasks CASCADE;
+CREATE TABLE public.contest_tasks(
+	contest_id integer,
+	task_id integer,
+	CONSTRAINT contest_tasks_pk PRIMARY KEY (contest_id,task_id)
+
+);
+-- ddl-end --
+ALTER TABLE public.contest_tasks OWNER TO openolympus;
+-- ddl-end --
+
+-- object: contest_fk | type: CONSTRAINT --
+-- ALTER TABLE public.contest_tasks DROP CONSTRAINT IF EXISTS contest_fk CASCADE;
+ALTER TABLE public.contest_tasks ADD CONSTRAINT contest_fk FOREIGN KEY (contest_id)
+REFERENCES public.contest (id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+-- object: task_fk | type: CONSTRAINT --
+-- ALTER TABLE public.contest_tasks DROP CONSTRAINT IF EXISTS task_fk CASCADE;
+ALTER TABLE public.contest_tasks ADD CONSTRAINT task_fk FOREIGN KEY (task_id)
+REFERENCES public.task (id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+-- object: public.get_contest_start_for_user | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS public.get_contest_start_for_user(IN integer,IN bigint) CASCADE;
+CREATE FUNCTION public.get_contest_start_for_user (IN contest_id_p integer, IN user_id_p bigint)
+	RETURNS timestamptz
+	LANGUAGE sql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 1
+	AS $$
+SELECT contest.start_time
+     FROM contest
+    WHERE contest.id = contest_id_p
+$$;
+-- ddl-end --
+ALTER FUNCTION public.get_contest_start_for_user(IN integer,IN bigint) OWNER TO openolympus;
+-- ddl-end --
+
+-- object: public.get_contest_start | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS public.get_contest_start(IN integer) CASCADE;
+CREATE FUNCTION public.get_contest_start (IN contest_id_p integer)
+	RETURNS timestamptz
+	LANGUAGE sql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 1
+	AS $$
+SELECT contest.start_time
+     FROM contest
+    WHERE contest.id = contest_id_p
+$$;
+-- ddl-end --
+ALTER FUNCTION public.get_contest_start(IN integer) OWNER TO openolympus;
+-- ddl-end --
+
+-- object: public.get_contest_end | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS public.get_contest_end(IN integer) CASCADE;
+CREATE FUNCTION public.get_contest_end (IN contest_id_p integer)
+	RETURNS timestamptz
+	LANGUAGE sql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 1
+	AS $$
+SELECT (  contest.start_time
+           + (contest.duration * INTERVAL '1 MILLISECOND')
+           + (SELECT (  max (contest_participation.time_extension)
+                      * INTERVAL '1 MILLISECOND')
+                FROM contest_participation
+               WHERE contest_participation.contest_id = contest_id_p))
+     FROM contest
+    WHERE contest.id = contest_id_p
+$$;
+-- ddl-end --
+ALTER FUNCTION public.get_contest_end(IN integer) OWNER TO openolympus;
+-- ddl-end --
+
+-- object: public.get_contest_end_for_user | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS public.get_contest_end_for_user(IN integer,IN bigint) CASCADE;
+CREATE FUNCTION public.get_contest_end_for_user (IN contest_id_p integer, IN user_id_p bigint)
+	RETURNS timestamptz
+	LANGUAGE sql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 1
+	AS $$
+SELECT (  contest.start_time
+           + (contest.duration * INTERVAL '1 MILLISECOND')
+           + (SELECT (  contest_participation.time_extension
+                      * INTERVAL '1 MILLISECOND')
+                FROM contest_participation
+               WHERE     contest_participation.contest_id = contest_id_p
+                     AND contest_participation.user_id = user_id_p))
+     FROM contest
+    WHERE contest.id = contest_id_p
+$$;
+-- ddl-end --
+ALTER FUNCTION public.get_contest_end_for_user(IN integer,IN bigint) OWNER TO openolympus;
 -- ddl-end --
 
 -- object: user_principal_id_mapping | type: CONSTRAINT --

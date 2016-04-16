@@ -41,7 +41,10 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityOr({
 				@SecurityAnd({
 								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasContestPermission.class)
-		})
+				}),
+				@SecurityAnd({
+								@SecurityLeaf(value = SecurityClearanceType.CONTEST_REMOVER)
+				})
 })
 @ContestPermissionRequired(ContestPermissionType.delete)
 @RestController

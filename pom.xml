@@ -115,10 +115,6 @@
 			<version>18.0</version>
 		</dependency>
 		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
@@ -133,11 +129,6 @@
 					<groupId>org.slf4j</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-email</groupId>
@@ -191,16 +182,6 @@
 			<groupId>org.jooq</groupId>
 			<artifactId>joor</artifactId>
 			<version>0.9.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opensaml</groupId>
-			<artifactId>openws</artifactId>
-			<version>1.4.2-1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-cypher-compiler-2.1</artifactId>
-			<version>2.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -313,6 +294,10 @@
 										<forcedType>
 											<name>java.time.Duration</name>
 											<expression>.*duration.*</expression>
+										</forcedType>
+										<forcedType>
+											<name>java.time.Duration</name>
+											<expression>time_extension</expression>
 										</forcedType>
 										<forcedType>
 											<name>java.time.Duration</name>

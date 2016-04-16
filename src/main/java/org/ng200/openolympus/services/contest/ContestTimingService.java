@@ -34,9 +34,7 @@ import org.ng200.openolympus.jooq.routines.GetContestEnd;
 import org.ng200.openolympus.jooq.routines.GetContestEndForUser;
 import org.ng200.openolympus.jooq.routines.GetContestStart;
 import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
-import org.ng200.openolympus.jooq.tables.daos.TimeExtensionDao;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
-import org.ng200.openolympus.jooq.tables.pojos.TimeExtension;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooqsupport.PostgresSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,22 +45,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContestTimingService {
 
 	@Autowired
-	private TimeExtensionDao timeExtensionDao;
-
-	@Autowired
 	private DSLContext dslContext;
 
 	@Transactional
-	public void extendTimeForUser(final Contest contest, final User user,
+	public void setUserTimeExtension(final Contest contest, final User user,
 			final Duration time) {
-		this.timeExtensionDao.insert(new TimeExtension(null, time, null, user
-				.getId(), contest.getId()));
+		this.dslContext.update(Tables.CONTEST_PARTICIPATION)
+				.set(Tables.CONTEST_PARTICIPATION.TIME_EXTENSION, time)
+				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID
+						.eq(contest.getId())
+						.and(Tables.CONTEST_PARTICIPATION.USER_ID
+								.eq(user.getId())))
+				.execute();
 	}
 
 	public OffsetDateTime getContestEndIncludingAllTimeExtensions(
 			final Contest contest) {
 		final GetContestEnd procedure = new GetContestEnd();
-		procedure.setContestId(contest.getId());
+		procedure.setContestIdP(contest.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
 		return procedure.getReturnValue();
@@ -70,8 +70,8 @@ public class ContestTimingService {
 
 	public OffsetDateTime getContestEndTimeForUser(Contest contest, User user) {
 		final GetContestEndForUser procedure = new GetContestEndForUser();
-		procedure.setContestId(contest.getId());
-		procedure.setUserId(user.getId());
+		procedure.setContestIdP(contest.getId());
+		procedure.setUserIdP(user.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
 		return procedure.getReturnValue();
@@ -90,7 +90,7 @@ public class ContestTimingService {
 	public OffsetDateTime getContestStartIncludingAllTimeExtensions(
 			final Contest contest) {
 		final GetContestStart procedure = new GetContestStart();
-		procedure.setContestId(contest.getId());
+		procedure.setContestIdP(contest.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
 		return procedure.getReturnValue();
@@ -99,8 +99,8 @@ public class ContestTimingService {
 	public OffsetDateTime getContestStartTimeForUser(Contest contest,
 			User user) {
 		final GetContestStartForUser procedure = new GetContestStartForUser();
-		procedure.setContestId(contest.getId());
-		procedure.setUserId(user.getId());
+		procedure.setContestIdP(contest.getId());
+		procedure.setUserIdP(user.getId());
 		procedure.attach(this.dslContext.configuration());
 		procedure.execute();
 		return procedure.getReturnValue();

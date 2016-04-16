@@ -29,8 +29,10 @@ import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.SortField;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
+import org.ng200.openolympus.cerberus.util.Lists;
 import org.ng200.openolympus.dto.UserRanking;
 import org.ng200.openolympus.jooq.Tables;
 import org.ng200.openolympus.jooq.tables.daos.UserDao;
@@ -49,6 +51,10 @@ public class UserService extends GenericCreateUpdateRepository {
 			.concat(Arrays.stream(Tables.USER.fields()),
 					Stream.of(Tables.PRINCIPAL.PERMISSIONS))
 			.toArray(Field<?>[]::new);
+
+	public static final List<SortField<?>> USER_ALPHABETICAL_ORDER = Lists.from(
+			Tables.USER.LAST_NAME_MAIN.asc(), Tables.USER.FIRST_NAME_MAIN.asc(),
+			Tables.USER.MIDDLE_NAME_MAIN.asc(), Tables.USER.USERNAME.asc());
 
 	@Autowired
 	private UserDao userDao;
@@ -99,7 +105,7 @@ public class UserService extends GenericCreateUpdateRepository {
 								.or(Tables.USER.LAST_NAME_LOCALISED
 										.like(pattern))
 
-		).limit(30).fetchInto(User.class);
+				).limit(30).fetchInto(User.class);
 	}
 
 	public List<UserRanking> getArchiveRankPage(final int page,

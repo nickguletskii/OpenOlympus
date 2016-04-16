@@ -22,9 +22,11 @@
  */
 package org.ng200.openolympus.services.contest;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.jooq.DSLContext;
+import org.jooq.SelectField;
 import org.jooq.impl.DSL;
 import org.ng200.openolympus.jooq.Routines;
 import org.ng200.openolympus.jooq.Tables;
@@ -33,9 +35,13 @@ import org.ng200.openolympus.jooq.tables.daos.ContestParticipationDao;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.ContestParticipation;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.model.Participant;
+import org.ng200.openolympus.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.ImmutableList;
 
 @Service
 public class ContestUsersService {
@@ -46,23 +52,34 @@ public class ContestUsersService {
 	@Autowired
 	private DSLContext dslContext;
 
+	private static final SelectField<?>[] CONTEST_PARTICIPANTS_SELECT_FIELDS = ImmutableList
+			.<SelectField<?>> builder()
+			.add(Tables.CONTEST_PARTICIPATION.TIME_EXTENSION
+					.as("time_extension"))
+			.add(
+					Tables.USER.fields())
+			.build().toArray(new SelectField<?>[0]);
+
 	@Transactional
 	public void addContestParticipant(final Contest contest, final User user) {
 		this.contestParticipationDao.insert(new ContestParticipation(null, null,
-				user.getId(), contest.getId()));
+				user.getId(), contest.getId(), Duration.ZERO));
 	}
 
-	public List<User> getPariticipantsPage(Contest contest, Integer pageNumber,
+	public List<Participant> getPariticipantsPage(Contest contest,
+			Integer pageNumber,
 			int pageSize) {
 		return this.dslContext
-				.select(Tables.USER.fields())
+				.select(CONTEST_PARTICIPANTS_SELECT_FIELDS)
 				.from(Tables.CONTEST_PARTICIPATION)
 				.leftOuterJoin(Tables.USER)
 				.on(Tables.CONTEST_PARTICIPATION.USER_ID.eq(Tables.USER.ID))
 				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
 						.getId()))
+				.orderBy(UserService.USER_ALPHABETICAL_ORDER)
 				.limit(pageSize)
-				.offset((pageNumber - 1) * pageSize).fetchInto(User.class);
+				.offset((pageNumber - 1) * pageSize)
+				.fetchInto(Participant.class);
 	}
 
 	public boolean isUserInContest(Contest contest, User user) {
@@ -108,6 +125,15 @@ public class ContestUsersService {
 								contest.getId(), user.getId(),
 								ContestPermissionType.manage_acl)
 						.booleanValue();
+	}
+
+	public long countParticipants(Contest contest) {
+		return this.dslContext
+				.selectCount()
+				.from(Tables.CONTEST_PARTICIPATION)
+				.where(Tables.CONTEST_PARTICIPATION.CONTEST_ID.eq(contest
+						.getId()))
+				.fetchOne(0, long.class);
 	}
 
 }

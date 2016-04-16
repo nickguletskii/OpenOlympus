@@ -22,7 +22,6 @@
  */
 package org.ng200.openolympus.controller;
 
-import org.opensaml.util.resource.ResourceException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -37,7 +36,7 @@ public class FaviconController {
 
 	@RequestMapping(value = "/favicon.ico", produces = "image/x-icon")
 	@ResponseBody
-	public Resource favicon(WebRequest requst) throws ResourceException {
+	public Resource favicon(WebRequest requst) {
 		return new ClassPathResource("public/resources/favicon.ico");
 	}
 }

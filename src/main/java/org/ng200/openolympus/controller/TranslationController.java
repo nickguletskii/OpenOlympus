@@ -30,8 +30,8 @@ import java.util.Map.Entry;
 import org.ng200.openolympus.resourceresolvers.OpenOlympusMessageSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
@@ -39,11 +39,11 @@ import org.springframework.web.context.request.WebRequest;
 @Profile("web")
 public class TranslationController {
 	@Autowired
-	OpenOlympusMessageSource messageSource;
+	private OpenOlympusMessageSource messageSource;
 
-	@RequestMapping(value = "/translation")
+	@RequestMapping(value = "/translation/{lang}")
 	public Map<String, String> strings(WebRequest webRequest,
-			@RequestParam("lang") String lang) {
+			@PathVariable("lang") String lang) {
 		if (webRequest.checkNotModified(this.messageSource.getLastModified())) {
 			return null;
 		}

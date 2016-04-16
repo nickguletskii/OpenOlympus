@@ -44,6 +44,10 @@ public enum SecurityClearanceType {
 	 */
 	CONTEST_CREATOR,
 	/**
+	 * This security clearance type is granted to users who can remove contests.
+	 */
+	CONTEST_REMOVER,
+	/**
 	 * This security clearance type is granted to users who can create contests.
 	 */
 	TASK_SUPERVISOR,

@@ -24,7 +24,6 @@ package org.ng200.openolympus.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.opensaml.util.resource.ResourceException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -48,8 +47,7 @@ public class SinglepageController {
 
 	@RequestMapping(value = "/**", produces = MediaType.TEXT_HTML_VALUE)
 	@ResponseBody
-	public ResponseEntity<Resource> singlepage(HttpServletRequest request)
-			throws ResourceException {
+	public ResponseEntity<Resource> singlepage(HttpServletRequest request){
 		if (SinglepageController.API_PATH_MATCHER.matches(request)) {
 			return new ResponseEntity<Resource>(HttpStatus.NOT_FOUND);
 		}

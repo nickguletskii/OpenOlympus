@@ -31,6 +31,7 @@ import org.ng200.openolympus.exceptions.ResourceNotFoundException;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
+import org.ng200.openolympus.model.Participant;
 import org.ng200.openolympus.security.annotations.ContestPermissionRequired;
 import org.ng200.openolympus.security.annotations.SecurityAnd;
 import org.ng200.openolympus.security.annotations.SecurityLeaf;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,7 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityOr({
 				@SecurityAnd({
 								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserHasContestPermission.class)
-		})
+				})
 })
 @ContestPermissionRequired(ContestPermissionType.view_participants)
 public class ContestParticipantsController {
@@ -61,8 +63,7 @@ public class ContestParticipantsController {
 	private ContestUsersService contestUsersService;
 
 	@RequestMapping(value = "/api/contest/{contest}/participants", method = RequestMethod.GET)
-
-	public List<User> showParticipantsPage(
+	public List<Participant> showParticipantsPage(
 			@PathVariable(value = "contest") final Contest contest,
 			@RequestParam(value = "page", defaultValue = "1") final Integer pageNumber,
 			final Model model, final Principal principal) {
@@ -77,4 +78,10 @@ public class ContestParticipantsController {
 				.getPariticipantsPage(contest, pageNumber, 10);
 	}
 
+	@RequestMapping(value = "/api/contest/{contest}/participantsCount", method = RequestMethod.GET)
+	@ResponseBody
+	public long contestCount(
+			@PathVariable(value = "contest") final Contest contest) {
+		return this.contestUsersService.countParticipants(contest);
+	}
 }

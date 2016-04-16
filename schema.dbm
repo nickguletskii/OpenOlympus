@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.2-beta1" last-position="572,0" last-zoom="0.55"
+<dbmodel pgmodeler-ver="0.8.2-beta1" last-position="0,0" last-zoom="0.55"
 	 default-schema="public" default-owner="openolympus">
 <role name="openolympus"
       login="true"
@@ -18,112 +18,6 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <schema name="public" protected="true" rect-visible="true" fill-color="#e1e1e1" sql-disabled="true">
 </schema>
-
-<function name="get_contest_end"
-		window-func="false"
-		returns-setof="false"
-		behavior-type="CALLED ON NULL INPUT"
-		function-type="VOLATILE"
-		security-type="SECURITY INVOKER"
-		execution-cost="100"
-		row-amount="0">
-	<schema name="public"/>
-	<role name="openolympus"/>
-	<language name="sql" sql-disabled="true"/>
-	<return-type>
-	<type name="timestamp" with-timezone="true"/>
-	</return-type>
-	<parameter name="contest_id">
-		<type name="integer"/>
-	</parameter>
-	<definition><![CDATA[ SELECT
-(contest.start_time + (contest.duration * INTERVAL '1 MILLISECOND') +
-(SELECT
-(COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
-FROM (
-SELECT COALESCE (sum(time_extension.duration), 0) as duration
-FROM time_extension
-WHERE time_extension.contest_id = contest.id
-GROUP BY time_extension.user_id ) AS extensions_per_user ) )
-FROM contest
-WHERE contest.id = contest_id]]></definition>
-</function>
-
-<function name="get_contest_end_for_user"
-		window-func="false"
-		returns-setof="false"
-		behavior-type="CALLED ON NULL INPUT"
-		function-type="VOLATILE"
-		security-type="SECURITY INVOKER"
-		execution-cost="100"
-		row-amount="0">
-	<schema name="public"/>
-	<role name="openolympus"/>
-	<language name="sql" sql-disabled="true"/>
-	<return-type>
-	<type name="timestamp" with-timezone="true"/>
-	</return-type>
-	<parameter name="contest_id" in="true">
-		<type name="integer"/>
-	</parameter>
-	<parameter name="user_id" in="true">
-		<type name="bigint"/>
-	</parameter>
-	<definition><![CDATA[SELECT
-(contest.start_time +
-(contest.duration * INTERVAL '1 MILLISECOND') +
-(SELECT (COALESCE(max(extensions_per_user.duration), 0) * INTERVAL '1 MILLISECOND')
-FROM ( SELECT COALESCE (sum(time_extension.duration), 0) as duration
-FROM time_extension
-WHERE time_extension.contest_id = contest.id
-AND time_extension.user_id = user_id
-GROUP BY time_extension.user_id ) AS extensions_per_user ) )
-FROM contest
-WHERE contest.id = contest_id ]]></definition>
-</function>
-
-<function name="get_contest_start"
-		window-func="false"
-		returns-setof="false"
-		behavior-type="CALLED ON NULL INPUT"
-		function-type="VOLATILE"
-		security-type="SECURITY INVOKER"
-		execution-cost="100"
-		row-amount="0">
-	<schema name="public"/>
-	<role name="openolympus"/>
-	<language name="sql" sql-disabled="true"/>
-	<return-type>
-	<type name="timestamp" with-timezone="true"/>
-	</return-type>
-	<parameter name="contest_id">
-		<type name="integer"/>
-	</parameter>
-	<definition><![CDATA[ SELECT contest.start_time FROM contest WHERE contest.id = contest_id]]></definition>
-</function>
-
-<function name="get_contest_start_for_user"
-		window-func="false"
-		returns-setof="false"
-		behavior-type="CALLED ON NULL INPUT"
-		function-type="VOLATILE"
-		security-type="SECURITY INVOKER"
-		execution-cost="100"
-		row-amount="0">
-	<schema name="public"/>
-	<role name="openolympus"/>
-	<language name="sql" sql-disabled="true"/>
-	<return-type>
-	<type name="timestamp" with-timezone="true"/>
-	</return-type>
-	<parameter name="contest_id">
-		<type name="integer"/>
-	</parameter>
-	<parameter name="user_id">
-		<type name="bigint"/>
-	</parameter>
-	<definition><![CDATA[ SELECT contest.start_time FROM contest WHERE contest.id = contest_id ]]></definition>
-</function>
 
 <function name="get_solution_author"
 		window-func="false"
@@ -157,7 +51,7 @@ WHERE contest.id = contest_id ]]></definition>
 	<role name="openolympus"/>
 	<language name="sql" sql-disabled="true"/>
 	<return-type>
-	<type name="timestamp" with-timezone="true"/>
+	<type name="timestamp with time zone" with-timezone="true"/>
 	</return-type>
 	<parameter name="solution_id">
 		<type name="bigint"/>
@@ -213,7 +107,19 @@ WHERE contest.id = contest_id ]]></definition>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
-	<definition><![CDATA[ BEGIN IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN PERFORM update_user_in_contest(NEW.user_id, NEW.contest_id); END IF; IF (TG_OP = 'DELETE') THEN PERFORM update_user_in_contest(OLD.user_id, OLD.contest_id); END IF; RETURN NULL; END; ]]></definition>
+	<definition><![CDATA[BEGIN
+   IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE')
+   THEN
+       PERFORM update_user_in_contest(NEW.user_id, NEW.contest_id);
+   END IF;
+
+   IF (TG_OP = 'DELETE')
+   THEN
+       PERFORM update_user_in_contest(OLD.user_id, OLD.contest_id);
+   END IF;
+
+   RETURN NULL;
+END;]]></definition>
 </function>
 
 <function name="maintain_solution_score"
@@ -326,7 +232,7 @@ END;]]></definition>
 <usertype name="general_permission_type" configuration="enumeration">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<enumeration values="create_contests,remove_contests,create_tasks,remove_tasks,view_others_user_details,remove_user,approve_user_registrations,change_other_users_password,change_other_users_personal_info,enumerate_all_users,task_supervisor,view_other_users_personal_info,create_groups,list_groups,manage_principal_permissions,view_all_solutions,view_archive_during_contest,rejudge_tasks"/>
+	<enumeration values="approve_user_registrations,change_other_users_password,change_other_users_personal_info,create_contests,create_groups,enumerate_all_users,list_groups,manage_principal_permissions,rejudge_tasks,remove_contests,remove_user,task_supervisor,view_all_solutions,view_archive_during_contest,view_other_users_personal_info"/>
 </usertype>
 
 <table name="contest_participation">
@@ -338,6 +244,9 @@ END;]]></definition>
 	</column>
 	<column name="score">
 		<type name="numeric" length="19" precision="2"/>
+	</column>
+	<column name="time_extension" not-null="true" default-value="0">
+		<type name="bigint" interval-type="MINUTE"/>
 	</column>
 	<constraint name="contest_participation_pkey" type="pk-constr" table="public.contest_participation">
 		<columns names="id" ref-type="src-columns"/>
@@ -395,7 +304,7 @@ END;]]></definition>
 		<type name="character varying" length="64"/>
 	</column>
 	<column name="last_used" not-null="true">
-		<type name="timestamp" with-timezone="true"/>
+		<type name="timestamp with time zone" with-timezone="true"/>
 	</column>
 	<constraint name="persistent_logins_pkey" type="pk-constr" table="public.persistent_logins">
 		<columns names="series" ref-type="src-columns"/>
@@ -446,7 +355,7 @@ END;]]></definition>
 		<type name="boolean"/>
 	</column>
 	<column name="time_added">
-		<type name="timestamp" with-timezone="true"/>
+		<type name="timestamp with time zone" with-timezone="true"/>
 	</column>
 	<constraint name="solution_pkey" type="pk-constr" table="public.solution">
 		<columns names="id" ref-type="src-columns"/>
@@ -463,38 +372,10 @@ END;]]></definition>
 	</customidxs>
 </table>
 
-<table name="time_extension">
-	<schema name="public"/>
-	<role name="openolympus"/>
-	<position x="198.182" y="1601.82"/>
-	<column name="id" not-null="true">
-		<type name="bigserial"/>
-	</column>
-	<column name="duration">
-		<type name="bigint"/>
-	</column>
-	<column name="reason">
-		<type name="text"/>
-	</column>
-	<constraint name="time_extension_pkey" type="pk-constr" table="public.time_extension">
-		<columns names="id" ref-type="src-columns"/>
-	</constraint>
-
-	<customidxs object-type="column">
-		<object name="contest_id" index="4"/>
-		<object name="user_id" index="3"/>
-	</customidxs>
-
-	<customidxs object-type="constraint">
-		<object name="USER_fk" index="2"/>
-		<object name="contest_fk" index="1"/>
-	</customidxs>
-</table>
-
 <table name="contest">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="893.835" y="1827.82"/>
+	<position x="895.653" y="1827.82"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
 	</column>
@@ -508,7 +389,7 @@ END;]]></definition>
 		<type name="boolean"/>
 	</column>
 	<column name="start_time">
-		<type name="timestamp" with-timezone="true"/>
+		<type name="timestamp with time zone" with-timezone="true"/>
 	</column>
 	<constraint name="contest_pkey" type="pk-constr" table="public.contest">
 		<columns names="id" ref-type="src-columns"/>
@@ -535,7 +416,7 @@ END;]]></definition>
 		<type name="text" length="255"/>
 	</column>
 	<column name="created_date">
-		<type name="timestamp" with-timezone="true"/>
+		<type name="timestamp with time zone" with-timezone="true"/>
 	</column>
 	<constraint name="task_pkey" type="pk-constr" table="public.task">
 		<columns names="id" ref-type="src-columns"/>
@@ -561,7 +442,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permissions" not-null="true" default-value="ARRAY[]::public.general_permission_type[]">
-		<type name="public.general_permission_type" dimension="1" precision="32681"/>
+		<type name="public.general_permission_type" dimension="1"/>
 	</column>
 	<constraint name="principal_pk" type="pk-constr" table="public.principal">
 		<columns names="id" ref-type="src-columns"/>
@@ -706,15 +587,6 @@ END;]]></definition>
 	</customidxs>
 </table>
 
-<relationship name="user_time_extensions" type="rel1n"
-	 src-col-pattern="user_id"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#230ee5"
-	 src-table="public.&quot;USER&quot;"
-	 dst-table="public.time_extension"
-	 src-required="true" dst-required="false"/>
-
 <relationship name="user_contest_messages" type="rel1n"
 	 src-col-pattern="user_id"
 	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
@@ -789,7 +661,7 @@ END;]]></definition>
 		<type name="numeric" length="19" precision="2"/>
 	</column>
 	<column name="status" not-null="true">
-		<type name="public.verdict_status_type" precision="32681"/>
+		<type name="public.verdict_status_type"/>
 	</column>
 	<column name="viewable_during_contest" not-null="true">
 		<type name="boolean"/>
@@ -865,16 +737,6 @@ END;]]></definition>
 		<position x="0" y="0"/>
 	</label>
 </relationship>
-
-<relationship name="contest_time_extensions" type="rel1n"
-	 src-col-pattern="{st}_{sc}"
-	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
-	 src-fk-pattern="{st}_fk"
-	 custom-color="#362e7f"
-	 src-table="public.contest"
-	 dst-table="public.time_extension"
-	 src-required="true" dst-required="false"
-	del-action="CASCADE"/>
 
 <relationship name="task_solutions" type="rel1n"
 	 src-col-pattern="{st}_{sc}"
@@ -1043,11 +905,11 @@ END;]]></definition>
 		<type name="bigint"/>
 	</parameter>
 	<parameter name="permission_p" in="true">
-		<type name="public.general_permission_type" precision="0"/>
+		<type name="public.general_permission_type"/>
 	</parameter>
-	<definition><![CDATA[BEGIN 
+	<definition><![CDATA[BEGIN
 	IF (SELECT 1 FROM principal
-		WHERE 
+		WHERE
 		(
 			principal.id = principal_id_p
 			OR
@@ -1085,9 +947,9 @@ END;]]></definition>
 		<type name="bigint"/>
 	</parameter>
 	<parameter name="permission_p" in="true">
-		<type name="public.contest_permission_type" precision="0"/>
+		<type name="public.contest_permission_type"/>
 	</parameter>
-	<definition><![CDATA[BEGIN 
+	<definition><![CDATA[BEGIN
 	IF EXISTS (SELECT 1 FROM contest_permission WHERE
 		permission_applies_to_principal(principal_id_p, contest_permission.principal_id) AND
 		contest_permission.contest_id=contest_id_p AND
@@ -1126,9 +988,9 @@ END;]]></definition>
 		<type name="bigint"/>
 	</parameter>
 	<parameter name="permission_p" in="true">
-		<type name="public.task_permission_type" precision="0"/>
+		<type name="public.task_permission_type"/>
 	</parameter>
-	<definition><![CDATA[BEGIN 
+	<definition><![CDATA[BEGIN
 	IF EXISTS (SELECT 1 FROM task_permission WHERE
 		permission_applies_to_principal(principal_id_p, task_permission.principal_id) AND
 		task_permission.task_id=task_id_p AND
@@ -1181,54 +1043,37 @@ END;]]></definition>
 	<return-type>
 	<type name="trigger"/>
 	</return-type>
-	<definition><![CDATA[DECLARE end_time timestamp WITH time ZONE;
+	<definition><![CDATA[DECLARE
+   end_time   timestamp WITH TIME ZONE;
 BEGIN
-    end_time = (
-        SELECT (
-                NEW.start_time + (
-                    NEW.duration * interval '1 MILLISECOND' )
-            + (
-                SELECT (
-                        COALESCE (
-                            max (
-                                extensions_per_user.duration ),
-                        0 )
-            * interval '1 MILLISECOND' )
-FROM (
-        SELECT
-            COALESCE (
-                sum (
-                    time_extension.duration ),
-            0 ) AS duration
-FROM
-    time_extension
-WHERE
-    time_extension.contest_id = NEW.id
-GROUP BY
-    time_extension.user_id ) AS extensions_per_user ) ) );
-RAISE NOTICE 'end time is %', end_time;
-IF EXISTS (
-    SELECT
-        1
-    FROM
-        contest
-    WHERE
-        tstzrange (
-            get_contest_start (
-                contest.id ),
-        get_contest_end (
-            contest.id ) )
-&& tstzrange (
-    NEW.start_time,
-    end_time )
-AND contest.id != NEW.id )
-THEN RAISE EXCEPTION 'contest intersects';
-END IF;
-RETURN NULL;
+   IF TG_OP = 'UPDATE'
+   THEN
+      end_time =
+           NEW.start_time
+         + (NEW.duration * INTERVAL '1 MILLISECOND')
+         + (SELECT (  max (contest_participation.time_extension)
+                    * INTERVAL '1 MILLISECOND')
+             WHERE contest_participation.contest_id = NEW.id);
+   ELSE
+      end_time = NEW.start_time + (NEW.duration * INTERVAL '1 MILLISECOND');
+   END IF;
+
+   IF EXISTS
+         (SELECT *
+            FROM contest
+           WHERE         tstzrange (get_contest_start (contest.id),
+                                    get_contest_end (contest.id))
+                     && tstzrange (NEW.start_time, end_time)
+                 AND contest.id != NEW.id)
+   THEN
+       RAISE EXCEPTION 'contest intersects';
+   END IF;
+
+   RETURN NEW;
 END;]]></definition>
 </function>
 
-<trigger name="contest_intersection_consistency_check" firing-type="AFTER" per-line="true" constraint="false"
+<trigger name="contest_intersection_consistency_check" firing-type="BEFORE" per-line="true" constraint="false"
 	 ins-event="true" del-event="false" upd-event="true" trunc-event="false"
 	 table="public.contest">
 		<function signature="public.raise_contest_intersects_error()"/>
@@ -1246,13 +1091,13 @@ END;]]></definition>
 	<role name="openolympus"/>
 	<language name="sql" sql-disabled="true"/>
 	<return-type>
-	<type name="public.contest" precision="32764"/>
+	<type name="public.contest"/>
 	</return-type>
 	<parameter name="time_range_start" in="true">
-		<type name="timestamp" with-timezone="true"/>
+		<type name="timestamp with time zone" with-timezone="true"/>
 	</parameter>
 	<parameter name="time_range_end" in="true">
-		<type name="timestamp" with-timezone="true"/>
+		<type name="timestamp with time zone" with-timezone="true"/>
 	</parameter>
 	<definition><![CDATA[SELECT * FROM contest WHERE tstzrange(get_contest_start(contest.id), get_contest_end(contest.id)) && tstzrange(time_range_start, time_range_end)]]></definition>
 </function>
@@ -1282,9 +1127,9 @@ END;]]></definition>
 		<type name="bigint"/>
 	</parameter>
 	<parameter name="permission_p" in="true">
-		<type name="public.group_permission_type" precision="0"/>
+		<type name="public.group_permission_type"/>
 	</parameter>
-	<definition><![CDATA[BEGIN 
+	<definition><![CDATA[BEGIN
 	IF EXISTS (SELECT 1 FROM group_permission WHERE
 		permission_applies_to_principal(principal_id_p, group_permission.principal_id) AND
 		group_permission.group_id=group_id_p AND
@@ -1348,7 +1193,7 @@ END;]]></definition>
 		<type name="bigint"/>
 	</column>
 	<column name="permission" not-null="true">
-		<type name="public.group_permission_type" precision="32681"/>
+		<type name="public.group_permission_type"/>
 	</column>
 	<constraint name="group_permission_pk" type="pk-constr" table="public.group_permission">
 		<columns names="principal_id,group_id,permission" ref-type="src-columns"/>
@@ -1843,7 +1688,7 @@ END;]]></definition>
 	<role name="openolympus"/>
 	<position x="1146.64" y="1715.59"/>
 	<column name="permission" not-null="true">
-		<type name="public.contest_permission_type" precision="32681"/>
+		<type name="public.contest_permission_type"/>
 	</column>
 	<column name="contest_id" not-null="true">
 		<type name="integer"/>
@@ -1989,7 +1834,7 @@ END;
 	<role name="openolympus"/>
 	<position x="1887.73" y="1116.99"/>
 	<column name="permission" not-null="true">
-		<type name="public.task_permission_type" precision="32681"/>
+		<type name="public.task_permission_type"/>
 	</column>
 	<constraint name="task_permission_pk" type="pk-constr" table="public.task_permission">
 		<columns names="permission" ref-type="src-columns"/>
@@ -2062,6 +1907,111 @@ END;
 	 src-required="true" dst-required="false"
 	 identifier="true"
 />
+
+<function name="get_contest_start_for_user"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="openolympus"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamptz"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<parameter name="user_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[SELECT contest.start_time
+     FROM contest
+    WHERE contest.id = contest_id_p]]></definition>
+</function>
+
+<function name="get_contest_start"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="openolympus"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamptz"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<definition><![CDATA[SELECT contest.start_time
+     FROM contest
+    WHERE contest.id = contest_id_p]]></definition>
+</function>
+
+<function name="get_contest_end"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="openolympus"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamptz"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<definition><![CDATA[SELECT (  contest.start_time
+           + (contest.duration * INTERVAL '1 MILLISECOND')
+           + (SELECT (  max (contest_participation.time_extension)
+                      * INTERVAL '1 MILLISECOND')
+                FROM contest_participation
+               WHERE contest_participation.contest_id = contest_id_p))
+     FROM contest
+    WHERE contest.id = contest_id_p]]></definition>
+</function>
+
+<function name="get_contest_end_for_user"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="openolympus"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="timestamptz"/>
+	</return-type>
+	<parameter name="contest_id_p" in="true">
+		<type name="integer"/>
+	</parameter>
+	<parameter name="user_id_p" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[SELECT (  contest.start_time
+           + (contest.duration * INTERVAL '1 MILLISECOND')
+           + (SELECT (  contest_participation.time_extension
+                      * INTERVAL '1 MILLISECOND')
+                FROM contest_participation
+               WHERE     contest_participation.contest_id = contest_id_p
+                     AND contest_participation.user_id = user_id_p))
+     FROM contest
+    WHERE contest.id = contest_id_p]]></definition>
+</function>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

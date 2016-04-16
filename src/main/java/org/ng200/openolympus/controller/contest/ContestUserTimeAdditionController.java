@@ -75,7 +75,7 @@ public class ContestUserTimeAdditionController {
 		if (bindingResult.hasErrors()) {
 			throw new BindException(bindingResult);
 		}
-		this.contestTimingService.extendTimeForUser(contest,
+		this.contestTimingService.setUserTimeExtension(contest,
 				contestUserTimeAdditionDto.getUser(),
 				contestUserTimeAdditionDto.getTime());
 		return BindingResponse.OK;

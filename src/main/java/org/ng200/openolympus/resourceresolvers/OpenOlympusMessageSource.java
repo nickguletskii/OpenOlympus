@@ -22,30 +22,15 @@
  */
 package org.ng200.openolympus.resourceresolvers;
 
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
-import org.ng200.openolympus.FileAccess;
-import org.ng200.openolympus.config.StorageConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 public final class OpenOlympusMessageSource extends
 		ReloadableResourceBundleMessageSource {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(OpenOlympusMessageSource.class);
-
-	private StorageConfiguration storageConfig;
 	private long lastModified;
 
 	@Override
@@ -67,50 +52,6 @@ public final class OpenOlympusMessageSource extends
 			PropertiesHolder propHolder) {
 		this.lastModified = System.currentTimeMillis();
 		return super.refreshProperties(filename, propHolder);
-	}
-
-	private void reportMissingLocalisationKey(final String code) {
-		try {
-			if (code.isEmpty() || Character.isUpperCase(code.charAt(0))) {
-				return;
-			}
-			final Path file = FileSystems.getDefault().getPath(
-					this.storageConfig.getStoragePath(),
-					"missingLocalisation.txt");
-			if (!FileAccess.exists(file)) {
-				FileAccess.createDirectories(file.getParent());
-				FileAccess.createFile(file);
-			}
-			final Set<String> s = new TreeSet<>(Arrays.asList(FileAccess
-					.readUTF8String(file).split("\n")));
-			s.add(code);
-			FileAccess.writeUTF8StringToFile(file,
-					s.stream().collect(Collectors.joining("\n")));
-		} catch (final IOException e) {
-			OpenOlympusMessageSource.logger.error(
-					"Couldn't add to missing key repo: {}", e);
-		}
-	}
-
-	@Override
-	protected MessageFormat resolveCode(final String code,
-			final Locale locale) {
-		final MessageFormat format = super.resolveCode(code, locale);
-		;
-		if (format == null) {
-			this.reportMissingLocalisationKey(code);
-		}
-		return format;
-	}
-
-	@Override
-	protected String resolveCodeWithoutArguments(final String code,
-			final Locale locale) {
-		final String string = super.resolveCodeWithoutArguments(code, locale);
-		if (string == null) {
-			this.reportMissingLocalisationKey(code);
-		}
-		return string;
 	}
 
 	public void setLastModified(long lastModified) {
