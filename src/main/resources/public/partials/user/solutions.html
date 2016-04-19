@@ -26,7 +26,7 @@
     id="tasksTable">
     <thead>
         <tr>
-            <th width="50">{{'user.solutions.submissionTime' | translate}}</th>
+            <th width="180">{{'user.solutions.submissionTime' | translate}}</th>
             <th>{{ 'user.solutions.taskName' | translate}}</th>
             <th width="50">{{ 'user.solutions.score' | translate}}</th>
             <th width="50">{{ 'user.solutions.maximumScore' | translate}}</th>
@@ -46,6 +46,7 @@
 </table>
 <uib-pagination total-items="solutionCount"
     ng-model="page"
+    ng-change="changePage(page)"
     previous-text="&lsaquo;"
     next-text="&rsaquo; "
     first-text="&laquo; "

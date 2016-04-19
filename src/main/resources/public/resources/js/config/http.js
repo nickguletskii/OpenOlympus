@@ -77,6 +77,9 @@ class OpenOlympusRequestInterceptor {
 			}
 			switch (status) {
 			case -1:
+				if (response.config.ignoreFailure) {
+					return this.$q.reject(response);
+				}
 				errorHandler.showConnectionLostError();
 				this.$rootScope.$destroy();
 				return null;

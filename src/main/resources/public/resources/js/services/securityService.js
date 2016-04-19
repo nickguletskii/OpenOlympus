@@ -21,7 +21,9 @@
  * THE SOFTWARE.
  */
 
-import { services } from "app";
+import {
+	services
+} from "app";
 import moment from "moment";
 import {
 	property as _property,
@@ -68,11 +70,13 @@ class SecurityService {
 					this.$http.get(url(this.user.id), {
 						params: {
 							permission
-						}
+						},
+						ignoreFailure: true
 					})
 						.then(_property("data"))
 						.then((val) => deferred.resolve(val));
-				}
+				},
+				(r) => false
 			);
 		return deferred.promise;
 	}
@@ -106,7 +110,7 @@ class SecurityService {
 
 	get isSuperUser() {
 		return this.update()
-			.then(() => this.isSuperUserImmediate);
+			.then(() => this.isSuperUserImmediate, (r) => false);
 	}
 
 	get isSuperUserImmediate() {
@@ -137,12 +141,12 @@ class SecurityService {
 			.then((data) => {
 				// TODO: implement
 				return true;
-			});
+			}, (r) => false);
 	}
 
 	hasPermission(permission) {
 		return this.update()
-			.then(() => this.hasPermissionImmediate(permission));
+			.then(() => this.hasPermissionImmediate(permission), (r) => false);
 	}
 
 	hasPermissionImmediate(permission) {
@@ -168,7 +172,7 @@ class SecurityService {
 
 	noCurrentContest() {
 		return this.update()
-			.then(() => this.noCurrentContestImmediate);
+			.then(() => this.noCurrentContestImmediate, (r) => false);
 	}
 
 	noCurrentContestImmediate() {
@@ -198,7 +202,12 @@ class SecurityService {
 			return this.updatePromise;
 		}
 
-		this.updatePromise = this.$http.get("/api/security/status")
+		this.updatePromise = this.$http({
+			method: "GET",
+			url: "/api/security/status",
+			data: {},
+			ignoreFailure: true
+		})
 			.then((r) => {
 				dataInternal = r.data;
 				this.securityStatusCache.put("data", dataInternal);
@@ -206,7 +215,7 @@ class SecurityService {
 				this.updatePromise = null;
 				this.$rootScope.$broadcast("securityInfoChanged");
 				return dataInternal;
-			});
+			}, (r) => r);
 
 		return this.updatePromise;
 	}
@@ -264,7 +273,7 @@ services
 		function poller() {
 			SecurityService.update()
 				.then(() => {
-					$timeout(poller, 60000);
+					$timeout(poller, 6000);
 				});
 		}
 		poller();

@@ -38,8 +38,8 @@
             <input typeahead-bootstrap-model
                 type="text"
                 placeholder="{{ 'contest.addTask.placeholder' | translate }}"
-                typeahead="task for task in getTaskSuggestions($viewValue)"
-                typeahead-loading="{{ 'contest.addTask.loadingSuggestions' | translate }}"
+                uib-typeahead="task for task in getTaskSuggestions($viewValue)"
+                uib-typeahead-loading="{{ 'contest.addTask.loadingSuggestions' | translate }}"
                 class="form-control"></input>
         </typeahead-bootstrap>
         <submit-button label="{{ form.submitButtonText | translate: form.lastTaskAdded }}"

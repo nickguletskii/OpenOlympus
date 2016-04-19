@@ -35,7 +35,7 @@ const controller =
 
 		class SolutionSubmissionForm extends FormDefaultHelperService.FormClass {
 			constructor() {
-				super($scope, "task.createForm");
+				super($scope, "task.solutionSubmissionForm");
 				this.submitUrl = `/api/task/${$stateParams.taskId}/submitSolution`;
 			}
 

@@ -75,8 +75,10 @@ public class SolutionStatusController {
 			super();
 			this.verdicts = verdicts;
 			this.score = verdicts.stream().map(v -> v.getScore())
+					.filter(s -> s != null)
 					.reduce(BigDecimal.ZERO, (l, r) -> l.add(r));
 			this.maximumScore = verdicts.stream().map(v -> v.getMaximumScore())
+					.filter(s -> s != null)
 					.reduce(BigDecimal.ZERO, (l, r) -> l.add(r));
 		}
 

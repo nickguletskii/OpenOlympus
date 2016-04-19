@@ -311,30 +311,6 @@ END;]]></definition>
 	</constraint>
 </table>
 
-<table name="property">
-	<schema name="public"/>
-	<role name="openolympus"/>
-	<position x="360" y="300"/>
-	<column name="id" not-null="true">
-		<type name="bigint"/>
-	</column>
-	<column name="property_key">
-		<type name="character varying" length="255"/>
-	</column>
-	<column name="property_value">
-		<type name="bytea"/>
-	</column>
-	<constraint name="property_pkey" type="pk-constr" table="public.property">
-		<columns names="id" ref-type="src-columns"/>
-	</constraint>
-	<constraint name="uk_4b6vatgj30955xsjr51yegxi9" type="uq-constr" table="public.property">
-		<columns names="property_value" ref-type="src-columns"/>
-	</constraint>
-	<constraint name="uk_8jytv8tu3pui7ram00b44tn4u" type="uq-constr" table="public.property">
-		<columns names="property_key" ref-type="src-columns"/>
-	</constraint>
-</table>
-
 <table name="solution">
 	<schema name="public"/>
 	<role name="openolympus"/>
@@ -402,7 +378,7 @@ END;]]></definition>
 <table name="task">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="1862.92" y="899.632"/>
+	<position x="1866.56" y="994.177"/>
 	<column name="id" not-null="true">
 		<type name="serial"/>
 	</column>
@@ -437,7 +413,7 @@ END;]]></definition>
 <table name="principal">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="1260.99" y="1120.28"/>
+	<position x="1091.42" y="944.299"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -452,7 +428,7 @@ END;]]></definition>
 <table name="USER">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="980" y="363.636"/>
+	<position x="1067.27" y="498.181"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -545,7 +521,7 @@ END;]]></definition>
 <table name="group">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="1550.8" y="1585.52"/>
+	<position x="1143.05" y="1096.81"/>
 	<column name="id" not-null="true" sequence="public.principal_sequence">
 		<type name="bigint"/>
 	</column>
@@ -1051,8 +1027,10 @@ BEGIN
       end_time =
            NEW.start_time
          + (NEW.duration * INTERVAL '1 MILLISECOND')
-         + (SELECT (  max (contest_participation.time_extension)
+         + (SELECT (  coalesce (max (contest_participation.time_extension),
+                                0)
                     * INTERVAL '1 MILLISECOND')
+              FROM contest_participation
              WHERE contest_participation.contest_id = NEW.id);
    ELSE
       end_time = NEW.start_time + (NEW.duration * INTERVAL '1 MILLISECOND');
@@ -1185,7 +1163,7 @@ END;]]></definition>
 <table name="group_permission">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="1830.48" y="1330.96"/>
+	<position x="1117.75" y="1307.32"/>
 	<column name="principal_id" not-null="true">
 		<type name="bigint"/>
 	</column>
@@ -1231,7 +1209,7 @@ END;]]></definition>
 <table name="group_users">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="967.026" y="1276.27"/>
+	<position x="707.026" y="1082.59"/>
 	<column name="can_add_others_to_group" not-null="true" default-value="false">
 		<type name="bool"/>
 	</column>
@@ -1256,11 +1234,7 @@ END;]]></definition>
 	 dst-table="public.group_users"
 	 src-required="true" dst-required="false"
 	 identifier="true"
->
-	<line>
-		<position x="1181.41" y="1624.9"/>
-	</line>
-</relationship>
+/>
 
 <relationship name="USER_has_many_group_users" type="rel1n"
 	 src-col-pattern="user_id"
@@ -1686,7 +1660,7 @@ END;]]></definition>
 <table name="contest_permission">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="1146.64" y="1715.59"/>
+	<position x="1705.78" y="1249.85"/>
 	<column name="permission" not-null="true">
 		<type name="public.contest_permission_type"/>
 	</column>
@@ -1832,7 +1806,7 @@ END;
 <table name="task_permission">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="1887.73" y="1116.99"/>
+	<position x="1740.36" y="773.832"/>
 	<column name="permission" not-null="true">
 		<type name="public.task_permission_type"/>
 	</column>
@@ -1874,7 +1848,7 @@ END;
 <table name="contest_tasks">
 	<schema name="public"/>
 	<role name="openolympus"/>
-	<position x="2194.74" y="1825.54"/>
+	<position x="2195.79" y="1816.07"/>
 
 	<customidxs object-type="column">
 		<object name="contest_id" index="0"/>
@@ -1973,13 +1947,13 @@ END;
 		<type name="integer"/>
 	</parameter>
 	<definition><![CDATA[SELECT (  contest.start_time
-           + (contest.duration * INTERVAL '1 MILLISECOND')
-           + (SELECT (  max (contest_participation.time_extension)
-                      * INTERVAL '1 MILLISECOND')
-                FROM contest_participation
-               WHERE contest_participation.contest_id = contest_id_p))
-     FROM contest
-    WHERE contest.id = contest_id_p]]></definition>
+        + (contest.duration * INTERVAL '1 MILLISECOND')
+        + (SELECT (  coalesce (max (contest_participation.time_extension), 0)
+                   * INTERVAL '1 MILLISECOND')
+             FROM contest_participation
+            WHERE contest_participation.contest_id = contest_id_p))
+  FROM contest
+ WHERE contest.id = contest_id_p]]></definition>
 </function>
 
 <function name="get_contest_end_for_user"
@@ -2003,15 +1977,88 @@ END;
 		<type name="bigint"/>
 	</parameter>
 	<definition><![CDATA[SELECT (  contest.start_time
-           + (contest.duration * INTERVAL '1 MILLISECOND')
-           + (SELECT (  contest_participation.time_extension
-                      * INTERVAL '1 MILLISECOND')
-                FROM contest_participation
-               WHERE     contest_participation.contest_id = contest_id_p
-                     AND contest_participation.user_id = user_id_p))
-     FROM contest
-    WHERE contest.id = contest_id_p]]></definition>
+        + (contest.duration * INTERVAL '1 MILLISECOND')
+        + (SELECT (  coalesce (contest_participation.time_extension, 0)
+                   * INTERVAL '1 MILLISECOND')
+             FROM contest_participation
+            WHERE     contest_participation.contest_id = contest_id_p
+                  AND contest_participation.user_id = user_id_p))
+  FROM contest
+ WHERE contest.id = contest_id_p]]></definition>
 </function>
+
+<index name="contest_participation_by_user_and_contest" table="public.contest_participation"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="contest_id"/>
+		</idxelement>
+		<idxelement use-sorting="false">
+			<column name="user_id"/>
+		</idxelement>
+</index>
+
+<index name="contest_participation_by_contest_and_score" table="public.contest_participation"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="contest_id"/>
+		</idxelement>
+		<idxelement use-sorting="true" nulls-first="false" asc-order="false">
+			<column name="score"/>
+		</idxelement>
+</index>
+
+<index name="contest_by_time" table="public.contest"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="start_time"/>
+		</idxelement>
+</index>
+
+<index name="verdict_by_solution_id" table="public.verdict"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="solution_id"/>
+		</idxelement>
+</index>
+
+<index name="solution_by_time_added" table="public.solution"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="false">
+			<column name="time_added"/>
+		</idxelement>
+</index>
+
+<index name="solution_by_score" table="public.solution"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="false">
+			<column name="score"/>
+		</idxelement>
+</index>
+
+<index name="solution_by_user_and_score" table="public.solution"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="user_id"/>
+		</idxelement>
+		<idxelement use-sorting="false">
+			<column name="score"/>
+		</idxelement>
+</index>
+
+<index name="user_by_username" table="public.&quot;USER&quot;"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="username"/>
+		</idxelement>
+</index>
 
 <constraint name="user_principal_id_mapping" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="public.principal" table="public.&quot;USER&quot;">

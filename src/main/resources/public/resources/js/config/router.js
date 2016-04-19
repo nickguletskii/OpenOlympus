@@ -22,6 +22,9 @@
  */
 import angular from "angular";
 import module from "app";
+import {
+	merge as _merge
+} from "lodash";
 
 export function initialiseRouterLogic() {
 	module.config(/* @ngInject*/ ($locationProvider) => {
@@ -31,7 +34,6 @@ export function initialiseRouterLogic() {
 		.run(/* @ngInject*/ ($rootScope, $stateParams,
 			$location, $state, $window, $injector, $log) => {
 			// Make state parameters easily accessible
-			$rootScope.stateParams = $stateParams;
 			$rootScope.$on("$stateNotFound",
 				(event, unfoundState) => {
 					$log.error("Couldn't find state: ", unfoundState);
@@ -78,6 +80,7 @@ export function initialiseRouterLogic() {
 			$rootScope.$on("$stateChangeSuccess",
 				(event, toState, toParams, fromState, fromParams) => {
 					$rootScope.stateConfig = toState;
+					$rootScope.stateParams = toParams;
 				});
 
 			$rootScope.$on("$stateChangeError",
@@ -90,5 +93,10 @@ export function initialiseRouterLogic() {
 						$rootScope.showErrorModal = true;
 					}
 				});
+			$rootScope.changePage = (page) => {
+				$state.go(".", _merge($rootScope.stateParams, {
+					page
+				}));
+			};
 		});
 }
