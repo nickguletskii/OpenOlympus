@@ -41,7 +41,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<skipTests>true</skipTests>
-		<jooq.version>3.7.2</jooq.version>
+		<jooq.version>3.7.3</jooq.version>
 		<postgresql.version>9.4.1208</postgresql.version>
 	</properties>
 	<parent>
@@ -131,7 +131,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>commons-email</groupId>
+			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
 			<version>1.1</version>
 		</dependency>
