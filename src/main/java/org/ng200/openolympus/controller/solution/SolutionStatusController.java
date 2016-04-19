@@ -52,15 +52,15 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityOr({
 				@SecurityAnd({
 								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = UserIsOwnerOfSolutionSecurityPredicate.class)
-		}),
+				}),
 
 				@SecurityAnd({
 								@SecurityLeaf(value = SecurityClearanceType.ANONYMOUS, predicates = SolutionIsInContestModeratedByCurrentUserSecurityPredicate.class)
-		}),
+				}),
 
 				@SecurityAnd({
 								@SecurityLeaf(value = SecurityClearanceType.VIEW_ALL_SOLUTIONS)
-		})
+				})
 
 })
 public class SolutionStatusController {
@@ -74,6 +74,10 @@ public class SolutionStatusController {
 		public SolutionDto(List<Verdict> verdicts) {
 			super();
 			this.verdicts = verdicts;
+			this.score = verdicts.stream().map(v -> v.getScore())
+					.reduce(BigDecimal.ZERO, (l, r) -> l.add(r));
+			this.maximumScore = verdicts.stream().map(v -> v.getMaximumScore())
+					.reduce(BigDecimal.ZERO, (l, r) -> l.add(r));
 		}
 
 		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)

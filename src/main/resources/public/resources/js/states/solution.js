@@ -22,38 +22,56 @@
  */
 
 import Util from "oolutil";
-
+import {
+	every as _every
+} from "lodash";
 const controller =
 	/* @ngInject*/
 	($timeout, $scope, $stateParams, SolutionService, data) => {
 		const DELAY_MIN = 100;
 		const DELAY_STEP = 100;
 		const DELAY_MAX = 1000;
+		const FINISHED_MULTIPLIER = 10;
 		let delay = DELAY_MIN;
 
-		function setData(solution) {
+		const setData = (solution) => {
 			if (!Util.equalsWithoutAngular($scope.solution, solution)) {
 				$scope.solution = solution;
 				delay = DELAY_MIN;
 			}
 			return solution;
-		}
+		};
 
-		function update(callback) {
+		const update = (callback) => {
 			SolutionService.getVerdicts($stateParams.solutionId)
 				.then(setData)
 				.then(callback);
-		}
+		};
+
+		$scope.isTested = (verdict) =>
+			(verdict.status !== "being_tested" &&
+				verdict.status !== "waiting");
+		const multiplier = () => {
+			if (!$scope.solution) {
+				return 1;
+			}
+			if (_every($scope.solution.verdicts, $scope.isTested)) {
+				return FINISHED_MULTIPLIER;
+			}
+			return 1;
+		};
 		setData(data);
 
 		let promise;
 
-		function poller() {
-			delay = Math.min(delay + DELAY_STEP, DELAY_MAX);
+		const poller = () => {
+			delay = Math.min(delay + multiplier() * DELAY_STEP, multiplier() *
+				DELAY_MAX);
 			update(() => {
 				promise = $timeout(poller, delay);
 			});
-		}
+		};
+
 		promise = $timeout(poller, delay);
 		$scope.$on("$destroy", () => {
 			$timeout.cancel(promise);

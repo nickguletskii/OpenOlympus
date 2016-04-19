@@ -27,12 +27,12 @@
         id="verdictTable">
         <thead>
             <tr class="info">
-                <th width="50">{{ 'solution.verdict.score' | translate }}</th>
-                <th width="50">{{ 'solution.verdict.maximumScore' | translate }}</th>
-                <th width="50">{{ 'solution.verdict.cpuTime' | translate }}</th>
-                <th width="50">{{ 'solution.verdict.realTime' | translate }}</th>
-                <th width="50">{{ 'solution.verdict.memory' | translate }}</th>
-                <th>{{ 'solution.verdict.message' | translate }}</th>
+                <th>{{ 'solution.verdict.score' | translate }}</th>
+                <th>{{ 'solution.verdict.maximumScore' | translate }}</th>
+                <th>{{ 'solution.verdict.cpuTime' | translate }}</th>
+                <th>{{ 'solution.verdict.realTime' | translate }}</th>
+                <th>{{ 'solution.verdict.memory' | translate }}</th>
+                <th>{{ 'solution.verdict.status' | translate }}</th>
             </tr>
             <tr id="totalHeader"
                 class="total">
@@ -46,13 +46,13 @@
         </thead>
         <tbody>
             <tr ng-repeat="verdict in solution.verdicts track by verdict.id"
-                ng-class="{success: verdict.score===verdict.maximumScore, danger: verdict.score!==verdict.maximumScore &amp;&amp; verdict.tested}">
+                ng-class="{success: verdict.score===verdict.maximumScore, danger: verdict.score!==verdict.maximumScore &amp;&amp; isTested(verdict)}">
                 <td>{{verdict.score | minusOneNoValue}}</td>
                 <td>{{verdict.maximumScore | minusOneNoValue}}</td>
                 <td>{{verdict.cpuTime | minusOneNoValue}}</td>
                 <td>{{verdict.realTime | minusOneNoValue}}</td>
                 <td>{{verdict.memoryPeak | toKB | minusOneNoValue}} KB</td>
-                <td translate="{{verdict.message}}"
+                <td translate="{{ ('solution.verdict.status.'+verdict.status) | translate }}"
                     translate-values="{info: verdict.additionalInformation}"></td>
             </tr>
         </tbody>

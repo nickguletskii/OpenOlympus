@@ -22,7 +22,7 @@
  */
 import {
 	mapValues as _mapValues,
-	pick as _pick,
+	pickBy as _pickBy,
 	isString as _isString,
 	isObject as _isObject,
 	isEqual as _isEqual
@@ -32,9 +32,9 @@ export default class OpenOlympusUtils {
 		if (!_isObject(obj)) {
 			return obj;
 		}
-		return _mapValues(_pick(obj, (name) => {
+		return _mapValues(_pickBy(obj, (value, name) => {
 			if (_isString(name)) {
-				return name.substring(0, 1) === "$";
+				return name.substring(0, 1) !== "$";
 			}
 			return true;
 		}), OpenOlympusUtils.removeAngularElements);

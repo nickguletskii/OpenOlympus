@@ -58,7 +58,7 @@
                     uib-tooltip="{{ 'archive.list.task.rejudgeButton' | translate }}"
                     class=" hidden-print pull-right btn btn-warning btn-xs fa fa-refresh "
                     ui-sref=".rejudgeTaskConfirmation({taskId: task.id})"
-                    ng-if="security.hasAnyPermission('rejudge_tasks')">
+                    ng-if="security.hasPermissionImmediate('rejudge_tasks')">
                 </button>
             </td>
         </tr>

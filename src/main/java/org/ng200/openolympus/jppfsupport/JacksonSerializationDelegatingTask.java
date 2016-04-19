@@ -32,6 +32,8 @@ import org.jppf.node.protocol.AbstractTask;
 import org.ng200.openolympus.cerberus.util.ExceptionalProducer;
 import org.ng200.openolympus.exceptions.GeneralNestedRuntimeException;
 import org.ng200.openolympus.factory.JacksonSerializationFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,6 +47,10 @@ public class JacksonSerializationDelegatingTask<V, T extends ExceptionalProducer
 	 *
 	 */
 	private static final long serialVersionUID = -4648573373270853023L;
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(JacksonSerializationDelegatingTask.class);
+
 	private static final ObjectMapper OBJECT_MAPPER = JacksonSerializationFactory
 			.createObjectMapper();
 	private final String value;
@@ -60,9 +66,15 @@ public class JacksonSerializationDelegatingTask<V, T extends ExceptionalProducer
 
 	public JsonTaskExecutionResult<V> getResultOrThrowable()
 			throws JsonParseException, JsonMappingException, IOException {
-		return JacksonSerializationDelegatingTask.OBJECT_MAPPER.readValue(
-				this.getResult(),
-				JsonTaskExecutionResult.class);
+		try {
+			return JacksonSerializationDelegatingTask.OBJECT_MAPPER.readValue(
+					this.getResult(),
+					JsonTaskExecutionResult.class);
+		} catch (JsonMappingException e) {
+			logger.error("Couldn't deserialize execution result: {}",
+					this.getResult());
+			throw e;
+		}
 	}
 
 	@Override
