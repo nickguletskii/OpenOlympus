@@ -111,8 +111,10 @@ public class ContestTimingService {
 
 		return this.dslContext
 				.selectFrom(Routines.getContestsThatIntersect(
-						PostgresSupport.CURRENT_TIMESTAMP,
-						PostgresSupport.CURRENT_TIMESTAMP))
+						DSL.field("(?::TIMESTAMP WITH TIME ZONE)", startDate)
+								.cast(OffsetDateTime.class),
+						DSL.field("(?::TIMESTAMP WITH TIME ZONE)", endDate)
+								.cast(OffsetDateTime.class)))
 				.fetchInto(Contest.class);
 	}
 

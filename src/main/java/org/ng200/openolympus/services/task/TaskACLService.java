@@ -56,8 +56,8 @@ public class TaskACLService {
 	}
 
 	public void createDefaultTaskACL(Task task, User owner) {
-		final TaskPermissionRecord permissionRecord = new TaskPermissionRecord(TaskPermissionType.manage_acl,
-				task.getId(), owner.getId());
+		final TaskPermissionRecord permissionRecord = new TaskPermissionRecord(
+				task.getId(), owner.getId(), TaskPermissionType.manage_acl);
 		permissionRecord.attach(this.dslContext.configuration());
 		permissionRecord.insert();
 	}

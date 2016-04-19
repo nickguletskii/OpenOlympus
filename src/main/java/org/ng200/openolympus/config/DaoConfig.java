@@ -31,7 +31,6 @@ import org.ng200.openolympus.jooq.tables.daos.ContestTasksDao;
 import org.ng200.openolympus.jooq.tables.daos.GroupDao;
 import org.ng200.openolympus.jooq.tables.daos.GroupUsersDao;
 import org.ng200.openolympus.jooq.tables.daos.PrincipalDao;
-import org.ng200.openolympus.jooq.tables.daos.PropertyDao;
 import org.ng200.openolympus.jooq.tables.daos.SolutionDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskDao;
 import org.ng200.openolympus.jooq.tables.daos.TaskPermissionDao;
@@ -91,12 +90,7 @@ public class DaoConfig {
 	public PrincipalDao principalDao() {
 		return new PrincipalDao(this.dslContext.configuration());
 	}
-
-	@Bean
-	public PropertyDao propertyDao() {
-		return new PropertyDao(this.dslContext.configuration());
-	}
-
+	
 	@Bean
 	public SolutionDao solutionDao() {
 		return new SolutionDao(this.dslContext.configuration());

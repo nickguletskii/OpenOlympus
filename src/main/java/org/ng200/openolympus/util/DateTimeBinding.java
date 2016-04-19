@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Types;
 import java.time.OffsetDateTime;
-import java.util.Objects;
 
 import org.jooq.Binding;
 import org.jooq.BindingGetResultSetContext;
@@ -108,7 +107,7 @@ public class DateTimeBinding
 	public void register(BindingRegisterContext<OffsetDateTime> ctx)
 			throws SQLException {
 		ctx.statement().registerOutParameter(ctx.index(),
-				Types.TIMESTAMP_WITH_TIMEZONE);
+				Types.TIMESTAMP_WITH_TIMEZONE, "TIMESTAMP WITH TIME ZONE");
 	}
 
 	@Override
@@ -120,8 +119,9 @@ public class DateTimeBinding
 	@Override
 	public void set(BindingSetStatementContext<OffsetDateTime> ctx)
 			throws SQLException {
-		ctx.statement().setString(ctx.index(),
-				Objects.toString(ctx.convert(this.converter()).value(), null));
+		ctx.statement().setObject(ctx.index(),
+				ctx.convert(this.converter()).value(),
+				Types.TIMESTAMP_WITH_TIMEZONE);
 	}
 
 	@Override
