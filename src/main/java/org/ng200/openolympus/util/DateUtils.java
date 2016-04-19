@@ -22,6 +22,7 @@
  */
 package org.ng200.openolympus.util;
 
+import java.time.OffsetDateTime;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -37,4 +38,8 @@ public class DateUtils {
 			.toFormatter()
 			.withChronology(IsoChronology.INSTANCE)
 			.withResolverStyle(ResolverStyle.STRICT);
+
+	public static OffsetDateTime parse(String string) {
+		return OffsetDateTime.parse(string, ISO_OFFSET_DATE_TIME);
+	}
 }
