@@ -95,6 +95,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 				.csrf()
 				.csrfTokenRepository(this.csrfTokenRepository())
+				.ignoringAntMatchers("/git/**")
 				.and()
 				.headers()
 				.xssProtection()
