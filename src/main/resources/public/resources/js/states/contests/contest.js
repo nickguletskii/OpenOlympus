@@ -25,7 +25,8 @@ import moment from "moment";
 
 const controller =
 	/* @ngInject*/
-	($timeout, $scope, $rootScope, $stateParams, contest, datetime, ContestService) => {
+	($timeout, $scope, $rootScope, $stateParams, contest, datetime, ContestService,
+		SecurityService) => {
 		function updateTasks() {
 			ContestService.getContestInfo($stateParams.contestId)
 				.then((contestInfo) => {
@@ -44,8 +45,8 @@ const controller =
 
 		const tick = () => {
 			$scope.$apply(() => {
-				const end = moment(contest.timings.endTimeIncludingTimeExtensions || contest.timings.endTime);
-				console.log(datetime.currentServerTime(), end);
+				const end = moment(contest.timings.endTimeIncludingTimeExtensions ||
+					contest.timings.endTime);
 				if (datetime.currentServerTime()
 					.isBefore(moment(contest.timings.startTime))) {
 					$scope.contest.countdown = datetime.timeTo(contest.timings.startTime);
@@ -70,6 +71,11 @@ const controller =
 		$rootScope.$on("taskAddedToContest", () => {
 			updateTasks();
 		});
+		SecurityService
+			.hasContestPermission($stateParams.contestId, "remove_task")
+			.then(canRemoveTasks => {
+				$scope.canRemoveTasks = canRemoveTasks;
+			});
 	};
 
 export default {

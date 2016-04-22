@@ -23,33 +23,32 @@
 
 -->
 <table class="table table-striped table-bordered table-hover"
-    id="tasksTable">
-    <thead>
-        <tr>
-            <th width="180">{{'user.solutions.submissionTime' | translate}}</th>
-            <th>{{ 'user.solutions.taskName' | translate}}</th>
-            <th width="50">{{ 'user.solutions.score' | translate}}</th>
-            <th width="50">{{ 'user.solutions.maximumScore' | translate}}</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="solution in solutions">
-            <td>
-                <a secref
-                    ui-sref="solutionView({solutionId: solution.id})">{{solution.submissionTime | localiseTimestamped}}</a>
-            </td>
-            <td>{{solution.task.name}}</td>
-            <td>{{solution.score}}</td>
-            <td>{{solution.maximumScore}}</td>
-        </tr>
-    </tbody>
+				id="tasksTable">
+	<thead>
+		<tr>
+			<th width="180">{{'user.solutions.submissionTime' | translate}}</th>
+			<th>{{ 'user.solutions.taskName' | translate}}</th>
+			<th width="50">{{ 'user.solutions.score' | translate}}</th>
+			<th width="50">{{ 'user.solutions.maximumScore' | translate}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="solution in solutions">
+			<td>
+				<a ui-sref="solutionView({solutionId: solution.id})">{{solution.timeAdded | localiseTimestamped}}</a>
+			</td>
+			<td>{{solution.task.name}}</td>
+			<td>{{solution.score}}</td>
+			<td>{{solution.maximumScore}}</td>
+		</tr>
+	</tbody>
 </table>
 <uib-pagination total-items="solutionCount"
-    ng-model="page"
-    ng-change="changePage(page)"
-    previous-text="&lsaquo;"
-    next-text="&rsaquo; "
-    first-text="&laquo; "
-    last-text="&raquo; "
-    direction-links="true "
-    boundary-links="true "></uib-pagination>
+				ng-model="page"
+				ng-change="changePage(page)"
+				previous-text="&lsaquo;"
+				next-text="&rsaquo; "
+				first-text="&laquo; "
+				last-text="&raquo; "
+				direction-links="true "
+				boundary-links="true "></uib-pagination>

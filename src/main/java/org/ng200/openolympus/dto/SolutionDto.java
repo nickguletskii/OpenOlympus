@@ -26,6 +26,7 @@ import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
+import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.predicates.SolutionSecurityPredicate;
 
 @SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionSecurityPredicate.class)
@@ -36,18 +37,33 @@ public class SolutionDto extends Solution {
 	 */
 	private static final long serialVersionUID = 6222576840807621528L;
 
+	public static long getSerialversionuid() {
+		return SolutionDto.serialVersionUID;
+	}
+
 	private Task task;
 
-	public SolutionDto(Task task) {
-		this.setTask(task);
+	private User user;
+
+	public SolutionDto(Task task, User user) {
+		this.task = task;
+		this.user = user;
 	}
 
 	public Task getTask() {
 		return this.task;
 	}
 
+	public User getUser() {
+		return this.user;
+	}
+
 	public void setTask(Task task) {
 		this.task = task;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

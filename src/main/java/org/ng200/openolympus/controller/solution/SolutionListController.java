@@ -109,7 +109,8 @@ public class SolutionListController {
 				.map(solution -> {
 					SolutionDto solutionDto = new SolutionDto(
 							this.taskCRUDService
-									.getById(solution.getTaskId()));
+									.getById(solution.getTaskId()),
+							this.userService.getUserById(solution.getUserId()));
 					BeanUtils.copyProperties(solution, solutionDto);
 					return solutionDto;
 				})
@@ -147,7 +148,7 @@ public class SolutionListController {
 				.map(solution -> {
 					SolutionDto solutionDto = new SolutionDto(
 							this.taskCRUDService
-									.getById(solution.getTaskId()));
+									.getById(solution.getTaskId()), null);
 					BeanUtils.copyProperties(solution, solutionDto);
 					return solutionDto;
 

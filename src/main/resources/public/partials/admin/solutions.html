@@ -24,33 +24,40 @@
 -->
 <!DOCTYPE html>
 <table class="table table-striped table-bordered table-hover"
-    id="tasksTable">
-    <thead>
-        <tr>
-            <th width="180">{{'admin.solutions.submissionTime' | translate}}</th>
-            <th>{{ 'admin.solutions.taskName' | translate}}</th>
-            <th width="50">{{ 'admin.solutions.score' | translate}}</th>
-            <th width="50">{{ 'admin.solutions.maximumScore' | translate}}</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="solution in solutions">
-            <td>
-                <a secref
-                    ui-sref="solutionView({solutionId: solution.id})">{{solution.submissionTime | localiseTimestamped}}</a>
-            </td>
-            <td>{{solution.task.name}}</td>
-            <td>{{solution.score}}</td>
-            <td>{{solution.maximumScore}}</td>
-        </tr>
-    </tbody>
+				id="tasksTable">
+	<thead>
+		<tr>
+			<th width="180">{{'admin.solutions.submissionTime' | translate}}</th>
+			<th>{{ 'admin.solutions.username' | translate}}</th>
+			<th>{{ 'admin.solutions.firstName' | translate}}</th>
+			<th>{{ 'admin.solutions.middleName' | translate}}</th>
+			<th>{{ 'admin.solutions.lastName' | translate}}</th>
+			<th>{{ 'admin.solutions.taskName' | translate}}</th>
+			<th width="50">{{ 'admin.solutions.score' | translate}}</th>
+			<th width="50">{{ 'admin.solutions.maximumScore' | translate}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="solution in solutions">
+			<td>
+				<a ui-sref="solutionView({solutionId: solution.id})">{{solution.timeAdded | localiseTimestamped}}</a>
+			</td>
+			<td>{{solution.user.username}}</td>
+			<td>{{solution.user.firstNameMain}}</td>
+			<td>{{solution.user.middleNameMain}}</td>
+			<td>{{solution.user.lastNameMain}}</td>
+			<td>{{solution.task.name}}</td>
+			<td>{{solution.score}}</td>
+			<td>{{solution.maximumScore}}</td>
+		</tr>
+	</tbody>
 </table>
 <uib-pagination total-items="solutionCount"
-    ng-model="page"
-    ng-change="changePage(page)"
-    previous-text="&lsaquo;"
-    next-text="&rsaquo; "
-    first-text="&laquo; "
-    last-text="&raquo; "
-    direction-links="true "
-    boundary-links="true "></uib-pagination>
+				ng-model="page"
+				ng-change="changePage(page)"
+				previous-text="&lsaquo;"
+				next-text="&rsaquo; "
+				first-text="&laquo; "
+				last-text="&raquo; "
+				direction-links="true "
+				boundary-links="true "></uib-pagination>

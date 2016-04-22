@@ -270,9 +270,6 @@ public class TestingService {
 		this.verdictCheckSchedulingExecutorService.scheduleAtFixedRate(
 				() -> {
 					synchronized (schedulerLock) {
-						TestingService.logger.info(
-								"Collecting garbage! Solution judges to process: {}",
-								solutionsToSweep.size());
 						solutionsToSweep.stream()
 								.filter(id -> solutionTestingComplete(id))
 								.forEach(id -> {
