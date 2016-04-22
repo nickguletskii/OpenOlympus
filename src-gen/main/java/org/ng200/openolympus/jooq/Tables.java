@@ -38,6 +38,7 @@ import org.ng200.openolympus.jooq.tables.ContestPermission;
 import org.ng200.openolympus.jooq.tables.ContestQuestion;
 import org.ng200.openolympus.jooq.tables.ContestTasks;
 import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
+import org.ng200.openolympus.jooq.tables.GetRunningContest;
 import org.ng200.openolympus.jooq.tables.Group;
 import org.ng200.openolympus.jooq.tables.GroupPermission;
 import org.ng200.openolympus.jooq.tables.GroupUsers;
@@ -111,6 +112,18 @@ public class Tables {
 	 */
 	public static GetContestsThatIntersect GET_CONTESTS_THAT_INTERSECT(Field<OffsetDateTime> timeRangeStart, Field<OffsetDateTime> timeRangeEnd) {
 		return GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT.call(timeRangeStart, timeRangeEnd);
+	}
+
+	/**
+	 * The table public.get_running_contest
+	 */
+	public static final GetRunningContest GET_RUNNING_CONTEST = org.ng200.openolympus.jooq.tables.GetRunningContest.GET_RUNNING_CONTEST;
+
+	/**
+	 * Get <code>public.get_running_contest</code> as a table.
+	 */
+	public static GetRunningContest GET_RUNNING_CONTEST() {
+		return GetRunningContest.GET_RUNNING_CONTEST.call();
 	}
 
 	/**

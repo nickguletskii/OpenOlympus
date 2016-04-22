@@ -27,19 +27,28 @@ import {
 import {
 	services
 } from "app";
-services.factory("PromiseUtils", /* @ngInject*/ ($q) => {
-	return {
-		and: () => $q.all(
-				_map(arguments, arg => $q.when(arg))
+
+class PromiseUtils {
+	/* @ngInject*/
+	constructor($q) {
+		this.$q = $q;
+	}
+	and(...args) {
+		return this.$q.all(
+				_map(args, arg => this.$q.when(arg))
 			)
 			.then(all =>
 				_reduce(all,
-					(flattened, other) => flattened && other, true)),
-		or: () => $q.all(
-				_map(arguments, arg => $q.when(arg))
+					(flattened, other) => flattened && other, true));
+	}
+	or(...args) {
+		return this.$q.all(
+				_map(args, arg => this.$q.when(arg))
 			)
 			.then(all =>
 				_reduce(all,
-					(flattened, other) => flattened || other, false))
-	};
-});
+					(flattened, other) => flattened || other, false));
+	}
+}
+
+services.service("PromiseUtils", PromiseUtils);

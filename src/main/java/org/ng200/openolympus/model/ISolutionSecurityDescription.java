@@ -40,6 +40,7 @@ public interface ISolutionSecurityDescription extends ISolution {
 	public Long getId();
 
 	@Override
+	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
 	public BigDecimal getMaximumScore();
 
 	@Override

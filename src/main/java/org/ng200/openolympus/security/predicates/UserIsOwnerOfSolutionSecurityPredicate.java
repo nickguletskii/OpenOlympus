@@ -41,7 +41,7 @@ public class UserIsOwnerOfSolutionSecurityPredicate
 
 	@MethodSecurityPredicate
 	public SecurityClearanceType predicate(@CurrentUser User user,
-			@Parameter("solution") Solution solution) {
+			@Parameter("id") Solution solution) {
 		if (solution.getUserId() == user.getId()) {
 			return SecurityClearanceType.ANONYMOUS;
 		}

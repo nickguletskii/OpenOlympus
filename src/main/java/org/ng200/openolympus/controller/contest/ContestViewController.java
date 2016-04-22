@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
+import org.ng200.openolympus.controller.contest.ContestViewController.ContestDTO;
 import org.ng200.openolympus.jooq.enums.ContestPermissionType;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
@@ -42,6 +43,7 @@ import org.ng200.openolympus.services.contest.ContestTasksService;
 import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,25 +57,20 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityOr({
 				@SecurityAnd({
 								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER)
-		})
+				})
 })
 public class ContestViewController {
 
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = UserKnowsAboutContestSecurityPredicate.class)
-	public static class ContestDTO {
+	public static class ContestDTO extends Contest {
 		private String name;
 		private TimingDTO timings;
 		private List<Task> tasks;
 
-		public ContestDTO(String name, TimingDTO timings, List<Task> tasks) {
+		public ContestDTO() {
 			super();
-			this.name = name;
 			this.timings = timings;
 			this.tasks = tasks;
-		}
-
-		public String getName() {
-			return this.name;
 		}
 
 		public List<Task> getTasks() {
@@ -84,17 +81,16 @@ public class ContestViewController {
 			return this.timings;
 		}
 
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public void setTasks(List<Task> tasks) {
+		public ContestDTO setTasks(List<Task> tasks) {
 			this.tasks = tasks;
+			return this;
 		}
 
-		public void setTimings(TimingDTO timings) {
+		public ContestDTO setTimings(TimingDTO timings) {
 			this.timings = timings;
+			return this;
 		}
+
 	}
 
 	public static class TimingDTO {
@@ -175,16 +171,19 @@ public class ContestViewController {
 		final List<Task> tasks = this.canViewTasks(user, contest)
 				? this.contestTasksService.getContestTasks(contest)
 				: null;
-		return new ContestDTO(contest.getName(),
-				new TimingDTO(this.contestTimingService
-						.getContestStartIncludingAllTimeExtensions(contest),
-						this.contestTimingService
-								.getContestEndIncludingAllTimeExtensions(
-										contest),
-						this.contestTimingService.getContestStartTimeForUser(
-								contest,
-								user)),
-				tasks);
+		ContestDTO contestDto = new ContestDTO();
+		BeanUtils.copyProperties(contest, contestDto);
+		contestDto.setTasks(tasks);
+		contestDto.setTimings(new TimingDTO(this.contestTimingService
+				.getContestStartIncludingAllTimeExtensions(contest),
+				this.contestTimingService
+						.getContestEndIncludingAllTimeExtensions(
+								contest),
+				this.contestTimingService.getContestEndTimeForUser(
+						contest,
+						user)));
+
+		return contestDto;
 	}
 
 }

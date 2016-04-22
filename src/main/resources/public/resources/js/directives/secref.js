@@ -108,7 +108,9 @@ directives.directive("secref",
 				if (!allowed) {
 					ngIf(false);
 				} else if (allowed.then) {
-					allowed.then((val) => ngIf(val));
+					allowed.then((val) => {
+						ngIf(val);
+					});
 				} else {
 					ngIf(allowed);
 				}

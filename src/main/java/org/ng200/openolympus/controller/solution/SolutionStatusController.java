@@ -38,6 +38,7 @@ import org.ng200.openolympus.security.predicates.SolutionScoreSecurityPredicate;
 import org.ng200.openolympus.security.predicates.SolutionSecurityPredicate;
 import org.ng200.openolympus.security.predicates.UserIsOwnerOfSolutionSecurityPredicate;
 import org.ng200.openolympus.services.SolutionService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,7 +67,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SolutionStatusController {
 
 	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionSecurityPredicate.class)
-	public static class SolutionDto {
+	public static class SolutionDto extends Solution {
 		private BigDecimal score;
 		private BigDecimal maximumScore;
 		private List<Verdict> verdicts;
@@ -74,12 +75,6 @@ public class SolutionStatusController {
 		public SolutionDto(List<Verdict> verdicts) {
 			super();
 			this.verdicts = verdicts;
-			this.score = verdicts.stream().map(v -> v.getScore())
-					.filter(s -> s != null)
-					.reduce(BigDecimal.ZERO, (l, r) -> l.add(r));
-			this.maximumScore = verdicts.stream().map(v -> v.getMaximumScore())
-					.filter(s -> s != null)
-					.reduce(BigDecimal.ZERO, (l, r) -> l.add(r));
 		}
 
 		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
@@ -95,14 +90,6 @@ public class SolutionStatusController {
 		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
 		public List<Verdict> getVerdicts() {
 			return this.verdicts;
-		}
-
-		public void setMaximumScore(BigDecimal maximumScore) {
-			this.maximumScore = maximumScore;
-		}
-
-		public void setScore(BigDecimal score) {
-			this.score = score;
 		}
 
 		public void setVerdicts(List<Verdict> verdicts) {
@@ -123,6 +110,7 @@ public class SolutionStatusController {
 				.stream()
 				.sorted((l, r) -> Long.compare(l.getId(), r.getId()))
 				.collect(Collectors.toList()));
+		BeanUtils.copyProperties(solution, dto);
 		return dto;
 	}
 }

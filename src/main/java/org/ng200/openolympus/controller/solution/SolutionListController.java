@@ -39,6 +39,7 @@ import org.ng200.openolympus.services.SolutionService;
 import org.ng200.openolympus.services.UserService;
 import org.ng200.openolympus.services.contest.ContestTimingService;
 import org.ng200.openolympus.services.task.TaskCRUDService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.ui.Model;
@@ -68,7 +69,7 @@ public class SolutionListController {
 	@SecurityOr({
 					@SecurityAnd({
 									@SecurityLeaf(SecurityClearanceType.VIEW_ALL_SOLUTIONS)
-			})
+					})
 	})
 	@RequestMapping(value = "/api/admin/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCount(final User user) {
@@ -78,7 +79,7 @@ public class SolutionListController {
 	@SecurityOr({
 					@SecurityAnd({
 									@SecurityLeaf(SecurityClearanceType.APPROVED_USER)
-			})
+					})
 	})
 	@RequestMapping(value = "/api/user/solutionsCount", method = RequestMethod.GET)
 	public long getSolutionCountForUser(final Principal principal) {
@@ -96,7 +97,7 @@ public class SolutionListController {
 	@SecurityOr({
 					@SecurityAnd({
 									@SecurityLeaf(SecurityClearanceType.VIEW_ALL_SOLUTIONS)
-			})
+					})
 	})
 	@RequestMapping(value = "/api/admin/solutions", method = RequestMethod.GET)
 	public List<SolutionDto> showAllSolutions(
@@ -105,15 +106,20 @@ public class SolutionListController {
 		return this.solutionService
 				.getPage(pageNumber, SolutionListController.PAGE_SIZE)
 				.stream()
-				.map(solution -> new SolutionDto(solution, this.taskCRUDService
-						.getById(solution.getTaskId())))
+				.map(solution -> {
+					SolutionDto solutionDto = new SolutionDto(
+							this.taskCRUDService
+									.getById(solution.getTaskId()));
+					BeanUtils.copyProperties(solution, solutionDto);
+					return solutionDto;
+				})
 				.collect(Collectors.toList());
 	}
 
 	@SecurityOr({
 					@SecurityAnd({
 									@SecurityLeaf(SecurityClearanceType.APPROVED_USER)
-			})
+					})
 	})
 	@RequestMapping(value = "/api/user/solutions", method = RequestMethod.GET)
 
@@ -138,13 +144,13 @@ public class SolutionListController {
 
 		return solutions
 				.stream()
-				.map(solution -> new SolutionDto(solution, this.taskCRUDService
-						.getById(solution.getTaskId())))
-				.map(dto -> {
-					if (contest != null) {
-						dto.setScore(null);
-					}
-					return dto;
+				.map(solution -> {
+					SolutionDto solutionDto = new SolutionDto(
+							this.taskCRUDService
+									.getById(solution.getTaskId()));
+					BeanUtils.copyProperties(solution, solutionDto);
+					return solutionDto;
+
 				}).collect(Collectors.toList());
 	}
 }

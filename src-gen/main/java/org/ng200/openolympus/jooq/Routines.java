@@ -96,6 +96,7 @@ import org.ng200.openolympus.jooq.routines.UpdateSolution;
 import org.ng200.openolympus.jooq.routines.UpdateUserInContest;
 import org.ng200.openolympus.jooq.routines.UserImmutableColumns;
 import org.ng200.openolympus.jooq.tables.GetContestsThatIntersect;
+import org.ng200.openolympus.jooq.tables.GetRunningContest;
 
 
 /**
@@ -1653,5 +1654,12 @@ public class Routines {
 	 */
 	public static GetContestsThatIntersect getContestsThatIntersect(Field<OffsetDateTime> timeRangeStart, Field<OffsetDateTime> timeRangeEnd) {
 		return GetContestsThatIntersect.GET_CONTESTS_THAT_INTERSECT.call(timeRangeStart, timeRangeEnd);
+	}
+
+	/**
+	 * Get <code>public.get_running_contest</code> as a table.
+	 */
+	public static GetRunningContest getRunningContest() {
+		return GetRunningContest.GET_RUNNING_CONTEST.call();
 	}
 }

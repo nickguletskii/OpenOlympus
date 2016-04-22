@@ -44,15 +44,17 @@ const controller =
 
 		const tick = () => {
 			$scope.$apply(() => {
+				const end = moment(contest.timings.endTimeIncludingTimeExtensions || contest.timings.endTime);
+				console.log(datetime.currentServerTime(), end);
 				if (datetime.currentServerTime()
 					.isBefore(moment(contest.timings.startTime))) {
 					$scope.contest.countdown = datetime.timeTo(contest.timings.startTime);
 					$scope.contest.countdownKey = "contest.timeToStart";
 					prevValue = "timeToStart";
 				} else if (datetime.currentServerTime()
-					.isBefore(moment(contest.timings.endTimeIncludingTimeExtensions))) {
+					.isBefore(end)) {
 					$scope.contest.countdown =
-						datetime.timeTo(contest.timings.endTimeIncludingTimeExtensions);
+						datetime.timeTo(end);
 					$scope.contest.countdownKey = "contest.timeToEnd";
 					if (prevValue === "timeToStart") {
 						updateTasks();

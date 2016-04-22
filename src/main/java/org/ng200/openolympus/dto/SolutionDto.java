@@ -22,90 +22,32 @@
  */
 package org.ng200.openolympus.dto;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-
 import org.ng200.openolympus.SecurityClearanceType;
 import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.Solution;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
-import org.ng200.openolympus.security.predicates.SolutionScoreSecurityPredicate;
 import org.ng200.openolympus.security.predicates.SolutionSecurityPredicate;
 
 @SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionSecurityPredicate.class)
-public class SolutionDto implements Serializable {
+public class SolutionDto extends Solution {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 6222576840807621528L;
 
-	private long id;
-	private long userId;
-
-	private BigDecimal score;
-	private BigDecimal maximumScore;
-	private OffsetDateTime submissionTime;
 	private Task task;
 
-	public SolutionDto(Solution solution, Task task) {
-		this.id = solution.getId();
-		this.userId = solution.getUserId();
-		this.score = solution.getScore();
-		this.maximumScore = solution.getMaximumScore();
+	public SolutionDto(Task task) {
 		this.setTask(task);
-		this.submissionTime = solution.getTimeAdded();
-	}
-
-	public long getId() {
-		return this.id;
-	}
-
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
-	public BigDecimal getMaximumScore() {
-		return this.maximumScore;
-	}
-
-	@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
-	public BigDecimal getScore() {
-		return this.score;
-	}
-
-	public OffsetDateTime getSubmissionTime() {
-		return this.submissionTime;
 	}
 
 	public Task getTask() {
 		return this.task;
 	}
 
-	public long getUserId() {
-		return this.userId;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public void setMaximumScore(BigDecimal maximumScore) {
-		this.maximumScore = maximumScore;
-	}
-
-	public void setScore(BigDecimal score) {
-		this.score = score;
-	}
-
-	public void setSubmissionTime(OffsetDateTime timeAdded) {
-		this.submissionTime = timeAdded;
-	}
-
 	public void setTask(Task task) {
 		this.task = task;
-	}
-
-	public void setUserId(long userId) {
-		this.userId = userId;
 	}
 
 }

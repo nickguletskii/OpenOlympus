@@ -75,7 +75,6 @@ import com.google.common.collect.ImmutableMap;
 								@SecurityLeaf(value = SecurityClearanceType.APPROVED_USER, predicates = TaskViewSecurityPredicate.class)
 		})
 })
-@TaskPermissionRequired(TaskPermissionType.view)
 public class TaskViewController {
 
 	public static class TaskDescriptionView {

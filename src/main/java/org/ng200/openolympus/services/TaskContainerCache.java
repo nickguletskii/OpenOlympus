@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.ng200.openolympus.SharedTemporaryStorageFactory;
 import org.ng200.openolympus.jooq.tables.pojos.Task;
@@ -37,7 +36,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TaskContainerCache {
-	private final ConcurrentMap<Task, TaskContainer> taskContainers;
+	private final ConcurrentMap<Integer, TaskContainer> taskContainers;
 	private final StorageService storageService;
 	private SharedTemporaryStorageFactory sharedTemporaryStorageFactory = null;
 
@@ -51,10 +50,6 @@ public class TaskContainerCache {
 	public TaskContainerCache(final StorageService storageService) {
 		this.taskContainers = new ConcurrentHashMap<>();
 		this.storageService = storageService;
-		this.executorService.scheduleAtFixedRate(() -> {
-			this.taskContainers.forEach((id, taskContainer) -> taskContainer
-					.collectGarbage(this.solutionService));
-		} , 10, 10, TimeUnit.SECONDS);
 	}
 
 	public void clear() {
@@ -68,13 +63,12 @@ public class TaskContainerCache {
 							this.storageService.getStoragePath()));
 		}
 		return this.taskContainers.computeIfAbsent(
-				task,
+				task.getId(),
 				(key) -> {
 					try {
 						return new TaskContainer(this.storageService
 								.getTaskJudgeFile(task),
-								this.sharedTemporaryStorageFactory,
-								this.executorService);
+								this.sharedTemporaryStorageFactory);
 					} catch (final Exception e) {
 						throw new RuntimeException(
 								"Couldn't load task container", e);

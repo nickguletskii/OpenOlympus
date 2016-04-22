@@ -83,7 +83,7 @@ public class VerdictSecurityPredicate implements SecurityClearancePredicate {
 			return SecurityClearanceType.APPROVED_USER;
 		}
 
-		return SecurityClearanceType.APPROVED_USER;
+		return SecurityClearanceType.SUPERUSER;
 	}
 
 }

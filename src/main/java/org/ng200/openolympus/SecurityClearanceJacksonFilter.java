@@ -31,8 +31,12 @@ import org.ng200.openolympus.annotations.SecurityClearanceRequired;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.security.SecurityClearancePredicate;
 import org.ng200.openolympus.services.SecurityClearanceVerificationService;
+import org.ng200.openolympus.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -44,12 +48,16 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 
 public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(SecurityClearanceJacksonFilter.class);
 	@Autowired
 	private AutowireCapableBeanFactory autowireCapableBeanFactory;
 
 	@Autowired
 	private SecurityClearanceVerificationService securityClearanceVerificationService;
 
+	@Autowired
+	private UserService userService;
 	private final Map<Class<? extends SecurityClearancePredicate>, SecurityClearancePredicate> predicateBeans = new HashMap<>();
 
 	private SecurityClearancePredicate getPredicate(
@@ -76,8 +84,15 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 			PropertyName propertyName) {
 		final User user = Optional.ofNullable(SecurityContextHolder
 				.getContext().getAuthentication())
-				.map(authentication -> (User) authentication
-						.getPrincipal())
+				.<User> map((Authentication authentication) -> {
+					if (authentication
+							.getPrincipal() instanceof User) {
+						return (User) authentication
+								.getPrincipal();
+					}
+					return (User) userService.getUserByUsername(authentication
+							.getPrincipal().toString());
+				})
 				.orElse(null);
 
 		// No annotation -> no restriction.
@@ -103,7 +118,7 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 	@Override
 	public void serializeAsElement(Object elementValue, JsonGenerator jgen,
 			SerializerProvider provider, PropertyWriter writer)
-					throws Exception {
+			throws Exception {
 		if (this.includeElement(elementValue)) {
 			writer.serializeAsElement(elementValue, jgen, provider);
 		}
@@ -112,7 +127,7 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 	@Override
 	public void serializeAsField(Object bean, JsonGenerator jgen,
 			SerializerProvider provider, BeanPropertyWriter writer)
-					throws Exception {
+			throws Exception {
 		if (this.include(bean, writer)) {
 			writer.serializeAsField(bean, jgen, provider);
 		} else if (!jgen.canOmitFields()) { // since 2.3
@@ -123,7 +138,7 @@ public class SecurityClearanceJacksonFilter extends SimpleBeanPropertyFilter {
 	@Override
 	public void serializeAsField(Object pojo, JsonGenerator jgen,
 			SerializerProvider provider, PropertyWriter writer)
-					throws Exception {
+			throws Exception {
 		if (this.include(pojo, writer)) {
 			writer.serializeAsField(pojo, jgen, provider);
 		} else if (!jgen.canOmitFields()) { // since 2.3

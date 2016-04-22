@@ -52,7 +52,7 @@
                 <td>{{verdict.cpuTime | minusOneNoValue}}</td>
                 <td>{{verdict.realTime | minusOneNoValue}}</td>
                 <td>{{verdict.memoryPeak | toKB | minusOneNoValue}} KB</td>
-                <td translate="{{ ('solution.verdict.status.'+verdict.status) | translate }}"
+                <td translate="{{('solution.verdict.status.'+verdict.status)}}"
                     translate-values="{info: verdict.additionalInformation}"></td>
             </tr>
         </tbody>

@@ -92,13 +92,17 @@ public class SolutionService extends GenericCreateUpdateRepository {
 				.fetchOne().value1();
 	}
 
-	public long getNumberOfPendingVerdicts(final Solution solution) {
+	public long getNumberOfPendingVerdicts(final Long solution) {
 		return this.dslContext
 				.selectCount()
 				.from(Tables.VERDICT)
-				.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()).and(
+				.where(Tables.VERDICT.SOLUTION_ID.eq(solution).and(
 						Tables.VERDICT.STATUS.eq(VerdictStatusType.waiting)))
 				.fetchOne().value1();
+	}
+
+	public long getNumberOfPendingVerdicts(final Solution solution) {
+		return getNumberOfPendingVerdicts(solution.getId());
 	}
 
 	public List<Solution> getPage(final int pageNumber, final int pageSize) {
@@ -112,8 +116,7 @@ public class SolutionService extends GenericCreateUpdateRepository {
 			final int pageSize, final OffsetDateTime startTime,
 			final OffsetDateTime endTime) {
 		return this.dslContext
-				.selectCount()
-				.from(Tables.SOLUTION)
+				.selectFrom(Tables.SOLUTION)
 				.where(Tables.SOLUTION.USER_ID.eq(user.getId()).and(
 						Tables.SOLUTION.TIME_ADDED.between(startTime, endTime)))
 				.groupBy(Tables.SOLUTION.ID)
@@ -165,13 +168,9 @@ public class SolutionService extends GenericCreateUpdateRepository {
 
 	public List<Verdict> getVerdictsVisibleDuringContest(
 			final Solution solution) {
-		// TODO: show full tests during contest should be an option
-		if (this.contestTimingService.getRunningContest() == null) {
-			return this.dslContext.selectFrom(Tables.VERDICT)
-					.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()))
-					.fetchInto(Verdict.class);
-		}
-		return this.getVerdictsVisibleDuringContest(solution);
+		return this.dslContext.selectFrom(Tables.VERDICT)
+				.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()))
+				.fetchInto(Verdict.class);
 	}
 
 	@Transactional

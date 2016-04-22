@@ -29,22 +29,34 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectForUpdateOfStep;
+import org.jooq.impl.DSL;
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.event.JobListenerAdapter;
+import org.neo4j.cypher.internal.compiler.v2_2.planner.logical.steps.solveOptionalMatches;
+import org.neo4j.cypher.internal.helpers.Converge.iterateUntilConverged;
 import org.ng200.openolympus.cerberus.Janitor;
 import org.ng200.openolympus.cerberus.SolutionJudge;
 import org.ng200.openolympus.cerberus.SolutionResult;
@@ -81,6 +93,7 @@ public class TestingService {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestingService.class);
+	private static final Object schedulerLock = new Object();
 	private final JPPFClient jppfClient = new JPPFClient();
 
 	private final Cache<Integer, Pair<String, String>> internalErrors = CacheBuilder
@@ -109,11 +122,135 @@ public class TestingService {
 
 	private final StorageService storageService;
 
+	private HashMap<Long, SolutionJudgeState> solutionJudgeStates = new HashMap<>();
+
+	private Set<Long> solutionsToSweep = new HashSet<Long>();
+
+	private DSLContext dslContext;
+
+	private void markSolution(Long id) {
+		synchronized (schedulerLock) {
+			solutionsToSweep.add(id);
+		}
+	}
+
+	private class SolutionJudgeState {
+		private CompletableFuture<SolutionJudge> futureJudge = null;
+		private Solution solution;
+		private boolean closed = false;
+
+		public SolutionJudgeState(
+				Solution solution, Task task, TaskContainer taskContainer) {
+			this.solution = solution;
+			futureJudge = CompletableFuture
+					.supplyAsync(() -> taskContainer.createSolutionJudge())
+					.thenCompose((judge) -> {
+						try {
+							return (CompletableFuture<SolutionJudge>) compileSolution(
+									solution, judge,
+									taskContainer
+											.getProperties());
+
+						} catch (final Throwable e) {
+							TestingService.logger.error(
+									"Solution compilation failed "
+											+ "because judge for task "
+											+ "\"{}\"({}) thew an "
+											+ "exception: {}",
+									task.getName(), task.getId(), e);
+							final CompletableFuture<SolutionJudge> ex = new CompletableFuture<>();
+							ex.completeExceptionally(e);
+							try {
+								judge.closeShared();
+							} catch (Exception e1) {
+								tryCloseShared(judge);
+							}
+							return (CompletableFuture<SolutionJudge>) ex;
+						} finally {
+							markSolution(solution.getId());
+							Janitor.cleanUp(judge);
+							logger.info(
+									"Calling janitor on solution judge for solution {}",
+									solution.getId());
+						}
+					});
+			futureJudge.handle((j, t) -> {
+				if (t != null)
+					tryCloseShared(j);
+				return null;
+			});
+		}
+
+		public void checkVerdict(Verdict verdict) {
+			if (closed) {
+				throw new IllegalStateException(
+						"Attempt to invoke checkVerdict on a closed solution judge!");
+			}
+			try {
+				final Solution solution = solutionDao.fetchOneById(verdict
+						.getSolutionId());
+				final Task task = taskDao
+						.fetchOneById(solution.getTaskId());
+				final TaskContainer taskContainer = taskContainerCache
+						.getTaskContainerForTask(task);
+
+				this.futureJudge
+						.thenApply((judge) -> {
+							try {
+								TestingService.this.checkVerdict(verdict, judge,
+										taskContainer
+												.getTestFiles(verdict
+														.getPath()),
+										verdict.getMaximumScore(),
+										taskContainer.getProperties());
+								return judge;
+							} catch (final Throwable e) {
+								logger.error("Couldn't check verdict: ", e);
+								throw new GeneralNestedRuntimeException(
+										"Couldn't check verdict: ", e);
+							} finally {
+								markSolution(solution.getId());
+								Janitor.cleanUp(judge);
+								logger.info(
+										"Called janitor on solution judge for solution {}",
+										solution.getId());
+							}
+						});
+			} catch (final Exception e) {
+				TestingService.logger.error(
+						"Couldn't schedule judgement for verdict {}: ", verdict,
+						e);
+			}
+		}
+
+		public void close() {
+			this.closed = true;
+			solutionJudgeStates.remove(this);
+			this.futureJudge.thenAccept(j -> {
+				tryCloseShared(j);
+			});
+		}
+
+		private void tryCloseShared(SolutionJudge j) {
+			try {
+				j.closeShared();
+				logger.info(
+						"Closed solution judge's shared resources for solution {}",
+						solution.getId());
+			} catch (Exception e) {
+				logger.error(
+						"Couldn't close shared resources of the solution judge for solution {}",
+						solution.getId());
+			}
+		}
+	}
+
 	@Autowired
 	public TestingService(TaskContainerCache taskContainerCache,
 			StorageService storageService, DSLContext dslContext) {
 		this.taskContainerCache = taskContainerCache;
 		this.storageService = storageService;
+		this.dslContext = dslContext;
 
 		this.verdictCheckSchedulingExecutorService.scheduleAtFixedRate(
 				() -> {
@@ -128,55 +265,36 @@ public class TestingService {
 								"Couldn't poll database for pending verdicts: {}",
 								t);
 					}
-				} , 0, 100, TimeUnit.MILLISECONDS);
+				}, 0, 100, TimeUnit.MILLISECONDS);
+
+		this.verdictCheckSchedulingExecutorService.scheduleAtFixedRate(
+				() -> {
+					synchronized (schedulerLock) {
+						TestingService.logger.info(
+								"Collecting garbage! Solution judges to process: {}",
+								solutionsToSweep.size());
+						solutionsToSweep.stream()
+								.filter(id -> solutionTestingComplete(id))
+								.forEach(id -> {
+									TestingService.logger.info(
+											"The solution judge for solution {} is garbage, removing!",
+											id);
+									solutionJudgeStates.remove(id).close();
+								});
+					}
+				}, 0, 10, TimeUnit.SECONDS);
 	}
 
-	private CompletableFuture<SolutionJudge> actOnJudge(Verdict verdict,
-			Solution solution,
-			Task task,
-			TaskContainer taskContainer,
-			CompletableFuture<SolutionJudge> futureJudge) {
-		return futureJudge
-				.thenCompose(judge -> {
-					try {
-						if (!judge.isCompiled()) {
-							return this.compileSolution(
-									solution, judge,
-									taskContainer
-											.getProperties());
-						}
-					} catch (final Throwable e) {
-						TestingService.logger.error(
-								"Solution compilation failed "
-										+ "because judge for task "
-										+ "\"{}\"({}) thew an "
-										+ "exception: {}",
-								task.getName(), task.getId(), e);
-						final CompletableFuture<SolutionJudge> ex = new CompletableFuture<>();
-						ex.completeExceptionally(e);
-						return ex;
-					} finally {
-						Janitor.cleanUp(judge);
-					}
-					return CompletableFuture
-							.<SolutionJudge> completedFuture(judge);
-				})
-				.thenApply((judge) -> {
-					try {
-						this.checkVerdict(verdict, judge,
-								taskContainer
-										.getTestFiles(verdict
-												.getPath()),
-								verdict.getMaximumScore(),
-								taskContainer.getProperties());
-						return judge;
-					} catch (final Throwable e) {
-						throw new GeneralNestedRuntimeException(
-								"Couldn't check verdict: ", e);
-					} finally {
-						Janitor.cleanUp(judge);
-					}
-				});
+	private boolean solutionTestingComplete(Long id) {
+		return dslContext.select(DSL.field(DSL.not(DSL.exists(
+				dslContext.selectOne().from(Tables.VERDICT)
+						.where(Tables.VERDICT.SOLUTION_ID
+								.eq(id)
+								.and(Tables.VERDICT.STATUS
+										.eq(VerdictStatusType.being_tested)
+										.or(Tables.VERDICT.STATUS
+												.eq(VerdictStatusType.waiting))))))))
+				.fetchOne().value1();
 	}
 
 	private void checkVerdict(final Verdict verdict, final SolutionJudge judge,
@@ -271,6 +389,9 @@ public class TestingService {
 													new Pair<String, String>(
 															task.getName(),
 															message)));
+							logger.info(
+									"The judge returned that an internal error has occurred, but no exception is available. More information: {}",
+									result.getErrorMessages());
 							break;
 						case COMPILE_ERROR:
 							final String message = result.getErrorMessages()
@@ -309,7 +430,7 @@ public class TestingService {
 	private CompletableFuture<SolutionJudge> compileSolution(
 			final Solution solution,
 			final SolutionJudge judge, final Properties properties)
-					throws ExecutionException {
+			throws ExecutionException {
 
 		final CompletableFuture<SolutionJudge> completableFuture = new CompletableFuture<>();
 
@@ -452,10 +573,15 @@ public class TestingService {
 			final TaskContainer taskContainer = this.taskContainerCache
 					.getTaskContainerForTask(task);
 
-			taskContainer.applyToJudge(solution,
-					(futureJudge) -> this.actOnJudge(verdict, solution, task,
-							taskContainer,
-							futureJudge));
+			synchronized (schedulerLock) {
+				this.solutionJudgeStates.computeIfAbsent(
+						verdict.getSolutionId(),
+						(id) -> new SolutionJudgeState(solution, task,
+								taskContainer));
+				this.solutionJudgeStates.get(verdict.getSolutionId())
+						.checkVerdict(verdict);
+			}
+
 		} catch (final Exception e) {
 			TestingService.logger.error(
 					"Couldn't schedule judgement for verdict {}: ", verdict, e);

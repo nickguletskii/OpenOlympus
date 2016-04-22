@@ -48,7 +48,7 @@ const controller = /* @ngInject*/ ($scope, $stateParams, UserService,
 			.finally(() => {
 				$scope.loading = false;
 			});
-	}
+	};
 
 	const addUserApprovalResponseInfo = (userApprovals) =>
 		({
@@ -60,13 +60,13 @@ const controller = /* @ngInject*/ ($scope, $stateParams, UserService,
 				const oldUser = find({
 					id: user.id
 				})($scope.users);
-				if(oldUser) {
+				if (oldUser) {
 					user = oldUser;
 				}
 				const userResponse = find({
 					id: user.id
 				})(userApprovals);
-				if(!userResponse) {
+				if (!userResponse) {
 					return user;
 				}
 				return assign({
@@ -130,17 +130,17 @@ const controller = /* @ngInject*/ ($scope, $stateParams, UserService,
 
 
 	$scope.getTooltipForUser = (user) => {
-		if(user.statusMessage) {
+		if (user.statusMessage) {
 			return user.statusMessage;
 		}
-		if(user.approvalEmailSent) {
-			if(user.checked) {
+		if (user.approvalEmailSent) {
+			if (user.checked) {
 				return tooltips[tooltipKeys["resendApprovalEmail"]];
 			}
 			return tooltips[tooltipKeys["approvalEmailAlreadySent"]];
 		}
 
-		if(user.checked) {
+		if (user.checked) {
 			return tooltips[tooltipKeys["sendApprovalEmail"]];
 		}
 		return "";
@@ -169,29 +169,29 @@ const controller = /* @ngInject*/ ($scope, $stateParams, UserService,
 	};
 
 	$scope.getButtonClassForUser = (user) => {
-		if(user.resultType === "FAILURE") {
+		if (user.resultType === "FAILURE") {
 			return "btn-danger";
 		}
-		if(user.resultType === "SUCCESS") {
+		if (user.resultType === "SUCCESS") {
 			return "btn-success";
 		}
-		if(user.approvalEmailSent) {
+		if (user.approvalEmailSent) {
 			return "btn-warning";
 		}
-		if(user.checked) {
+		if (user.checked) {
 			return "btn-info";
 		}
 		return "btn-default";
 	};
 
 	$scope.getButtonIconClassForUser = (user) => {
-		if(user.approvalEmailSent) {
-			if(user.checked) {
+		if (user.approvalEmailSent) {
+			if (user.checked) {
 				return "fa-refresh";
 			}
 			return "fa-hourglass-o";
 		}
-		if(user.checked) {
+		if (user.checked) {
 			return "fa-check-square";
 		}
 		return "fa-square-o";

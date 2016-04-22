@@ -31,46 +31,36 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.PropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-@SuppressWarnings("deprecation")
-@Component
 @Configuration
 public class JacksonConfiguration {
 	@Bean
 	@Primary
 	public ObjectMapper jacksonObjectMapper() {
-		return this.jacksonObjectMapperBuilder().build();
+		return this.objectMapperBuilder().build();
+	}
+
+	@JsonFilter("default")
+	private static class DefaultFilterMixin {
+
 	}
 
 	@Bean
-	public Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder() {
+	public Jackson2ObjectMapperBuilder objectMapperBuilder() {
 		return Jackson2ObjectMapperBuilder
 				.json()
 				.failOnUnknownProperties(false)
 				.modules(new OffsetDateTimeModule(),
 						new DurationJacksonModule())
-				.filters(new FilterProvider() {
-
-					@Override
-					public BeanPropertyFilter findFilter(Object filterId) {
-						return JacksonConfiguration.this
-								.securityClearanceJacksonFilter();
-					}
-
-					@Override
-					public PropertyFilter findPropertyFilter(Object filterId,
-							Object valueToFilter) {
-						return JacksonConfiguration.this
-								.securityClearanceJacksonFilter();
-					}
-				})
+				.filters(new SimpleFilterProvider().addFilter(
+						"default",
+						this.securityClearanceJacksonFilter()))
+				.mixIn(Object.class, DefaultFilterMixin.class)
 				.annotationIntrospector(new JacksonAnnotationIntrospector());
 	}
 

@@ -37,6 +37,8 @@ import org.ng200.openolympus.jooq.routines.GetContestStartForUser;
 import org.ng200.openolympus.jooq.tables.pojos.Contest;
 import org.ng200.openolympus.jooq.tables.pojos.User;
 import org.ng200.openolympus.jooqsupport.PostgresSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ContestTimingService {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(ContestTimingService.class);
 	@Autowired
 	private DSLContext dslContext;
 
@@ -119,21 +123,20 @@ public class ContestTimingService {
 	}
 
 	public Contest getRunningContest() {
-		return this.dslContext
-				.selectFrom(Routines.getContestsThatIntersect(
-						PostgresSupport.CURRENT_TIMESTAMP,
-						PostgresSupport.CURRENT_TIMESTAMP))
+		return dslContext.selectFrom(Routines.getRunningContest())
 				.fetchOneInto(Contest.class);
 	}
 
 	public boolean isContestInProgressForUser(final Contest contest,
 			final User user) {
-		return this.dslContext.select(DSL.field(
-				PostgresSupport.CURRENT_TIMESTAMP.between(
-						Routines.getContestStartForUser(
-								contest.getId(), user.getId()),
-						Routines.getContestEndForUser(
-								contest.getId(), user.getId()))))
+		return this.dslContext
+				.select(DSL.<Boolean> coalesce(DSL.field(
+						PostgresSupport.CURRENT_TIMESTAMP.between(
+								Routines.getContestStartForUser(
+										contest.getId(), user.getId()),
+								Routines.getContestEndForUser(
+										contest.getId(), user.getId()))),
+						false))
 				.fetchOne().value1();
 	}
 

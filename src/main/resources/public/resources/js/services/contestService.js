@@ -21,10 +21,14 @@
  * THE SOFTWARE.
  */
 
+import property from "lodash/fp/property";
+import pickBy from "lodash/fp/pickBy";
 import {
-	property as _property
+	isEmpty as _isEmpty
 } from "lodash";
-import { services } from "app";
+import {
+	services
+} from "app";
 
 class ContestService {
 	/* @ngInject*/
@@ -36,37 +40,41 @@ class ContestService {
 			params: {
 				page
 			}
-		}).then(_property("data"));
+		})
+			.then(property("data"))
+			.then(pickBy((x) => !_isEmpty(x)));
 	}
 	countContests() {
 		return this.$http.get("/api/contestsCount")
-			.then(_property("data"));
+			.then(property("data"));
 	}
 	getContestInfo(contestId) {
 		return this.$http.get(`/api/contest/${contestId}`)
-			.then(_property("data"));
+			.then(property("data"));
 	}
 	countContestParticipants(contestId) {
 		return this.$http.get(`api/contest/${contestId}/participantsCount`)
-			.then(_property("data"));
+			.then(property("data"));
 	}
 	getContestParticipantsPage(contestId, page) {
 		return this.$http.get(`api/contest/${contestId}/participants`, {
 			params: {
 				page
 			}
-		}).then(_property("data"));
+		})
+			.then(property("data"));
 	}
 	getContestResultsPage(contestId, page) {
 		return this.$http.get(`api/contest/${contestId}/results`, {
 			params: {
 				page
 			}
-		}).then(_property("data"));
+		})
+			.then(property("data"));
 	}
 	getContestEditData(contestId) {
 		return this.$http.get(`/api/contest/${contestId}/edit`)
-			.then(_property("data"));
+			.then(property("data"));
 	}
 	removeParticipant(contestId, id) {
 		return this.$http.delete(`/api/contest/${contestId}/removeUser`, {
