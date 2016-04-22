@@ -35,6 +35,7 @@
 			<th>{{ 'admin.solutions.taskName' | translate}}</th>
 			<th width="50">{{ 'admin.solutions.score' | translate}}</th>
 			<th width="50">{{ 'admin.solutions.maximumScore' | translate}}</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -49,6 +50,14 @@
 			<td>{{solution.task.name}}</td>
 			<td>{{solution.score}}</td>
 			<td>{{solution.maximumScore}}</td>
+			<td>
+				<button type="button"
+								uib-tooltip="{{ 'admin.solutions.solution.rejudgeButton' | translate }}"
+								class=" hidden-print pull-right btn btn-warning btn-xs fa fa-refresh "
+								ui-sref=".rejudgeSolution({taskId: solution.task.id, solutionId: solution.id })"
+								ng-if="security.hasPermissionImmediate('rejudge_tasks')">
+				</button>
+			</td>
 		</tr>
 	</tbody>
 </table>

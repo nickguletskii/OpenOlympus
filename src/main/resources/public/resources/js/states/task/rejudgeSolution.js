@@ -24,17 +24,18 @@ const controller =
 	/* @ngInject*/
 	($scope, $http, $stateParams, $state, taskName, FormDefaultHelperService) => {
 		$scope.taskName = taskName;
+		$scope.solutionId = $stateParams.solutionId;
 
-		class TaskRejudgementForm extends FormDefaultHelperService.FormClass {
+		class SolutionRejudgementForm extends FormDefaultHelperService.FormClass {
 			constructor() {
 				super($scope, "task.rejudgeForm");
-				this.submitUrl = `/api/task/${$stateParams.taskId}/rejudgeTask`;
 			}
 
 			submit() {
 				this.preSubmit();
 				$http.post(
-						`/api/task/${$stateParams.taskId}/rejudgeTask`)
+						`/api/task/${$stateParams.taskId}/rejudgeSolution/${$stateParams.solutionId}`
+					)
 					.then(() => {
 						this.resetProgress();
 						this.form.$setPristine();
@@ -44,13 +45,13 @@ const controller =
 			}
 
 		}
-		$scope.form = new TaskRejudgementForm();
+		$scope.form = new SolutionRejudgementForm();
 	};
 
 export default {
-	"parent": "archiveTaskList",
-	"name": "archiveTaskList.rejudgeTask",
-	"url": "/rejudgeTask/{taskId}",
+	"parent": "adminSolutionList",
+	"name": "adminSolutionList.rejudgeSolution",
+	"url": "/task/{taskId}/rejudgeSolution/{solutionId}",
 	"templateUrl": "/partials/task/rejudge.html",
 	controller,
 	"backdrop": true,

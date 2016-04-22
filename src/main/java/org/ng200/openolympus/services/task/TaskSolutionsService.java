@@ -66,16 +66,20 @@ public class TaskSolutionsService {
 	@Transactional
 	public void rejudgeTask(final Task task)
 			throws ExecutionException, IOException {
-		this.dslContext.delete(Tables.VERDICT).where(Tables.VERDICT.SOLUTION_ID
-				.in(this.dslContext.select(Tables.SOLUTION.ID)
-						.from(Tables.SOLUTION)
-						.where(Tables.SOLUTION.TASK_ID.eq(task.getId()))));
 		final Cursor<SolutionRecord> solutions = this.dslContext
 				.selectFrom(Tables.SOLUTION)
 				.where(Tables.SOLUTION.TASK_ID.eq(task.getId())).fetchLazy();
 		while (solutions.hasNext()) {
 			final Solution solution = solutions.fetchOneInto(Solution.class);
-			this.testingService.testSolutionOnAllTests(solution);
+			rejudgeSolution(solution);
 		}
+	}
+
+	@Transactional
+	public void rejudgeSolution(final Solution solution) throws IOException {
+		this.dslContext.deleteFrom(Tables.VERDICT)
+				.where(Tables.VERDICT.SOLUTION_ID.eq(solution.getId()))
+				.execute();
+		this.testingService.testSolutionOnAllTests(solution);
 	}
 }

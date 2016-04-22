@@ -21,6 +21,7 @@
  * THE SOFTWARE.
  */
 export { default as rejudeTaskModal } from "states/task/rejudge";
+export { default as rejudeSolutionModal } from "states/task/rejudgeSolution";
 export { default as addTaskModal } from "states/contests/contest/addTask";
 export { default as changeUserTimeExtensionModal } from
 	"states/contests/contest/changeUserTimeExtension";
