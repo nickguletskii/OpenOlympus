@@ -22,24 +22,50 @@
  */
 const controller =
 	/* @ngInject*/
-	($http, $stateParams, $state) => {
-		$http.post(`/api/task/${$stateParams.taskId}/rejudgeTask`)
-			.then(() => {
-				$state.go("^.rejudgeTaskSuccess", {
-					taskId: $stateParams.taskId
-				});
-			});
+	($scope, $http, $stateParams, $state, taskName, FormDefaultHelperService) => {
+		$scope.taskName = taskName;
+
+		class TaskRejudgementForm extends FormDefaultHelperService.FormClass {
+			constructor() {
+				super($scope, "task.rejudgeForm");
+				this.submitUrl = `/api/task/${$stateParams.taskId}/rejudgeTask`;
+			}
+
+			submit() {
+				this.preSubmit();
+				$http.post(
+						`/api/task/${$stateParams.taskId}/rejudgeTask`)
+					.then(() => {
+						this.resetProgress();
+						this.form.$setPristine();
+						this.formController.resetFields();
+						this.justSubmitted = true;
+					});
+			}
+
+		}
+		$scope.form = new TaskRejudgementForm();
 	};
 
 export default {
 	"parent": "archiveTaskList",
-	"name": "archiveTaskList.rejudgeTaskWorking",
-	"templateUrl": "/partials/archive/tasks/rejudgeTask/working.html",
+	"name": "archiveTaskList.rejudgeTask",
+	"url": "/archive/task/{taskId}/rejudge",
+	"templateUrl": "/partials/task/rejudge.html",
 	controller,
 	"backdrop": true,
 	"modal": true,
+	"resolve": {
+		"taskName": (TaskService, $stateParams) =>
+			TaskService.getTaskName($stateParams.taskId)
+	},
 	"data": {
 		canAccess: /* @ngInject*/ ($refStateParams, SecurityService) =>
 			SecurityService.hasTaskPermission($refStateParams.taskId, "rejudge")
+	},
+	params: {
+		taskId: {
+			squash: false
+		}
 	}
 };

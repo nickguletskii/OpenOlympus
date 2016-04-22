@@ -64,11 +64,6 @@
 					secref
 					ui-sref="taskModificationView({taskId: task.id, contestId: contestId})">
 				</button>
-				<button type="button"
-					uib-tooltip="{{ 'contest.task.rejudgeButton' | translate }}"
-					class=" hidden-print pull-right btn btn-warning btn-xs fa fa-refresh "
-					ui-sref=".rejudgeTaskConfirmation({taskId: task.id})">
-				</button>
 				<button class="btn btn-danger btn-xs fa fa-remove pull-right"
 					ng-if="canRemoveTasks"
 					ng-really-click="removeTask(item)"

@@ -23,15 +23,25 @@
 
 -->
 <div class="modal-header">
-	<button type="button" class="close" ng-click="$dismiss('close')">
+	<button type="button"
+					class="close"
+					ng-click="$dismiss('cancel')">
 		<span>&times;</span>
 	</button>
-	<h4 class="modal-title"> {{'task.rejudge.successTitle' | translate}}</h4>
+	<h4 class="modal-title">{{'task.rejudge.title' | translate}}</h4>
 </div>
 <div class="modal-body">
-	<p>{{'task.rejudge.success' | translate}}</p>
+	<p translate="task.rejudge.body"></p>
+	<form form-autoconfig="form"
+					novalidate>
+		<submit-button label="{{ form.submitButtonText | translate: form.lastTaskAdded }}"
+
+						button-class="{{form.submitButtonClass}}"
+						icon="{{form.submitButtonIcon}}"></submit-button>
+	</form>
 </div>
 <div class="modal-footer">
-	<button type="button" class="btn btn-success" ng-click="$dismiss('close')">{{'task.rejudge.closeButton' | translate}}</button>
+	<button type="button"
+					class="btn btn-default"
+					ng-click="$dismiss('close')">{{'task.rejudge.closeButton' | translate}}</button>
 </div>
-
