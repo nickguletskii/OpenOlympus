@@ -46,13 +46,13 @@
         </thead>
         <tbody>
             <tr ng-repeat="verdict in solution.verdicts track by verdict.id"
-                ng-class="{success: verdict.score===verdict.maximumScore, danger: verdict.score!==verdict.maximumScore &amp;&amp; isTested(verdict)}">
-                <td>{{verdict.score | minusOneNoValue}}</td>
-                <td>{{verdict.maximumScore | minusOneNoValue}}</td>
-                <td>{{verdict.cpuTime | minusOneNoValue}}</td>
-                <td>{{verdict.realTime | minusOneNoValue}}</td>
-                <td>{{verdict.memoryPeak | toKB | minusOneNoValue}} KB</td>
-                <td translate="{{('solution.verdict.status.'+verdict.status)}}"
+                ng-class="{success: verdict.score && (verdict.score===verdict.maximumScore), danger: verdict.score!==verdict.maximumScore &amp;&amp; isTested(verdict)}">
+                <td>{{(verdict.score || -1) | minusOneNoValue}}</td>
+                <td>{{(verdict.maximumScore || -1) | minusOneNoValue}}</td>
+                <td>{{(verdict.cpuTime || -1) | minusOneNoValue}}</td>
+                <td>{{(verdict.realTime || -1) | minusOneNoValue}}</td>
+                <td>{{(verdict.memoryPeak || -1) | toKB | minusOneNoValue}} KB</td>
+                <td translate="{{('solution.verdict.status.'+(verdict.status||'accessRestricted'))}}"
                     translate-values="{info: verdict.additionalInformation}"></td>
             </tr>
         </tbody>

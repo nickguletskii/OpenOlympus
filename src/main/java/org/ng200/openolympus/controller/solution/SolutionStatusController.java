@@ -87,7 +87,6 @@ public class SolutionStatusController {
 			return this.score;
 		}
 
-		@SecurityClearanceRequired(minimumClearance = SecurityClearanceType.APPROVED_USER, predicates = SolutionScoreSecurityPredicate.class)
 		public List<Verdict> getVerdicts() {
 			return this.verdicts;
 		}

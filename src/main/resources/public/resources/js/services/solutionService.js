@@ -21,8 +21,10 @@
  * THE SOFTWARE.
  */
 import { services } from "app";
+import property from "lodash/fp/property";
+import pickBy from "lodash/fp/pickBy";
 import {
-	property as _property
+	isEmpty as _isEmpty
 } from "lodash";
 
 class SolutionService {
@@ -32,29 +34,32 @@ class SolutionService {
 	}
 	countUserSolutions() {
 		return this.$http.get("/api/user/solutionsCount")
-			.then(_property("data"));
+			.then(property("data"));
 	}
 	getUserSolutionsPage(page) {
 		return this.$http.get("/api/user/solutions", {
 			params: {
 				page
 			}
-		}).then(_property("data"));
+		}).then(property("data"))
+		.then(pickBy((x) => !_isEmpty(x)));
 	}
 	countSolutions() {
 		return this.$http.get("/api/admin/solutionsCount")
-			.then(_property("data"));
+			.then(property("data"));
 	}
 	getSolutionsPage(page) {
 		return this.$http.get("/api/admin/solutions", {
 			params: {
 				page
 			}
-		}).then(_property("data"));
+		}).then(property("data"))
+		.then(pickBy((x) => !_isEmpty(x)));
 	}
 	getVerdicts(solutionId) {
 		return this.$http.get(`/api/solution/${solutionId}`)
-			.then(_property("data"));
+			.then(property("data"))
+			.then(pickBy((x) => !_isEmpty(x)));
 	}
 }
 
